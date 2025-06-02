@@ -1,0 +1,40 @@
+disabled_rules:
+  - block_based_kvo
+  - class_delegate_protocol
+  - cyclomatic_complexity
+  - discouraged_direct_init
+  - file_length
+  - function_body_length
+  - function_parameter_count
+  - generic_type_name
+  - identifier_name
+  - inclusive_language
+  - large_tuple
+  - line_length
+  - nesting
+  - no_fallthrough_only
+  - private_over_fileprivate
+  - todo
+  - type_body_length
+  - type_name
+  - xctfail_message
+
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - empty_string
+  - force_unwrapping
+  - implicit_return
+  - implicitly_unwrapped_optional
+  - multiline_arguments_brackets
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - redundant_self_in_closure
+  - redundant_type_annotation
+  - sorted_imports
+  - toggle_bool
+  - trailing_closure
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces

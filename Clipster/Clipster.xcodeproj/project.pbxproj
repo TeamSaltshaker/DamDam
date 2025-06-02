@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4468B8B72DEC961600AD2F57 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 4468B8B62DEC961600AD2F57 /* .swiftlint.yml */; };
 		44DFD9CF2DE9D36400B6CD87 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9CE2DE9D36400B6CD87 /* RxCocoa */; };
 		44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D02DE9D36400B6CD87 /* RxRelay */; };
 		44DFD9D32DE9D36400B6CD87 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D22DE9D36400B6CD87 /* RxSwift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4468B8B62DEC961600AD2F57 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		44DFD9B52DE9D0E000B6CD87 /* Clipster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Clipster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -60,6 +62,7 @@
 		44DFD9AC2DE9D0E000B6CD87 = {
 			isa = PBXGroup;
 			children = (
+				4468B8B62DEC961600AD2F57 /* .swiftlint.yml */,
 				44DFD9B72DE9D0E000B6CD87 /* Clipster */,
 				44DFD9B62DE9D0E000B6CD87 /* Products */,
 			);
@@ -80,6 +83,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 44DFD9C82DE9D0E200B6CD87 /* Build configuration list for PBXNativeTarget "Clipster" */;
 			buildPhases = (
+				4468BB792DED43DD00AD2F57 /* Run SwiftLint Script */,
 				44DFD9B12DE9D0E000B6CD87 /* Sources */,
 				44DFD9B22DE9D0E000B6CD87 /* Frameworks */,
 				44DFD9B32DE9D0E000B6CD87 /* Resources */,
@@ -149,10 +153,34 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4468B8B72DEC961600AD2F57 /* .swiftlint.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4468BB792DED43DD00AD2F57 /* Run SwiftLint Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		44DFD9B12DE9D0E000B6CD87 /* Sources */ = {
@@ -173,6 +201,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -204,6 +233,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
