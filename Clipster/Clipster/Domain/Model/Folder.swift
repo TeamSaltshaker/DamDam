@@ -7,6 +7,6 @@ struct Folder {
     let folders: [Folder]
     let clips: [Clip]
     let createdAt: Date
-    let udpatedAt: Date
+    let updatedAt: Date
     let deletedAt: Date?
 }

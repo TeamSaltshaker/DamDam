@@ -6,6 +6,6 @@ struct URLMetadata {
     let body: String
     let thumbnailImageURL: URL
     let createdAt: Date
-    let udpatedAt: Date
+    let updatedAt: Date
     let deletedAt: Date?
 }
