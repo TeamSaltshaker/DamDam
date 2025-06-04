@@ -15,15 +15,14 @@ final class CoreDataStack {
             let description = NSPersistentStoreDescription(url: storeURL)
             container.persistentStoreDescriptions = [description]
         } else {
-            fatalError("❌ Failed to locate AppGroup container")
+            fatalError("\(Self.self): ❌ Failed to locate AppGroup container")
         }
 
-        container.loadPersistentStores { description, error in
+        container.loadPersistentStores { _, error in
             if let error {
-                fatalError("❌ Failed to load persistent stores: \(error.localizedDescription)")
+                fatalError("\(Self.self): ❌ Failed to load persistent stores: \(error.localizedDescription)")
             } else {
-                print("✅ Persistent store loaded successfully")
-                print("  - Store URL: \(description.url?.absoluteString ?? "")")
+                print("\(Self.self): ✅ Persistent store loaded successfully")
             }
         }
         return container
