@@ -21,7 +21,6 @@
         <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Folder" inverseName="folders" inverseEntity="Folder"/>
     </entity>
     <entity name="URLMetadata" representedClassName="URLMetadata" syncable="YES">
-        <attribute name="body" attributeType="String" defaultValueString=""/>
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="deletedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="thumbnailImageURLString" attributeType="String" defaultValueString=""/>
