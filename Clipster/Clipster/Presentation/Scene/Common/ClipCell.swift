@@ -32,6 +32,14 @@ final class ClipCell: UICollectionViewCell {
         return stackView
     }()
 
+    private let visitIndicatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBlue
+        view.layer.cornerRadius = 4
+        view.isHidden = true
+        return view
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -45,6 +53,7 @@ final class ClipCell: UICollectionViewCell {
         thumbnailImageView.kf.setImage(with: display.thumbnailImageURL)
         titleLabel.text = display.title
         memoLabel.text = display.memo
+        visitIndicatorView.isHidden = display.isVisited
     }
 }
 
@@ -72,7 +81,8 @@ private extension ClipCell {
     func setHierarchy() {
         [
             thumbnailImageView,
-            stackView
+            stackView,
+            visitIndicatorView
         ].forEach { addSubview($0) }
     }
 
@@ -85,7 +95,13 @@ private extension ClipCell {
 
         stackView.snp.makeConstraints { make in
             make.leading.equalTo(thumbnailImageView.snp.trailing).offset(8)
+            make.trailing.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
+        }
+
+        visitIndicatorView.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview().inset(8)
+            make.size.equalTo(8)
         }
     }
 }
