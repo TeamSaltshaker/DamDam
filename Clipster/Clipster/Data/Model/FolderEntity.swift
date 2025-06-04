@@ -4,6 +4,7 @@ import CoreData
 public class FolderEntity: NSManagedObject {
     @NSManaged public var id: UUID
     @NSManaged public var title: String
+    @NSManaged public var depth: Int16
     @NSManaged public var createdAt: Date
     @NSManaged public var updatedAt: Date
     @NSManaged public var deletedAt: Date?
