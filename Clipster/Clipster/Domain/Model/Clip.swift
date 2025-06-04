@@ -7,6 +7,6 @@ struct Clip {
     let memo: String
     let isVisited: Bool
     let createdAt: Date
-    let udpatedAt: Date
+    let updatedAt: Date
     let deletedAt: Date?
 }
