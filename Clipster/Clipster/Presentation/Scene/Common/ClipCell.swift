@@ -83,7 +83,7 @@ private extension ClipCell {
             thumbnailImageView,
             stackView,
             visitIndicatorView
-        ].forEach { addSubview($0) }
+        ].forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {

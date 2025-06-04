@@ -87,7 +87,7 @@ private extension FolderCell {
             folderImageContainerView,
             stackView,
             chevronImageView
-        ].forEach { addSubview($0) }
+        ].forEach { contentView.addSubview($0) }
 
         folderImageContainerView.addSubview(folderImageView)
     }
