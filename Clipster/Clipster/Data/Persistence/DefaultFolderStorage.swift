@@ -25,7 +25,6 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 
-    @discardableResult
     func insertFolder(_ folder: Folder) -> Result<Void, CoreDataError> {
         let entity = FolderEntity(context: context)
 

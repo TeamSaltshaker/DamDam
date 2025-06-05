@@ -7,7 +7,6 @@ final class DefaultClipStorage: ClipStorage {
         self.context = context
     }
 
-    @discardableResult
     func insertClip(_ clip: Clip) -> Result<Void, CoreDataError> {
         let entity = ClipEntity(context: context)
 
