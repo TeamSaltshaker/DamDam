@@ -31,8 +31,13 @@ final class EditFolderView: UIView {
 
 private extension EditFolderView {
     func configure() {
+        setAttributes()
         setHierarchy()
         setConstraints()
+    }
+
+    func setAttributes() {
+        backgroundColor = .systemBackground
     }
 
     func setHierarchy() {
