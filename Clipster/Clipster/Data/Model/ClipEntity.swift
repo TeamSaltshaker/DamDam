@@ -12,3 +12,9 @@ public class ClipEntity: NSManagedObject {
     @NSManaged public var folder: FolderEntity?
     @NSManaged public var urlMetadata: URLMetadataEntity?
 }
+
+extension ClipEntity {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<ClipEntity> {
+        NSFetchRequest<ClipEntity>(entityName: "Clip")
+    }
+}
