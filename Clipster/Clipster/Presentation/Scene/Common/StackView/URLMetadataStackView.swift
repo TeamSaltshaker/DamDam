@@ -87,8 +87,8 @@ private extension URLMetadataStackView {
 
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints { make in
-            make.height.equalToSuperview()
-            make.width.equalTo(thumbnailImageView.snp.height)
+            make.width.equalTo(80)
+            make.height.equalTo(thumbnailImageView.snp.width)
         }
     }
 }
