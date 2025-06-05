@@ -87,3 +87,11 @@ final class DefaultClipStorage: ClipStorage {
         return entity
     }
 }
+
+#if DEBUG
+extension DefaultClipStorage {
+    func fetchAllClipsForDebug() -> [ClipEntity]? {
+        try? context.fetch(ClipEntity.fetchRequest())
+    }
+}
+#endif

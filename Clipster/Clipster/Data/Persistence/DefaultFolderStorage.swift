@@ -69,3 +69,11 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 }
+
+#if DEBUG
+extension DefaultFolderStorage {
+    func fetchAllFoldersForDebug() -> [FolderEntity]? {
+        try? context.fetch(FolderEntity.fetchRequest())
+    }
+}
+#endif
