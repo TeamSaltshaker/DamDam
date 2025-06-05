@@ -1,7 +1,7 @@
 import UIKit
 
 final class EditFolderTextField: UITextField {
-    let textPadding = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+    let textPadding = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 32)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
