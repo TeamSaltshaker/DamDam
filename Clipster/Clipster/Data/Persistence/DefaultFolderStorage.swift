@@ -9,7 +9,7 @@ final class DefaultFolderStorage: FolderStorage {
 
     func fetchFolder(by id: UUID) -> Result<FolderEntity, CoreDataError> {
         let request = FolderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
         request.fetchLimit = 1
 
         do {
@@ -27,7 +27,7 @@ final class DefaultFolderStorage: FolderStorage {
 
     func fetchTopLevelFolders() -> Result<[FolderEntity], CoreDataError> {
         let request = FolderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "parentFolder == nil")
+        request.predicate = NSPredicate(format: "parentFolder == nil AND deletedAt == nil")
 
         do {
             let entities = try context.fetch(request)

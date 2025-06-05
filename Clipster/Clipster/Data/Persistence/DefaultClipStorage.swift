@@ -9,7 +9,7 @@ final class DefaultClipStorage: ClipStorage {
 
     func fetchUnvisitedClips() -> Result<[ClipEntity], CoreDataError> {
         let request = ClipEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "lastVisitedAt == nil")
+        request.predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
 
         do {
             let entities = try context.fetch(request)
@@ -52,7 +52,7 @@ final class DefaultClipStorage: ClipStorage {
 
     private func fetchFolderEntity(by id: UUID) -> FolderEntity? {
         let request = FolderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
         request.fetchLimit = 1
 
         return try? context.fetch(request).first
