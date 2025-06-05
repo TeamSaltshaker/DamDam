@@ -7,6 +7,24 @@ final class DefaultClipStorage: ClipStorage {
         self.context = context
     }
 
+    func fetchClip(by id: UUID) -> Result<ClipEntity, CoreDataError> {
+        let request = ClipEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
+        request.fetchLimit = 1
+
+        do {
+            guard let entity = try context.fetch(request).first else {
+                print("\(Self.self): ❌ Failed to fetch: Entity not found")
+                return .failure(.entityNotFound)
+            }
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entity)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
     func fetchUnvisitedClips() -> Result<[ClipEntity], CoreDataError> {
         let request = ClipEntity.fetchRequest()
         request.predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
