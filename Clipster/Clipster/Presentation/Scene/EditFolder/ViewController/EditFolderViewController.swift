@@ -2,9 +2,11 @@ import SnapKit
 import UIKit
 
 final class EditFolderViewController: UIViewController {
-    private let backButton = EditFolderBackButton()
-    private let saveButton = EditFolderSaveButton()
     private let editFolderView = EditFolderView()
+
+    override func loadView() {
+        view = editFolderView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -15,26 +17,12 @@ final class EditFolderViewController: UIViewController {
 private extension EditFolderViewController {
     func configure() {
         setAttributes()
-        setHierarchy()
-        setConstraints()
     }
 
     func setAttributes() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: editFolderView.backButton)
 
-        let rightBarButton = UIBarButtonItem(customView: saveButton)
+        let rightBarButton = UIBarButtonItem(customView: editFolderView.saveButton)
         navigationItem.rightBarButtonItem = rightBarButton
-    }
-
-    func setHierarchy() {
-        view.addSubview(editFolderView)
-    }
-
-    func setConstraints() {
-        editFolderView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(16)
-            make.bottom.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(16)
-        }
     }
 }

@@ -6,7 +6,6 @@ final class EditFolderBackButton: UIView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "arrow.left"), for: .normal)
         button.tintColor = .systemBlue
-
         return button
     }()
 

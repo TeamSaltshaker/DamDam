@@ -2,6 +2,8 @@ import SnapKit
 import UIKit
 
 final class EditFolderView: UIView {
+    let backButton = EditFolderBackButton()
+    let saveButton = EditFolderSaveButton()
     private let folderTitleTextField = EditFolderTextField()
 
     override init(frame: CGRect) {
@@ -26,8 +28,8 @@ private extension EditFolderView {
 
     func setConstraints() {
         folderTitleTextField.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
             make.height.equalTo(44)
         }
     }
