@@ -1,3 +1,4 @@
+import RxSwift
 import SnapKit
 import UIKit
 
@@ -6,6 +7,14 @@ final class EditFolderView: UIView {
     let saveButton = EditFolderSaveButton()
     private let folderTitleTextField = EditFolderTextField()
 
+    var folderTitleChanges: Observable<String> {
+        folderTitleTextField.rx.text.orEmpty.asObservable()
+    }
+
+    var folderTitleBinder: Binder<String?> {
+        folderTitleTextField.rx.text
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -13,6 +22,10 @@ final class EditFolderView: UIView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+
+    func setTextFieldInteraction(enabled: Bool) {
+        folderTitleTextField.isUserInteractionEnabled = enabled
     }
 }
 

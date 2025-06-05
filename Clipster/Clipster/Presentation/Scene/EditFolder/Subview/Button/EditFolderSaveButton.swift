@@ -19,5 +19,6 @@ private extension EditFolderSaveButton {
     func setAttributes() {
         setTitle("저장", for: .normal)
         setTitleColor(.systemBlue, for: .normal)
+        setTitleColor(.systemGray, for: .disabled)
     }
 }
