@@ -1,0 +1,34 @@
+import SnapKit
+import UIKit
+
+final class EditFolderView: UIView {
+    private let folderTitleTextField = EditFolderTextField()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configure()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}
+
+private extension EditFolderView {
+    func configure() {
+        setHierarchy()
+        setConstraints()
+    }
+
+    func setHierarchy() {
+        addSubview(folderTitleTextField)
+    }
+
+    func setConstraints() {
+        folderTitleTextField.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(44)
+        }
+    }
+}
