@@ -4,7 +4,7 @@ import RxSwift
 
 final class HomeViewModel {
     enum Action {
-        case fetchHomeDisplay
+        case makeHomeDisplay
         case deleteClip(_ clipID: UUID)
     }
 
@@ -36,8 +36,8 @@ final class HomeViewModel {
         action
             .subscribe(with: self) { owner, action in
                 switch action {
-                case .fetchHomeDisplay:
-                    Task { await owner.fetchHomeDisPlay() }
+                case .makeHomeDisplay:
+                    Task { await owner.makeHomeDisplay() }
                 case .deleteClip(let id):
                     Task { await owner.deleteClip(id) }
                 }
@@ -45,15 +45,14 @@ final class HomeViewModel {
             .disposed(by: disposeBag)
     }
 
-    private func fetchHomeDisPlay() async {
-        async let rootFolder = fetchRootFolder()
-        async let unvisitedClips = fetchUnvisitedClip()
+    private func makeHomeDisplay() async {
+        async let clipsResult = makeClipCellDisplays()
+        async let foldersResult = makeFolderCellDisplays()
 
         do {
             let homeDisplay = try await HomeDisplay(
-                unvitsedClips: unvisitedClips,
-                folders: rootFolder.folders,
-                clips: rootFolder.clips
+                unvitsedClips: clipsResult,
+                folders: foldersResult
             )
             state.accept(.HomeDisplay(homeDisplay))
         } catch {
@@ -61,23 +60,25 @@ final class HomeViewModel {
         }
     }
 
-    private func fetchRootFolder() async throws -> Folder {
-        let result = await fetchFolderUseCase.execute(parentFolderID: nil)
-        switch result {
-        case .success(let folder):
-            return folder
-        case .failure(let error):
-            throw error
+    private func makeClipCellDisplays() async throws -> [ClipCellDisplay] {
+        let clips = try await fetchUnvisitedClipsUseCase.execute().get()
+        return clips.map {
+            ClipCellDisplay(
+                thumbnailImageURL: $0.urlMetadata.thumbnailImageURL,
+                title: $0.urlMetadata.title,
+                memo: $0.memo,
+                isVisited: $0.isVisited
+            )
         }
     }
 
-    private func fetchUnvisitedClip() async throws -> [Clip] {
-        let result = await fetchUnvisitedClipUseCase.execute()
-        switch result {
-        case .success(let clip):
-            return clip
-        case .failure(let error):
-            throw error
+    private func makeFolderCellDisplays() async throws -> [FolderCellDisplay] {
+        let folder = try await fetchFolderUseCase.execute(parentFolderID: nil).get()
+        return folder.folders.map {
+            FolderCellDisplay(
+                title: $0.title,
+                itemCount: $0.clips.count
+            )
         }
     }
 
@@ -85,7 +86,7 @@ final class HomeViewModel {
         let result = await deleteClipUseCase.execute(id: id)
         switch result {
         case .success:
-            await fetchHomeDisPlay()
+            await makeHomeDisplay()
         case .failure(let error):
             print(error)
         }
