@@ -17,16 +17,16 @@ final class HomeViewModel {
     let action = PublishRelay<Action>()
     let state = PublishRelay<State>()
 
-    private let fetchUnvisitedClipUseCase: FetchUnvisitedClipUseCase
+    private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
-        fetchUnvisitedClipUseCase: FetchUnvisitedClipUseCase,
+        fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         deleteClipUseCase: DeleteClipUseCase
     ) {
-        self.fetchUnvisitedClipUseCase = fetchUnvisitedClipUseCase
+        self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteClipUseCase = deleteClipUseCase
         bind()
