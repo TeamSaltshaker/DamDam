@@ -25,6 +25,20 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 
+    func fetchTopLevelFolders() -> Result<[FolderEntity], CoreDataError> {
+        let request = FolderEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "parentFolder == nil")
+
+        do {
+            let entities = try context.fetch(request)
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entities)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
     func insertFolder(_ folder: Folder) -> Result<Void, CoreDataError> {
         let entity = FolderEntity(context: context)
 
