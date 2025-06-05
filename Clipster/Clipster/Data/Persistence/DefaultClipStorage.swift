@@ -7,6 +7,20 @@ final class DefaultClipStorage: ClipStorage {
         self.context = context
     }
 
+    func fetchUnvisitedClips() -> Result<[ClipEntity], CoreDataError> {
+        let request = ClipEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "lastVisitedAt == nil")
+
+        do {
+            let entities = try context.fetch(request)
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entities)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
     func insertClip(_ clip: Clip) -> Result<Void, CoreDataError> {
         let entity = ClipEntity(context: context)
 
