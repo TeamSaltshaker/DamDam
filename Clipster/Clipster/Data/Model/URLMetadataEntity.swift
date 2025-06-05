@@ -11,3 +11,9 @@ public class URLMetadataEntity: NSManagedObject {
 
     @NSManaged public var clip: ClipEntity?
 }
+
+extension URLMetadataEntity {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<URLMetadataEntity> {
+        NSFetchRequest<URLMetadataEntity>(entityName: "URLMetadata")
+    }
+}

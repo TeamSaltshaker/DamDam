@@ -13,3 +13,9 @@ public class FolderEntity: NSManagedObject {
     @NSManaged public var folders: Set<FolderEntity>?
     @NSManaged public var clips: Set<ClipEntity>?
 }
+
+extension FolderEntity {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<FolderEntity> {
+        NSFetchRequest<FolderEntity>(entityName: "Folder")
+    }
+}
