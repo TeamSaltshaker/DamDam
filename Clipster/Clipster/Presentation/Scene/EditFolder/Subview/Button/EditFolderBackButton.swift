@@ -2,8 +2,20 @@ import SnapKit
 import UIKit
 
 final class EditFolderBackButton: UIView {
-    private let backButton = UIButton()
-    private let titleLabel = UILabel()
+    private let backButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "arrow.left"), for: .normal)
+        button.tintColor = .systemBlue
+
+        return button
+    }()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 17)
+        label.textColor = .label
+        return label
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,17 +33,8 @@ final class EditFolderBackButton: UIView {
 
 private extension EditFolderBackButton {
     func configure() {
-        setAttributes()
         setHierarchy()
         setConstraints()
-    }
-
-    func setAttributes() {
-        backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        backButton.tintColor = .systemBlue
-
-        titleLabel.font = .boldSystemFont(ofSize: 17)
-        titleLabel.textColor = .label
     }
 
     func setHierarchy() {
