@@ -34,8 +34,7 @@ private extension SectionHeaderView {
 
     func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
-            $0.centerY.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
     }
 }
