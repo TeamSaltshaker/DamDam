@@ -159,10 +159,9 @@ private extension HomeView {
             heightDimension: .absolute(72)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(8)
 
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 20
+        section.interGroupSpacing = 8
         section.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
 
         return section
