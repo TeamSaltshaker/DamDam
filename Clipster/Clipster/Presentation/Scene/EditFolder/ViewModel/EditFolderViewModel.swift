@@ -99,11 +99,9 @@ final class EditFolderViewModel {
             .disposed(by: disposeBag)
 
         action
-            .filter {
-                if case .saveButtonTapped = $0 { return true } else { return false }
-            }
+            .filter { if case .saveButtonTapped = $0 { return true } else { return false } }
             .withLatestFrom(stateRelay)
-            .filter { $0.isSavable && !$0.isProcessing }
+            .filter { $0.isSavable }
             .flatMapLatest { currentState in
                 let title = currentState.folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -116,6 +114,7 @@ final class EditFolderViewModel {
                     return Observable<EditFolderAction>.just(.saveSucceeded)
                 }
             }
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: action)
             .disposed(by: disposeBag)
     }
