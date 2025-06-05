@@ -28,5 +28,9 @@ final class CoreDataStack {
         return container
     }()
 
+    var context: NSManagedObjectContext {
+        container.viewContext
+    }
+
     private init() {}
 }
