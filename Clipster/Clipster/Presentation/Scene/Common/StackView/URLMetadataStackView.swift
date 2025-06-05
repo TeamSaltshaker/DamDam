@@ -2,12 +2,12 @@ import Kingfisher
 import SnapKit
 import UIKit
 
-enum URLMetadataType {
-    case edit
-    case detail
-}
-
 final class URLMetadataStackView: UIStackView {
+    enum URLMetadataType {
+        case edit
+        case detail
+    }
+
     let type: URLMetadataType
 
     private let thumbnailImageView: UIImageView = {
