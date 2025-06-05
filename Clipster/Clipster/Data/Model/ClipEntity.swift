@@ -4,7 +4,7 @@ import CoreData
 public class ClipEntity: NSManagedObject {
     @NSManaged public var id: UUID
     @NSManaged public var memo: String
-    @NSManaged public var isVisited: Bool
+    @NSManaged public var lastVisitedAt: Date?
     @NSManaged public var createdAt: Date
     @NSManaged public var updatedAt: Date
     @NSManaged public var deletedAt: Date?
