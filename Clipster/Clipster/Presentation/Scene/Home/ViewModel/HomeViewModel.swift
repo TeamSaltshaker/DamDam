@@ -67,7 +67,7 @@ final class HomeViewModel {
                 thumbnailImageURL: $0.urlMetadata.thumbnailImageURL,
                 title: $0.urlMetadata.title,
                 memo: $0.memo,
-                isVisited: $0.isVisited
+                isVisited: $0.lastVisitedAt != nil
             )
         }
     }

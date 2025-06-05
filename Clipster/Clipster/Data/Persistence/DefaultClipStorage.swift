@@ -12,7 +12,7 @@ final class DefaultClipStorage: ClipStorage {
 
         entity.id = clip.id
         entity.memo = clip.memo
-        entity.isVisited = clip.isVisited
+        entity.lastVisitedAt = clip.lastVisitedAt
         entity.createdAt = clip.createdAt
         entity.updatedAt = clip.updatedAt
 
