@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class EditFolderViewController: UIViewController, UIGestureRecognizerDelegate {
+final class EditFolderViewController: UIViewController {
     private let backButton = EditFolderBackButton()
     private let saveButton = EditFolderSaveButton()
     private let editFolderView = EditFolderView()
