@@ -31,6 +31,7 @@ final class HomeView: UIView {
             frame: .zero,
             collectionViewLayout: createCollectionViewLayout()
         )
+        collectionView.delegate = self
         return collectionView
     }()
 
@@ -192,6 +193,54 @@ private extension HomeView {
         header.contentInsets = .init(top: 0, leading: 12, bottom: 0, trailing: 0)
 
         return header
+    }
+}
+
+extension HomeView: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let item = dataSource?.itemIdentifier(for: indexPath) else { return nil }
+
+        return UIContextMenuConfiguration(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { _ in
+            var actions: [UIAction] = []
+
+            switch item {
+            case .clip:
+                let info = UIAction(
+                    title: "상세정보",
+                    image: UIImage(systemName: "magnifyingglass")
+                ) { [weak self] _ in
+                    self?.action.accept(.info(indexPath))
+                }
+                actions.append(info)
+                fallthrough
+            case .folder:
+                let edit = UIAction(
+                    title: "편집",
+                    image: UIImage(systemName: "pencil")
+                ) { [weak self] _ in
+                    self?.action.accept(.edit(indexPath))
+                }
+
+                let delete = UIAction(
+                    title: "삭제",
+                    image: UIImage(systemName: "trash"),
+                    attributes: .destructive
+                ) { [weak self] _ in
+                    self?.action.accept(.delete(indexPath))
+                }
+
+                actions.append(contentsOf: [edit, delete])
+            }
+
+            return UIMenu(title: "", children: actions)
+        }
     }
 }
 
