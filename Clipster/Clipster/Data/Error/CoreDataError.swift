@@ -3,4 +3,5 @@ enum CoreDataError: Error {
     case fetchFailed(String)
     case insertFailed(String)
     case updateFailed(String)
+    case deleteFailed(String)
 }
