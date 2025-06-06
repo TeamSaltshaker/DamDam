@@ -5,10 +5,12 @@ import RxSwift
 final class EditClipViewModel: ViewModel {
     enum Action {
         case editURLInputTextField(String)
+        case editMomo(String)
     }
 
     enum Mutation {
         case updateURLInputText(String)
+        case updateMemo(String)
     }
 
     struct State {
@@ -16,6 +18,8 @@ final class EditClipViewModel: ViewModel {
         var isEmptyURLInput: Bool = false
         var isHiddenURLMetadataStackView = false
         var isHiddenURLValidationStackView = false
+        var memoText: String = ""
+        var memoLimit: String = "0/100"
     }
 
     var state: BehaviorRelay<State>
@@ -31,6 +35,8 @@ final class EditClipViewModel: ViewModel {
         switch action {
         case .editURLInputTextField(let urlText):
             return .just(.updateURLInputText(urlText))
+        case .editMomo(let memoText):
+            return .just(.updateMemo(memoText))
         }
     }
 
@@ -42,6 +48,9 @@ final class EditClipViewModel: ViewModel {
             newState.isEmptyURLInput = newState.urlInputText.isEmpty
             newState.isHiddenURLMetadataStackView = newState.urlInputText.isEmpty
             newState.isHiddenURLValidationStackView = newState.urlInputText.isEmpty
+        case .updateMemo(let memoText):
+            newState.memoText = memoText
+            newState.memoLimit = "\(memoText.count)/100"
         }
         return newState
     }
