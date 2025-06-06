@@ -9,7 +9,7 @@ final class DefaultFolderStorage: FolderStorage {
 
     func fetchFolder(by id: UUID) -> Result<FolderEntity, CoreDataError> {
         let request = FolderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
         request.fetchLimit = 1
 
         do {
@@ -19,6 +19,20 @@ final class DefaultFolderStorage: FolderStorage {
             }
             print("\(Self.self): ✅ Fetch successfully")
             return .success(entity)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
+    func fetchTopLevelFolders() -> Result<[FolderEntity], CoreDataError> {
+        let request = FolderEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "parentFolder == nil AND deletedAt == nil")
+
+        do {
+            let entities = try context.fetch(request)
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entities)
         } catch {
             print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
             return .failure(.fetchFailed(error.localizedDescription))
@@ -55,3 +69,11 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 }
+
+#if DEBUG
+extension DefaultFolderStorage {
+    func fetchAllFoldersForDebug() -> [FolderEntity]? {
+        try? context.fetch(FolderEntity.fetchRequest())
+    }
+}
+#endif

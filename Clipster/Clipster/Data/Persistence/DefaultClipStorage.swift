@@ -7,6 +7,38 @@ final class DefaultClipStorage: ClipStorage {
         self.context = context
     }
 
+    func fetchClip(by id: UUID) -> Result<ClipEntity, CoreDataError> {
+        let request = ClipEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
+        request.fetchLimit = 1
+
+        do {
+            guard let entity = try context.fetch(request).first else {
+                print("\(Self.self): ❌ Failed to fetch: Entity not found")
+                return .failure(.entityNotFound)
+            }
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entity)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
+    func fetchUnvisitedClips() -> Result<[ClipEntity], CoreDataError> {
+        let request = ClipEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
+
+        do {
+            let entities = try context.fetch(request)
+            print("\(Self.self): ✅ Fetch successfully")
+            return .success(entities)
+        } catch {
+            print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+            return .failure(.fetchFailed(error.localizedDescription))
+        }
+    }
+
     func insertClip(_ clip: Clip) -> Result<Void, CoreDataError> {
         let entity = ClipEntity(context: context)
 
@@ -38,7 +70,7 @@ final class DefaultClipStorage: ClipStorage {
 
     private func fetchFolderEntity(by id: UUID) -> FolderEntity? {
         let request = FolderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
         request.fetchLimit = 1
 
         return try? context.fetch(request).first
@@ -55,3 +87,11 @@ final class DefaultClipStorage: ClipStorage {
         return entity
     }
 }
+
+#if DEBUG
+extension DefaultClipStorage {
+    func fetchAllClipsForDebug() -> [ClipEntity]? {
+        try? context.fetch(ClipEntity.fetchRequest())
+    }
+}
+#endif
