@@ -1,7 +1,16 @@
+import RxCocoa
+import RxSwift
 import SnapKit
 import UIKit
 
 final class HomeView: UIView {
+    enum Action {
+        case tap(IndexPath)
+        case info(IndexPath)
+        case edit(IndexPath)
+        case delete(IndexPath)
+    }
+
     enum Section: Int, CaseIterable {
         case clip
         case folder
@@ -11,6 +20,9 @@ final class HomeView: UIView {
         case clip(ClipCellDisplay)
         case folder(FolderCellDisplay)
     }
+
+    private let disposeBag = DisposeBag()
+    let action = PublishRelay<Action>()
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
@@ -188,6 +200,7 @@ private extension HomeView {
         setAttributes()
         setHierarchy()
         setConstraints()
+        setBindings()
     }
 
     func setAttributes() {
@@ -204,5 +217,12 @@ private extension HomeView {
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+    }
+
+    func setBindings() {
+        collectionView.rx.itemSelected
+            .map { Action.tap($0) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
     }
 }
