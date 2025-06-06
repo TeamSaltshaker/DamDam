@@ -3,7 +3,8 @@ import UIKit
 final class EditClipViewController: UIViewController {
     private let editClipView = EditClipView()
 
-    init(url: URL?) {
+    init(viewModel: EditClipViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
