@@ -24,20 +24,20 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    private let textField: UITextField = {
+    let urlInputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "URL 입력"
         textField.borderStyle = .roundedRect
         return textField
     }()
 
-    private let urlValidationStacKView: URLValidationStackView = {
+    let urlValidationStacKView: URLValidationStackView = {
         let stackView = URLValidationStackView()
         stackView.isHidden = true
         return stackView
     }()
 
-    private let memoTextView: UITextView = {
+    let memoTextView: UITextView = {
         let textView = UITextView()
         textView.layer.cornerRadius = 12
         textView.clipsToBounds = true
