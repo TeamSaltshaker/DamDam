@@ -24,20 +24,20 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    private let textField: UITextField = {
+    let urlInputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "URL 입력"
         textField.borderStyle = .roundedRect
         return textField
     }()
 
-    private let urlValidationStacKView: URLValidationStackView = {
+    let urlValidationStacKView: URLValidationStackView = {
         let stackView = URLValidationStackView()
         stackView.isHidden = true
         return stackView
     }()
 
-    private let memoTextView: UITextView = {
+    let memoTextView: UITextView = {
         let textView = UITextView()
         textView.layer.cornerRadius = 12
         textView.clipsToBounds = true
@@ -46,6 +46,13 @@ final class EditClipView: UIView {
         textView.layer.borderWidth = 1
         textView.layer.borderColor = UIColor.systemGray5.cgColor
         return textView
+    }()
+
+    let memoLimitLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .secondaryLabel
+        label.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+        return label
     }()
 
     override init(frame: CGRect) {
@@ -67,7 +74,7 @@ private extension EditClipView {
     func setHierarchy() {
         [
             urlMetadataStackView,
-            textField,
+            urlInputTextField,
             urlValidationStacKView
         ].forEach {
             urlInfoStackView.addArrangedSubview($0)
@@ -75,7 +82,8 @@ private extension EditClipView {
 
         [
             urlInfoStackView,
-            memoTextView
+            memoTextView,
+            memoLimitLabel
         ].forEach {
             addSubview($0)
         }
@@ -91,6 +99,11 @@ private extension EditClipView {
             make.top.equalTo(urlInfoStackView.snp.bottom).offset(20)
             make.directionalHorizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(120)
+        }
+
+        memoLimitLabel.snp.makeConstraints { make in
+            make.top.equalTo(memoTextView.snp.bottom).offset(10)
+            make.right.equalToSuperview().inset(25)
         }
     }
 }

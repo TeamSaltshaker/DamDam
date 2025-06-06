@@ -15,6 +15,7 @@ final class URLMetadataStackView: UIStackView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
+        imageView.image = .none
         return imageView
     }()
 
@@ -32,6 +33,7 @@ final class URLMetadataStackView: UIStackView {
         label.font = .systemFont(ofSize: 16, weight: .semibold)
         label.numberOfLines = 2
         label.textColor = .label
+        label.text = " "
         return label
     }()
 
@@ -40,6 +42,7 @@ final class URLMetadataStackView: UIStackView {
         label.font = .systemFont(ofSize: 13, weight: .medium)
         label.numberOfLines = 2
         label.textColor = .link
+        label.text = " "
         if case .edit = type { label.isHidden = true }
         return label
     }()
