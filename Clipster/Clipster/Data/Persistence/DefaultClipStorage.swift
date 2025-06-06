@@ -105,6 +105,29 @@ final class DefaultClipStorage: ClipStorage {
         }
     }
 
+    func deleteClip(_ clip: Clip) -> Result<Void, CoreDataError> {
+        let request = ClipEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", clip.id as CVarArg)
+        request.fetchLimit = 1
+
+        do {
+            guard let entity = try context.fetch(request).first else {
+                print("\(Self.self): ❌ Failed to delete: Entity not found")
+                return .failure(.entityNotFound)
+            }
+
+            entity.deletedAt = clip.deletedAt
+            entity.urlMetadata?.deletedAt = clip.urlMetadata.deletedAt
+
+            try context.save()
+            print("\(Self.self): ✅ Delete successfully")
+            return .success(())
+        } catch {
+            print("\(Self.self): ❌ Failed to delete: \(error.localizedDescription)")
+            return .failure(.updateFailed(error.localizedDescription))
+        }
+    }
+
     private func fetchFolderEntity(by id: UUID) -> FolderEntity? {
         let request = FolderEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)

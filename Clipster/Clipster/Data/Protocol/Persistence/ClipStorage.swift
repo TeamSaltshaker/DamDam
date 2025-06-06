@@ -5,4 +5,5 @@ protocol ClipStorage {
     func fetchUnvisitedClips() -> Result<[ClipEntity], CoreDataError>
     func insertClip(_ clip: Clip) -> Result<Void, CoreDataError>
     func updateClip(_ clip: Clip) -> Result<Void, CoreDataError>
+    func deleteClip(_ clip: Clip) -> Result<Void, CoreDataError>
 }
