@@ -177,7 +177,7 @@ private extension HomeView {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
-        header.contentInsets = .init(top: 0, leading: 36, bottom: 0, trailing: 12)
+        header.contentInsets = .init(top: 0, leading: 12, bottom: 0, trailing: 0)
 
         return header
     }
