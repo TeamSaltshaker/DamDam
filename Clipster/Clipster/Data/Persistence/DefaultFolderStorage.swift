@@ -108,6 +108,45 @@ final class DefaultFolderStorage: FolderStorage {
             return .failure(.updateFailed(error.localizedDescription))
         }
     }
+
+    func deleteFolder(_ folder: Folder) -> Result<Void, CoreDataError> {
+        let request = FolderEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", folder.id as CVarArg)
+        request.fetchLimit = 1
+
+        do {
+            guard let entity = try context.fetch(request).first else {
+                print("\(Self.self): ❌ Failed to delete: Entity not found")
+                return .failure(.entityNotFound)
+            }
+
+            deleteFolder(entity, deletedAt: folder.deletedAt)
+
+            try context.save()
+            print("\(Self.self): ✅ Delete successfully")
+            return .success(())
+        } catch {
+            print("\(Self.self): ❌ Failed to delete: \(error.localizedDescription)")
+            return .failure(.updateFailed(error.localizedDescription))
+        }
+    }
+
+    private func deleteFolder(_ entity: FolderEntity, deletedAt: Date?) {
+        entity.deletedAt = deletedAt
+
+        entity.folders?
+            .filter { $0.deletedAt == nil }
+            .forEach { subEntity in
+                deleteFolder(subEntity, deletedAt: deletedAt)
+            }
+
+        entity.clips?
+            .filter { $0.deletedAt == nil }
+            .forEach { subEntity in
+                subEntity.deletedAt = deletedAt
+                subEntity.urlMetadata?.deletedAt = deletedAt
+            }
+    }
 }
 
 #if DEBUG

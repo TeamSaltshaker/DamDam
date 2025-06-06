@@ -5,4 +5,5 @@ protocol FolderStorage {
     func fetchTopLevelFolders() -> Result<[FolderEntity], CoreDataError>
     func insertFolder(_ folder: Folder) -> Result<Void, CoreDataError>
     func updateFolder(_ folder: Folder) -> Result<Void, CoreDataError>
+    func deleteFolder(_ folder: Folder) -> Result<Void, CoreDataError>
 }
