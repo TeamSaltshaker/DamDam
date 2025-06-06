@@ -1,6 +1,11 @@
+import RxCocoa
+import RxSwift
 import UIKit
 
 final class EditClipViewController: UIViewController {
+    private let viewModel: EditClipViewModel
+    private let disposeBag = DisposeBag()
+
     private let editClipView = EditClipView()
 
     init(viewModel: EditClipViewModel) {
@@ -25,10 +30,80 @@ final class EditClipViewController: UIViewController {
 private extension EditClipViewController {
     func configure() {
         setAttributes()
+        setBindings()
     }
 
     func setAttributes() {
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: editClipView.saveButton)
+    }
+
+    func setBindings() {
+        viewModel.state
+            .map(\.urlInputText)
+            .take(1)
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.urlInputTextField.rx.text)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.memoText)
+            .take(1)
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.memoTextView.rx.text)
+            .disposed(by: disposeBag)
+
+        editClipView.urlInputTextField
+            .rx
+            .text
+            .orEmpty
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.viewModel.action.accept(.editURLInputTextField($0))
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.isHiddenURLMetadataStackView)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlMetadataStackView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.isHiddenURLValidationStackView)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlValidationStacKView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        editClipView.memoTextView
+            .rx
+            .text
+            .orEmpty
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.viewModel.action.accept(.editMomo($0))
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.memoTextView
+            .rx
+            .text
+            .orEmpty
+            .distinctUntilChanged()
+            .map { String($0.prefix(100)) }
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.memoTextView.rx.text)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.memoLimit)
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "0/100")
+            .drive(editClipView.memoLimitLabel.rx.text)
+            .disposed(by: disposeBag)
     }
 }
