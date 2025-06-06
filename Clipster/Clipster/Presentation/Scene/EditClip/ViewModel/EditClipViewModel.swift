@@ -14,20 +14,23 @@ final class EditClipViewModel: ViewModel {
     }
 
     struct State {
-        var urlInputText: String = ""
-        var isEmptyURLInput: Bool = false
+        var urlInputText: String
         var isHiddenURLMetadataStackView = false
         var isHiddenURLValidationStackView = false
-        var memoText: String = ""
-        var memoLimit: String = "0/100"
+        var memoText: String
+        var memoLimit: String
     }
 
     var state: BehaviorRelay<State>
     var action = PublishRelay<Action>()
     var disposeBag = DisposeBag()
 
-    init() {
-        state = BehaviorRelay(value: State())
+    init(urlText: String = "", memoText: String = "") {
+        state = BehaviorRelay(value: State(
+            urlInputText: urlText,
+            memoText: memoText,
+            memoLimit: "\(memoText)/100"
+        ))
         bind()
     }
 
@@ -45,7 +48,6 @@ final class EditClipViewModel: ViewModel {
         switch mutation {
         case .updateURLInputText(let urlText):
             newState.urlInputText = urlText
-            newState.isEmptyURLInput = newState.urlInputText.isEmpty
             newState.isHiddenURLMetadataStackView = newState.urlInputText.isEmpty
             newState.isHiddenURLValidationStackView = newState.urlInputText.isEmpty
         case .updateMemo(let memoText):
