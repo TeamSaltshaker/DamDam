@@ -2,7 +2,6 @@ import RxRelay
 import RxSwift
 
 enum ClipDetailAction {
-    case viewDidLoad
     case viewWillAppear
     case editButtonTapped
     case deleteButtonTapped
@@ -60,6 +59,10 @@ final class ClipDetailViewModel {
         self.stateRelay = BehaviorRelay(value: initialState)
         self.state = self.stateRelay.asObservable()
 
+        let viewWillAppearStream = action
+            .filter { if case .viewWillAppear = $0 { return true } else { return false } }
+            .share()
+
         action
             .do { action in
                 print("\(Self.self): received action → \(action)")
@@ -70,9 +73,6 @@ final class ClipDetailViewModel {
                 newState.shouldNavigateToEdit = false
 
                 switch action {
-                case .viewDidLoad:
-                    print("\(Self.self): viewDidLoad")
-                    newState.isLoading = true
                 case .viewWillAppear:
                     print("\(Self.self): viewWillAppear")
                     newState.isLoading = true
@@ -112,8 +112,8 @@ final class ClipDetailViewModel {
             .bind(to: stateRelay)
             .disposed(by: disposeBag)
 
-        action
-            .filter { if case .viewDidLoad = $0 { return true } else { return false } }
+        viewWillAppearStream
+            .take(1)
             .flatMapLatest { [weak self] _ -> Observable<ClipDetailAction> in
                 guard let self else { return .empty() }
 
@@ -136,8 +136,8 @@ final class ClipDetailViewModel {
             .bind(to: action)
             .disposed(by: disposeBag)
 
-        action
-            .filter { if case .viewWillAppear = $0 { return true } else { return false } }
+        viewWillAppearStream
+            .skip(1)
             .flatMapLatest { [weak self] _ -> Observable<ClipDetailAction> in
                 guard let self else { return .empty() }
 
