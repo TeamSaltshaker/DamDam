@@ -2,16 +2,21 @@ import Foundation
 
 final class DefaultClipRepository: ClipRepository {
     private let storage: ClipStorage
+    private let mapper: DomainMapper
 
-    init(storage: ClipStorage) {
+    init(
+        storage: ClipStorage,
+        mapper: DomainMapper,
+    ) {
         self.storage = storage
+        self.mapper = mapper
     }
 
     func fetchClip(by id: UUID) -> Result<Clip, DomainError> {
         storage.fetchClip(by: id)
             .mapError { _ in .unknownError }
             .flatMap { entity in
-                guard let clip = toDomain(from: entity) else {
+                guard let clip = mapper.clip(from: entity) else {
                     return .failure(.unknownError)
                 }
                 return .success(clip)
@@ -22,7 +27,7 @@ final class DefaultClipRepository: ClipRepository {
         storage.fetchUnvisitedClips()
             .mapError { _ in .unknownError }
             .flatMap { entities in
-                let clips = entities.compactMap(toDomain)
+                let clips = entities.compactMap(mapper.clip)
                 return .success(clips)
             }
     }
@@ -40,40 +45,5 @@ final class DefaultClipRepository: ClipRepository {
     func deleteClip(_ clip: Clip) -> Result<Void, DomainError> {
         storage.deleteClip(clip)
             .mapError { _ in .unknownError }
-    }
-
-    private func toDomain(from entity: ClipEntity) -> Clip? {
-        guard let folderID = entity.folder?.id,
-              let urlMetadataEntity = entity.urlMetadata,
-              let urlMetadata = toDomain(from: urlMetadataEntity) else {
-            return nil
-        }
-
-        return Clip(
-            id: entity.id,
-            folderID: folderID,
-            urlMetadata: urlMetadata,
-            memo: entity.memo,
-            lastVisitedAt: entity.lastVisitedAt,
-            createdAt: entity.createdAt,
-            updatedAt: entity.updatedAt,
-            deletedAt: entity.deletedAt,
-        )
-    }
-
-    private func toDomain(from entity: URLMetadataEntity) -> URLMetadata? {
-        guard let url = URL(string: entity.urlString),
-              let thumbnailImageURL = URL(string: entity.thumbnailImageURLString) else {
-            return nil
-        }
-
-        return URLMetadata(
-            url: url,
-            title: entity.title,
-            thumbnailImageURL: thumbnailImageURL,
-            createdAt: entity.createdAt,
-            updatedAt: entity.updatedAt,
-            deletedAt: entity.deletedAt,
-        )
     }
 }
