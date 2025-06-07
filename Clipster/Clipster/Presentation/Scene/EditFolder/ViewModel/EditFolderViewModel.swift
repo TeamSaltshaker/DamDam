@@ -110,43 +110,32 @@ final class EditFolderViewModel {
             .filter { $0.isSavable }
             .flatMapLatest { currentState in
                 let title = currentState.folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                let date = Date()
+
+                var newFolder: Folder
+                let useCase: (Folder) async -> Result<Void, DomainError>
 
                 switch currentState.mode {
                 case .add(let parentFolder):
                     print("\(Self.self): attempting to add folder '\(title)' to parent '\(parentFolder?.title ?? "root")'")
 
-                    let createdAt = Date()
-                    let folder = Folder(
+                    newFolder = Folder(
                         id: UUID(),
                         parentFolderID: parentFolder?.id,
                         title: title,
                         depth: (parentFolder?.depth ?? -1) + 1,
                         folders: [],
                         clips: [],
-                        createdAt: createdAt,
-                        updatedAt: createdAt,
+                        createdAt: date,
+                        updatedAt: date,
                         deletedAt: nil
                     )
 
-                    return Observable<EditFolderAction>.create { observer in
-                        Task {
-                            let result = await self.createFolderUseCase.execute(folder)
-                            switch result {
-                            case .success:
-                                observer.onNext(.saveSucceeded)
-                            case .failure(let error):
-                                observer.onNext(.saveFailed(error))
-                            }
-                            observer.onCompleted()
-                        }
-
-                        return Disposables.create()
-                    }
+                    useCase = self.createFolderUseCase.execute
                 case .edit(let parentFolder, let folder):
                     print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
 
-                    let updatedAt = Date()
-                    let folder = Folder(
+                    newFolder = Folder(
                         id: folder.id,
                         parentFolderID: parentFolder?.id,
                         title: title,
@@ -154,24 +143,25 @@ final class EditFolderViewModel {
                         folders: folder.folders,
                         clips: folder.clips,
                         createdAt: folder.createdAt,
-                        updatedAt: updatedAt,
+                        updatedAt: date,
                         deletedAt: folder.deletedAt
                     )
 
-                    return Observable<EditFolderAction>.create { observer in
-                        Task {
-                            let result = await self.updateFolderUseCase.execute(folder)
-                            switch result {
-                            case .success:
-                                observer.onNext(.saveSucceeded)
-                            case .failure(let error):
-                                observer.onNext(.saveFailed(error))
-                            }
-                            observer.onCompleted()
-                        }
+                    useCase = self.updateFolderUseCase.execute
+                }
 
-                        return Disposables.create()
+                return Observable<EditFolderAction>.create { observer in
+                    Task {
+                        let result = await useCase(newFolder)
+                        switch result {
+                        case .success:
+                            observer.onNext(.saveSucceeded)
+                        case .failure(let error):
+                            observer.onNext(.saveFailed(error))
+                        }
+                        observer.onCompleted()
                     }
+                    return Disposables.create()
                 }
             }
             .observe(on: MainScheduler.asyncInstance)
