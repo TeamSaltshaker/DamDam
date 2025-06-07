@@ -102,5 +102,33 @@ private extension HomeViewController {
                 }
             }
             .disposed(by: disposeBag)
+
+        homeviewModel.route
+            .subscribe(with: self) { _, route in
+                switch route {
+                case .showAddClip:
+                    print("클립 추가 화면 이동\n")
+                case .showAddFolder:
+                    print("폴더 추가 화면 이동\n")
+                case .showWebView(let url):
+                    print("웹 뷰")
+                    print("\(url)\n")
+                case .showFolder(let folder):
+                    print("폴더 화면 이동")
+                    print("\(folder)\n")
+                case .showDetailClip(let clip):
+                    print("클립 상세 화면 이동")
+                    print("\(clip)\n")
+                case .showEditClip(let clip):
+                    print("클립 편집 화면 이동")
+                    print("\(clip)\n")
+                case .showEditFolder(let folder):
+                    print("폴더 편집 화면 이동\n")
+                    print(folder)
+                case .showLicense:
+                    print("라이센스 화면 이동\n")
+                }
+            }
+            .disposed(by: disposeBag)
     }
 }

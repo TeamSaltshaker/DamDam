@@ -21,7 +21,7 @@ final class HomeViewModel {
     enum Route {
         case showAddClip
         case showAddFolder
-        case showWebView
+        case showWebView(URL)
         case showFolder(Folder)
         case showDetailClip(Clip)
         case showEditClip(Clip)
@@ -41,15 +41,18 @@ final class HomeViewModel {
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteClipUseCase: DeleteClipUseCase
+    private let deleteFolderUseCase: DeleteFolderUseCase
 
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
-        deleteClipUseCase: DeleteClipUseCase
+        deleteClipUseCase: DeleteClipUseCase,
+        deleteFolderUseCase: DeleteFolderUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteClipUseCase = deleteClipUseCase
+        self.deleteFolderUseCase = deleteFolderUseCase
         bind()
     }
 
@@ -60,22 +63,51 @@ final class HomeViewModel {
                 case .viewWillAppear:
                     Task { await owner.makeHomeDisplay() }
                 case .tapAddClip:
-                    print("클립 추가")
+                    owner.route.accept(.showAddClip)
                 case .tapAddFolder:
-                    print("폴더 추가")
-                case .tapCell(let indexPath):
-                    print("tapCell \(indexPath)")
-                case .tapDetail(let indexPath):
-                    print("tapDetail \(indexPath)")
-                case .tapEdit(let indexPath):
-                    print("tapEdit \(indexPath)")
+                    owner.route.accept(.showAddFolder)
+                case .tapCell(let indexPath),
+                     .tapDetail(let indexPath),
+                     .tapEdit(let indexPath):
+                    if let route = owner.route(for: action, at: indexPath) {
+                        owner.route.accept(route)
+                    }
                 case .tapDelete(let indexPath):
-                    print("tapDelete \(indexPath)")
+                    owner.handleTapDelete(at: indexPath)
                 case .tapLicense:
-                    print("라이센스")
+                    owner.route.accept(.showLicense)
                 }
             }
             .disposed(by: disposeBag)
+    }
+
+    private func route(for action: Action, at indexPath: IndexPath) -> Route? {
+        switch indexPath.section {
+        case 0 where indexPath.item < unvisitedClips.count:
+            let clip = unvisitedClips[indexPath.item]
+            switch action {
+            case .tapCell:
+                return .showWebView(clip.urlMetadata.url)
+            case .tapDetail:
+                return .showDetailClip(clip)
+            case .tapEdit:
+                return .showEditClip(clip)
+            default:
+                return nil
+            }
+        case 1 where indexPath.item < folders.count:
+            let folder = folders[indexPath.item]
+            switch action {
+            case .tapCell:
+                return .showFolder(folder)
+            case .tapEdit:
+                return .showEditFolder(folder)
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
     }
 
     private func makeHomeDisplay() async {
@@ -119,8 +151,24 @@ final class HomeViewModel {
         }
     }
 
-    private func deleteClip(_ clip: Clip) async {
-        let result = await deleteClipUseCase.execute(clip)
+    private func handleTapDelete(at indexPath: IndexPath) {
+        switch indexPath.section {
+        case 0 where indexPath.item < unvisitedClips.count:
+            let clip = unvisitedClips[indexPath.item]
+            Task { await delete(clip, with: deleteClipUseCase.execute) }
+        case 1 where indexPath.item < folders.count:
+            let folder = folders[indexPath.item]
+            Task { await delete(folder, with: deleteFolderUseCase.execute) }
+        default:
+            break
+        }
+    }
+
+    private func delete<T>(
+        _ target: T,
+        with execute: @escaping (T) async -> Result<Void, Error>
+    ) async {
+        let result = await execute(target)
         switch result {
         case .success:
             await makeHomeDisplay()
