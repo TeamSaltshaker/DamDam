@@ -95,7 +95,8 @@ private extension HomeViewController {
             .disposed(by: disposeBag)
 
         homeviewModel.state
-            .subscribe(with: self) { owner, state in
+            .asSignal()
+            .emit(with: self) { owner, state in
                 switch state {
                 case .homeDisplay(let homeDisplay):
                     owner.homeView.setDisplay(homeDisplay)
@@ -104,7 +105,8 @@ private extension HomeViewController {
             .disposed(by: disposeBag)
 
         homeviewModel.route
-            .subscribe(with: self) { _, route in
+            .asSignal()
+            .emit(with: self) { _, route in
                 switch route {
                 case .showAddClip:
                     print("클립 추가 화면 이동\n")
