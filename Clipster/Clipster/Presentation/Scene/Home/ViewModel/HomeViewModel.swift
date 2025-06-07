@@ -12,10 +12,25 @@ final class HomeViewModel {
         case homeDisplay(HomeDisplay)
     }
 
+    enum Route {
+        case showAddClip
+        case showAddFolder
+        case showWebView
+        case showFolder(Folder)
+        case showDetailClip(Clip)
+        case showEditClip(Clip)
+        case showEditFolder(Folder)
+        case showLicense
+    }
+
     private let disposeBag = DisposeBag()
 
     let action = PublishRelay<Action>()
     let state = PublishRelay<State>()
+    let route = PublishRelay<Route>()
+
+    private var unvisitedClips: [Clip] = []
+    private var folders: [Folder] = []
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
@@ -62,6 +77,8 @@ final class HomeViewModel {
 
     private func makeClipCellDisplays() async throws -> [ClipCellDisplay] {
         let clips = try await fetchUnvisitedClipsUseCase.execute().get()
+        unvisitedClips = clips
+
         return clips.map {
             ClipCellDisplay(
                 thumbnailImageURL: $0.urlMetadata.thumbnailImageURL,
@@ -74,6 +91,8 @@ final class HomeViewModel {
 
     private func makeFolderCellDisplays() async throws -> [FolderCellDisplay] {
         let folder = try await fetchFolderUseCase.execute(parentFolderID: nil).get()
+        folders = folder.folders
+
         return folder.folders.map {
             FolderCellDisplay(
                 title: $0.title,
