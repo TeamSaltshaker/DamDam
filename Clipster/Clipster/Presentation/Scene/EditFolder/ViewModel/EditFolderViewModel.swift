@@ -1,3 +1,4 @@
+import Foundation
 import RxRelay
 import RxSwift
 
@@ -50,6 +51,7 @@ struct EditFolderState {
 }
 
 final class EditFolderViewModel {
+    private let createFolderUseCase: CreateFolderUseCase
     private let disposeBag = DisposeBag()
 
     private let stateRelay: BehaviorRelay<EditFolderState>
@@ -57,7 +59,12 @@ final class EditFolderViewModel {
     let action = PublishRelay<EditFolderAction>()
     let state: Observable<EditFolderState>
 
-    init(mode: EditFolderMode) {
+    init(
+        createFolderUseCase: CreateFolderUseCase,
+        mode: EditFolderMode
+    ) {
+        self.createFolderUseCase = createFolderUseCase
+
         let initialState = EditFolderState(mode: mode)
         self.stateRelay = BehaviorRelay(value: initialState)
         self.state = self.stateRelay.asObservable()
@@ -104,7 +111,34 @@ final class EditFolderViewModel {
                 switch currentState.mode {
                 case .add(let parentFolder):
                     print("\(Self.self): attempting to add folder '\(title)' to parent '\(parentFolder?.title ?? "root")'")
-                    return Observable<EditFolderAction>.just(.saveSucceeded)
+
+                    let createdAt = Date()
+                    let folder = Folder(
+                        id: UUID(),
+                        parentFolderID: parentFolder?.id,
+                        title: title,
+                        depth: (parentFolder?.depth ?? -1) + 1,
+                        folders: [],
+                        clips: [],
+                        createdAt: createdAt,
+                        updatedAt: createdAt,
+                        deletedAt: nil
+                    )
+
+                    return Observable<EditFolderAction>.create { observer in
+                        Task {
+                            let result = await self.createFolderUseCase.execute(folder)
+                            switch result {
+                            case .success:
+                                observer.onNext(.saveSucceeded)
+                            case .failure(let error):
+                                observer.onNext(.saveFailed(error))
+                            }
+                            observer.onCompleted()
+                        }
+
+                        return Disposables.create()
+                    }
                 case .edit(let parentFolder, let folder):
                     print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
                     return Observable<EditFolderAction>.just(.saveSucceeded)
