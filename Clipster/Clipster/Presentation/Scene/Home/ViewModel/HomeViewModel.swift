@@ -9,7 +9,7 @@ final class HomeViewModel {
     }
 
     enum State {
-        case HomeDisplay(HomeDisplay)
+        case homeDisplay(HomeDisplay)
     }
 
     private let disposeBag = DisposeBag()
@@ -54,7 +54,7 @@ final class HomeViewModel {
                 unvitsedClips: clipsResult,
                 folders: foldersResult
             )
-            state.accept(.HomeDisplay(homeDisplay))
+            state.accept(.homeDisplay(homeDisplay))
         } catch {
             print(error)
         }
