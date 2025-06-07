@@ -1,10 +1,9 @@
-import Foundation
 import RxRelay
 import RxSwift
 
 enum EditFolderMode {
-    case add(parentFolderID: UUID?, parentFolderTitle: String)
-    case edit(folderToEdit: Folder, parentFolderTitle: String)
+    case add(parentFolder: Folder?)
+    case edit(parentFolder: Folder?, folder: Folder)
 }
 
 enum EditFolderAction {
@@ -18,7 +17,6 @@ struct EditFolderState {
     let mode: EditFolderMode
     var folderTitle: String
     let initialFolderTitle: String
-    let navigationTitle: String
 
     var isSavable: Bool {
         let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -41,14 +39,12 @@ struct EditFolderState {
     init(mode: EditFolderMode) {
         self.mode = mode
         switch mode {
-        case .add(_, let parentFolderTitle):
+        case .add:
             self.folderTitle = ""
             self.initialFolderTitle = ""
-            self.navigationTitle = parentFolderTitle
-        case .edit(let folder, let parentFolderTitle):
+        case .edit(_, let folder):
             self.folderTitle = folder.title
             self.initialFolderTitle = folder.title
-            self.navigationTitle = parentFolderTitle
         }
     }
 }
@@ -106,11 +102,11 @@ final class EditFolderViewModel {
                 let title = currentState.folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
 
                 switch currentState.mode {
-                case .add(let parentID, _):
-                    print("\(Self.self): attempting to add folder '\(title)' to parent \(String(describing: parentID))")
+                case .add(let parentFolder):
+                    print("\(Self.self): attempting to add folder '\(title)' to parent '\(parentFolder?.title ?? "root")'")
                     return Observable<EditFolderAction>.just(.saveSucceeded)
-                case .edit(let folder, _):
-                    print("\(Self.self): attempting to edit folder \(folder.id) title to '\(title)'")
+                case .edit(let parentFolder, let folder):
+                    print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
                     return Observable<EditFolderAction>.just(.saveSucceeded)
                 }
             }
