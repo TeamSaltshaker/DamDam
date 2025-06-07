@@ -7,6 +7,7 @@ enum ClipDetailAction {
     case editButtonTapped
     case deleteButtonTapped
     case deleteConfirmed
+    case deleteCanceled
     case dataLoadSucceeded(clip: Clip, folder: Folder)
     case dataLoadFailed(Error)
     case deleteSucceeded
@@ -67,7 +68,6 @@ final class ClipDetailViewModel {
                 var newState = state
                 newState.errorMessage = nil
                 newState.shouldNavigateToEdit = false
-                newState.showDeleteConfirmation = false
 
                 switch action {
                 case .viewDidLoad:
@@ -85,6 +85,9 @@ final class ClipDetailViewModel {
                 case .deleteConfirmed:
                     print("\(Self.self): delete confirmed")
                     newState.isProcessingDelete = true
+                case .deleteCanceled:
+                    print("\(Self.self): delete canceled")
+                    newState.showDeleteConfirmation = false
                 case .dataLoadSucceeded(let clip, let folder):
                     print("\(Self.self): data load succeeded with clip \(clip.id), folder \(folder.id)")
                     newState.isLoading = false
