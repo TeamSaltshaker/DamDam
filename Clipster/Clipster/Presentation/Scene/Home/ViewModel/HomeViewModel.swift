@@ -82,8 +82,8 @@ final class HomeViewModel {
         }
     }
 
-    private func deleteClip(_ id: UUID) async {
-        let result = await deleteClipUseCase.execute(id: id)
+    private func deleteClip(_ clip: Clip) async {
+        let result = await deleteClipUseCase.execute(clip)
         switch result {
         case .success:
             await makeHomeDisplay()
