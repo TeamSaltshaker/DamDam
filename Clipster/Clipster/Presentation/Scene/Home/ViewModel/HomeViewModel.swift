@@ -4,8 +4,14 @@ import RxSwift
 
 final class HomeViewModel {
     enum Action {
-        case makeHomeDisplay
-        case deleteClip(_ clipID: UUID)
+        case viewWillAppear
+        case tapAddClip
+        case tapAddFolder
+        case tapCell(IndexPath)
+        case tapDetail(IndexPath)
+        case tapEdit(IndexPath)
+        case tapDelete(IndexPath)
+        case tapLicense
     }
 
     enum State {
@@ -51,10 +57,22 @@ final class HomeViewModel {
         action
             .subscribe(with: self) { owner, action in
                 switch action {
-                case .makeHomeDisplay:
+                case .viewWillAppear:
                     Task { await owner.makeHomeDisplay() }
-                case .deleteClip(let id):
-                    Task { await owner.deleteClip(id) }
+                case .tapAddClip:
+                    print("클립 추가")
+                case .tapAddFolder:
+                    print("폴더 추가")
+                case .tapCell(let indexPath):
+                    print("tapCell \(indexPath)")
+                case .tapDetail(let indexPath):
+                    print("tapDetail \(indexPath)")
+                case .tapEdit(let indexPath):
+                    print("tapEdit \(indexPath)")
+                case .tapDelete(let indexPath):
+                    print("tapDelete \(indexPath)")
+                case .tapLicense:
+                    print("라이센스")
                 }
             }
             .disposed(by: disposeBag)
