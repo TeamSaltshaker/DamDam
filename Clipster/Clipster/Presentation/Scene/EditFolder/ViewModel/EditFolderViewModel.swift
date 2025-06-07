@@ -52,6 +52,7 @@ struct EditFolderState {
 
 final class EditFolderViewModel {
     private let createFolderUseCase: CreateFolderUseCase
+    private let updateFolderUseCase: UpdateFolderUseCase
     private let disposeBag = DisposeBag()
 
     private let stateRelay: BehaviorRelay<EditFolderState>
@@ -61,9 +62,11 @@ final class EditFolderViewModel {
 
     init(
         createFolderUseCase: CreateFolderUseCase,
+        updateFolderUseCase: UpdateFolderUseCase,
         mode: EditFolderMode
     ) {
         self.createFolderUseCase = createFolderUseCase
+        self.updateFolderUseCase = updateFolderUseCase
 
         let initialState = EditFolderState(mode: mode)
         self.stateRelay = BehaviorRelay(value: initialState)
@@ -141,7 +144,34 @@ final class EditFolderViewModel {
                     }
                 case .edit(let parentFolder, let folder):
                     print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
-                    return Observable<EditFolderAction>.just(.saveSucceeded)
+
+                    let updatedAt = Date()
+                    let folder = Folder(
+                        id: folder.id,
+                        parentFolderID: parentFolder?.id,
+                        title: title,
+                        depth: (parentFolder?.depth ?? -1) + 1,
+                        folders: folder.folders,
+                        clips: folder.clips,
+                        createdAt: folder.createdAt,
+                        updatedAt: updatedAt,
+                        deletedAt: folder.deletedAt
+                    )
+
+                    return Observable<EditFolderAction>.create { observer in
+                        Task {
+                            let result = await self.updateFolderUseCase.execute(folder)
+                            switch result {
+                            case .success:
+                                observer.onNext(.saveSucceeded)
+                            case .failure(let error):
+                                observer.onNext(.saveFailed(error))
+                            }
+                            observer.onCompleted()
+                        }
+
+                        return Disposables.create()
+                    }
                 }
             }
             .observe(on: MainScheduler.asyncInstance)
