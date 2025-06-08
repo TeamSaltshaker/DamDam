@@ -10,9 +10,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
+        let context = CoreDataStack.shared.context
+        let storage = DefaultClipStorage(context: context)
+        let clipRepository = DefaultClipRepository(storage: storage, mapper: DomainMapper())
         let fetchUnvisitedClipsUseCase = DefaultFetchUnvisitedClipsUseCase()
         let fetchTopLevelFoldersUseCase = DefaultFetchTopLevelFoldersUseCase()
-        let deleteClipUseCase = DefaultDeleteClipUseCase()
+        let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
         let deleteFolderUseCase = DefaultDeleteFolderUseCase()
         let homeViewModel = HomeViewModel(
             fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,

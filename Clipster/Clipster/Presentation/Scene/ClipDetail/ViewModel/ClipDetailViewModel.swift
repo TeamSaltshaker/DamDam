@@ -121,7 +121,7 @@ final class ClipDetailViewModel {
 
                 print("\(Self.self): fetching folder for clip \(clip.id)")
                 return runAsyncTask {
-                    await self.fetchFolderUseCase.execute(parentFolderID: clip.folderID)
+                    await self.fetchFolderUseCase.execute(id: clip.folderID)
                 }
                 .map {
                     print("\(Self.self): fetchFolderUseCase succeeded for folder \($0.id)")
@@ -152,7 +152,7 @@ final class ClipDetailViewModel {
 
                     print("\(Self.self): fetching folder for clip \(updatedClip.id) in folder \(updatedClip.folderID)")
                     return self.runAsyncTask {
-                        await self.fetchFolderUseCase.execute(parentFolderID: updatedClip.folderID)
+                        await self.fetchFolderUseCase.execute(id: updatedClip.folderID)
                     }
                     .map { folder in
                         print("\(Self.self): fetchFolderUseCase succeeded for folder \(folder.id)")
@@ -174,11 +174,11 @@ final class ClipDetailViewModel {
             .flatMapLatest { [weak self] state -> Observable<ClipDetailAction> in
                 guard let self else { return .empty() }
 
-                let clipID = state.clip.id
+                let clip = state.clip
 
-                print("\(Self.self): attempting to delete clip \(clipID)")
+                print("\(Self.self): attempting to delete clip \(clip.id)")
                 return runAsyncTask {
-                    await self.deleteClipUseCase.execute(id: clipID)
+                    await self.deleteClipUseCase.execute(clip)
                 }
                 .map {
                     print("\(Self.self): deleteClipUseCase succeeded")
