@@ -39,7 +39,12 @@ final class UnvisitedClipListViewController: UIViewController {
 
 private extension UnvisitedClipListViewController {
     func configure() {
+        setAttributes()
         setBindings()
+    }
+
+    func setAttributes() {
+        title = "방문하지 않은 클립"
     }
 
     func setBindings() {
