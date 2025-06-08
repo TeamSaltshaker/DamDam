@@ -1,9 +1,21 @@
+import RxCocoa
+import RxSwift
 import SnapKit
 import UIKit
 
 final class UnvisitedClipListView: UIView {
+    enum Action {
+        case tap(Int)
+        case detail(Int)
+        case edit(Int)
+        case delete(Int)
+    }
+
     typealias Section = Int
     typealias Item = ClipCellDisplay
+
+    private let disposeBag = DisposeBag()
+    let action = PublishRelay<Action>()
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
@@ -12,6 +24,7 @@ final class UnvisitedClipListView: UIView {
             frame: .zero,
             collectionViewLayout: createCollectionViewLayout()
         )
+        collectionView.delegate = self
         return collectionView
     }()
 
@@ -75,11 +88,49 @@ private extension UnvisitedClipListView {
     }
 }
 
+extension UnvisitedClipListView: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        UIContextMenuConfiguration(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { _ in
+            let info = UIAction(
+                title: "상세정보",
+                image: UIImage(systemName: "magnifyingglass")
+            ) { [weak self] _ in
+                self?.action.accept(.detail(indexPath.item))
+            }
+
+            let edit = UIAction(
+                title: "편집",
+                image: UIImage(systemName: "pencil")
+            ) { [weak self] _ in
+                self?.action.accept(.edit(indexPath.item))
+            }
+
+            let delete = UIAction(
+                title: "삭제",
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive
+            ) { [weak self] _ in
+                self?.action.accept(.delete(indexPath.item))
+            }
+
+        return UIMenu(title: "", children: [info, edit, delete])
+        }
+    }
+}
+
 private extension UnvisitedClipListView {
     func configure() {
         setAttributes()
         setHierarchy()
         setConstraints()
+        setBindings()
     }
 
     func setAttributes() {
@@ -96,5 +147,12 @@ private extension UnvisitedClipListView {
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+    }
+
+    func setBindings() {
+        collectionView.rx.itemSelected
+            .map { Action.tap($0.row) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
     }
 }
