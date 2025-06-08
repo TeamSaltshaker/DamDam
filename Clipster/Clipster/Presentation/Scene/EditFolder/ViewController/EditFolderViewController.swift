@@ -43,15 +43,6 @@ private extension EditFolderViewController {
 
     func setBindings() {
         viewModel.state
-            .map { $0.navigationTitle }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind { [weak self] title in
-                self?.editFolderView.backButton.setDisplay(title)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
             .map { $0.isSavable }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)

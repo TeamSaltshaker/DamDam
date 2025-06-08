@@ -3,8 +3,8 @@ import RxRelay
 import RxSwift
 
 enum EditFolderMode {
-    case add(parentFolderID: UUID?, parentFolderTitle: String)
-    case edit(folderToEdit: Folder, parentFolderTitle: String)
+    case add(parentFolder: Folder?)
+    case edit(parentFolder: Folder?, folder: Folder)
 }
 
 enum EditFolderAction {
@@ -18,7 +18,6 @@ struct EditFolderState {
     let mode: EditFolderMode
     var folderTitle: String
     let initialFolderTitle: String
-    let navigationTitle: String
 
     var isSavable: Bool {
         let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -41,19 +40,19 @@ struct EditFolderState {
     init(mode: EditFolderMode) {
         self.mode = mode
         switch mode {
-        case .add(_, let parentFolderTitle):
+        case .add:
             self.folderTitle = ""
             self.initialFolderTitle = ""
-            self.navigationTitle = parentFolderTitle
-        case .edit(let folder, let parentFolderTitle):
+        case .edit(_, let folder):
             self.folderTitle = folder.title
             self.initialFolderTitle = folder.title
-            self.navigationTitle = parentFolderTitle
         }
     }
 }
 
 final class EditFolderViewModel {
+    private let createFolderUseCase: CreateFolderUseCase
+    private let updateFolderUseCase: UpdateFolderUseCase
     private let disposeBag = DisposeBag()
 
     private let stateRelay: BehaviorRelay<EditFolderState>
@@ -61,7 +60,14 @@ final class EditFolderViewModel {
     let action = PublishRelay<EditFolderAction>()
     let state: Observable<EditFolderState>
 
-    init(mode: EditFolderMode) {
+    init(
+        createFolderUseCase: CreateFolderUseCase,
+        updateFolderUseCase: UpdateFolderUseCase,
+        mode: EditFolderMode
+    ) {
+        self.createFolderUseCase = createFolderUseCase
+        self.updateFolderUseCase = updateFolderUseCase
+
         let initialState = EditFolderState(mode: mode)
         self.stateRelay = BehaviorRelay(value: initialState)
         self.state = self.stateRelay.asObservable()
@@ -104,14 +110,58 @@ final class EditFolderViewModel {
             .filter { $0.isSavable }
             .flatMapLatest { currentState in
                 let title = currentState.folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                let date = Date()
+
+                var newFolder: Folder
+                let useCase: (Folder) async -> Result<Void, DomainError>
 
                 switch currentState.mode {
-                case .add(let parentID, _):
-                    print("\(Self.self): attempting to add folder '\(title)' to parent \(String(describing: parentID))")
-                    return Observable<EditFolderAction>.just(.saveSucceeded)
-                case .edit(let folder, _):
-                    print("\(Self.self): attempting to edit folder \(folder.id) title to '\(title)'")
-                    return Observable<EditFolderAction>.just(.saveSucceeded)
+                case .add(let parentFolder):
+                    print("\(Self.self): attempting to add folder '\(title)' to parent '\(parentFolder?.title ?? "root")'")
+
+                    newFolder = Folder(
+                        id: UUID(),
+                        parentFolderID: parentFolder?.id,
+                        title: title,
+                        depth: (parentFolder?.depth ?? -1) + 1,
+                        folders: [],
+                        clips: [],
+                        createdAt: date,
+                        updatedAt: date,
+                        deletedAt: nil
+                    )
+
+                    useCase = self.createFolderUseCase.execute
+                case .edit(let parentFolder, let folder):
+                    print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
+
+                    newFolder = Folder(
+                        id: folder.id,
+                        parentFolderID: parentFolder?.id,
+                        title: title,
+                        depth: (parentFolder?.depth ?? -1) + 1,
+                        folders: folder.folders,
+                        clips: folder.clips,
+                        createdAt: folder.createdAt,
+                        updatedAt: date,
+                        deletedAt: folder.deletedAt
+                    )
+
+                    useCase = self.updateFolderUseCase.execute
+                }
+
+                return Observable<EditFolderAction>.create { observer in
+                    Task {
+                        let result = await useCase(newFolder)
+                        switch result {
+                        case .success:
+                            observer.onNext(.saveSucceeded)
+                        case .failure(let error):
+                            observer.onNext(.saveFailed(error))
+                        }
+                        observer.onCompleted()
+                    }
+                    return Disposables.create()
                 }
             }
             .observe(on: MainScheduler.asyncInstance)
