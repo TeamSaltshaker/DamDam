@@ -16,8 +16,8 @@ final class EditClipViewModel: ViewModel {
 
     struct State {
         var urlInputText: String
-        var isHiddenURLMetadataStackView = false
-        var isHiddenURLValidationStackView = false
+        var isHiddenURLMetadataStackView = true
+        var isHiddenURLValidationStackView = true
         var memoText: String
         var memoLimit: String
         var isURLValid = false
