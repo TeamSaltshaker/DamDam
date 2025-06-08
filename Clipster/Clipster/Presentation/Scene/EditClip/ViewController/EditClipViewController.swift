@@ -120,5 +120,15 @@ private extension EditClipViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.urlValidationStacKView.statusLabel.rx.text)
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.urlMetadata)
+            .compactMap { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] urlMetadataDisplay in
+                self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
+            }
+            .disposed(by: disposeBag)
     }
 }
