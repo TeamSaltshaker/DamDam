@@ -105,5 +105,20 @@ private extension EditClipViewController {
             .asDriver(onErrorJustReturn: "0/100")
             .drive(editClipView.memoLimitLabel.rx.text)
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.urlValidationImageName)
+            .map { UIImage(systemName: $0) }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.urlValidationLabelText)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlValidationStacKView.statusLabel.rx.text)
+            .disposed(by: disposeBag)
     }
 }
