@@ -7,10 +7,10 @@ final class DefaultCheckVaildityUseCase: CheckURLValidityUseCase {
         self.repository = repository
     }
 
-    func execute(urlString: String) async throws -> Bool {
+    func execute(urlString: String) async -> Result<Bool, Error> {
         guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
+            return .failure(URLError(.badURL))
         }
-        return try await repository.execute(url: url).get()
+        return await repository.execute(url: url)
     }
 }

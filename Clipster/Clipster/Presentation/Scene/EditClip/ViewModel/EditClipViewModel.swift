@@ -50,9 +50,11 @@ final class EditClipViewModel: ViewModel {
         case .editURLInputTextField(let urlText):
             return .merge(
                 .just(.updateURLInputText(urlText)),
-                .fromAsync { try await self.checkURLValidityUseCase.execute(urlString: urlText) }
-                    .map { Mutation.updateValidURL($0) }
-                    .catchAndReturn(.updateValidURL(false))
+                .fromAsync {
+                    try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
+                }
+                .map { Mutation.updateValidURL($0) }
+                .catchAndReturn(.updateValidURL(false))
             )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))

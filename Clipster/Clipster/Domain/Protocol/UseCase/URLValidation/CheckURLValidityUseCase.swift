@@ -1,3 +1,3 @@
 protocol CheckURLValidityUseCase {
-    func execute(urlString: String) async throws -> Bool
+    func execute(urlString: String) async -> Result<Bool, Error>
 }
