@@ -11,6 +11,7 @@ final class EditClipViewModel: ViewModel {
     enum Mutation {
         case updateURLInputText(String)
         case updateMemo(String)
+        case updateValidURL(Bool)
     }
 
     struct State {
@@ -19,25 +20,42 @@ final class EditClipViewModel: ViewModel {
         var isHiddenURLValidationStackView = false
         var memoText: String
         var memoLimit: String
+        var isURLValid = false
+        var urlValidationImageName: String = ""
+        var urlValidationLabelText: String = ""
     }
 
     var state: BehaviorRelay<State>
     var action = PublishRelay<Action>()
     var disposeBag = DisposeBag()
 
-    init(urlText: String = "", memoText: String = "") {
+    private let checkURLValidityUseCase: CheckURLValidityUseCase
+
+    init(
+        urlText: String = "",
+        memoText: String = "",
+        checkURLValidityUseCase: CheckURLValidityUseCase
+    ) {
         state = BehaviorRelay(value: State(
             urlInputText: urlText,
             memoText: memoText,
             memoLimit: "\(memoText)/100"
         ))
+        self.checkURLValidityUseCase = checkURLValidityUseCase
         bind()
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .editURLInputTextField(let urlText):
-            return .just(.updateURLInputText(urlText))
+            return .merge(
+                .just(.updateURLInputText(urlText)),
+                .fromAsync {
+                    try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
+                }
+                .map { Mutation.updateValidURL($0) }
+                .catchAndReturn(.updateValidURL(false))
+            )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))
         }
@@ -53,7 +71,28 @@ final class EditClipViewModel: ViewModel {
         case .updateMemo(let memoText):
             newState.memoText = memoText
             newState.memoLimit = "\(memoText.count)/100"
+        case .updateValidURL(let result):
+            newState.isURLValid = result
+            newState.urlValidationImageName = result ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+            newState.urlValidationLabelText = result ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
         }
         return newState
+    }
+}
+
+extension Observable {
+    static func fromAsync<T>(_ block: @escaping () async throws -> T) -> Observable<T> {
+        Single.create { emitter in
+            Task {
+                do {
+                    let result = try await block()
+                    emitter(.success(result))
+                } catch {
+                    emitter(.failure(error))
+                }
+            }
+            return Disposables.create()
+        }
+        .asObservable()
     }
 }
