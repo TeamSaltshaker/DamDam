@@ -27,6 +27,7 @@ final class HomeViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         homeviewModel.action.accept(.viewWillAppear)
     }
 
