@@ -1,5 +1,5 @@
 import Foundation
 
-protocol FetchFolderUseCase {
+protocol FetchTopLevelFoldersUseCase {
     func execute(parentFolderID: UUID?) async -> Result<Folder, Error>
 }
