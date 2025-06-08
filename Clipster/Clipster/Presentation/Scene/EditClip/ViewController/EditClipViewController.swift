@@ -130,5 +130,17 @@ private extension EditClipViewController {
                 self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
             }
             .disposed(by: disposeBag)
+
+        Observable.combineLatest(
+            viewModel.state.map(\.memoText),
+            viewModel.state.map(\.isURLValid),
+        )
+        .map { memoText, isURLValid in
+            !memoText.isEmpty && isURLValid
+        }
+        .distinctUntilChanged()
+        .asDriver(onErrorDriveWith: .empty())
+        .drive(editClipView.saveButton.rx.isEnabled)
+        .disposed(by: disposeBag)
     }
 }
