@@ -9,6 +9,7 @@ final class HomeView: UIView {
         case detail(IndexPath)
         case edit(IndexPath)
         case delete(IndexPath)
+        case showAllClips
     }
 
     enum Section: Int, CaseIterable {
@@ -78,6 +79,12 @@ final class HomeView: UIView {
             switch section {
             case .clip:
                 header.setTitle("방문하지 않은 클립")
+                header.setShowAllButtonVisible(true)
+
+                header.showAllTapped
+                    .map { Action.showAllClips }
+                    .bind(to: self.action)
+                    .disposed(by: self.disposeBag)
             case .folder:
                 header.setTitle("폴더")
             }

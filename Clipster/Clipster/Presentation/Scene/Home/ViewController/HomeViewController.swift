@@ -84,6 +84,8 @@ private extension HomeViewController {
                     owner.homeviewModel.action.accept(.tapEdit(indexPath))
                 case .delete(let indexPath):
                     owner.homeviewModel.action.accept(.tapDelete(indexPath))
+                case .showAllClips:
+                    owner.homeviewModel.action.accept(.tapShowALlClips)
                 }
             }
             .disposed(by: disposeBag)
@@ -121,6 +123,9 @@ private extension HomeViewController {
                 case .showEditFolder(let folder):
                     print("폴더 편집 화면 이동\n")
                     print(folder)
+                case .showUnvisitedClipList(let clips):
+                    print("읽지 않은 클립 화면 이동")
+                    print("\(clips)\n")
                 }
             }
             .disposed(by: disposeBag)
