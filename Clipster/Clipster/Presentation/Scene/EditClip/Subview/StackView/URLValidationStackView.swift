@@ -2,14 +2,14 @@ import SnapKit
 import UIKit
 
 final class URLValidationStackView: UIStackView {
-    private let statusImageView: UIImageView = {
+    let statusImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "checkmark.circle.fill")
+        imageView.image = .none
         imageView.tintColor = .green
         return imageView
     }()
 
-    private let statusLabel: UILabel = {
+    let statusLabel: UILabel = {
         let label = UILabel()
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 13, weight: .light)
