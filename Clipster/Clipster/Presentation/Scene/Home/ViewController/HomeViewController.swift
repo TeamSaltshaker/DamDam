@@ -102,7 +102,7 @@ private extension HomeViewController {
 
         homeviewModel.route
             .asSignal()
-            .emit(with: self) { _, route in
+            .emit(with: self) { owner, route in
                 switch route {
                 case .showAddClip:
                     print("클립 추가 화면 이동\n")
@@ -126,6 +126,8 @@ private extension HomeViewController {
                 case .showUnvisitedClipList(let clips):
                     print("읽지 않은 클립 화면 이동")
                     print("\(clips)\n")
+                    let vc = UnvisitedClipListViewController()
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)
