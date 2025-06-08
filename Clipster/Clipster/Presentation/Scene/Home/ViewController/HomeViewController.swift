@@ -63,20 +63,13 @@ private extension HomeViewController {
     }
 
     func setNavigationBarItems() {
-        let infoButton = UIBarButtonItem(
-            image: UIImage(systemName: "info.circle"),
-            primaryAction: UIAction { [weak self] _ in
-                self?.homeviewModel.action.accept(.tapLicense)
-            }
-        )
-
         let addButton = UIBarButtonItem(
             systemItem: .add,
             menu: makeAddButtonMenu()
         )
 
         navigationController?.navigationBar.tintColor = .label
-        navigationItem.rightBarButtonItems = [infoButton, addButton]
+        navigationItem.rightBarButtonItem = addButton
     }
 
     func setBindings() {
@@ -128,8 +121,6 @@ private extension HomeViewController {
                 case .showEditFolder(let folder):
                     print("폴더 편집 화면 이동\n")
                     print(folder)
-                case .showLicense:
-                    print("라이센스 화면 이동\n")
                 }
             }
             .disposed(by: disposeBag)
