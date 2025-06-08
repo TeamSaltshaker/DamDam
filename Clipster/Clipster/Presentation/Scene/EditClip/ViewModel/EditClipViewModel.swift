@@ -21,8 +21,8 @@ final class EditClipViewModel: ViewModel {
         var memoText: String
         var memoLimit: String
         var isURLValid = false
-        var urlValidationImageName: String = "exclamationmark.triangle.fill"
-        var urlValidationLabelText: String = "올바르지 않은 URL 입니다."
+        var urlValidationImageName: String = ""
+        var urlValidationLabelText: String = ""
     }
 
     var state: BehaviorRelay<State>

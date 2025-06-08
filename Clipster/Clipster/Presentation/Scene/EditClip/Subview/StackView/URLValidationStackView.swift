@@ -13,7 +13,7 @@ final class URLValidationStackView: UIStackView {
         let label = UILabel()
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 13, weight: .light)
-        label.text = "올바른 URL 입니다"
+        label.text = " "
         return label
     }()
 
