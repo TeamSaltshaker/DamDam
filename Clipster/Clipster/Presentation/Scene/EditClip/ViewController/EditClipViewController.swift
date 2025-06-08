@@ -68,14 +68,18 @@ private extension EditClipViewController {
             .map(\.isHiddenURLMetadataStackView)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlMetadataStackView.rx.isHidden)
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlMetadataStackView.setHiddenAnimated(isHidden)
+            }
             .disposed(by: disposeBag)
 
         viewModel.state
             .map(\.isHiddenURLValidationStackView)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlValidationStacKView.rx.isHidden)
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlValidationStacKView.setHiddenAnimated(isHidden)
+            }
             .disposed(by: disposeBag)
 
         editClipView.memoTextView
