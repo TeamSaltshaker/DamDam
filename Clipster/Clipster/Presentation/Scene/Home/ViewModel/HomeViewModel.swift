@@ -39,18 +39,18 @@ final class HomeViewModel {
     private var folders: [Folder] = []
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
-    private let fetchFolderUseCase: FetchFolderUseCase
+    private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let deleteClipUseCase: DeleteClipUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
 
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
-        fetchFolderUseCase: FetchFolderUseCase,
+        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         deleteClipUseCase: DeleteClipUseCase,
         deleteFolderUseCase: DeleteFolderUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
-        self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.deleteClipUseCase = deleteClipUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         bind()
@@ -140,7 +140,7 @@ final class HomeViewModel {
     }
 
     private func makeFolderCellDisplays() async throws -> [FolderCellDisplay] {
-        let folder = try await fetchFolderUseCase.execute(parentFolderID: nil).get()
+        let folder = try await fetchTopLevelFoldersUseCase.execute(parentFolderID: nil).get()
         folders = folder.folders
 
         return folder.folders.map {
