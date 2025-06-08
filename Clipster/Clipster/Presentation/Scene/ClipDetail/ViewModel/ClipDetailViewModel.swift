@@ -174,11 +174,11 @@ final class ClipDetailViewModel {
             .flatMapLatest { [weak self] state -> Observable<ClipDetailAction> in
                 guard let self else { return .empty() }
 
-                let clipID = state.clip.id
+                let clip = state.clip
 
-                print("\(Self.self): attempting to delete clip \(clipID)")
+                print("\(Self.self): attempting to delete clip \(clip.id)")
                 return runAsyncTask {
-                    await self.deleteClipUseCase.execute(id: clipID)
+                    await self.deleteClipUseCase.execute(clip)
                 }
                 .map {
                     print("\(Self.self): deleteClipUseCase succeeded")
