@@ -24,6 +24,7 @@ final class EditClipViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        hideKeyboardWhenTappedBackground()
     }
 }
 
