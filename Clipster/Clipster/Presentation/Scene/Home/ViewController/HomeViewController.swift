@@ -131,7 +131,7 @@ private extension HomeViewController {
                 case .showUnvisitedClipList(let clips):
                     print("읽지 않은 클립 화면 이동")
                     print("\(clips)\n")
-                    let vc = UnvisitedClipListViewController()
+                    let vc = UnvisitedClipListViewController(clips: clips)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
