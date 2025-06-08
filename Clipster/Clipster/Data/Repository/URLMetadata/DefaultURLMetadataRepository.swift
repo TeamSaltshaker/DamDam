@@ -24,7 +24,7 @@ private extension DefaultURLMetadataRepository {
         ParsedURLMetadataDTO(
             url: url,
             title: extractMetaContent(html: html, property: "og:title") ?? "",
-            thumbnailImage: extractMetaContent(html: html, property: "og:image") ?? ""
+            thumbnailImageURL: extractMetaContent(html: html, property: "og:image") ?? ""
         )
     }
 

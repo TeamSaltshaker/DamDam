@@ -3,7 +3,7 @@ import Foundation
 struct ParsedURLMetadataDTO {
     var url: URL
     var title: String
-    var thumbnailImage: String
+    var thumbnailImageURL: String
 }
 
 extension ParsedURLMetadataDTO {
@@ -11,7 +11,7 @@ extension ParsedURLMetadataDTO {
         ParsedURLMetadata(
             url: url,
             title: title,
-            thumbnailImage: URL(string: thumbnailImage)
+            thumbnailImageURL: URL(string: thumbnailImageURL)
         )
     }
 }
