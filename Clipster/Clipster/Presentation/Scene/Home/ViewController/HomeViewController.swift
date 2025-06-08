@@ -29,6 +29,12 @@ final class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         homeviewModel.action.accept(.viewWillAppear)
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     private func makeAddButtonMenu() -> UIMenu {
@@ -59,7 +65,6 @@ private extension HomeViewController {
 
     func setAttributes() {
         title = "Clipster"
-        navigationController?.navigationBar.prefersLargeTitles = true
     }
 
     func setNavigationBarItems() {
