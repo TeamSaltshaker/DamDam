@@ -2,12 +2,7 @@ import SnapKit
 import UIKit
 
 final class FolderSelectorNavigationView: UIView {
-    private let backButton: BackButton = {
-        let button = BackButton()
-        button.setDisplay("이전폴더")
-        return button
-    }()
-
+    private let backButton = BackButton("이전폴더")
     private let titleView = UIView()
 
     private let titleLabel: UILabel = {
