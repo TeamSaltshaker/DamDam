@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultCheckVaildityUseCase: CheckURLValidityUseCase {
+final class DefaultCheckValidityUseCase: CheckURLValidityUseCase {
     let urlValidationRepository: URLValidationRepository
 
     init(urlValidationRepository: URLValidationRepository) {
