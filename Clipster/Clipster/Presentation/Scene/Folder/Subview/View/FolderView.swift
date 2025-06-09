@@ -17,7 +17,7 @@ final class FolderView: UIView {
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
             collectionViewLayout: createLayout(),

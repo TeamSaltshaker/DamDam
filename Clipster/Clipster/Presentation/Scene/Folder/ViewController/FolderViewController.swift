@@ -1,5 +1,6 @@
 import RxCocoa
 import RxSwift
+import SafariServices
 import SnapKit
 import UIKit
 
@@ -70,6 +71,46 @@ private extension FolderViewController {
                 guard let self else { return }
                 title = state.currentFolderTitle
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.navigation
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] navigation in
+                guard let self else { return }
+                switch navigation {
+                case .editClipView(let clip):
+                    () // TODO: editClipView
+                case .editFolderView(let folder):
+                    () // TODO: editFolderView
+                case .folderView(let folder):
+                    let clipStorage = DefaultClipStorage(context: CoreDataStack.shared.context)
+                    let clipRepository = DefaultClipRepository(storage: clipStorage, mapper: DomainMapper())
+                    let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
+                    let childFolderViewModel = FolderViewModel(
+                        folder: folder,
+                        mapper: CellDisplayMapper(),
+                        deleteFolderUseCase: DefaultDeleteFolderUseCase(),
+                        deleteClipUseCase: deleteClipUseCase,
+                    )
+                    let childFolderViewController = FolderViewController(viewModel: childFolderViewModel)
+                    navigationController?.pushViewController(childFolderViewController, animated: true)
+                case .clipDetailView(let clip):
+                    () // TODO: clipDetailView
+                case .webView(let url):
+                    let safariVC = SFSafariViewController(url: url)
+                    present(safariVC, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        folderView.collectionView
+            .rx
+            .itemSelected
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] indexPath in
+                guard let self else { return }
+                viewModel.action.accept(.didTapCell(indexPath))
             }
             .disposed(by: disposeBag)
     }
