@@ -19,8 +19,8 @@ final class EditClipViewModel: ViewModel {
         var urlInputText: String
         var isHiddenURLMetadataStackView = true
         var isHiddenURLValidationStackView = true
-        var memoText: String
-        var memoLimit: String
+        var memoText: String = ""
+        var memoLimit: String = "0/100"
         var isURLValid = false
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
@@ -36,14 +36,26 @@ final class EditClipViewModel: ViewModel {
 
     init(
         urlText: String = "",
-        memoText: String = "",
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase
     ) {
         state = BehaviorRelay(value: State(
-            urlInputText: urlText,
-            memoText: memoText,
-            memoLimit: "\(memoText)/100"
+            urlInputText: urlText
+        ))
+        self.checkURLValidityUseCase = checkURLValidityUseCase
+        self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        bind()
+    }
+
+    init(
+        clip: Clip,
+        checkURLValidityUseCase: CheckURLValidityUseCase,
+        parseURLMetadataUseCase: ParseURLMetadataUseCase
+    ) {
+        state = BehaviorRelay(value: State(
+            urlInputText: clip.urlMetadata.url.absoluteString,
+            memoText: clip.memo,
+            memoLimit: "\(clip.memo.count)/100"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
