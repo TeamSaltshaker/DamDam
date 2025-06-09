@@ -55,9 +55,9 @@ final class FolderCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ display: FolderCellDisplay) {
+    func setDisplay(_ display: FolderDisplay) {
         titleLabel.text = display.title
-        itemCountLabel.text = "\(display.itemCount) items"
+        itemCountLabel.text = display.itemCount
     }
 }
 

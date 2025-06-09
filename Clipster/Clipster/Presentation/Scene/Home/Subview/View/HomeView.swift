@@ -18,8 +18,8 @@ final class HomeView: UIView {
     }
 
     enum Item: Hashable {
-        case clip(ClipCellDisplay)
-        case folder(FolderCellDisplay)
+        case clip(ClipDisplay)
+        case folder(FolderDisplay)
     }
 
     private let disposeBag = DisposeBag()
@@ -47,11 +47,11 @@ final class HomeView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipCellDisplay> { cell, _, item in
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
-        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderCellDisplay> { cell, _, item in
+        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
