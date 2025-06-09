@@ -47,6 +47,15 @@ final class FolderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func setDisplay(folders: [FolderCellDisplay], clips: [ClipCellDisplay]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+        snapshot.appendSections([.folder, .clip])
+        snapshot.appendItems(folders.map { .folder($0) }, toSection: .folder)
+        snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
+
+        dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+
     private func createLayout() -> UICollectionViewLayout {
         UICollectionViewCompositionalLayout { _, _ in
             let itemSize = NSCollectionLayoutSize(

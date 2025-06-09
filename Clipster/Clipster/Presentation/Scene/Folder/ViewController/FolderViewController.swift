@@ -65,11 +65,11 @@ private extension FolderViewController {
 
     func setBindings() {
         viewModel.state
-            .compactMap(\.currentFolderTitle)
-            .asDriver(onErrorJustReturn: "")
-            .drive { [weak self] currentFolderTitle in
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] state in
                 guard let self else { return }
-                title = currentFolderTitle
+                title = state.currentFolderTitle
+                folderView.setDisplay(folders: state.folders, clips: state.clips)
             }
             .disposed(by: disposeBag)
     }
