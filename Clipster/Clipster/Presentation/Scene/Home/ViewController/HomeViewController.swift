@@ -85,7 +85,7 @@ private extension HomeViewController {
                 case .delete(let indexPath):
                     owner.homeviewModel.action.accept(.tapDelete(indexPath))
                 case .showAllClips:
-                    owner.homeviewModel.action.accept(.tapShowALlClips)
+                    owner.homeviewModel.action.accept(.tapShowAllClips)
                 }
             }
             .disposed(by: disposeBag)

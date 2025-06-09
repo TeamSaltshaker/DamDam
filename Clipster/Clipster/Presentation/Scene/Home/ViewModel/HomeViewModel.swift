@@ -11,7 +11,7 @@ final class HomeViewModel {
         case tapDetail(IndexPath)
         case tapEdit(IndexPath)
         case tapDelete(IndexPath)
-        case tapShowALlClips
+        case tapShowAllClips
     }
 
     enum State {
@@ -74,7 +74,7 @@ final class HomeViewModel {
                     }
                 case .tapDelete(let indexPath):
                     owner.handleTapDelete(at: indexPath)
-                case .tapShowALlClips:
+                case .tapShowAllClips:
                     owner.route.accept(.showUnvisitedClipList(self.unvisitedClips))
                 }
             }
