@@ -133,7 +133,28 @@ private extension FolderViewController {
                     let childFolderVC = FolderViewController(viewModel: childFolderVM)
                     navigationController?.pushViewController(childFolderVC, animated: true)
                 case .clipDetailView(let clip):
-                    () // TODO: clipDetailView
+                    let folderStorage = DefaultFolderStorage(context: CoreDataStack.shared.context)
+                    let folderRepository = DefaultFolderRepository(
+                        storage: folderStorage,
+                        mapper: DomainMapper()
+                    )
+                    let clipStorage = DefaultClipStorage(context: CoreDataStack.shared.context)
+                    let clipRepository = DefaultClipRepository(
+                        storage: clipStorage,
+                        mapper: DomainMapper(),
+                    )
+                    let fetchFolderUC = DefaultFetchFolderUseCase(folderRepository: folderRepository)
+                    let deleteClipUC = DefaultDeleteClipUseCase(clipRepository: clipRepository)
+                    let fetchClipUC = DefaultFetchClipUseCase(clipRepository: clipRepository)
+                    let clipDetailVM = ClipDetailViewModel(
+                        fetchFolderUseCase: fetchFolderUC,
+                        deleteClipUseCase: deleteClipUC,
+                        fetchClipUseCase: fetchClipUC,
+                        clip: clip,
+                        navigationTitle: "상세정보",
+                    )
+                    let clipDetailVC = ClipDetailViewController(viewModel: clipDetailVM)
+                    navigationController?.pushViewController(clipDetailVC, animated: true)
                 case .webView(let url):
                     let safariVC = SFSafariViewController(url: url)
                     present(safariVC, animated: true)
