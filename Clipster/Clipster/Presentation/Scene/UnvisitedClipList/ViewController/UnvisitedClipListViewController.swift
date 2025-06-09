@@ -17,6 +17,10 @@ final class UnvisitedClipListViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func loadView() {
+        view = unvisitedClipListView
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
@@ -25,10 +29,6 @@ final class UnvisitedClipListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         unvisitedClipListViewModel.action.accept(.viewWillAppear)
-    }
-
-    override func loadView() {
-        view = unvisitedClipListView
     }
 }
 
