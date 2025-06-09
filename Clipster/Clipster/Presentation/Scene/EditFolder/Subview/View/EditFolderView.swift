@@ -3,6 +3,14 @@ import SnapKit
 import UIKit
 
 final class EditFolderView: UIView {
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "제목"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        return label
+    }()
+
     private let folderTitleTextField = EditFolderTextField()
 
     var folderTitleChanges: Observable<String> {
@@ -39,14 +47,20 @@ private extension EditFolderView {
     }
 
     func setHierarchy() {
-        addSubview(folderTitleTextField)
+        [titleLabel, folderTitleTextField]
+            .forEach { addSubview($0) }
     }
 
     func setConstraints() {
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
         folderTitleTextField.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
-            make.height.equalTo(44)
+            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(48)
         }
     }
 }
