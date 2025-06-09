@@ -3,13 +3,13 @@ import RxSwift
 import UIKit
 
 final class UnvisitedClipListViewController: UIViewController {
-    private let clips: [Clip]
     private let disposeBag = DisposeBag()
 
+    private let unvisitedClipListViewModel: UnvisitedClipListViewModel
     private let unvisitedClipListView = UnvisitedClipListView()
 
-    init(clips: [Clip]) {
-        self.clips = clips
+    init(unvisitedClipListViewModel: UnvisitedClipListViewModel) {
+        self.unvisitedClipListViewModel = unvisitedClipListViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -20,16 +20,12 @@ final class UnvisitedClipListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        unvisitedClipListViewModel.action.accept(.viewDidLoad)
+    }
 
-        let cellDisplays = clips.map {
-            ClipCellDisplay(
-                thumbnailImageURL: $0.urlMetadata.thumbnailImageURL,
-                title: $0.urlMetadata.title,
-                memo: $0.memo,
-                isVisited: $0.lastVisitedAt != nil
-            )
-        }
-        unvisitedClipListView.setDisplay(cellDisplays)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        unvisitedClipListViewModel.action.accept(.viewWillAppear)
     }
 
     override func loadView() {
@@ -49,16 +45,16 @@ private extension UnvisitedClipListViewController {
 
     func setBindings() {
         unvisitedClipListView.action
-            .bind(with: self) { _, action in
+            .bind(with: self) { owner, action in
                 switch action {
                 case .tap(let index):
-                    print("\(index)번째 클립 탭")
+                    owner.unvisitedClipListViewModel.action.accept(.tapCell(index))
                 case .detail(let index):
-                    print("\(index)번째 클립 상세")
+                    owner.unvisitedClipListViewModel.action.accept(.tapDetail(index))
                 case .edit(let index):
-                    print("\(index)번째 클립 수정")
+                    owner.unvisitedClipListViewModel.action.accept(.tapEdit(index))
                 case .delete(let index):
-                    print("\(index)번째 클립 삭제")
+                    owner.unvisitedClipListViewModel.action.accept(.tapDelete(index))
                 }
             }
             .disposed(by: disposeBag)

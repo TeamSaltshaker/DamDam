@@ -129,9 +129,17 @@ private extension HomeViewController {
                     print("폴더 편집 화면 이동\n")
                     print(folder)
                 case .showUnvisitedClipList(let clips):
-                    print("읽지 않은 클립 화면 이동")
-                    print("\(clips)\n")
-                    let vc = UnvisitedClipListViewController(clips: clips)
+                    let context = CoreDataStack.shared.context
+                    let storage = DefaultClipStorage(context: context)
+                    let clipRepository = DefaultClipRepository(storage: storage, mapper: DomainMapper())
+                    let fetchUnvisitedClipsUseCase = DefaultFetchUnvisitedClipsUseCase()
+                    let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
+                    let viewModel = UnvisitedClipListViewModel(
+                        clips: clips,
+                        fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
+                        deleteClipUseCase: deleteClipUseCase
+                    )
+                    let vc = UnvisitedClipListViewController(unvisitedClipListViewModel: viewModel)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
