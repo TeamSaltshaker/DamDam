@@ -11,7 +11,7 @@ final class HomeViewModel {
         case tapDetail(IndexPath)
         case tapEdit(IndexPath)
         case tapDelete(IndexPath)
-        case tapLicense
+        case tapShowAllClips
     }
 
     enum State {
@@ -26,7 +26,7 @@ final class HomeViewModel {
         case showDetailClip(Clip)
         case showEditClip(Clip)
         case showEditFolder(Folder)
-        case showLicense
+        case showUnvisitedClipList([Clip])
     }
 
     private let disposeBag = DisposeBag()
@@ -74,8 +74,8 @@ final class HomeViewModel {
                     }
                 case .tapDelete(let indexPath):
                     owner.handleTapDelete(at: indexPath)
-                case .tapLicense:
-                    owner.route.accept(.showLicense)
+                case .tapShowAllClips:
+                    owner.route.accept(.showUnvisitedClipList(self.unvisitedClips))
                 }
             }
             .disposed(by: disposeBag)
