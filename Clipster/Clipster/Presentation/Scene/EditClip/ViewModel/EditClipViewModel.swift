@@ -12,17 +12,19 @@ final class EditClipViewModel: ViewModel {
         case updateURLInputText(String)
         case updateMemo(String)
         case updateValidURL(Bool)
+        case updateURLMetadata(URLMetadataDisplay?)
     }
 
     struct State {
         var urlInputText: String
-        var isHiddenURLMetadataStackView = false
-        var isHiddenURLValidationStackView = false
+        var isHiddenURLMetadataStackView = true
+        var isHiddenURLValidationStackView = true
         var memoText: String
         var memoLimit: String
         var isURLValid = false
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
+        var urlMetadata: URLMetadataDisplay?
     }
 
     var state: BehaviorRelay<State>
@@ -30,11 +32,13 @@ final class EditClipViewModel: ViewModel {
     var disposeBag = DisposeBag()
 
     private let checkURLValidityUseCase: CheckURLValidityUseCase
+    private let parseURLMetadataUseCase: ParseURLMetadataUseCase
 
     init(
         urlText: String = "",
         memoText: String = "",
-        checkURLValidityUseCase: CheckURLValidityUseCase
+        checkURLValidityUseCase: CheckURLValidityUseCase,
+        parseURLMetadataUseCase: ParseURLMetadataUseCase
     ) {
         state = BehaviorRelay(value: State(
             urlInputText: urlText,
@@ -42,6 +46,7 @@ final class EditClipViewModel: ViewModel {
             memoLimit: "\(memoText)/100"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
+        self.parseURLMetadataUseCase = parseURLMetadataUseCase
         bind()
     }
 
@@ -53,8 +58,13 @@ final class EditClipViewModel: ViewModel {
                 .fromAsync {
                     try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
                 }
-                .map { Mutation.updateValidURL($0) }
-                .catchAndReturn(.updateValidURL(false))
+                .map { .updateValidURL($0) }
+                .catchAndReturn(.updateValidURL(false)),
+                .fromAsync {
+                    try await self.parseURLMetadataUseCase.execute(urlString: urlText).get()
+                }
+                .map { .updateURLMetadata(self.toURLMetaDisplay(entity: $0)) }
+                .catchAndReturn(.updateURLMetadata(nil))
             )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))
@@ -66,8 +76,9 @@ final class EditClipViewModel: ViewModel {
         switch mutation {
         case .updateURLInputText(let urlText):
             newState.urlInputText = urlText
-            newState.isHiddenURLMetadataStackView = newState.urlInputText.isEmpty
-            newState.isHiddenURLValidationStackView = newState.urlInputText.isEmpty
+            if urlText.isEmpty {
+                newState.isHiddenURLValidationStackView = true
+            }
         case .updateMemo(let memoText):
             newState.memoText = memoText
             newState.memoLimit = "\(memoText.count)/100"
@@ -75,8 +86,24 @@ final class EditClipViewModel: ViewModel {
             newState.isURLValid = result
             newState.urlValidationImageName = result ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
             newState.urlValidationLabelText = result ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
+            if !state.urlInputText.isEmpty {
+                newState.isHiddenURLValidationStackView = false
+            }
+        case .updateURLMetadata(let urlMetaDisplay):
+            newState.urlMetadata = urlMetaDisplay
+            newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
         }
         return newState
+    }
+}
+
+private extension EditClipViewModel {
+    func toURLMetaDisplay(entity: ParsedURLMetadata) -> URLMetadataDisplay {
+        URLMetadataDisplay(
+            url: entity.url,
+            title: entity.title,
+            thumbnailImageURL: entity.thumbnailImageURL
+        )
     }
 }
 

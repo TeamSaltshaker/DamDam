@@ -8,6 +8,7 @@ final class EditClipView: UIView {
         button.setTitleColor(.tintColor, for: .normal)
         button.setTitleColor(.lightGray, for: .disabled)
         button.frame = .init(x: 0, y: 0, width: 44, height: 44)
+        button.isEnabled = false
         return button
     }()
 

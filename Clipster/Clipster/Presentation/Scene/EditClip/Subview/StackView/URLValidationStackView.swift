@@ -53,3 +53,21 @@ private extension URLValidationStackView {
         }
     }
 }
+
+extension URLValidationStackView {
+    func setHiddenAnimated(_ hidden: Bool, duration: TimeInterval = 0.25) {
+        if hidden {
+            UIView.animate(withDuration: duration) {
+                self.alpha = 0
+                self.isHidden = true
+            }
+        } else {
+            self.isHidden = false
+            self.alpha = 0
+            UIView.animate(withDuration: duration) {
+                self.alpha = 1
+                self.superview?.layoutIfNeeded()
+            }
+        }
+    }
+}

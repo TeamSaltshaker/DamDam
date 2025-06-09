@@ -24,6 +24,7 @@ final class EditClipViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        hideKeyboardWhenTappedBackground()
     }
 }
 
@@ -68,14 +69,18 @@ private extension EditClipViewController {
             .map(\.isHiddenURLMetadataStackView)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlMetadataStackView.rx.isHidden)
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlMetadataStackView.setHiddenAnimated(isHidden)
+            }
             .disposed(by: disposeBag)
 
         viewModel.state
             .map(\.isHiddenURLValidationStackView)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlValidationStacKView.rx.isHidden)
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlValidationStacKView.setHiddenAnimated(isHidden)
+            }
             .disposed(by: disposeBag)
 
         editClipView.memoTextView
@@ -120,5 +125,27 @@ private extension EditClipViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.urlValidationStacKView.statusLabel.rx.text)
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.urlMetadata)
+            .compactMap { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] urlMetadataDisplay in
+                self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
+            }
+            .disposed(by: disposeBag)
+
+        Observable.combineLatest(
+            viewModel.state.map(\.memoText),
+            viewModel.state.map(\.isURLValid),
+        )
+        .map { memoText, isURLValid in
+            !memoText.isEmpty && isURLValid
+        }
+        .distinctUntilChanged()
+        .asDriver(onErrorDriveWith: .empty())
+        .drive(editClipView.saveButton.rx.isEnabled)
+        .disposed(by: disposeBag)
     }
 }
