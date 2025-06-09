@@ -131,6 +131,7 @@ final class HomeViewModel {
 
         return clips.map {
             ClipCellDisplay(
+                id: $0.id,
                 thumbnailImageURL: $0.urlMetadata.thumbnailImageURL,
                 title: $0.urlMetadata.title,
                 memo: $0.memo,
@@ -145,6 +146,7 @@ final class HomeViewModel {
 
         return folder.folders.map {
             FolderCellDisplay(
+                id: $0.id,
                 title: $0.title,
                 itemCount: $0.clips.count
             )
