@@ -17,8 +17,8 @@ private extension SaveButton {
     }
 
     func setAttributes() {
-        let normalFont = UIFont.systemFont(ofSize: 14, weight: .bold)
-        let disabledFont = UIFont.systemFont(ofSize: 14, weight: .medium)
+        let normalFont = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        let disabledFont = UIFont.systemFont(ofSize: 16, weight: .medium)
 
         let normalAttributes: [NSAttributedString.Key: Any] = [
             .font: normalFont,
