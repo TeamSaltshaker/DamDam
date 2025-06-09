@@ -77,4 +77,55 @@ final class DIContainer {
     func makeCheckURLValidityUseCase() -> CheckURLValidityUseCase {
         DefaultCheckVaildityUseCase(urlValidationRepository: makeURLValidationRepository())
     }
+
+    func makeClipDetailViewModel(clip: Clip, navigationTitle: String) -> ClipDetailViewModel {
+        ClipDetailViewModel(
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase(),
+            fetchClipUseCase: makeFetchClipUseCase(),
+            clip: clip,
+            navigationTitle: navigationTitle
+        )
+    }
+
+    func makeEditClipViewModel(clip: Clip) -> EditClipViewModel {
+        EditClipViewModel(
+            clip: clip,
+            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
+            parseURLMetadataUseCase: makeParseURLMetadataUseCase()
+        )
+    }
+
+    func makeEditFolderViewModel(mode: EditFolderMode) -> EditFolderViewModel {
+        EditFolderViewModel(
+            createFolderUseCase: makeCreateFolderUseCase(),
+            updateFolderUseCase: makeUpdateFolderUseCase(),
+            mode: mode
+        )
+    }
+
+    func makeFolderViewModel(folder: Folder) -> FolderViewModel {
+        FolderViewModel(
+            folder: folder,
+            deleteFolderUseCase: makeDeleteFolderUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase()
+        )
+    }
+
+    func makeHomeViewModel() -> HomeViewModel {
+        HomeViewModel(
+            fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase(),
+            deleteFolderUseCase: makeDeleteFolderUseCase()
+        )
+    }
+
+    func makeUnvisitedClipListViewModel(clips: [Clip]) -> UnvisitedClipListViewModel {
+        UnvisitedClipListViewModel(
+            clips: clips,
+            fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase()
+        )
+    }
 }
