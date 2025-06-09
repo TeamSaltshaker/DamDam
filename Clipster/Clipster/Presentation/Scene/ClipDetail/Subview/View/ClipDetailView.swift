@@ -48,7 +48,6 @@ final class ClipDetailView: UIView {
     func setDisplay(_ clipDisplay: ClipDisplay, _ folderTitle: String) {
         urlMetadataStackView.setDisplay(model: clipDisplay.urlMetadata)
         addedOnRow.setDisplay(clipDisplay.createdAt)
-        lastVisitedRow.setDisplay(clipDisplay.lastVisitedAt)
         folderRow.setDisplay(folderTitle)
         memoView.setDisplay(clipDisplay.memo)
     }

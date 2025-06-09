@@ -49,9 +49,9 @@ final class ClipCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ display: ClipCellDisplay) {
-        thumbnailImageView.kf.setImage(with: display.thumbnailImageURL)
-        titleLabel.text = display.title
+    func setDisplay(_ display: ClipDisplay) {
+        thumbnailImageView.kf.setImage(with: display.urlMetadata.thumbnailImageURL)
+        titleLabel.text = display.urlMetadata.title
         memoLabel.text = display.memo
         visitIndicatorView.isHidden = display.isVisited
     }

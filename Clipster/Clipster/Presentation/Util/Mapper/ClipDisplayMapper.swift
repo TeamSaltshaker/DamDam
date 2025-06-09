@@ -8,14 +8,12 @@ struct ClipDisplayMapper {
             thumbnailImageURL: clip.urlMetadata.thumbnailImageURL
         )
 
-        let createdAt = formatDate(clip.createdAt)
-        let lastVisitedAt = clip.lastVisitedAt.map(formatDate) ?? "방문 기록 없음"
-
         return ClipDisplay(
+            id: clip.id,
             urlMetadata: urlMetadataDisplay,
             memo: clip.memo,
-            lastVisitedAt: lastVisitedAt,
-            createdAt: createdAt
+            createdAt: formatDate(clip.createdAt),
+            isVisited: clip.lastVisitedAt != nil
         )
     }
 

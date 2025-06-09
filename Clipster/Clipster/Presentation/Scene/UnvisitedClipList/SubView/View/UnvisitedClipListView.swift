@@ -12,7 +12,7 @@ final class UnvisitedClipListView: UIView {
     }
 
     typealias Section = Int
-    typealias Item = ClipCellDisplay
+    typealias Item = ClipDisplay
 
     private let disposeBag = DisposeBag()
     let action = PublishRelay<Action>()
@@ -39,7 +39,7 @@ final class UnvisitedClipListView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipCellDisplay> { cell, _, item in
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
@@ -52,7 +52,7 @@ final class UnvisitedClipListView: UIView {
         }
     }
 
-    func setDisplay(_ display: [ClipCellDisplay]) {
+    func setDisplay(_ display: [ClipDisplay]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([0])
         snapshot.appendItems(display, toSection: 0)

@@ -1,7 +1,7 @@
 import Foundation
 
-struct FolderCellDisplay: Hashable {
+struct FolderDisplay: Hashable {
     let id: UUID
     let title: String
-    let itemCount: Int
+    let itemCount: String
 }
