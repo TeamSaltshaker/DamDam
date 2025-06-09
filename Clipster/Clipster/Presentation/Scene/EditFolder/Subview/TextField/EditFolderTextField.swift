@@ -1,7 +1,7 @@
 import UIKit
 
 final class EditFolderTextField: UITextField {
-    let textPadding = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 32)
+    let textPadding = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,9 +31,9 @@ extension EditFolderTextField {
     }
 
     func setAttributes() {
-        clearButtonMode = .whileEditing
-        placeholder = "폴더 이름"
-        layer.cornerRadius = 10
-        backgroundColor = .secondarySystemBackground
+        placeholder = "제목을 입력하세요."
+        layer.borderWidth = 1
+        layer.cornerRadius = 12
+        layer.borderColor = UIColor.tertiaryLabel.cgColor
     }
 }

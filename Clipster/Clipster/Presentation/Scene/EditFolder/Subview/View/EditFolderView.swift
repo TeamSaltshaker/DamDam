@@ -3,9 +3,34 @@ import SnapKit
 import UIKit
 
 final class EditFolderView: UIView {
-    let backButton = EditFolderBackButton()
-    let saveButton = EditFolderSaveButton()
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "제목"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        return label
+    }()
+
     private let folderTitleTextField = EditFolderTextField()
+
+    private let folderLabel: UILabel = {
+        let label = UILabel()
+        label.text = "저장폴더"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        return label
+    }()
+
+    private let folderView = UIView()
+    private let folderRowView = FolderRowView()
+
+    private let chevronImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .label
+        return imageView
+    }()
 
     var folderTitleChanges: Observable<String> {
         folderTitleTextField.rx.text.orEmpty.asObservable()
@@ -41,14 +66,46 @@ private extension EditFolderView {
     }
 
     func setHierarchy() {
-        addSubview(folderTitleTextField)
+        [titleLabel, folderTitleTextField, folderLabel, folderView]
+            .forEach { addSubview($0) }
+
+        [folderRowView, chevronImageView]
+            .forEach { folderView.addSubview($0) }
     }
 
     func setConstraints() {
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
         folderTitleTextField.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
-            make.height.equalTo(44)
+            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(48)
+        }
+
+        folderLabel.snp.makeConstraints { make in
+            make.top.equalTo(folderTitleTextField.snp.bottom).offset(40)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
+        folderView.snp.makeConstraints { make in
+            make.top.equalTo(folderLabel.snp.bottom).offset(12)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(72)
+        }
+
+        folderRowView.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview().inset(12)
+            make.leading.equalToSuperview().offset(20)
+        }
+
+        chevronImageView.snp.makeConstraints { make in
+            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
+            make.trailing.equalToSuperview().inset(20)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(24)
         }
     }
 }
