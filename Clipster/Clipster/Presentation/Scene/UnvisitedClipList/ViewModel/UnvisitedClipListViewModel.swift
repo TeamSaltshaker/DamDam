@@ -4,7 +4,6 @@ import RxSwift
 
 final class UnvisitedClipListViewModel {
     enum Action {
-        case viewDidLoad
         case viewWillAppear
         case tapCell(Int)
         case tapDetail(Int)
@@ -50,8 +49,6 @@ final class UnvisitedClipListViewModel {
             .do { print("\(Self.self): received action → \($0)") }
             .subscribe(with: self) { owner, action in
                 switch action {
-                case .viewDidLoad:
-                    owner.handleViewDidLoad()
                 case .viewWillAppear:
                     Task { await owner.handleViewWillAppear() }
                 case .tapCell(let index),
@@ -68,24 +65,20 @@ final class UnvisitedClipListViewModel {
             .disposed(by: disposeBag)
     }
 
-    private func handleViewDidLoad() {
-        let cellDisplay = clips.map(makeClipCellDisplay)
-        state.accept(.clips(cellDisplay))
-    }
-
     private func handleViewWillAppear() async {
-        guard shouldFetchOnAppear else {
+        if shouldFetchOnAppear {
+            let result = await fetchUnvisitedClipsUseCase.execute()
+            switch result {
+            case .success(let clips):
+                let cellDisplay = clips.map(makeClipCellDisplay)
+                state.accept(.clips(cellDisplay))
+            case .failure(let error):
+                print(error)
+            }
+        } else {
             shouldFetchOnAppear = true
-            return
-        }
-
-        let result = await fetchUnvisitedClipsUseCase.execute()
-        switch result {
-        case .success(let clips):
             let cellDisplay = clips.map(makeClipCellDisplay)
             state.accept(.clips(cellDisplay))
-        case .failure(let error):
-            print(error)
         }
     }
 

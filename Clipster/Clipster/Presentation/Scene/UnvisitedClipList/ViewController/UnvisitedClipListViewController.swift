@@ -20,7 +20,6 @@ final class UnvisitedClipListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        unvisitedClipListViewModel.action.accept(.viewDidLoad)
     }
 
     override func viewWillAppear(_ animated: Bool) {
