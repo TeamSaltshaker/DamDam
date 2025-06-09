@@ -58,5 +58,32 @@ private extension UnvisitedClipListViewController {
                 }
             }
             .disposed(by: disposeBag)
+
+        unvisitedClipListViewModel.state
+            .asSignal()
+            .emit(with: self) { owner, state in
+                switch state {
+                case .clips(let clips):
+                    owner.unvisitedClipListView.setDisplay(clips)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        unvisitedClipListViewModel.route
+            .asSignal()
+            .emit(with: self) { _, route in
+                switch route {
+                case .showWebView(let url):
+                    print("웹 뷰")
+                    print("\(url)\n")
+                case .showDetailClip(let clip):
+                    print("클립 상세 화면 이동")
+                    print("\(clip)\n")
+                case .showEditClip(let clip):
+                    print("클립 편집 화면 이동")
+                    print("\(clip)\n")
+                }
+            }
+            .disposed(by: disposeBag)
     }
 }

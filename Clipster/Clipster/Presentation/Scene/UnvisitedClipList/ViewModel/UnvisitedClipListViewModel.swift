@@ -29,6 +29,7 @@ final class UnvisitedClipListViewModel {
     let route = PublishRelay<Route>()
 
     private var clips: [Clip]
+    private var shouldFetchOnAppear: Bool = false
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let deleteClipUseCase: DeleteClipUseCase
@@ -50,17 +51,76 @@ final class UnvisitedClipListViewModel {
             .subscribe(with: self) { owner, action in
                 switch action {
                 case .viewDidLoad:
-                    break
+                    owner.handleViewDidLoad()
                 case .viewWillAppear:
-                    break
+                    Task { await owner.handleViewWillAppear() }
                 case .tapCell(let index),
                      .tapDetail(let index),
                      .tapEdit(let index):
-                    break
+                    if let route = owner.route(for: action, at: index) {
+                        owner.route.accept(route)
+                    }
                 case .tapDelete(let index):
-                    break
+                    guard index < owner.clips.count else { break }
+                    Task { await owner.deleteClip(owner.clips[index]) }
                 }
             }
             .disposed(by: disposeBag)
+    }
+
+    private func handleViewDidLoad() {
+        let cellDisplay = clips.map(makeClipCellDisplay)
+        state.accept(.clips(cellDisplay))
+    }
+
+    private func handleViewWillAppear() async {
+        guard shouldFetchOnAppear else {
+            shouldFetchOnAppear = true
+            return
+        }
+
+        let result = await fetchUnvisitedClipsUseCase.execute()
+        switch result {
+        case .success(let clips):
+            let cellDisplay = clips.map(makeClipCellDisplay)
+            state.accept(.clips(cellDisplay))
+        case .failure(let error):
+            print(error)
+        }
+    }
+
+    private func route(for action: Action, at index: Int) -> Route? {
+        guard index < clips.count else { return nil }
+
+        let clip = clips[index]
+        switch action {
+        case .tapCell:
+            return .showWebView(clip.urlMetadata.url)
+        case .tapDetail:
+            return .showDetailClip(clip)
+        case .tapEdit:
+            return .showEditClip(clip)
+        default:
+            return nil
+        }
+    }
+
+    private func deleteClip(_ clip: Clip) async {
+        let result = await deleteClipUseCase.execute(clip)
+        switch result {
+        case .success:
+            await handleViewWillAppear()
+        case .failure(let error):
+            print(error)
+        }
+    }
+
+    private func makeClipCellDisplay(_ clip: Clip) -> ClipCellDisplay {
+        ClipCellDisplay(
+            thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
+            title: clip.urlMetadata.title,
+            memo: clip.memo,
+            isVisited: clip.lastVisitedAt != nil
+        )
     }
 }
