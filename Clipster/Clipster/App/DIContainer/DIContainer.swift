@@ -15,4 +15,26 @@ final class DIContainer {
     func makeFolderStorage() -> FolderStorage {
          DefaultFolderStorage(context: context)
      }
+
+    func makeClipRepository() -> ClipRepository {
+        DefaultClipRepository(
+            storage: makeClipStorage(),
+            mapper: DomainMapper()
+        )
+    }
+
+    func makeFolderRepository() -> FolderRepository {
+        DefaultFolderRepository(
+            storage: makeFolderStorage(),
+            mapper: DomainMapper()
+        )
+    }
+
+    func makeURLMetadataRepository() -> URLMetadataRepository {
+        DefaultURLMetadataRepository()
+    }
+
+    func makeURLValidationRepository() -> URLValidationRepository {
+        DefaultURLValidationRepository()
+    }
 }
