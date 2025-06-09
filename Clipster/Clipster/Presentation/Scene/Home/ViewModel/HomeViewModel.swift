@@ -141,15 +141,20 @@ final class HomeViewModel {
     }
 
     private func makeFolderCellDisplays() async throws -> [FolderCellDisplay] {
-        let folder = try await fetchTopLevelFoldersUseCase.execute(parentFolderID: nil).get()
-        folders = folder.folders
+        let folders = try await fetchTopLevelFoldersUseCase.execute().get()
 
-        return folder.folders.map {
-            FolderCellDisplay(
-                id: $0.id,
-                title: $0.title,
-                itemCount: $0.clips.count
-            )
+        if let root = folders.first {
+            self.folders = root.folders
+            return root.folders.map {
+                FolderCellDisplay(
+                    id: $0.id,
+                    title: $0.title,
+                    itemCount: $0.clips.count
+                )
+            }
+        } else {
+            self.folders = []
+            return []
         }
     }
 
