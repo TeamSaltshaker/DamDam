@@ -2,7 +2,7 @@ import SnapKit
 import UIKit
 
 final class FolderSelectorView: UIView {
-    private let folderSelectorNavigationView = FolderSelectorNavigationView()
+    let folderSelectorNavigationView = FolderSelectorNavigationView()
 
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
