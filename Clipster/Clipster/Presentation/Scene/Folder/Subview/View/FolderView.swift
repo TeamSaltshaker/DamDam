@@ -10,8 +10,8 @@ final class FolderView: UIView {
     }
 
     enum Item: Hashable {
-        case folder(FolderCellDisplay)
-        case clip(ClipCellDisplay)
+        case folder(FolderDisplay)
+        case clip(ClipDisplay)
     }
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
@@ -47,7 +47,7 @@ final class FolderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(folders: [FolderCellDisplay], clips: [ClipCellDisplay]) {
+    func setDisplay(folders: [FolderDisplay], clips: [ClipDisplay]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.folder, .clip])
         snapshot.appendItems(folders.map { .folder($0) }, toSection: .folder)

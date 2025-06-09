@@ -126,7 +126,6 @@ private extension FolderViewController {
                     let deleteClipUC = DefaultDeleteClipUseCase(clipRepository: clipRepository)
                     let childFolderVM = FolderViewModel(
                         folder: folder,
-                        mapper: CellDisplayMapper(),
                         deleteFolderUseCase: DefaultDeleteFolderUseCase(),
                         deleteClipUseCase: deleteClipUC,
                     )
