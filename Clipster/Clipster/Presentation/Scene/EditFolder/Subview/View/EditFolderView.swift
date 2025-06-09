@@ -13,6 +13,14 @@ final class EditFolderView: UIView {
 
     private let folderTitleTextField = EditFolderTextField()
 
+    private let folderLabel: UILabel = {
+        let label = UILabel()
+        label.text = "저장폴더"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        return label
+    }()
+
     var folderTitleChanges: Observable<String> {
         folderTitleTextField.rx.text.orEmpty.asObservable()
     }
@@ -47,7 +55,7 @@ private extension EditFolderView {
     }
 
     func setHierarchy() {
-        [titleLabel, folderTitleTextField]
+        [titleLabel, folderTitleTextField, folderLabel]
             .forEach { addSubview($0) }
     }
 
@@ -61,6 +69,11 @@ private extension EditFolderView {
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(48)
+        }
+
+        folderLabel.snp.makeConstraints { make in
+            make.top.equalTo(folderTitleTextField.snp.bottom).offset(40)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
     }
 }
