@@ -133,10 +133,15 @@ final class HomeViewModel {
     }
 
     private func makeFolderCellDisplays() async throws -> [FolderDisplay] {
-        let folder = try await fetchTopLevelFoldersUseCase.execute(parentFolderID: nil).get()
-        folders = folder.folders
+        let folders = try await fetchTopLevelFoldersUseCase.execute().get()
 
-        return folder.folders.map { FolderDisplayMapper.map($0) }
+        if let root = folders.first {
+            self.folders = root.folders
+            return root.folders.map { FolderDisplayMapper.map($0) }
+        } else {
+            self.folders = []
+            return []
+        }
     }
 
     private func handleTapDelete(at indexPath: IndexPath) {

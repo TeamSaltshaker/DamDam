@@ -132,7 +132,7 @@ private extension HomeViewController {
                     let context = CoreDataStack.shared.context
                     let storage = DefaultClipStorage(context: context)
                     let clipRepository = DefaultClipRepository(storage: storage, mapper: DomainMapper())
-                    let fetchUnvisitedClipsUseCase = DefaultFetchUnvisitedClipsUseCase()
+                    let fetchUnvisitedClipsUseCase = DefaultFetchUnvisitedClipsUseCase(clipRepository: clipRepository)
                     let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
                     let viewModel = UnvisitedClipListViewModel(
                         clips: clips,
