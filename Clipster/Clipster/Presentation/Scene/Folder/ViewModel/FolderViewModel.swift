@@ -19,7 +19,7 @@ final class FolderViewModel {
 
     enum Navigation {
         case editClipView(Clip?)
-        case editFolderView(Folder?)
+        case editFolderView(Folder, Folder?)
         case folderView(Folder)
         case clipDetailView(Clip)
         case webView(URL)
@@ -97,17 +97,17 @@ private extension FolderViewModel {
     }
 
     func navigateToAddFolderView() {
-        navigation.accept(.editFolderView(nil))
+        navigation.accept(.editFolderView(folder, nil))
     }
 
     func navigateToEditView(at indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
-            let folder = folder.folders[indexPath.item]
-            navigation.accept(.editFolderView(folder))
+            let selectedFolder = folder.folders[indexPath.item]
+            navigation.accept(.editFolderView(folder, selectedFolder))
         case 1:
-            let clip = folder.clips[indexPath.item]
-            navigation.accept(.editClipView(clip))
+            let selectedClip = folder.clips[indexPath.item]
+            navigation.accept(.editClipView(selectedClip))
         default:
             break
         }

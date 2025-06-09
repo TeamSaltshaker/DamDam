@@ -80,21 +80,58 @@ private extension FolderViewController {
                 guard let self else { return }
                 switch navigation {
                 case .editClipView(let clip):
-                    () // TODO: editClipView
-                case .editFolderView(let folder):
-                    () // TODO: editFolderView
+                    let urlValidationReposiotry = DefaultURLValidationRepository()
+                    let checkValidityUC = DefaultCheckVaildityUseCase(repository: urlValidationReposiotry)
+                    let urlMetadataRepository = DefaultURLMetadataRepository()
+                    let parseURLMetadataUC = DefaultParseURLMetadataUseCase(repository: urlMetadataRepository)
+                    let editClipVM: EditClipViewModel
+                    if let clip = clip {
+                        editClipVM = EditClipViewModel(
+                            clip: clip,
+                            checkURLValidityUseCase: checkValidityUC,
+                            parseURLMetadataUseCase: parseURLMetadataUC,
+                        )
+                    } else {
+                        editClipVM = EditClipViewModel(
+                            checkURLValidityUseCase: checkValidityUC,
+                            parseURLMetadataUseCase: parseURLMetadataUC,
+                        )
+                    }
+                    let editClipVC = EditClipViewController(viewModel: editClipVM)
+                    navigationController?.pushViewController(editClipVC, animated: true)
+                case .editFolderView(let parentFolder, let folder):
+                    let folderStorage = DefaultFolderStorage(context: CoreDataStack.shared.context)
+                    let folderRepository = DefaultFolderRepository(
+                        storage: folderStorage,
+                        mapper: DomainMapper(),
+                    )
+                    let createFolderUC = DefaultCreateFolderUseCase(folderRepository: folderRepository)
+                    let updateFolderUC = DefaultUpdateFolderUseCase(folderRepository: folderRepository)
+                    let mode: EditFolderMode
+                    if let folder = folder {
+                        mode = .edit(parentFolder: parentFolder, folder: folder)
+                    } else {
+                        mode = .add(parentFolder: parentFolder)
+                    }
+                    let editFolderVM = EditFolderViewModel(
+                        createFolderUseCase: createFolderUC,
+                        updateFolderUseCase: updateFolderUC,
+                        mode: mode,
+                    )
+                    let editFolderVC = EditFolderViewController(viewModel: editFolderVM)
+                    navigationController?.pushViewController(editFolderVC, animated: true)
                 case .folderView(let folder):
                     let clipStorage = DefaultClipStorage(context: CoreDataStack.shared.context)
                     let clipRepository = DefaultClipRepository(storage: clipStorage, mapper: DomainMapper())
-                    let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
-                    let childFolderViewModel = FolderViewModel(
+                    let deleteClipUC = DefaultDeleteClipUseCase(clipRepository: clipRepository)
+                    let childFolderVM = FolderViewModel(
                         folder: folder,
                         mapper: CellDisplayMapper(),
                         deleteFolderUseCase: DefaultDeleteFolderUseCase(),
-                        deleteClipUseCase: deleteClipUseCase,
+                        deleteClipUseCase: deleteClipUC,
                     )
-                    let childFolderViewController = FolderViewController(viewModel: childFolderViewModel)
-                    navigationController?.pushViewController(childFolderViewController, animated: true)
+                    let childFolderVC = FolderViewController(viewModel: childFolderVM)
+                    navigationController?.pushViewController(childFolderVC, animated: true)
                 case .clipDetailView(let clip):
                     () // TODO: clipDetailView
                 case .webView(let url):
