@@ -1,9 +1,3 @@
-import Foundation
-
-enum DummyError: Error {
-    case notImplemented
-}
-
 final class DefaultFetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase {
     private let folderRepository: FolderRepository
 
