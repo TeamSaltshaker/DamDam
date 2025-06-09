@@ -1,7 +1,11 @@
+import RxCocoa
+import RxSwift
+import SnapKit
 import UIKit
 
 final class FolderViewController: UIViewController {
     private let viewModel: FolderViewModel
+    private let disposeBag = DisposeBag()
 
     private let folderView = FolderView()
 
@@ -16,5 +20,27 @@ final class FolderViewController: UIViewController {
 
     override func loadView() {
         view = folderView
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configure()
+    }
+}
+
+private extension FolderViewController {
+    func configure() {
+        setBindings()
+    }
+
+    func setBindings() {
+        viewModel.state
+            .compactMap(\.currentFolderTitle)
+            .asDriver(onErrorJustReturn: "")
+            .drive { [weak self] currentFolderTitle in
+                guard let self else { return }
+                title = currentFolderTitle
+            }
+            .disposed(by: disposeBag)
     }
 }
