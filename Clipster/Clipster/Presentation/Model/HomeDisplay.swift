@@ -1,4 +1,4 @@
 struct HomeDisplay {
     let unvitsedClips: [ClipDisplay]
-    let folders: [FolderCellDisplay]
+    let folders: [FolderDisplay]
 }

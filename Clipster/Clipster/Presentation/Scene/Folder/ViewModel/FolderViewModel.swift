@@ -13,7 +13,7 @@ final class FolderViewModel {
 
     struct State {
         let currentFolderTitle: String
-        let folders: [FolderCellDisplay]
+        let folders: [FolderDisplay]
         let clips: [ClipDisplay]
     }
 
@@ -31,24 +31,21 @@ final class FolderViewModel {
     var disposeBag = DisposeBag()
 
     private let folder: Folder
-    private let mapper: CellDisplayMapper
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
         folder: Folder,
-        mapper: CellDisplayMapper,
         deleteFolderUseCase: DeleteFolderUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
-        self.mapper = mapper
         self.deleteFolderUseCase = deleteFolderUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
         state = BehaviorRelay(value: State(
             currentFolderTitle: folder.title,
-            folders: folder.folders.map { mapper.folderCellDisplay(from: $0) },
+            folders: folder.folders.map { FolderDisplayMapper.map($0) },
             clips: folder.clips.map { ClipDisplayMapper.map($0) },
         ))
         setBindings()

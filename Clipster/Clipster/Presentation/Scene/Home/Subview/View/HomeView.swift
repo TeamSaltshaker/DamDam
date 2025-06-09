@@ -19,7 +19,7 @@ final class HomeView: UIView {
 
     enum Item: Hashable {
         case clip(ClipDisplay)
-        case folder(FolderCellDisplay)
+        case folder(FolderDisplay)
     }
 
     private let disposeBag = DisposeBag()
@@ -51,7 +51,7 @@ final class HomeView: UIView {
             cell.setDisplay(item)
         }
 
-        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderCellDisplay> { cell, _, item in
+        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
