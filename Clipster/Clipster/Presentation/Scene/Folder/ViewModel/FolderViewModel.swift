@@ -7,6 +7,7 @@ final class FolderViewModel {
         case didTapCell(IndexPath)
         case didTapAddFolderButton
         case didTapAddClipButton
+        case didTapDetailButton(IndexPath)
         case didTapEditButton(IndexPath)
         case didTapDeleteButton(IndexPath)
     }
@@ -73,6 +74,8 @@ private extension FolderViewModel {
                     navigateToAddClipView()
                 case .didTapAddFolderButton:
                     navigateToAddFolderView()
+                case .didTapDetailButton(let indexPath):
+                    navigateToDetailView(at: indexPath)
                 case .didTapEditButton(let indexPath):
                     navigateToEditView(at: indexPath)
                 case .didTapDeleteButton(let indexPath):
@@ -98,6 +101,16 @@ private extension FolderViewModel {
 
     func navigateToAddFolderView() {
         navigation.accept(.editFolderView(folder, nil))
+    }
+
+    func navigateToDetailView(at indexPath: IndexPath) {
+        switch indexPath.section {
+        case 1:
+            let selectedClip = folder.clips[indexPath.item]
+            navigation.accept(.clipDetailView(selectedClip))
+        default:
+            break
+        }
     }
 
     func navigateToEditView(at indexPath: IndexPath) {

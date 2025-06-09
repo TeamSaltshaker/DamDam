@@ -52,6 +52,7 @@ private extension FolderViewController {
     func configure() {
         setNavigationBarItems()
         setBindings()
+        setDelegate()
     }
 
     func setNavigationBarItems() {
@@ -170,5 +171,48 @@ private extension FolderViewController {
                 viewModel.action.accept(.didTapCell(indexPath))
             }
             .disposed(by: disposeBag)
+    }
+
+    func setDelegate() {
+        folderView.collectionView
+            .rx
+            .setDelegate(self)
+            .disposed(by: disposeBag)
+    }
+}
+
+extension FolderViewController: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint,
+    ) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            guard let self else { return UIMenu() }
+
+            let detailAction = UIAction(
+                title: "상세정보",
+                image: UIImage(systemName: "info.circle"),
+            ) { _ in
+                self.viewModel.action.accept(.didTapDetailButton(indexPath))
+            }
+            let editAction = UIAction(
+                title: "편집",
+                image: UIImage(systemName: "pencil"),
+            ) { _ in
+                self.viewModel.action.accept(.didTapEditButton(indexPath))
+            }
+            let deleteAction = UIAction(
+                title: "삭제",
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive,
+            ) { _ in
+                self.viewModel.action.accept(.didTapDeleteButton(indexPath))
+            }
+            let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
+            return UIMenu(title: "", children: actions)
+        }
     }
 }
