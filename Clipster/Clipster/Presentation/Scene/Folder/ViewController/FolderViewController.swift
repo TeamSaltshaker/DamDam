@@ -26,11 +26,41 @@ final class FolderViewController: UIViewController {
         super.viewDidLoad()
         configure()
     }
+
+    private func makeAddButtonMenu() -> UIMenu {
+        let addFolderAction = UIAction(
+            title: "폴더 추가",
+            image: UIImage(systemName: "folder"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            viewModel.action.accept(.didTapAddFolderButton)
+        }
+        let addClipAction = UIAction(
+            title: "클립 추가",
+            image: UIImage(systemName: "paperclip"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            viewModel.action.accept(.didTapAddClipButton)
+        }
+
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    }
 }
 
 private extension FolderViewController {
     func configure() {
+        setNavigationBarItems()
         setBindings()
+    }
+
+    func setNavigationBarItems() {
+        let addButton = UIBarButtonItem(
+            systemItem: .add,
+            menu: makeAddButtonMenu()
+        )
+
+        navigationController?.navigationBar.tintColor = .label
+        navigationItem.rightBarButtonItem = addButton
     }
 
     func setBindings() {
