@@ -11,6 +11,7 @@ struct CellDisplayMapper {
 
     func clipCellDisplay(from clip: Clip) -> ClipCellDisplay {
         ClipCellDisplay(
+            id: clip.id,
             thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
             title: clip.urlMetadata.title,
             memo: clip.memo,
