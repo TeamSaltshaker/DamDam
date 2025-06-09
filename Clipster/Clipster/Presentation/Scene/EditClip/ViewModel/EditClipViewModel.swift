@@ -55,7 +55,7 @@ final class EditClipViewModel: ViewModel {
         state = BehaviorRelay(value: State(
             urlInputText: clip.urlMetadata.url.absoluteString,
             memoText: clip.memo,
-            memoLimit: "\(clip.memo)/100"
+            memoLimit: "\(clip.memo.count)/100"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
