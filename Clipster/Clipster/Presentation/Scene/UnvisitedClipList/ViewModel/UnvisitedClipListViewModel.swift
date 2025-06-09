@@ -110,6 +110,7 @@ final class UnvisitedClipListViewModel {
 
     private func makeClipCellDisplay(_ clip: Clip) -> ClipCellDisplay {
         ClipCellDisplay(
+            id: clip.id,
             thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
             title: clip.urlMetadata.title,
             memo: clip.memo,
