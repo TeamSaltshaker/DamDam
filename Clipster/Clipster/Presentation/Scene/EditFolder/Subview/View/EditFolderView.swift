@@ -3,6 +3,10 @@ import SnapKit
 import UIKit
 
 final class EditFolderView: UIView {
+    let commonNavigationView = CommonNavigationView()
+    let backButton = BackButton()
+    let saveButton = SaveButton()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "제목"
@@ -63,10 +67,13 @@ private extension EditFolderView {
 
     func setAttributes() {
         backgroundColor = .systemBackground
+
+        commonNavigationView.setLeftItem(backButton)
+        commonNavigationView.setRightItem(saveButton)
     }
 
     func setHierarchy() {
-        [titleLabel, folderTitleTextField, folderLabel, folderView]
+        [commonNavigationView, titleLabel, folderTitleTextField, folderLabel, folderView]
             .forEach { addSubview($0) }
 
         [folderRowView, chevronImageView]
@@ -74,8 +81,13 @@ private extension EditFolderView {
     }
 
     func setConstraints() {
+        commonNavigationView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalToSuperview()
+        }
+
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(24)
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
