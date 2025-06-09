@@ -29,6 +29,12 @@ final class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         homeviewModel.action.accept(.viewWillAppear)
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     private func makeAddButtonMenu() -> UIMenu {
@@ -59,7 +65,6 @@ private extension HomeViewController {
 
     func setAttributes() {
         title = "Clipster"
-        navigationController?.navigationBar.prefersLargeTitles = true
     }
 
     func setNavigationBarItems() {
@@ -126,7 +131,7 @@ private extension HomeViewController {
                 case .showUnvisitedClipList(let clips):
                     print("읽지 않은 클립 화면 이동")
                     print("\(clips)\n")
-                    let vc = UnvisitedClipListViewController()
+                    let vc = UnvisitedClipListViewController(clips: clips)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
