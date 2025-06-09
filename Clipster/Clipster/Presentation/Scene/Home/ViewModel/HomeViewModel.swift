@@ -132,18 +132,12 @@ final class HomeViewModel {
         return clips.map { ClipDisplayMapper.map($0) }
     }
 
-    private func makeFolderCellDisplays() async throws -> [FolderCellDisplay] {
+    private func makeFolderCellDisplays() async throws -> [FolderDisplay] {
         let folders = try await fetchTopLevelFoldersUseCase.execute().get()
 
         if let root = folders.first {
             self.folders = root.folders
-            return root.folders.map {
-                FolderCellDisplay(
-                    id: $0.id,
-                    title: $0.title,
-                    itemCount: $0.clips.count
-                )
-            }
+            return root.folders.map { FolderDisplayMapper.map($0) }
         } else {
             self.folders = []
             return []
