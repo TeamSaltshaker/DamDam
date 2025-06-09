@@ -3,8 +3,6 @@ import SnapKit
 import UIKit
 
 final class EditFolderView: UIView {
-    let backButton = EditFolderBackButton()
-    let saveButton = EditFolderSaveButton()
     private let folderTitleTextField = EditFolderTextField()
 
     var folderTitleChanges: Observable<String> {

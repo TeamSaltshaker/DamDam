@@ -7,6 +7,8 @@ final class EditFolderViewController: UIViewController {
     private let viewModel: EditFolderViewModel
     private let disposeBag = DisposeBag()
 
+    private let backButton = BackButton()
+    private let saveButton = SaveButton()
     private let editFolderView = EditFolderView()
 
     init(viewModel: EditFolderViewModel) {
@@ -35,10 +37,9 @@ private extension EditFolderViewController {
     }
 
     func setAttributes() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: editFolderView.backButton)
-
-        let rightBarButton = UIBarButtonItem(customView: editFolderView.saveButton)
-        navigationItem.rightBarButtonItem = rightBarButton
+        title = "폴더 추가"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveButton)
     }
 
     func setBindings() {
@@ -46,7 +47,7 @@ private extension EditFolderViewController {
             .map { $0.isSavable }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: editFolderView.saveButton.rx.isEnabled)
+            .bind(to: saveButton.rx.isEnabled)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -55,8 +56,8 @@ private extension EditFolderViewController {
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] isProcessing in
                 guard let self else { return }
-                self.editFolderView.saveButton.isUserInteractionEnabled = !isProcessing
-                self.editFolderView.saveButton.alpha = isProcessing ? 0.5 : 1.0
+                self.saveButton.isUserInteractionEnabled = !isProcessing
+                self.saveButton.alpha = isProcessing ? 0.5 : 1.0
                 self.editFolderView.setTextFieldInteraction(enabled: !isProcessing)
             }
             .disposed(by: disposeBag)
@@ -88,7 +89,7 @@ private extension EditFolderViewController {
             .bind(to: editFolderView.folderTitleBinder)
             .disposed(by: disposeBag)
 
-        editFolderView.backButton.tap
+        backButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
@@ -101,7 +102,7 @@ private extension EditFolderViewController {
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
 
-        editFolderView.saveButton.rx.tap
+        saveButton.rx.tap
             .map { EditFolderAction.saveButtonTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
