@@ -14,11 +14,37 @@
 		44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D52DE9D37000B6CD87 /* SnapKit */; };
 		44DFD9D92DE9D37D00B6CD87 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D82DE9D37D00B6CD87 /* Alamofire */; };
 		44DFD9DC2DE9D39300B6CD87 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9DB2DE9D39300B6CD87 /* Kingfisher */; };
+		9F781F192DF6CEFC00D7BEC6 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9F781F172DF6CEFC00D7BEC6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44DFD9AD2DE9D0E000B6CD87 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F781F0E2DF6CEFC00D7BEC6;
+			remoteInfo = ShareExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9F781F1A2DF6CEFC00D7BEC6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9F781F192DF6CEFC00D7BEC6 /* ShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4468B8B62DEC961600AD2F57 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		44DFD9B52DE9D0E000B6CD87 /* Clipster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Clipster.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -29,6 +55,13 @@
 			);
 			target = 44DFD9B42DE9D0E000B6CD87 /* Clipster */;
 		};
+		9F781F1E2DF6CEFC00D7BEC6 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,6 +71,14 @@
 				44DFD9C72DE9D0E200B6CD87 /* Exceptions for "Clipster" folder in "Clipster" target */,
 			);
 			path = Clipster;
+			sourceTree = "<group>";
+		};
+		9F781F102DF6CEFC00D7BEC6 /* ShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9F781F1E2DF6CEFC00D7BEC6 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */,
+			);
+			path = ShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,6 +97,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9F781F0C2DF6CEFC00D7BEC6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -64,6 +112,7 @@
 			children = (
 				4468B8B62DEC961600AD2F57 /* .swiftlint.yml */,
 				44DFD9B72DE9D0E000B6CD87 /* Clipster */,
+				9F781F102DF6CEFC00D7BEC6 /* ShareExtension */,
 				44DFD9B62DE9D0E000B6CD87 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -72,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				44DFD9B52DE9D0E000B6CD87 /* Clipster.app */,
+				9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,10 +137,12 @@
 				44DFD9B12DE9D0E000B6CD87 /* Sources */,
 				44DFD9B22DE9D0E000B6CD87 /* Frameworks */,
 				44DFD9B32DE9D0E000B6CD87 /* Resources */,
+				9F781F1A2DF6CEFC00D7BEC6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9F781F182DF6CEFC00D7BEC6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				44DFD9B72DE9D0E000B6CD87 /* Clipster */,
@@ -108,6 +160,28 @@
 			productReference = 44DFD9B52DE9D0E000B6CD87 /* Clipster.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F781F1D2DF6CEFC00D7BEC6 /* Build configuration list for PBXNativeTarget "ShareExtension" */;
+			buildPhases = (
+				9F781F0B2DF6CEFC00D7BEC6 /* Sources */,
+				9F781F0C2DF6CEFC00D7BEC6 /* Frameworks */,
+				9F781F0D2DF6CEFC00D7BEC6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9F781F102DF6CEFC00D7BEC6 /* ShareExtension */,
+			);
+			name = ShareExtension;
+			packageProductDependencies = (
+			);
+			productName = ShareExtension;
+			productReference = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -115,11 +189,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					44DFD9B42DE9D0E000B6CD87 = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					9F781F0E2DF6CEFC00D7BEC6 = {
+						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
@@ -144,6 +221,7 @@
 			projectRoot = "";
 			targets = (
 				44DFD9B42DE9D0E000B6CD87 /* Clipster */,
+				9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -154,6 +232,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4468B8B72DEC961600AD2F57 /* .swiftlint.yml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F781F0D2DF6CEFC00D7BEC6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,7 +275,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9F781F0B2DF6CEFC00D7BEC6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9F781F182DF6CEFC00D7BEC6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
+			targetProxy = 9F781F172DF6CEFC00D7BEC6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		44DFD9C92DE9D0E200B6CD87 /* Debug */ = {
@@ -199,9 +299,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Clipster/App/Clipster.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
@@ -216,6 +318,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_001;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -232,9 +336,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Clipster/App/Clipster.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
@@ -249,6 +355,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_001;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -378,6 +486,68 @@
 			};
 			name = Release;
 		};
+		9F781F1B2DF6CEFC00D7BEC6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_001;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9F781F1C2DF6CEFC00D7BEC6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_001;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -395,6 +565,15 @@
 			buildConfigurations = (
 				44DFD9C92DE9D0E200B6CD87 /* Debug */,
 				44DFD9CA2DE9D0E200B6CD87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F781F1D2DF6CEFC00D7BEC6 /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F781F1B2DF6CEFC00D7BEC6 /* Debug */,
+				9F781F1C2DF6CEFC00D7BEC6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
