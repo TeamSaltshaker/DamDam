@@ -8,14 +8,4 @@ struct CellDisplayMapper {
             itemCount: folder.folders.count + folder.clips.count
         )
     }
-
-    func clipCellDisplay(from clip: Clip) -> ClipCellDisplay {
-        ClipCellDisplay(
-            id: clip.id,
-            thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
-            title: clip.urlMetadata.title,
-            memo: clip.memo,
-            isVisited: clip.lastVisitedAt != nil
-        )
-    }
 }

@@ -18,7 +18,7 @@ final class HomeView: UIView {
     }
 
     enum Item: Hashable {
-        case clip(ClipCellDisplay)
+        case clip(ClipDisplay)
         case folder(FolderCellDisplay)
     }
 
@@ -47,7 +47,7 @@ final class HomeView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipCellDisplay> { cell, _, item in
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 

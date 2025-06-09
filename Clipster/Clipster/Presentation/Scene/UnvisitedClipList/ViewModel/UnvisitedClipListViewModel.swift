@@ -12,7 +12,7 @@ final class UnvisitedClipListViewModel {
     }
 
     enum State {
-        case clips([ClipCellDisplay])
+        case clips([ClipDisplay])
     }
 
     enum Route {
@@ -70,14 +70,14 @@ final class UnvisitedClipListViewModel {
             let result = await fetchUnvisitedClipsUseCase.execute()
             switch result {
             case .success(let clips):
-                let cellDisplay = clips.map(makeClipCellDisplay)
+                let cellDisplay = clips.map(ClipDisplayMapper.map)
                 state.accept(.clips(cellDisplay))
             case .failure(let error):
                 print(error)
             }
         } else {
             shouldFetchOnAppear = true
-            let cellDisplay = clips.map(makeClipCellDisplay)
+            let cellDisplay = clips.map(ClipDisplayMapper.map)
             state.accept(.clips(cellDisplay))
         }
     }
@@ -106,15 +106,5 @@ final class UnvisitedClipListViewModel {
         case .failure(let error):
             print(error)
         }
-    }
-
-    private func makeClipCellDisplay(_ clip: Clip) -> ClipCellDisplay {
-        ClipCellDisplay(
-            id: clip.id,
-            thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
-            title: clip.urlMetadata.title,
-            memo: clip.memo,
-            isVisited: clip.lastVisitedAt != nil
-        )
     }
 }

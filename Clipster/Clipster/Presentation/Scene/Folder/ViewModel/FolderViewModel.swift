@@ -14,7 +14,7 @@ final class FolderViewModel {
     struct State {
         let currentFolderTitle: String
         let folders: [FolderCellDisplay]
-        let clips: [ClipCellDisplay]
+        let clips: [ClipDisplay]
     }
 
     enum Navigation {
@@ -49,7 +49,7 @@ final class FolderViewModel {
         state = BehaviorRelay(value: State(
             currentFolderTitle: folder.title,
             folders: folder.folders.map { mapper.folderCellDisplay(from: $0) },
-            clips: folder.clips.map { mapper.clipCellDisplay(from: $0) },
+            clips: folder.clips.map { ClipDisplayMapper.map($0) },
         ))
         setBindings()
     }
