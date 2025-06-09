@@ -25,7 +25,7 @@ private extension BackButton {
     func setAttributes() {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "chevron.left")
-        config.imagePadding = 12
+        config.imagePadding = 8
         config.baseForegroundColor = .label
         config.contentInsets = .zero
 
