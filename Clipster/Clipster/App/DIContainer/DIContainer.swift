@@ -37,4 +37,44 @@ final class DIContainer {
     func makeURLValidationRepository() -> URLValidationRepository {
         DefaultURLValidationRepository()
     }
+
+    func makeDeleteClipUseCase() -> DeleteClipUseCase {
+        DefaultDeleteClipUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeFetchClipUseCase() -> FetchClipUseCase {
+        DefaultFetchClipUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {
+        DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeCreateFolderUseCase() -> CreateFolderUseCase {
+        DefaultCreateFolderUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeDeleteFolderUseCase() -> DeleteFolderUseCase {
+        DefaultDeleteFolderUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeFetchFolderUseCase() -> FetchFolderUseCase {
+        DefaultFetchFolderUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeFetchTopLevelFoldersUseCase() -> FetchTopLevelFoldersUseCase {
+        DefaultFetchTopLevelFoldersUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeUpdateFolderUseCase() -> UpdateFolderUseCase {
+        DefaultUpdateFolderUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeParseURLMetadataUseCase() -> ParseURLMetadataUseCase {
+        DefaultParseURLMetadataUseCase(urlMetadataRepository: makeURLMetadataRepository())
+    }
+
+    func makeCheckURLValidityUseCase() -> CheckURLValidityUseCase {
+        DefaultCheckVaildityUseCase(urlValidationRepository: makeURLValidationRepository())
+    }
 }
