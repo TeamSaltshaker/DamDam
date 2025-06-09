@@ -145,6 +145,7 @@ final class HomeViewModel {
 
         return folder.folders.map {
             FolderCellDisplay(
+                id: $0.id,
                 title: $0.title,
                 itemCount: $0.clips.count
             )
