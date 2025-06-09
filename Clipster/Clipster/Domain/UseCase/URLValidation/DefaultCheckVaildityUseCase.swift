@@ -1,16 +1,16 @@
 import Foundation
 
 final class DefaultCheckVaildityUseCase: CheckURLValidityUseCase {
-    let repository: URLValidationRepository
+    let urlValidationRepository: URLValidationRepository
 
-    init(repository: URLValidationRepository) {
-        self.repository = repository
+    init(urlValidationRepository: URLValidationRepository) {
+        self.urlValidationRepository = urlValidationRepository
     }
 
     func execute(urlString: String) async -> Result<Bool, Error> {
         guard let url = URL(string: urlString) else {
             return .failure(URLError(.badURL))
         }
-        return await repository.execute(url: url)
+        return await urlValidationRepository.execute(url: url)
     }
 }
