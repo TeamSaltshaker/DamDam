@@ -2,9 +2,10 @@ import SnapKit
 import UIKit
 
 final class ClipDetailView: UIView {
-    let backButton = ClipDetailBackButton()
-    let editButton = ClipDetailEditButton()
-    let deleteButton = ClipDetailDeleteButton()
+    let commonNavigationView = CommonNavigationView()
+    let backButton = BackButton()
+    let editButton = EditButton()
+    let deleteButton = DeleteButton()
 
     private let clipView: UIView = {
         let view = UIView()
@@ -74,10 +75,14 @@ private extension ClipDetailView {
 
     func setAttributes() {
         backgroundColor = .systemBackground
+
+        commonNavigationView.setTitle("폴더 상세정보")
+        commonNavigationView.setLeftItem(backButton)
+        commonNavigationView.setRightItems([editButton, deleteButton])
     }
 
     func setHierarchy() {
-        [clipView, memoView, activityIndicator]
+        [commonNavigationView, clipView, memoView, activityIndicator]
             .forEach { addSubview($0) }
 
         [urlMetadataStackView, separator, rowStackView]
@@ -88,8 +93,13 @@ private extension ClipDetailView {
     }
 
     func setConstraints() {
-        clipView.snp.makeConstraints { make in
+        commonNavigationView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalToSuperview()
+        }
+
+        clipView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview().inset(16)
         }
 
