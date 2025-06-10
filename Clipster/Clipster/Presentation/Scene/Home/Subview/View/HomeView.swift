@@ -5,7 +5,9 @@ import UIKit
 
 final class HomeView: UIView {
     enum Action {
-        case tap(IndexPath)
+        case tapAddFolder
+        case tapAddClip
+        case tapItem(IndexPath)
         case detail(IndexPath)
         case edit(IndexPath)
         case delete(IndexPath)
@@ -26,6 +28,25 @@ final class HomeView: UIView {
     let action = PublishRelay<Action>()
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
+
+    private let navigationView = UIView()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "아차차"
+        label.font = .systemFont(ofSize: 28, weight: .heavy)
+        label.textColor = .label
+        return label
+    }()
+
+    private lazy var addButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.tintColor = .label
+        button.showsMenuAsPrimaryAction = true
+        button.menu = makeAddButtonMenu()
+        return button
+    }()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -96,6 +117,24 @@ final class HomeView: UIView {
                 for: indexPath
             )
         }
+    }
+
+    private func makeAddButtonMenu() -> UIMenu {
+        let addFolderAction = UIAction(
+            title: "폴더 추가",
+            image: UIImage(systemName: "folder")
+        ) { [weak self] _ in
+            self?.action.accept(.tapAddFolder)
+        }
+
+        let addClipAction = UIAction(
+            title: "클립 추가",
+            image: UIImage(systemName: "paperclip"),
+        ) { [weak self] _ in
+            self?.action.accept(.tapAddClip)
+        }
+
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
     }
 
     func setDisplay(_ display: HomeDisplay) {
@@ -266,12 +305,36 @@ private extension HomeView {
     }
 
     func setHierarchy() {
-        addSubview(collectionView)
+        [
+            collectionView,
+            navigationView
+        ].forEach { addSubview($0) }
+
+        [
+            titleLabel,
+            addButton
+        ].forEach { navigationView.addSubview($0) }
     }
 
     func setConstraints() {
-        collectionView.snp.makeConstraints { make in
+        navigationView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(56)
+        }
+
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(24)
+            make.centerY.equalToSuperview()
+        }
+
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(24)
+            make.centerY.equalToSuperview()
+        }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
@@ -279,7 +342,7 @@ private extension HomeView {
 
     func setBindings() {
         collectionView.rx.itemSelected
-            .map { Action.tap($0) }
+            .map { Action.tapItem($0) }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
