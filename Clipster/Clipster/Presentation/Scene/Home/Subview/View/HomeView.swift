@@ -47,7 +47,7 @@ final class HomeView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
@@ -155,16 +155,16 @@ private extension HomeView {
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(0.7),
-            heightDimension: .absolute(72)
+            widthDimension: .absolute(144),
+            heightDimension: .absolute(179)
         )
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
-        section.interGroupSpacing = 8
-        section.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
+        section.interGroupSpacing = 16
+        section.contentInsets = .init(top: 24, leading: 24, bottom: 0, trailing: 24)
 
         return section
     }
