@@ -54,7 +54,6 @@ private extension FolderViewController {
     func configure() {
         setNavigationBarItems()
         setBindings()
-        setDelegate()
     }
 
     func setNavigationBarItems() {
@@ -116,57 +115,51 @@ private extension FolderViewController {
             }
             .disposed(by: disposeBag)
 
-        folderView.collectionView
-            .rx
-            .itemSelected
+        folderView.didTapCell
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] indexPath in
                 guard let self else { return }
                 viewModel.action.accept(.didTapCell(indexPath))
             }
             .disposed(by: disposeBag)
-    }
 
-    func setDelegate() {
-        folderView.collectionView
-            .rx
-            .setDelegate(self)
+        folderView.didTapDetailButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] indexPath in
+                guard let self else { return }
+                viewModel.action.accept(.didTapDetailButton(indexPath))
+            }
             .disposed(by: disposeBag)
-    }
-}
 
-extension FolderViewController: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
-        point: CGPoint,
-    ) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first else { return nil }
+        folderView.didTapEditButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] indexPath in
+                guard let self else { return }
+                viewModel.action.accept(.didTapEditButton(indexPath))
+            }
+            .disposed(by: disposeBag)
 
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            guard let self else { return UIMenu() }
+        folderView.didTapDeleteButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] (indexPath, title) in
+                guard let self else { return }
 
-            let detailAction = UIAction(
-                title: "상세정보",
-                image: UIImage(systemName: "info.circle"),
-            ) { _ in
-                self.viewModel.action.accept(.didTapDetailButton(indexPath))
+                let alertController = UIAlertController(
+                    title: title,
+                    message: "삭제하겠습니까?",
+                    preferredStyle: .alert,
+                )
+
+                let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+                alertController.addAction(cancelAction)
+
+                let deleteAction = UIAlertAction(title: "삭제", style: .destructive) { _ in
+                    self.viewModel.action.accept(.didTapDeleteButton(indexPath))
+                }
+                alertController.addAction(deleteAction)
+
+                self.present(alertController, animated: true)
             }
-            let editAction = UIAction(
-                title: "편집",
-                image: UIImage(systemName: "pencil"),
-            ) { _ in
-                self.viewModel.action.accept(.didTapEditButton(indexPath))
-            }
-            let deleteAction = UIAction(
-                title: "삭제",
-                image: UIImage(systemName: "trash"),
-                attributes: .destructive,
-            ) { _ in
-                self.viewModel.action.accept(.didTapDeleteButton(indexPath))
-            }
-            let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
-            return UIMenu(title: "", children: actions)
-        }
+            .disposed(by: disposeBag)
     }
 }

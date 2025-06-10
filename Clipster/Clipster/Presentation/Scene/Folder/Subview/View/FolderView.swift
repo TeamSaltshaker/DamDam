@@ -14,28 +14,20 @@ final class FolderView: UIView {
         case clip(ClipDisplay)
     }
 
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
+    let didTapCell = PublishRelay<IndexPath>()
+    let didTapDetailButton = PublishRelay<IndexPath>()
+    let didTapEditButton = PublishRelay<IndexPath>()
+    let didTapDeleteButton = PublishRelay<(IndexPath, String)>()
+
+    private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: .zero,
-            collectionViewLayout: createLayout(),
-        )
-//        collectionView.register(
-//            SectionHeaderView.self,
-//            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-//            withReuseIdentifier: "SectionHeaderView",
-//        )
-//        collectionView.register(
-//            FolderCell.self,
-//            forCellWithReuseIdentifier: "FolderCell",
-//        )
-//        collectionView.register(
-//            ClipCell.self,
-//            forCellWithReuseIdentifier: "ClipCell",
-//        )
-        return collectionView
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
+        tableView.register(ClipCell.self, forCellReuseIdentifier: ClipCell.identifier)
+        tableView.delegate = self
+        return tableView
     }()
 
     override init(frame: CGRect) {
@@ -55,90 +47,158 @@ final class FolderView: UIView {
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
-
-    private func createLayout() -> UICollectionViewLayout {
-        UICollectionViewCompositionalLayout { _, _ in
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0),
-            )
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(72)
-            )
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
-            let sectionLayout = NSCollectionLayoutSection(group: group)
-            sectionLayout.interGroupSpacing = 8
-            sectionLayout.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
-
-            let headerSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(44)
-            )
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
-            )
-            sectionLayout.boundarySupplementaryItems = [header]
-
-            return sectionLayout
-        }
-    }
 }
 
 private extension FolderView {
     func configure() {
         setHierarchy()
         setConstraints()
+        setBindings()
         setDataSource()
     }
 
     func setHierarchy() {
-        addSubview(collectionView)
+        addSubview(tableView)
     }
 
     func setConstraints() {
-        collectionView.snp.makeConstraints { make in
+        tableView.snp.makeConstraints { make in
             make.edges.equalTo(safeAreaLayoutGuide)
         }
     }
 
     func setDataSource() {
-//        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-//            switch item {
-//            case .folder(let folderDisplay):
-//                guard let cell = collectionView.dequeueReusableCell(
-//                    withReuseIdentifier: "FolderCell",
-//                    for: indexPath,
-//                ) as? FolderCell else { return UICollectionViewCell() }
-//                cell.setDisplay(folderDisplay)
-//
-//                return cell
-//            case .clip(let clipDisplay):
-//                guard let cell = collectionView.dequeueReusableCell(
-//                    withReuseIdentifier: "ClipCell",
-//                    for: indexPath,
-//                ) as? ClipCell else { return UICollectionViewCell() }
-//                cell.setDisplay(clipDisplay)
-//
-//                return cell
-//            }
-//        }
-
-        dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard kind == UICollectionView.elementKindSectionHeader,
-                  let header = collectionView.dequeueReusableSupplementaryView(
-                    ofKind: kind,
-                    withReuseIdentifier: "SectionHeaderView",
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
+            switch item {
+            case .folder(let folderDisplay):
+                guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: FolderCell.identifier,
                     for: indexPath,
-                  ) as? SectionHeaderView else { return nil }
-            header.setTitle(indexPath.section == 0 ? "폴더" : "클립")
+                ) as? FolderCell else { return UITableViewCell() }
+                cell.setDisplay(folderDisplay)
 
-            return header
+                return cell
+            case .clip(let clipDisplay):
+                guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: ClipCell.identifier,
+                    for: indexPath,
+                ) as? ClipCell else { return UITableViewCell() }
+                cell.setDisplay(clipDisplay)
+
+                return cell
+            }
         }
+    }
+
+    func setBindings() {
+        tableView.rx.itemSelected
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] indexPath in
+                guard let self else { return }
+                tableView.deselectRow(at: indexPath, animated: true)
+                didTapCell.accept(indexPath)
+            }
+            .disposed(by: disposeBag)
+    }
+}
+
+extension FolderView: UITableViewDelegate {
+    func tableView(
+        _ tableView: UITableView,
+        viewForHeaderInSection section: Int,
+    ) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = .clear
+
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.textColor = .label
+        label.text = section == 0 ? "폴더" : "클립"
+        headerView.addSubview(label)
+
+        label.snp.makeConstraints { make in
+            make.directionalHorizontalEdges.equalToSuperview().inset(16)
+            make.centerY.equalToSuperview()
+        }
+
+        return headerView
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        heightForHeaderInSection section: Int,
+    ) -> CGFloat {
+        44
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint,
+    ) -> UIContextMenuConfiguration? {
+        UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            guard let self else { return UIMenu() }
+
+            let detailAction = UIAction(
+                title: "상세정보",
+                image: UIImage(systemName: "info.circle"),
+            ) { _ in
+                self.didTapDetailButton.accept(indexPath)
+            }
+            let editAction = UIAction(
+                title: "편집",
+                image: UIImage(systemName: "pencil"),
+            ) { _ in
+                self.didTapEditButton.accept(indexPath)
+            }
+            let deleteAction = UIAction(
+                title: "삭제",
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive,
+            ) { _ in
+                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
+
+                switch item {
+                case .folder(let display):
+                    self.didTapDeleteButton.accept((indexPath, display.title))
+                case .clip(let display):
+                    self.didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+                }
+            }
+            let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
+
+            return UIMenu(title: "", children: actions)
+        }
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath,
+    ) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(
+            style: .destructive,
+            title: "삭제",
+        ) { [weak self] _, _, completion in
+            guard let self,
+                  let item = dataSource?.itemIdentifier(for: indexPath) else {
+                completion(false)
+                return
+            }
+
+            switch item {
+            case .folder(let display):
+                didTapDeleteButton.accept((indexPath, display.title))
+            case .clip(let display):
+                didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+            }
+
+            completion(true)
+        }
+        deleteAction.image = .init(systemName: "trash.fill")
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = false
+
+        return configuration
     }
 }
