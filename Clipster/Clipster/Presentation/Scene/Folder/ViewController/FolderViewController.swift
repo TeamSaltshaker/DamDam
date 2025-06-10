@@ -76,7 +76,7 @@ private extension FolderViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
                 guard let self else { return }
-                folderView.navigationView.setTitle(state.currentFolderTitle)
+                folderView.setDisplay(title: state.currentFolderTitle)
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
             }
             .disposed(by: disposeBag)

@@ -22,9 +22,9 @@ final class FolderView: UIView {
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
-    let navigationView = CommonNavigationView()
-    let backButton = BackButton()
-    let addButton = AddButton()
+    private let navigationView = CommonNavigationView()
+    private let backButton = BackButton()
+    private let addButton = AddButton()
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -41,6 +41,10 @@ final class FolderView: UIView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func setDisplay(title: String) {
+        navigationView.setTitle(title)
     }
 
     func setDisplay(folders: [FolderDisplay], clips: [ClipDisplay]) {
