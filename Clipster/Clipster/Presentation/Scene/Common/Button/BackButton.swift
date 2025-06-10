@@ -3,7 +3,6 @@ import UIKit
 final class BackButton: UIButton {
     convenience init(_ title: String) {
         self.init(frame: .zero)
-        configure()
         var config = configuration
         config?.title = title
         configuration = config
@@ -11,6 +10,7 @@ final class BackButton: UIButton {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        configure()
     }
 
     required init?(coder: NSCoder) {
