@@ -13,7 +13,7 @@ final class FolderSelectorNavigationView: UIView {
         return label
     }()
 
-    private let selectButton = SelectButton()
+    let selectButton = SelectButton()
 
     var backButtonTap: ControlEvent<Void> { backButton.rx.tap }
     var selectButtonTap: ControlEvent<Void> { selectButton.rx.tap }

@@ -113,13 +113,13 @@ final class EditFolderViewModel {
                     newState.isProcessing = false
                     newState.alertMessage = error.localizedDescription
                 case .folderSelectorDismissed(let selected):
+                    print("\(Self.self): folder selector dismissed with selection → \(selected?.title ?? "home")")
                     newState.shouldNavigateToFolderSelector = false
-                    if let selected = selected {
-                        print("\(Self.self): folder selector dismissed with selection → \(selected.title)")
-                        newState.parentFolder = selected
+                    newState.parentFolder = selected
+                    if let selected {
                         newState.parentFolderDisplay = FolderDisplayMapper.map(selected)
                     } else {
-                        print("\(Self.self): folder selector dismissed with no selection")
+                        newState.parentFolderDisplay = nil
                     }
                 }
 

@@ -91,5 +91,12 @@ private extension FolderSelectorViewController {
                 self.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
+
+        state
+            .map { $0.isSelectable }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: folderSelectorView.folderSelectorNavigationView.selectButton.rx.isEnabled)
+            .disposed(by: disposeBag)
     }
 }
