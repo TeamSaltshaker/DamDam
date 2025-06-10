@@ -17,7 +17,7 @@ final class FolderView: UIView {
     let didTapCell = PublishRelay<IndexPath>()
     let didTapDetailButton = PublishRelay<IndexPath>()
     let didTapEditButton = PublishRelay<IndexPath>()
-    let didTapDeleteButton = PublishRelay<IndexPath>()
+    let didTapDeleteButton = PublishRelay<(IndexPath, String)>()
 
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
@@ -156,7 +156,14 @@ extension FolderView: UITableViewDelegate {
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive,
             ) { _ in
-                self.didTapDeleteButton.accept(indexPath)
+                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
+
+                switch item {
+                case .folder(let display):
+                    self.didTapDeleteButton.accept((indexPath, display.title))
+                case .clip(let display):
+                    self.didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+                }
             }
             let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
 
@@ -172,11 +179,19 @@ extension FolderView: UITableViewDelegate {
             style: .destructive,
             title: "삭제",
         ) { [weak self] _, _, completion in
-            guard let self else {
+            guard let self,
+                  let item = dataSource?.itemIdentifier(for: indexPath) else {
                 completion(false)
                 return
             }
-            didTapDeleteButton.accept(indexPath)
+
+            switch item {
+            case .folder(let display):
+                didTapDeleteButton.accept((indexPath, display.title))
+            case .clip(let display):
+                didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+            }
+
             completion(true)
         }
         deleteAction.image = .init(systemName: "trash.fill")

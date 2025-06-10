@@ -141,9 +141,24 @@ private extension FolderViewController {
 
         folderView.didTapDeleteButton
             .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] indexPath in
+            .drive { [weak self] (indexPath, title) in
                 guard let self else { return }
-                viewModel.action.accept(.didTapDeleteButton(indexPath))
+
+                let alertController = UIAlertController(
+                    title: title,
+                    message: "삭제하겠습니까?",
+                    preferredStyle: .alert,
+                )
+
+                let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+                alertController.addAction(cancelAction)
+
+                let deleteAction = UIAlertAction(title: "삭제", style: .destructive) { _ in
+                    self.viewModel.action.accept(.didTapDeleteButton(indexPath))
+                }
+                alertController.addAction(deleteAction)
+
+                self.present(alertController, animated: true)
             }
             .disposed(by: disposeBag)
     }
