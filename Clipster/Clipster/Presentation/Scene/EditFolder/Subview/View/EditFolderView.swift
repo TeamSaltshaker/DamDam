@@ -15,7 +15,11 @@ final class EditFolderView: UIView {
         return label
     }()
 
-    private let folderTitleTextField = EditFolderTextField()
+    private let folderTitleTextField: CommonTextField = {
+        let textField = CommonTextField()
+        textField.placeholder = "URL을 입력해주세요."
+        return textField
+    }()
 
     let folderLabel: UILabel = {
         let label = UILabel()

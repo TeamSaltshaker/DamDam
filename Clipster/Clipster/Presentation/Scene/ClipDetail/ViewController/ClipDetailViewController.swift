@@ -45,7 +45,6 @@ private extension ClipDetailViewController {
             .map { (display: $0.clipDisplay, folderTitle: $0.folder?.title) }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] (display, folderTitle) in
-                self?.clipDetailView.setDisplay(display, folderTitle ?? "폴더 정보 없음")
             }
             .disposed(by: disposeBag)
 

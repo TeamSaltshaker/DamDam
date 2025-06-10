@@ -1,6 +1,6 @@
 import UIKit
 
-final class EditFolderTextField: UITextField {
+final class CommonTextField: UITextField {
     let textPadding = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
 
     override init(frame: CGRect) {
@@ -25,15 +25,14 @@ final class EditFolderTextField: UITextField {
     }
 }
 
-extension EditFolderTextField {
+extension CommonTextField {
     func configure() {
         setAttributes()
     }
 
     func setAttributes() {
-        placeholder = "제목을 입력하세요."
         layer.borderWidth = 1
         layer.cornerRadius = 12
-        layer.borderColor = UIColor.tertiaryLabel.cgColor
+        layer.borderColor = UIColor.systemGray5.cgColor
     }
 }
