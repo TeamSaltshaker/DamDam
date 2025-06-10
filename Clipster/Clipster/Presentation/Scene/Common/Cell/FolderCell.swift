@@ -2,41 +2,7 @@ import SnapKit
 import UIKit
 
 final class FolderCell: UITableViewCell {
-    private let folderImageContainerView: UIView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .systemBlue
-        imageView.layer.cornerRadius = 12
-        return imageView
-    }()
-
-    private let folderImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "folder")
-        imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .systemIndigo
-        return imageView
-    }()
-
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
-        label.textColor = .label
-        return label
-    }()
-
-    private let itemCountLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .systemGray
-        return label
-    }()
-
-    private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, itemCountLabel])
-        stackView.axis = .vertical
-        stackView.spacing = 8
-        return stackView
-    }()
+    private let folderRowView = FolderRowView()
 
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView()
@@ -56,8 +22,7 @@ final class FolderCell: UITableViewCell {
     }
 
     func setDisplay(_ display: FolderDisplay) {
-        titleLabel.text = display.title
-        itemCountLabel.text = display.itemCount
+        folderRowView.setDisplay(display)
     }
 }
 
@@ -84,35 +49,22 @@ private extension FolderCell {
 
     func setHierarchy() {
         [
-            folderImageContainerView,
-            stackView,
+            folderRowView,
             chevronImageView
         ].forEach { contentView.addSubview($0) }
-
-        folderImageContainerView.addSubview(folderImageView)
     }
 
     func setConstraints() {
-        folderImageContainerView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(16)
+        folderRowView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(12)
-            make.width.equalTo(folderImageContainerView.snp.height)
-        }
-
-        folderImageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(10)
-        }
-
-        stackView.snp.makeConstraints { make in
-            make.leading.equalTo(folderImageContainerView.snp.trailing).offset(8)
-            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
         }
 
         chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(stackView.snp.trailing).offset(8)
-            make.trailing.equalToSuperview().inset(16)
+            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
+            make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
-            make.size.equalTo(16)
+            make.size.equalTo(24)
         }
     }
 }
