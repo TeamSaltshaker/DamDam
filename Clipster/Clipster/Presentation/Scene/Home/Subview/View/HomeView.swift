@@ -39,6 +39,14 @@ final class HomeView: UIView {
         return button
     }()
 
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
+
+    let contentView = UIView()
+
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -56,6 +64,7 @@ final class HomeView: UIView {
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.rowHeight = 72
+        tableView.isScrollEnabled = false
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
         return tableView
     }()
@@ -244,14 +253,20 @@ private extension HomeView {
     func setHierarchy() {
         [
             navigationView,
-            collectionView,
-            tableView
+            scrollView
         ].forEach { addSubview($0) }
 
         [
             titleLabel,
             addButton
         ].forEach { navigationView.addSubview($0) }
+
+        [contentView].forEach { scrollView.addSubview($0) }
+
+        [
+            collectionView,
+            tableView
+        ].forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {
@@ -271,8 +286,19 @@ private extension HomeView {
             make.centerY.equalToSuperview()
         }
 
-        collectionView.snp.makeConstraints { make in
+        scrollView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
+
+        contentView.snp.makeConstraints {
+            $0.verticalEdges.equalTo(scrollView.contentLayoutGuide)
+            $0.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
+        }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(263)
         }
@@ -281,6 +307,7 @@ private extension HomeView {
             make.top.equalTo(collectionView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
+            make.height.equalTo(1000)
         }
     }
 
