@@ -30,40 +30,15 @@ final class FolderViewController: UIViewController {
         configure()
     }
 
-    private func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: UIImage(systemName: "folder"),
-        ) { [weak self] _ in
-            guard let self else { return }
-            viewModel.action.accept(.didTapAddFolderButton)
-        }
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
-        ) { [weak self] _ in
-            guard let self else { return }
-            viewModel.action.accept(.didTapAddClipButton)
-        }
-
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
 }
 
 private extension FolderViewController {
     func configure() {
-        setNavigationBarItems()
         setBindings()
-    }
-
-    func setNavigationBarItems() {
-        let addButton = UIBarButtonItem(
-            systemItem: .add,
-            menu: makeAddButtonMenu()
-        )
-
-        navigationController?.navigationBar.tintColor = .label
-        navigationItem.rightBarButtonItem = addButton
     }
 
     func setBindings() {
@@ -71,7 +46,7 @@ private extension FolderViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
                 guard let self else { return }
-                title = state.currentFolderTitle
+                folderView.setDisplay(title: state.currentFolderTitle)
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
             }
             .disposed(by: disposeBag)
@@ -112,6 +87,30 @@ private extension FolderViewController {
                     let vc = SFSafariViewController(url: url)
                     present(vc, animated: true)
                 }
+            }
+            .disposed(by: disposeBag)
+
+        folderView.didTapBackButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        folderView.didTapAddFolderButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                viewModel.action.accept(.didTapAddFolderButton)
+            }
+            .disposed(by: disposeBag)
+
+        folderView.didTapAddClipButton
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                viewModel.action.accept(.didTapAddClipButton)
             }
             .disposed(by: disposeBag)
 

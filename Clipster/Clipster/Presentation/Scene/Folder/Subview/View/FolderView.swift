@@ -14,6 +14,9 @@ final class FolderView: UIView {
         case clip(ClipDisplay)
     }
 
+    let didTapBackButton = PublishRelay<Void>()
+    let didTapAddFolderButton = PublishRelay<Void>()
+    let didTapAddClipButton = PublishRelay<Void>()
     let didTapCell = PublishRelay<IndexPath>()
     let didTapDetailButton = PublishRelay<IndexPath>()
     let didTapEditButton = PublishRelay<IndexPath>()
@@ -21,6 +24,10 @@ final class FolderView: UIView {
 
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
+
+    private let navigationView = CommonNavigationView()
+    private let backButton = BackButton()
+    private let addButton = AddButton()
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -39,6 +46,10 @@ final class FolderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func setDisplay(title: String) {
+        navigationView.setTitle(title)
+    }
+
     func setDisplay(folders: [FolderDisplay], clips: [ClipDisplay]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.folder, .clip])
@@ -47,23 +58,59 @@ final class FolderView: UIView {
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
+
+    private func makeAddButtonMenu() -> UIMenu {
+        let addFolderAction = UIAction(
+            title: "폴더 추가",
+            image: UIImage(systemName: "folder"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            didTapAddFolderButton.accept(())
+        }
+        let addClipAction = UIAction(
+            title: "클립 추가",
+            image: UIImage(systemName: "paperclip"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            didTapAddClipButton.accept(())
+        }
+
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    }
 }
 
 private extension FolderView {
     func configure() {
+        setAttributes()
         setHierarchy()
         setConstraints()
         setBindings()
         setDataSource()
     }
 
+    func setAttributes() {
+        navigationView.setLeftItem(backButton)
+        navigationView.setRightItem(addButton)
+
+        addButton.menu = makeAddButtonMenu()
+        addButton.showsMenuAsPrimaryAction = true
+    }
+
     func setHierarchy() {
-        addSubview(tableView)
+        [navigationView, tableView].forEach {
+            addSubview($0)
+        }
     }
 
     func setConstraints() {
+        navigationView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalToSuperview()
+        }
+
         tableView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
+            make.top.equalTo(navigationView.snp.bottom)
+            make.directionalHorizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 
@@ -91,6 +138,14 @@ private extension FolderView {
     }
 
     func setBindings() {
+        backButton.rx.tap
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                didTapBackButton.accept(())
+            }
+            .disposed(by: disposeBag)
+
         tableView.rx.itemSelected
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] indexPath in
