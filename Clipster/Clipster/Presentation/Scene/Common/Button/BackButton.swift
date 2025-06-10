@@ -1,19 +1,20 @@
 import UIKit
 
 final class BackButton: UIButton {
+    convenience init(_ title: String) {
+        self.init(frame: .zero)
+        configure()
+        var config = configuration
+        config?.title = title
+        configuration = config
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configure()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-    }
-
-    func setDisplay(_ title: String) {
-        var config = configuration
-        config?.title = title
-        configuration = config
     }
 }
 
@@ -25,7 +26,7 @@ private extension BackButton {
     func setAttributes() {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "chevron.left")
-        config.imagePadding = 12
+        config.imagePadding = 8
         config.baseForegroundColor = .label
         config.contentInsets = .zero
 
