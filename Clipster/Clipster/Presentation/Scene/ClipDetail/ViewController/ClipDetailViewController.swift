@@ -3,14 +3,14 @@ import UIKit
 
 final class ClipDetailViewController: UIViewController {
     private let viewModel: ClipDetailViewModel
-    private let diConatiner: DIContainer
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let clipDetailView = ClipDetailView()
 
     init(viewModel: ClipDetailViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
-        self.diConatiner = diContainer
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -42,9 +42,13 @@ private extension ClipDetailViewController {
         let state = viewModel.state.share(replay: 1)
 
         state
-            .map { (display: $0.clipDisplay, folderTitle: $0.folder?.title) }
+            .map { (clip: $0.clipDisplay, folder: $0.folderDisplay) }
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] (display, folderTitle) in
+            .subscribe { [weak self] (clip, folder) in
+                guard let folder else { return }
+
+                self?.clipDetailView.setDisplay(clip, folder: folder)
+                self?.clipDetailView.setInteraction(enabled: false)
             }
             .disposed(by: disposeBag)
 
@@ -109,8 +113,8 @@ private extension ClipDetailViewController {
             .subscribe { [weak self] state in
                 guard let self else { return }
 
-                let vm = self.diConatiner.makeEditClipViewModel(clip: state.clip)
-                let vc = EditClipViewController(viewModel: vm, diContainer: self.diConatiner)
+                let vm = self.diContainer.makeEditClipViewModel(clip: state.clip)
+                let vc = EditClipViewController(viewModel: vm, diContainer: self.diContainer)
                 self.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
