@@ -72,17 +72,25 @@ private extension UnvisitedClipListViewController {
 
         unvisitedClipListViewModel.route
             .asSignal()
-            .emit(with: self) { _, route in
+            .emit(with: self) { owner, route in
                 switch route {
                 case .showWebView(let url):
                     print("웹 뷰")
                     print("\(url)\n")
                 case .showDetailClip(let clip):
-                    print("클립 상세 화면 이동")
-                    print("\(clip)\n")
+                    let vm = owner.diContainer.makeClipDetailViewModel(clip: clip)
+                    let vc = ClipDetailViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
-                    print("클립 편집 화면 이동")
-                    print("\(clip)\n")
+                    let vm = owner.diContainer.makeEditClipViewModel(clip: clip)
+                    let vc = EditClipViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)
