@@ -76,7 +76,7 @@ final class HomeView: UIView {
         super.init(frame: frame)
         configure()
         configureCollectionDataSource()
-        configureDataDataSource()
+        configureTableDataSource()
     }
 
     required init?(coder: NSCoder) {
@@ -116,7 +116,7 @@ final class HomeView: UIView {
         }
     }
 
-    private func configureDataDataSource() {
+    private func configureTableDataSource() {
         tableDataSource = UITableViewDiffableDataSource<Int, FolderDisplay>(
             tableView: tableView
         ) { tableView, indexPath, item in
