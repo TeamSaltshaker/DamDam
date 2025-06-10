@@ -30,48 +30,53 @@ final class FolderViewController: UIViewController {
         configure()
     }
 
-    private func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: UIImage(systemName: "folder"),
-        ) { [weak self] _ in
-            guard let self else { return }
-            viewModel.action.accept(.didTapAddFolderButton)
-        }
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
-        ) { [weak self] _ in
-            guard let self else { return }
-            viewModel.action.accept(.didTapAddClipButton)
-        }
-
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
+
+//    private func makeAddButtonMenu() -> UIMenu {
+//        let addFolderAction = UIAction(
+//            title: "폴더 추가",
+//            image: UIImage(systemName: "folder"),
+//        ) { [weak self] _ in
+//            guard let self else { return }
+//            viewModel.action.accept(.didTapAddFolderButton)
+//        }
+//        let addClipAction = UIAction(
+//            title: "클립 추가",
+//            image: UIImage(systemName: "paperclip"),
+//        ) { [weak self] _ in
+//            guard let self else { return }
+//            viewModel.action.accept(.didTapAddClipButton)
+//        }
+//
+//        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+//    }
 }
 
 private extension FolderViewController {
     func configure() {
-        setNavigationBarItems()
+//        setNavigationBarItems()
         setBindings()
     }
 
-    func setNavigationBarItems() {
-        let addButton = UIBarButtonItem(
-            systemItem: .add,
-            menu: makeAddButtonMenu()
-        )
-
-        navigationController?.navigationBar.tintColor = .label
-        navigationItem.rightBarButtonItem = addButton
-    }
+//    func setNavigationBarItems() {
+//        let addButton = UIBarButtonItem(
+//            systemItem: .add,
+//            menu: makeAddButtonMenu()
+//        )
+//
+//        navigationController?.navigationBar.tintColor = .label
+//        navigationItem.rightBarButtonItem = addButton
+//    }
 
     func setBindings() {
         viewModel.state
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
                 guard let self else { return }
-                title = state.currentFolderTitle
+                folderView.navigationView.setTitle(state.currentFolderTitle)
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
             }
             .disposed(by: disposeBag)

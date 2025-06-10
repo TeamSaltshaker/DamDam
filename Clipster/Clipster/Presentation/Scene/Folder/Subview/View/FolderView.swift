@@ -22,6 +22,10 @@ final class FolderView: UIView {
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
+    let navigationView = CommonNavigationView()
+    let backButton = BackButton()
+    let addButton = AddButton()
+
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
@@ -51,19 +55,33 @@ final class FolderView: UIView {
 
 private extension FolderView {
     func configure() {
+        setAttributes()
         setHierarchy()
         setConstraints()
         setBindings()
         setDataSource()
     }
 
+    func setAttributes() {
+        navigationView.setLeftItem(backButton)
+        navigationView.setRightItem(addButton)
+    }
+
     func setHierarchy() {
-        addSubview(tableView)
+        [navigationView, tableView].forEach {
+            addSubview($0)
+        }
     }
 
     func setConstraints() {
+        navigationView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalToSuperview()
+        }
+
         tableView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
+            make.top.equalTo(navigationView.snp.bottom)
+            make.directionalHorizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 
