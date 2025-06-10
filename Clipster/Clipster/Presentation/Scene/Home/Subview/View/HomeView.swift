@@ -96,7 +96,7 @@ final class HomeView: UIView {
             )
         }
 
-        let headerRegistration = UICollectionView.SupplementaryRegistration<SectionHeaderView>(
+        let headerRegistration = UICollectionView.SupplementaryRegistration<CollectionHeaderView>(
             elementKind: UICollectionView.elementKindSectionHeader
         ) { header, _, _ in
             header.setTitle("방문하지 않은 클립")

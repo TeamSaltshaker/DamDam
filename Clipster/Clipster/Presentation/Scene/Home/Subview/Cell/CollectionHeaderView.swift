@@ -3,7 +3,7 @@ import RxSwift
 import SnapKit
 import UIKit
 
-final class SectionHeaderView: UICollectionReusableView {
+final class CollectionHeaderView: UICollectionReusableView {
     let showAllTapped = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
 
@@ -41,7 +41,7 @@ final class SectionHeaderView: UICollectionReusableView {
     }
 }
 
-private extension SectionHeaderView {
+private extension CollectionHeaderView {
     func configure() {
         setHierarchy()
         setConstraints()
