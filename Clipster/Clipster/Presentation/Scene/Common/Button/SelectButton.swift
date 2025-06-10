@@ -17,8 +17,19 @@ private extension SelectButton {
     }
 
     func setAttributes() {
-        setTitle("선택", for: .normal)
-        setTitleColor(.systemBlue, for: .normal)
-        titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        let normalFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        let disabledFont = UIFont.systemFont(ofSize: 16, weight: .medium)
+
+        let normalAttributes: [NSAttributedString.Key: Any] = [
+            .font: normalFont,
+            .foregroundColor: UIColor.systemBlue
+        ]
+        let disabledAttributes: [NSAttributedString.Key: Any] = [
+            .font: disabledFont,
+            .foregroundColor: UIColor.systemGray
+        ]
+
+        setAttributedTitle(NSAttributedString(string: "선택", attributes: normalAttributes), for: .normal)
+        setAttributedTitle(NSAttributedString(string: "선택", attributes: disabledAttributes), for: .disabled)
     }
 }
