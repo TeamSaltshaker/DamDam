@@ -217,30 +217,13 @@ extension HomeView: UICollectionViewDelegate {
         .init(
             identifier: indexPath as NSCopying,
             previewProvider: nil
-        ) { _ in
-            let info = UIAction(
-                title: "상세정보",
-                image: UIImage(systemName: "magnifyingglass")
-            ) { [weak self] _ in
-                self?.action.accept(.detail(indexPath))
-            }
+        ) { [weak self] _ in
+            guard let self else { return UIMenu() }
+            let detail = makeDetailAction(for: indexPath)
+            let edit = makeEditAction(for: indexPath)
+            let delete = makeDeleteAction(for: indexPath)
 
-            let edit = UIAction(
-                title: "편집",
-                image: UIImage(systemName: "pencil")
-            ) { [weak self] _ in
-                self?.action.accept(.edit(indexPath))
-            }
-
-            let delete = UIAction(
-                title: "삭제",
-                image: UIImage(systemName: "trash"),
-                attributes: .destructive
-            ) { [weak self] _ in
-                self?.action.accept(.delete(indexPath))
-            }
-
-            return UIMenu(title: "", children: [info, edit, delete])
+            return UIMenu(title: "", children: [detail, edit, delete])
         }
     }
 }
@@ -256,10 +239,59 @@ extension HomeView: UITableViewDelegate {
             completion(true)
         }
 
-        delete.image = UIImage(systemName: "trash.fill")
+        delete.image = UIImage(systemName: "trash")
         delete.backgroundColor = .systemRed
 
         return UISwipeActionsConfiguration(actions: [delete])
+    }
+}
+
+extension HomeView {
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        .init(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { [weak self] _ in
+            guard let self else { return UIMenu() }
+            let edit = makeEditAction(for: indexPath)
+            let delete = makeDeleteAction(for: indexPath)
+
+            return UIMenu(title: "", children: [edit, delete])
+        }
+    }
+}
+
+private extension HomeView {
+    private func makeDetailAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "상세정보",
+            image: UIImage(systemName: "magnifyingglass")
+        ) { [weak self] _ in
+            self?.action.accept(.detail(indexPath))
+        }
+    }
+
+    func makeEditAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "편집",
+            image: UIImage(systemName: "pencil")
+        ) { [weak self] _ in
+            self?.action.accept(.edit(indexPath))
+        }
+    }
+
+    func makeDeleteAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "삭제",
+            image: UIImage(systemName: "trash"),
+            attributes: .destructive
+        ) { [weak self] _ in
+            self?.action.accept(.delete(indexPath))
+        }
     }
 }
 
