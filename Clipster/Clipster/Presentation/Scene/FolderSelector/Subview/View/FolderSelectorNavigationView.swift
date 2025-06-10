@@ -1,11 +1,12 @@
+import RxCocoa
 import SnapKit
 import UIKit
 
 final class FolderSelectorNavigationView: UIView {
-    private let backButton = BackButton("이전폴더")
+    let backButton = BackButton("이전폴더")
     private let titleView = UIView()
 
-    private let titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .label
@@ -14,6 +15,9 @@ final class FolderSelectorNavigationView: UIView {
 
     private let selectButton = SelectButton()
 
+    var backButtonTap: ControlEvent<Void> { backButton.rx.tap }
+    var selectButtonTap: ControlEvent<Void> { selectButton.rx.tap }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -21,10 +25,6 @@ final class FolderSelectorNavigationView: UIView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-    }
-
-    func setDisplay(_ folder: FolderDisplay) {
-        titleLabel.text = folder.title
     }
 }
 
