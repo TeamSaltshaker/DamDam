@@ -105,8 +105,15 @@ private extension ClipDetailViewController {
             .map { $0.shouldNavigateToEdit }
             .distinctUntilChanged()
             .filter { $0 }
+            .withLatestFrom(state)
             .observe(on: MainScheduler.instance)
-            .subscribe()
+            .subscribe { [weak self] state in
+                guard let self else { return }
+
+                let vm = self.diConatiner.makeEditClipViewModel(clip: state.clip)
+                let vc = EditClipViewController(viewModel: vm, diContainer: self.diConatiner)
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
             .disposed(by: disposeBag)
 
         state
