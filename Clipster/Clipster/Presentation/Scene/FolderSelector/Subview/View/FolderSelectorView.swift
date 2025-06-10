@@ -4,6 +4,12 @@ import UIKit
 final class FolderSelectorView: UIView {
     let folderSelectorNavigationView = FolderSelectorNavigationView()
 
+    private let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray5
+        return view
+    }()
+
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(FolderSelectorCell.self, forCellReuseIdentifier: FolderSelectorCell.identifier)
@@ -24,17 +30,23 @@ final class FolderSelectorView: UIView {
     private func configureUI() {
         self.backgroundColor = .systemBackground
 
-        [folderSelectorNavigationView, tableView]
+        [folderSelectorNavigationView, separator, tableView]
             .forEach { addSubview($0) }
 
         folderSelectorNavigationView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(19.5)
+            make.top.equalToSuperview().offset(19)
             make.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(84)
         }
 
-        tableView.snp.makeConstraints { make in
+        separator.snp.makeConstraints { make in
             make.top.equalTo(folderSelectorNavigationView.snp.bottom)
+            make.directionalHorizontalEdges.equalToSuperview()
+            make.height.equalTo(0.7)
+        }
+
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(separator.snp.bottom)
             make.bottom.directionalHorizontalEdges.equalToSuperview()
         }
     }
