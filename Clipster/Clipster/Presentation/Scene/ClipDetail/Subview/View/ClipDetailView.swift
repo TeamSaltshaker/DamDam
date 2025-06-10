@@ -6,35 +6,9 @@ final class ClipDetailView: UIView {
     let backButton = BackButton()
     let editButton = EditButton()
     let deleteButton = DeleteButton()
-
-    private let clipView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .secondarySystemBackground
-        view.layer.cornerRadius = 12
-        return view
-    }()
-
-    private let urlMetadataStackView = URLMetadataStackView(type: .detail)
-
-    private let separator: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray5
-        return view
-    }()
-
-    private let rowStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 14
-        return stackView
-    }()
-
-    private let addedOnRow = ClipDetailRowView(title: "추가됨")
-    private let lastVisitedRow = ClipDetailRowView(title: "최근 열람")
-    private let folderRow = ClipDetailRowView(title: "저장 위치")
-
-    private let memoView = ClipDetailMemoView()
-
+    private let urlMetadataView = URLMetadataView()
+    private let urlView = URLView()
+    private let memoView = MemoView()
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 
     override init(frame: CGRect) {
@@ -46,20 +20,11 @@ final class ClipDetailView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ clipDisplay: ClipDisplay, _ folderTitle: String) {
-        urlMetadataStackView.setDisplay(model: clipDisplay.urlMetadata)
-        addedOnRow.setDisplay(clipDisplay.createdAt)
-        folderRow.setDisplay(folderTitle)
-        memoView.setDisplay(clipDisplay.memo)
-    }
-
     func setLoading(_ isLoading: Bool) {
         if isLoading {
-            clipView.isHidden = true
             memoView.isHidden = true
             activityIndicator.startAnimating()
         } else {
-            clipView.isHidden = false
             memoView.isHidden = false
             activityIndicator.stopAnimating()
         }
@@ -82,14 +47,8 @@ private extension ClipDetailView {
     }
 
     func setHierarchy() {
-        [commonNavigationView, clipView, memoView, activityIndicator]
+        [commonNavigationView, urlMetadataView, urlView, memoView, activityIndicator]
             .forEach { addSubview($0) }
-
-        [urlMetadataStackView, separator, rowStackView]
-            .forEach { clipView.addSubview($0) }
-
-        [addedOnRow, lastVisitedRow, folderRow]
-            .forEach { rowStackView.addArrangedSubview($0) }
     }
 
     func setConstraints() {
@@ -98,35 +57,23 @@ private extension ClipDetailView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
-        clipView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom)
-            make.horizontalEdges.equalToSuperview().inset(16)
+        urlMetadataView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
+        urlView.snp.makeConstraints { make in
+            make.top.equalTo(urlMetadataView.snp.bottom).offset(16)
+            make.directionalHorizontalEdges.equalToSuperview()
         }
 
         memoView.snp.makeConstraints { make in
-            make.top.equalTo(clipView.snp.bottom).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
+            make.top.equalTo(urlView.snp.bottom)
+            make.directionalHorizontalEdges.equalToSuperview()
         }
 
         activityIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
-        }
-
-        urlMetadataStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
-        }
-
-        separator.snp.makeConstraints { make in
-            make.top.equalTo(urlMetadataStackView.snp.bottom).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
-            make.height.equalTo(0.7)
-        }
-
-        rowStackView.snp.makeConstraints { make in
-            make.top.equalTo(separator.snp.bottom).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(16)
         }
     }
 }
