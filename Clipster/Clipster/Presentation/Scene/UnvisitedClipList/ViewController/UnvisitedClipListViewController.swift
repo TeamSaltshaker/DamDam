@@ -48,7 +48,9 @@ private extension UnvisitedClipListViewController {
         unvisitedClipListView.action
             .bind(with: self) { owner, action in
                 switch action {
-                case .tap(let index):
+                case .tapBack:
+                    owner.unvisitedClipListViewModel.action.accept(.tapBack)
+                case .tapCell(let index):
                     owner.unvisitedClipListViewModel.action.accept(.tapCell(index))
                 case .detail(let index):
                     owner.unvisitedClipListViewModel.action.accept(.tapDetail(index))
@@ -74,6 +76,8 @@ private extension UnvisitedClipListViewController {
             .asSignal()
             .emit(with: self) { owner, route in
                 switch route {
+                case .back:
+                    owner.navigationController?.popViewController(animated: true)
                 case .showWebView(let url):
                     print("웹 뷰")
                     print("\(url)\n")

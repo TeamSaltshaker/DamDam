@@ -5,7 +5,8 @@ import UIKit
 
 final class UnvisitedClipListView: UIView {
     enum Action {
-        case tap(Int)
+        case tapBack
+        case tapCell(Int)
         case detail(Int)
         case edit(Int)
         case delete(Int)
@@ -169,7 +170,12 @@ private extension UnvisitedClipListView {
 
     func setBindings() {
         collectionView.rx.itemSelected
-            .map { Action.tap($0.row) }
+            .map { Action.tapCell($0.row) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
+
+        backButton.rx.tap
+            .map { Action.tapBack }
             .bind(to: action)
             .disposed(by: disposeBag)
     }

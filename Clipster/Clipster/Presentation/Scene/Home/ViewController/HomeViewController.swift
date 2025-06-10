@@ -53,7 +53,7 @@ private extension HomeViewController {
                     owner.homeviewModel.action.accept(.tapAddFolder)
                 case .tapAddClip:
                     owner.homeviewModel.action.accept(.tapAddClip)
-                case .tapItem(let indexPath):
+                case .tapCell(let indexPath):
                     owner.homeviewModel.action.accept(.tapCell(indexPath))
                 case .detail(let indexPath):
                     owner.homeviewModel.action.accept(.tapDetail(indexPath))

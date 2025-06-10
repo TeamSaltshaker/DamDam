@@ -7,7 +7,7 @@ final class HomeView: UIView {
     enum Action {
         case tapAddFolder
         case tapAddClip
-        case tapItem(IndexPath)
+        case tapCell(IndexPath)
         case detail(IndexPath)
         case edit(IndexPath)
         case delete(IndexPath)
@@ -342,7 +342,7 @@ private extension HomeView {
 
     func setBindings() {
         collectionView.rx.itemSelected
-            .map { Action.tapItem($0) }
+            .map { Action.tapCell($0) }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
