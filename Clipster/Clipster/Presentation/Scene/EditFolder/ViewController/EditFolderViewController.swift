@@ -72,6 +72,9 @@ private extension EditFolderViewController {
 
                 let vm = self.diContainer.makeFolderSelectorViewModel(mode: .folder(parentFolder: parentFolder))
                 let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                vc.onSelectionComplete = { selected in
+                    self.viewModel.action.accept(.folderSelectorDismissed(selected: selected))
+                }
                 vc.modalPresentationStyle = .pageSheet
 
                 if let sheet = vc.sheetPresentationController {
