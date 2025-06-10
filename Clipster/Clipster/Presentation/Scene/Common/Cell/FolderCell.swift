@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class FolderCell: UICollectionViewCell {
+final class FolderCell: UITableViewCell {
     private let folderImageContainerView: UIView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .systemBlue
@@ -46,8 +46,8 @@ final class FolderCell: UICollectionViewCell {
         return imageView
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         configure()
     }
 
