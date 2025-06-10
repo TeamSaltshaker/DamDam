@@ -20,6 +20,8 @@ final class HomeView: UIView {
     private var collectionDataSource: UICollectionViewDiffableDataSource<Int, ClipDisplay>?
     private var tableDataSource: UITableViewDiffableDataSource<Int, FolderDisplay>?
 
+    private var tableViewHeightConstraint: Constraint?
+
     private let navigationView = UIView()
 
     private let titleLabel: UILabel = {
@@ -154,7 +156,11 @@ final class HomeView: UIView {
         var tableSnapshot = NSDiffableDataSourceSnapshot<Int, FolderDisplay>()
         tableSnapshot.appendSections([0])
         tableSnapshot.appendItems(display.folders)
-        tableDataSource?.apply(tableSnapshot)
+        tableDataSource?.apply(tableSnapshot, animatingDifferences: true) { [weak self] in
+            guard let self else { return }
+            let newHeight = tableView.contentSize.height
+            tableViewHeightConstraint?.update(offset: newHeight)
+        }
     }
 }
 
@@ -307,7 +313,7 @@ private extension HomeView {
             make.top.equalTo(collectionView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.equalTo(1000)
+            self.tableViewHeightConstraint = make.height.equalTo(0).constraint
         }
     }
 
