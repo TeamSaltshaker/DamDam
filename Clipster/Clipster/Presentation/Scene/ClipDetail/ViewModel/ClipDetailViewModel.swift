@@ -17,6 +17,7 @@ struct ClipDetailState {
     var clip: Clip
     var clipDisplay: ClipDisplay
     var folder: Folder?
+    var folderDisplay: FolderDisplay?
     var isLoading = true
     var isProcessingDelete = false
     var shouldDismiss = false
@@ -91,6 +92,7 @@ final class ClipDetailViewModel {
                     newState.clip = clip
                     newState.folder = folder
                     newState.clipDisplay = ClipDisplayMapper.map(clip)
+                    newState.folderDisplay = FolderDisplayMapper.map(folder)
                 case .dataLoadFailed(let error):
                     print("\(Self.self): data load failed with error: \(error.localizedDescription)")
                     newState.isLoading = false
