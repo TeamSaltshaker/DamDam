@@ -35,16 +35,7 @@ private extension FolderCell {
 
     func setAttributes() {
         backgroundColor = .systemBackground
-
         layer.cornerRadius = 16
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.25
-        layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowRadius = 4
-        layer.shadowPath = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: layer.cornerRadius
-        ).cgPath
     }
 
     func setHierarchy() {
@@ -57,11 +48,11 @@ private extension FolderCell {
     func setConstraints() {
         folderRowView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(12)
-            make.leading.equalToSuperview().offset(20)
+            make.leading.equalToSuperview().inset(20)
         }
 
         chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
+            make.leading.equalTo(folderRowView.snp.trailing).offset(16)
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
