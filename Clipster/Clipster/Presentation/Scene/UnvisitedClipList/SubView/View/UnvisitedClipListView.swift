@@ -18,7 +18,7 @@ final class UnvisitedClipListView: UIView {
     private let disposeBag = DisposeBag()
     let action = PublishRelay<Action>()
 
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
+    private var dataSource: UITableViewDiffableDataSource<Section, Item>?
 
     private lazy var navigationView: CommonNavigationView = {
         let view = CommonNavigationView()
@@ -29,13 +29,15 @@ final class UnvisitedClipListView: UIView {
 
     private let backButton = BackButton()
 
-    private lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: .zero,
-            collectionViewLayout: createCollectionViewLayout()
-        )
-        collectionView.delegate = self
-        return collectionView
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        tableView.separatorStyle = .none
+        tableView.allowsSelection = false
+        tableView.rowHeight = 72
+        tableView.register(ClipCell.self, forCellReuseIdentifier: ClipCell.identifier)
+        tableView.delegate = self
+        return tableView
     }()
 
     override init(frame: CGRect) {
@@ -49,17 +51,15 @@ final class UnvisitedClipListView: UIView {
     }
 
     private func configureDataSource() {
-//        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
-//            cell.setDisplay(item)
-//        }
-//
-//        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-//            collectionView.dequeueConfiguredReusableCell(
-//                using: clipCellRegistration,
-//                for: indexPath,
-//                item: item
-//            )
-//        }
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: ClipCell.identifier,
+                for: indexPath
+            ) as? ClipCell
+            else { return UITableViewCell() }
+            cell.setDisplay(item)
+            return cell
+        }
     }
 
     func setDisplay(_ display: [ClipDisplay]) {
@@ -98,10 +98,10 @@ private extension UnvisitedClipListView {
     }
 }
 
-extension UnvisitedClipListView: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        contextMenuConfigurationForItemAt indexPath: IndexPath,
+extension UnvisitedClipListView: UITableViewDelegate {
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
         UIContextMenuConfiguration(
@@ -149,7 +149,7 @@ private extension UnvisitedClipListView {
 
     func setHierarchy() {
         [
-            collectionView,
+            tableView,
             navigationView
         ].forEach { addSubview($0) }
     }
@@ -161,7 +161,7 @@ private extension UnvisitedClipListView {
             make.height.equalTo(56)
         }
 
-        collectionView.snp.makeConstraints { make in
+        tableView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -169,7 +169,7 @@ private extension UnvisitedClipListView {
     }
 
     func setBindings() {
-        collectionView.rx.itemSelected
+        tableView.rx.itemSelected
             .map { Action.tapCell($0.row) }
             .bind(to: action)
             .disposed(by: disposeBag)
