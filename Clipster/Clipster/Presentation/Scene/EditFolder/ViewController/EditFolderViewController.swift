@@ -47,10 +47,40 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         state
+            .compactMap { $0.parentFolderDisplay }
+            .distinctUntilChanged { $0.id == $1.id }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] parentFolderDisplay in
+                self?.editFolderView.folderRowView.setDisplay(parentFolderDisplay)
+            }
+            .disposed(by: disposeBag)
+
+        state
             .map { $0.isSavable }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: editFolderView.saveButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+
+        state
+            .map { ($0.shouldNavigateToFolderSelector, $0.parentFolder) }
+            .distinctUntilChanged { $0.0 == $1.0 }
+            .filter { $0.0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _, parentFolder in
+                guard let self else { return }
+
+                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .folder(parentFolder: parentFolder))
+                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                vc.modalPresentationStyle = .pageSheet
+
+                if let sheet = vc.sheetPresentationController {
+                    sheet.detents = [.custom { context in context.maximumDetentValue * (2.0 / 3.0) }]
+                    sheet.prefersGrabberVisible = true
+                }
+
+                present(vc, animated: true)
+            }
             .disposed(by: disposeBag)
 
         state
@@ -107,6 +137,11 @@ private extension EditFolderViewController {
 
         editFolderView.saveButton.rx.tap
             .map { EditFolderAction.saveButtonTapped }
+            .bind(to: viewModel.action)
+            .disposed(by: disposeBag)
+
+        editFolderView.folderViewTapGesture.rx.event
+            .map { _ in .folderViewTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
     }
