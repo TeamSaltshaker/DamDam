@@ -18,6 +18,7 @@ final class HomeView: UIView {
     let action = PublishRelay<Action>()
 
     private var collectionDataSource: UICollectionViewDiffableDataSource<Int, ClipDisplay>?
+    private var tableDataSource: UITableViewDiffableDataSource<Int, FolderDisplay>?
 
     private let navigationView = UIView()
 
@@ -45,13 +46,25 @@ final class HomeView: UIView {
         )
         collectionView.delegate = self
         collectionView.contentInset.top = 24
+        collectionView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
         return collectionView
+    }()
+
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        tableView.separatorStyle = .none
+        tableView.allowsSelection = false
+        tableView.rowHeight = 72
+        tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
+        return tableView
     }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
         configureCollectionDataSource()
+        configureDataDataSource()
     }
 
     required init?(coder: NSCoder) {
@@ -91,6 +104,20 @@ final class HomeView: UIView {
         }
     }
 
+    private func configureDataDataSource() {
+        tableDataSource = UITableViewDiffableDataSource<Int, FolderDisplay>(
+            tableView: tableView
+        ) { tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: FolderCell.identifier,
+                for: indexPath
+            ) as? FolderCell
+            else { return UITableViewCell() }
+            cell.setDisplay(item)
+            return cell
+        }
+    }
+
     private func makeAddButtonMenu() -> UIMenu {
         let addFolderAction = UIAction(
             title: "폴더 추가",
@@ -110,10 +137,15 @@ final class HomeView: UIView {
     }
 
     func setDisplay(_ display: HomeDisplay) {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, ClipDisplay>()
-        snapshot.appendSections([0])
-        snapshot.appendItems(display.unvitsedClips)
-        collectionDataSource?.apply(snapshot)
+        var collectionSnapshot = NSDiffableDataSourceSnapshot<Int, ClipDisplay>()
+        collectionSnapshot.appendSections([0])
+        collectionSnapshot.appendItems(display.unvitsedClips)
+        collectionDataSource?.apply(collectionSnapshot)
+
+        var tableSnapshot = NSDiffableDataSourceSnapshot<Int, FolderDisplay>()
+        tableSnapshot.appendSections([0])
+        tableSnapshot.appendItems(display.folders)
+        tableDataSource?.apply(tableSnapshot)
     }
 }
 
@@ -206,13 +238,14 @@ private extension HomeView {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
+        backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
     }
 
     func setHierarchy() {
         [
             navigationView,
-            collectionView
+            collectionView,
+            tableView
         ].forEach { addSubview($0) }
 
         [
@@ -242,6 +275,12 @@ private extension HomeView {
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(263)
+        }
+
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
 
