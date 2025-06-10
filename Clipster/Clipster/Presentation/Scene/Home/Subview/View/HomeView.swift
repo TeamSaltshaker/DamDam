@@ -47,55 +47,55 @@ final class HomeView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
-            cell.setDisplay(item)
-        }
-
-        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderDisplay> { cell, _, item in
-            cell.setDisplay(item)
-        }
-
-        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-            switch item {
-            case .clip(let clipItem):
-                collectionView.dequeueConfiguredReusableCell(
-                    using: clipCellRegistration,
-                    for: indexPath,
-                    item: clipItem
-                )
-            case .folder(let folderItem):
-                collectionView.dequeueConfiguredReusableCell(
-                    using: folderCellRegistration,
-                    for: indexPath,
-                    item: folderItem
-                )
-            }
-        }
-
-        let headerRegistration = UICollectionView.SupplementaryRegistration<SectionHeaderView>(
-            elementKind: UICollectionView.elementKindSectionHeader
-        ) { header, _, indexPath in
-            guard let section = Section(rawValue: indexPath.section) else { return }
-            switch section {
-            case .clip:
-                header.setTitle("방문하지 않은 클립")
-                header.setShowAllButtonVisible(true)
-
-                header.showAllTapped
-                    .map { Action.showAllClips }
-                    .bind(to: self.action)
-                    .disposed(by: self.disposeBag)
-            case .folder:
-                header.setTitle("폴더")
-            }
-        }
-
-        dataSource?.supplementaryViewProvider = { collectionView, _, indexPath in
-            collectionView.dequeueConfiguredReusableSupplementary(
-                using: headerRegistration,
-                for: indexPath
-            )
-        }
+//        let clipCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
+//            cell.setDisplay(item)
+//        }
+//
+//        let folderCellRegistration = UICollectionView.CellRegistration<FolderCell, FolderDisplay> { cell, _, item in
+//            cell.setDisplay(item)
+//        }
+//
+//        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
+//            switch item {
+//            case .clip(let clipItem):
+//                collectionView.dequeueConfiguredReusableCell(
+//                    using: clipCellRegistration,
+//                    for: indexPath,
+//                    item: clipItem
+//                )
+//            case .folder(let folderItem):
+//                collectionView.dequeueConfiguredReusableCell(
+//                    using: folderCellRegistration,
+//                    for: indexPath,
+//                    item: folderItem
+//                )
+//            }
+//        }
+//
+//        let headerRegistration = UICollectionView.SupplementaryRegistration<SectionHeaderView>(
+//            elementKind: UICollectionView.elementKindSectionHeader
+//        ) { header, _, indexPath in
+//            guard let section = Section(rawValue: indexPath.section) else { return }
+//            switch section {
+//            case .clip:
+//                header.setTitle("방문하지 않은 클립")
+//                header.setShowAllButtonVisible(true)
+//
+//                header.showAllTapped
+//                    .map { Action.showAllClips }
+//                    .bind(to: self.action)
+//                    .disposed(by: self.disposeBag)
+//            case .folder:
+//                header.setTitle("폴더")
+//            }
+//        }
+//
+//        dataSource?.supplementaryViewProvider = { collectionView, _, indexPath in
+//            collectionView.dequeueConfiguredReusableSupplementary(
+//                using: headerRegistration,
+//                for: indexPath
+//            )
+//        }
     }
 
     func setDisplay(_ display: HomeDisplay) {

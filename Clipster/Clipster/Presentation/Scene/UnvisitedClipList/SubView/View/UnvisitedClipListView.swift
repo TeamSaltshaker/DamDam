@@ -39,17 +39,17 @@ final class UnvisitedClipListView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
-            cell.setDisplay(item)
-        }
-
-        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-            collectionView.dequeueConfiguredReusableCell(
-                using: clipCellRegistration,
-                for: indexPath,
-                item: item
-            )
-        }
+//        let clipCellRegistration = UICollectionView.CellRegistration<ClipCell, ClipDisplay> { cell, _, item in
+//            cell.setDisplay(item)
+//        }
+//
+//        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
+//            collectionView.dequeueConfiguredReusableCell(
+//                using: clipCellRegistration,
+//                for: indexPath,
+//                item: item
+//            )
+//        }
     }
 
     func setDisplay(_ display: [ClipDisplay]) {
