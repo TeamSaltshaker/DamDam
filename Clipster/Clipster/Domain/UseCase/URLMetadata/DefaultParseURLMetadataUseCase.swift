@@ -1,16 +1,16 @@
 import Foundation
 
 final class DefaultParseURLMetadataUseCase: ParseURLMetadataUseCase {
-    let repository: URLMetadataRepository
+    let urlMetadataRepository: URLMetadataRepository
 
-    init(repository: URLMetadataRepository) {
-        self.repository = repository
+    init(urlMetadataRepository: URLMetadataRepository) {
+        self.urlMetadataRepository = urlMetadataRepository
     }
 
     func execute(urlString: String) async -> Result<ParsedURLMetadata, Error> {
         guard let url = URL(string: urlString) else {
             return .failure(URLError(.badURL))
         }
-        return await repository.execute(url: url)
+        return await urlMetadataRepository.execute(url: url)
     }
 }
