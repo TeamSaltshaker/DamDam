@@ -5,6 +5,7 @@ import RxSwift
 final class UnvisitedClipListViewModel {
     enum Action {
         case viewWillAppear
+        case tapBack
         case tapCell(Int)
         case tapDetail(Int)
         case tapEdit(Int)
@@ -16,6 +17,7 @@ final class UnvisitedClipListViewModel {
     }
 
     enum Route {
+        case back
         case showWebView(URL)
         case showDetailClip(Clip)
         case showEditClip(Clip)
@@ -51,6 +53,8 @@ final class UnvisitedClipListViewModel {
                 switch action {
                 case .viewWillAppear:
                     Task { await owner.handleViewWillAppear() }
+                case .tapBack:
+                    owner.route.accept(.back)
                 case .tapCell(let index),
                      .tapDetail(let index),
                      .tapEdit(let index):

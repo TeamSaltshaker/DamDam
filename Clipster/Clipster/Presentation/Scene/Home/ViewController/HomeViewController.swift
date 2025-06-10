@@ -31,59 +31,29 @@ final class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         homeviewModel.action.accept(.viewWillAppear)
-        navigationController?.navigationBar.prefersLargeTitles = true
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = false
-    }
-
-    private func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: UIImage(systemName: "folder")
-        ) { [weak self] _ in
-            self?.homeviewModel.action.accept(.tapAddFolder)
-        }
-
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
-        ) { [weak self] _ in
-            self?.homeviewModel.action.accept(.tapAddClip)
-        }
-
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
     }
 }
 
 private extension HomeViewController {
     func configure() {
         setAttributes()
-        setNavigationBarItems()
         setBindings()
     }
 
     func setAttributes() {
         title = "Clipster"
-    }
-
-    func setNavigationBarItems() {
-        let addButton = UIBarButtonItem(
-            systemItem: .add,
-            menu: makeAddButtonMenu()
-        )
-
-        navigationController?.navigationBar.tintColor = .label
-        navigationItem.rightBarButtonItem = addButton
+        navigationController?.isNavigationBarHidden = true
     }
 
     func setBindings() {
         homeView.action
             .bind(with: self) { owner, action in
                 switch action {
-                case .tap(let indexPath):
+                case .tapAddFolder:
+                    owner.homeviewModel.action.accept(.tapAddFolder)
+                case .tapAddClip:
+                    owner.homeviewModel.action.accept(.tapAddClip)
+                case .tapCell(let indexPath):
                     owner.homeviewModel.action.accept(.tapCell(indexPath))
                 case .detail(let indexPath):
                     owner.homeviewModel.action.accept(.tapDetail(indexPath))

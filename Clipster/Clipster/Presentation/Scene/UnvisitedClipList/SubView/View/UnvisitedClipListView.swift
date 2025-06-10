@@ -5,7 +5,8 @@ import UIKit
 
 final class UnvisitedClipListView: UIView {
     enum Action {
-        case tap(Int)
+        case tapBack
+        case tapCell(Int)
         case detail(Int)
         case edit(Int)
         case delete(Int)
@@ -18,6 +19,15 @@ final class UnvisitedClipListView: UIView {
     let action = PublishRelay<Action>()
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
+
+    private lazy var navigationView: CommonNavigationView = {
+        let view = CommonNavigationView()
+        view.setTitle("방문하지 않은 클립")
+        view.setLeftItem(backButton)
+        return view
+    }()
+
+    private let backButton = BackButton()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -80,7 +90,7 @@ private extension UnvisitedClipListView {
 
             let section = NSCollectionLayoutSection(group: group)
             section.interGroupSpacing = 8
-            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 24, bottom: 0, trailing: 24)
+            section.contentInsets = .init(top: 24, leading: 24, bottom: 0, trailing: 24)
             return section
         }
 
@@ -138,12 +148,21 @@ private extension UnvisitedClipListView {
     }
 
     func setHierarchy() {
-        addSubview(collectionView)
+        [
+            collectionView,
+            navigationView
+        ].forEach { addSubview($0) }
     }
 
     func setConstraints() {
-        collectionView.snp.makeConstraints { make in
+        navigationView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(56)
+        }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
@@ -151,7 +170,12 @@ private extension UnvisitedClipListView {
 
     func setBindings() {
         collectionView.rx.itemSelected
-            .map { Action.tap($0.row) }
+            .map { Action.tapCell($0.row) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
+
+        backButton.rx.tap
+            .map { Action.tapBack }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
