@@ -78,7 +78,7 @@ final class DIContainer {
         DefaultCheckValidityUseCase(urlValidationRepository: makeURLValidationRepository())
     }
 
-    func makeClipDetailViewModel(clip: Clip, navigationTitle: String) -> ClipDetailViewModel {
+    func makeClipDetailViewModel(clip: Clip) -> ClipDetailViewModel {
         ClipDetailViewModel(
             fetchFolderUseCase: makeFetchFolderUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
