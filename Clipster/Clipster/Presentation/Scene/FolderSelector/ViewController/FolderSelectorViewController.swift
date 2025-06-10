@@ -63,7 +63,7 @@ private extension FolderSelectorViewController {
 
         state
             .map(\.subfolders)
-            .bind(to: tableView.rx.items(cellIdentifier: FolderSelectorCell.identifier, cellType: FolderSelectorCell.self)) { _, folder, cell in
+            .bind(to: tableView.rx.items(cellIdentifier: FolderCell.identifier, cellType: FolderCell.self)) { _, folder, cell in
                 cell.setDisplay(FolderDisplayMapper.map(folder))
             }
             .disposed(by: disposeBag)

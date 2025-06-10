@@ -12,7 +12,7 @@ final class FolderSelectorView: UIView {
 
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.register(FolderSelectorCell.self, forCellReuseIdentifier: FolderSelectorCell.identifier)
+        tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
         tableView.rowHeight = 72
         tableView.separatorStyle = .none
         return tableView
