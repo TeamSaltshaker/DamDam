@@ -8,17 +8,6 @@ final class ShareViewController: SLComposeViewController {
         extractURL()
     }
 
-    private func openMainApp() {
-        if let url = URL(string: "clipster://") {
-            if openURLScheme(url) {
-                print("\(Self.self) ✅ URL Scheme open 성공")
-            } else {
-                print("\(Self.self) ❌ URL Scheme open 실패")
-            }
-        }
-        close()
-    }
-
     private func extractURL() {
         guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
               let attachments = extensionItem.attachments,
@@ -43,14 +32,27 @@ final class ShareViewController: SLComposeViewController {
 
             if let url = item as? URL {
                 print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
-                DispatchQueue.main.async {
-                    self.openMainApp()
+                if saveURLToUserDefaults(url) {
+                    DispatchQueue.main.async {
+                        self.openMainApp()
+                    }
                 }
             } else {
                 print("\(Self.self) ❌ URL 타입 변환 에러")
                 close()
             }
         }
+    }
+
+    private func openMainApp() {
+        if let url = URL(string: "clipster://") {
+            if openURLScheme(url) {
+                print("\(Self.self) ✅ URL Scheme open 성공")
+            } else {
+                print("\(Self.self) ❌ URL Scheme open 실패")
+            }
+        }
+        close()
     }
 
     private func openURLScheme(_ url: URL) -> Bool {
@@ -63,6 +65,17 @@ final class ShareViewController: SLComposeViewController {
             responder = responder?.next
         }
         return false
+    }
+
+    private func saveURLToUserDefaults(_ url: URL) -> Bool {
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.saltshaker.clipster") {
+            sharedDefaults.set(url.absoluteString, forKey: "sharedURL")
+            print("\(Self.self) ✅ UserDefaults에 URL 저장 완료: \(url.absoluteString)")
+            return true
+        } else {
+            print("\(Self.self) ❌ UserDefaults App Group 접근 실패")
+            return false
+        }
     }
 
     private func close() {
