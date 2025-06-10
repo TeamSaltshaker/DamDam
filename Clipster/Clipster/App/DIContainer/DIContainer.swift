@@ -84,7 +84,6 @@ final class DIContainer {
             deleteClipUseCase: makeDeleteClipUseCase(),
             fetchClipUseCase: makeFetchClipUseCase(),
             clip: clip,
-            navigationTitle: navigationTitle
         )
     }
 
