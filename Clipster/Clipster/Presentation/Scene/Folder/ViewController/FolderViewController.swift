@@ -6,12 +6,14 @@ import UIKit
 
 final class FolderViewController: UIViewController {
     private let viewModel: FolderViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let folderView = FolderView()
 
-    init(viewModel: FolderViewModel) {
+    init(viewModel: FolderViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
