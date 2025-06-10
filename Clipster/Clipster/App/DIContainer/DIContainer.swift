@@ -134,4 +134,11 @@ final class DIContainer {
             deleteClipUseCase: makeDeleteClipUseCase()
         )
     }
+
+    func makeFolderSelectorViewModel(mode: FolderSelectorMode) -> FolderSelectorViewModel {
+        FolderSelectorViewModel(
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
+            mode: mode
+        )
+    }
 }
