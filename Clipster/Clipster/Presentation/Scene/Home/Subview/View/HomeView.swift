@@ -66,8 +66,9 @@ final class HomeView: UIView {
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.rowHeight = 72
-        tableView.isScrollEnabled = false
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
+        tableView.isScrollEnabled = false
+        tableView.delegate = self
         return tableView
     }()
 
@@ -241,6 +242,24 @@ extension HomeView: UICollectionViewDelegate {
 
             return UIMenu(title: "", children: [info, edit, delete])
         }
+    }
+}
+
+extension HomeView: UITableViewDelegate {
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        let delete = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
+            guard let self = self else { return }
+            action.accept(.delete(indexPath))
+            completion(true)
+        }
+
+        delete.image = UIImage(systemName: "trash.fill")
+        delete.backgroundColor = .systemRed
+
+        return UISwipeActionsConfiguration(actions: [delete])
     }
 }
 
