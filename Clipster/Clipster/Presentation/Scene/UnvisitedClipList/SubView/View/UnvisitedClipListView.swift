@@ -19,6 +19,15 @@ final class UnvisitedClipListView: UIView {
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
+    private lazy var navigationView: CommonNavigationView = {
+        let view = CommonNavigationView()
+        view.setTitle("방문하지 않은 클립")
+        view.setLeftItem(backButton)
+        return view
+    }()
+
+    private let backButton = BackButton()
+
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -80,7 +89,7 @@ private extension UnvisitedClipListView {
 
             let section = NSCollectionLayoutSection(group: group)
             section.interGroupSpacing = 8
-            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 24, bottom: 0, trailing: 24)
+            section.contentInsets = .init(top: 24, leading: 24, bottom: 0, trailing: 24)
             return section
         }
 
@@ -138,12 +147,21 @@ private extension UnvisitedClipListView {
     }
 
     func setHierarchy() {
-        addSubview(collectionView)
+        [
+            collectionView,
+            navigationView
+        ].forEach { addSubview($0) }
     }
 
     func setConstraints() {
-        collectionView.snp.makeConstraints { make in
+        navigationView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(56)
+        }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
