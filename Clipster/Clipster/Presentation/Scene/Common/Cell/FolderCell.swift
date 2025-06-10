@@ -8,7 +8,7 @@ final class FolderCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "chevron.right")
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .systemGray
+        imageView.tintColor = .label
         return imageView
     }()
 
@@ -21,8 +21,8 @@ final class FolderCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ display: FolderDisplay) {
-        folderRowView.setDisplay(display)
+    func setDisplay(_ folder: FolderDisplay) {
+        folderRowView.setDisplay(folder)
     }
 }
 
@@ -34,21 +34,17 @@ private extension FolderCell {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
-        layer.cornerRadius = 16
     }
 
     func setHierarchy() {
-        [
-            folderRowView,
-            chevronImageView
-        ].forEach { contentView.addSubview($0) }
+        [folderRowView, chevronImageView]
+            .forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {
         folderRowView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(12)
-            make.leading.equalToSuperview().inset(20)
+            make.leading.equalToSuperview().offset(20)
+            make.centerY.equalToSuperview()
         }
 
         chevronImageView.snp.makeConstraints { make in
