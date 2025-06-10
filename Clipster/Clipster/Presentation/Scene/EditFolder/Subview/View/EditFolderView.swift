@@ -29,7 +29,12 @@ final class EditFolderView: UIView {
         return label
     }()
 
-    let folderView = UIView()
+    let folderView: UIView = {
+        let view = UIView()
+        view.isUserInteractionEnabled = true
+        return view
+    }()
+
     let folderRowView = FolderRowView()
 
     private let chevronImageView: UIImageView = {
@@ -130,6 +135,5 @@ private extension EditFolderView {
 
     func setBindings() {
         folderView.addGestureRecognizer(folderViewTapGesture)
-        folderView.isUserInteractionEnabled = true
     }
 }
