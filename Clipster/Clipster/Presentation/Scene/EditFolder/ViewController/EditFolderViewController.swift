@@ -5,12 +5,14 @@ import UIKit
 
 final class EditFolderViewController: UIViewController {
     private let viewModel: EditFolderViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let editFolderView = EditFolderView()
 
-    init(viewModel: EditFolderViewModel) {
+    init(viewModel: EditFolderViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 

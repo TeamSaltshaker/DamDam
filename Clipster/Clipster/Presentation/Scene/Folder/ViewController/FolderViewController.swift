@@ -89,7 +89,7 @@ private extension FolderViewController {
                     } else {
                         vm = diContainer.makeEditClipViewModel()
                     }
-                    let vc = EditClipViewController(viewModel: vm)
+                    let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .editFolderView(let parentFolder, let folder):
                     let mode: EditFolderMode
@@ -99,7 +99,7 @@ private extension FolderViewController {
                         mode = .add(parentFolder: parentFolder)
                     }
                     let vm = diContainer.makeEditFolderViewModel(mode: mode)
-                    let vc = EditFolderViewController(viewModel: vm)
+                    let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .folderView(let folder):
                     let vm = diContainer.makeFolderViewModel(folder: folder)
@@ -107,7 +107,7 @@ private extension FolderViewController {
                     navigationController?.pushViewController(vc, animated: true)
                 case .clipDetailView(let clip):
                     let vm = diContainer.makeClipDetailViewModel(clip: clip)
-                    let vc = ClipDetailViewController(viewModel: vm)
+                    let vc = ClipDetailViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .webView(let url):
                     let vc = SFSafariViewController(url: url)

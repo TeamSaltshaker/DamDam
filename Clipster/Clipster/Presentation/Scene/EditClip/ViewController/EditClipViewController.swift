@@ -4,12 +4,14 @@ import UIKit
 
 final class EditClipViewController: UIViewController {
     private let viewModel: EditClipViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let editClipView = EditClipView()
 
-    init(viewModel: EditClipViewModel) {
+    init(viewModel: EditClipViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 

@@ -9,13 +9,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         options connectionOptions: UIScene.ConnectionOptions,
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: windowScene)
         let diContainer = DIContainer()
-        let homeViewModel = diContainer.makeHomeViewModel()
-        let homeVC = HomeViewController(homeviewModel: homeViewModel)
+        let homeVM = diContainer.makeHomeViewModel()
+        let homeVC = HomeViewController(homeviewModel: homeVM, diContainer: diContainer)
+
+        window = UIWindow(windowScene: windowScene)
+        window?.backgroundColor = .systemBackground
         window?.rootViewController = UINavigationController(rootViewController: homeVC)
         window?.makeKeyAndVisible()
-
-        window?.backgroundColor = .systemBackground
     }
 }

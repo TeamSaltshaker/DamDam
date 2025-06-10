@@ -6,10 +6,12 @@ final class UnvisitedClipListViewController: UIViewController {
     private let disposeBag = DisposeBag()
 
     private let unvisitedClipListViewModel: UnvisitedClipListViewModel
+    private let diContainer: DIContainer
     private let unvisitedClipListView = UnvisitedClipListView()
 
-    init(unvisitedClipListViewModel: UnvisitedClipListViewModel) {
+    init(unvisitedClipListViewModel: UnvisitedClipListViewModel, diContainer: DIContainer) {
         self.unvisitedClipListViewModel = unvisitedClipListViewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 

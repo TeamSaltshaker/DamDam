@@ -6,10 +6,12 @@ final class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
 
     private let homeviewModel: HomeViewModel
+    private let diContainer: DIContainer
     private let homeView = HomeView()
 
-    init(homeviewModel: HomeViewModel) {
+    init(homeviewModel: HomeViewModel, diContainer: DIContainer) {
         self.homeviewModel = homeviewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -129,17 +131,11 @@ private extension HomeViewController {
                     print("폴더 편집 화면 이동\n")
                     print(folder)
                 case .showUnvisitedClipList(let clips):
-                    let context = CoreDataStack.shared.context
-                    let storage = DefaultClipStorage(context: context)
-                    let clipRepository = DefaultClipRepository(storage: storage, mapper: DomainMapper())
-                    let fetchUnvisitedClipsUseCase = DefaultFetchUnvisitedClipsUseCase(clipRepository: clipRepository)
-                    let deleteClipUseCase = DefaultDeleteClipUseCase(clipRepository: clipRepository)
-                    let viewModel = UnvisitedClipListViewModel(
-                        clips: clips,
-                        fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
-                        deleteClipUseCase: deleteClipUseCase
+                    let vm = owner.diContainer.makeUnvisitedClipListViewModel(clips: clips)
+                    let vc = UnvisitedClipListViewController(
+                        unvisitedClipListViewModel: vm,
+                        diContainer: owner.diContainer,
                     )
-                    let vc = UnvisitedClipListViewController(unvisitedClipListViewModel: viewModel)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
