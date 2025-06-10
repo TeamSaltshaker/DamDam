@@ -12,16 +12,8 @@ struct ClipDisplayMapper {
             id: clip.id,
             urlMetadata: urlMetadataDisplay,
             memo: clip.memo,
-            createdAt: formatDate(clip.createdAt),
+            memoLimit: "\(clip.memo.count) / 100",
             isVisited: clip.lastVisitedAt != nil
         )
-    }
-
-    private static func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.string(from: date)
     }
 }
