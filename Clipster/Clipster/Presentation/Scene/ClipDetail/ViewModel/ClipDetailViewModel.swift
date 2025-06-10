@@ -17,7 +17,6 @@ struct ClipDetailState {
     var clip: Clip
     var clipDisplay: ClipDisplay
     var folder: Folder?
-    let navigationTitle: String
     var isLoading = true
     var isProcessingDelete = false
     var shouldDismiss = false
@@ -25,10 +24,9 @@ struct ClipDetailState {
     var showDeleteConfirmation = false
     var errorMessage: String?
 
-    init(clip: Clip, navigationTitle: String) {
+    init(clip: Clip) {
         self.clip = clip
         self.clipDisplay = ClipDisplayMapper.map(clip)
-        self.navigationTitle = navigationTitle
     }
 }
 
@@ -48,14 +46,13 @@ final class ClipDetailViewModel {
         fetchFolderUseCase: FetchFolderUseCase,
         deleteClipUseCase: DeleteClipUseCase,
         fetchClipUseCase: FetchClipUseCase,
-        clip: Clip,
-        navigationTitle: String
+        clip: Clip
     ) {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteClipUseCase = deleteClipUseCase
         self.fetchClipUseCase = fetchClipUseCase
 
-        let initialState = ClipDetailState(clip: clip, navigationTitle: navigationTitle)
+        let initialState = ClipDetailState(clip: clip)
         self.stateRelay = BehaviorRelay(value: initialState)
         self.state = self.stateRelay.asObservable()
 

@@ -18,6 +18,7 @@ struct EditFolderState {
     let mode: EditFolderMode
     var folderTitle: String
     let initialFolderTitle: String
+    let navigationTitle: String
 
     var isSavable: Bool {
         let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -43,9 +44,11 @@ struct EditFolderState {
         case .add:
             self.folderTitle = ""
             self.initialFolderTitle = ""
+            self.navigationTitle = "폴더 추가"
         case .edit(_, let folder):
             self.folderTitle = folder.title
             self.initialFolderTitle = folder.title
+            self.navigationTitle = "폴더 편집"
         }
     }
 }

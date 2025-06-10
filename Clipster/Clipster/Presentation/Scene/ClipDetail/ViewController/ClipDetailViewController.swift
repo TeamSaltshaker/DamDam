@@ -33,29 +33,13 @@ final class ClipDetailViewController: UIViewController {
 
 private extension ClipDetailViewController {
     func configure() {
-        setAttributes()
         setBindings()
     }
 
-    func setAttributes() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: clipDetailView.backButton)
-
-        let deleteButton = UIBarButtonItem(customView: clipDetailView.deleteButton)
-        let editButton = UIBarButtonItem(customView: clipDetailView.editButton)
-        navigationItem.rightBarButtonItems = [deleteButton, editButton]
-    }
-
     func setBindings() {
-        viewModel.state
-            .map { $0.navigationTitle }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] title in
-                self?.clipDetailView.backButton.setDisplay(title)
-            }
-            .disposed(by: disposeBag)
+        let state = viewModel.state.share(replay: 1)
 
-        viewModel.state
+        state
             .map { (display: $0.clipDisplay, folderTitle: $0.folder?.title) }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] (display, folderTitle) in
@@ -63,7 +47,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .map { $0.isLoading }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
@@ -72,7 +56,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .map { $0.isProcessingDelete }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
@@ -86,7 +70,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .map { $0.showDeleteConfirmation }
             .distinctUntilChanged()
             .filter { $0 }
@@ -105,7 +89,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .compactMap { $0.errorMessage }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] message in
@@ -115,7 +99,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .map { $0.shouldNavigateToEdit }
             .distinctUntilChanged()
             .filter { $0 }
@@ -123,7 +107,7 @@ private extension ClipDetailViewController {
             .subscribe()
             .disposed(by: disposeBag)
 
-        viewModel.state
+        state
             .map { $0.shouldDismiss }
             .distinctUntilChanged()
             .filter { $0 }
@@ -133,7 +117,7 @@ private extension ClipDetailViewController {
             }
             .disposed(by: disposeBag)
 
-        clipDetailView.backButton.tap
+        clipDetailView.backButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
