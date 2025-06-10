@@ -20,6 +20,7 @@ enum FolderSelectorAction {
 
 struct FolderSelectorState {
     let mode: FolderSelectorMode
+    var initialParentFolder: Folder?
     var folders: [Folder] = []
     var currentPath: [Folder] = []
     var isLoading = true
@@ -36,7 +37,7 @@ struct FolderSelectorState {
     }
 
     var title: String {
-        selectedFolder?.title ?? ""
+        selectedFolder?.title ?? "홈"
     }
 
     var canNavigateUp: Bool {
@@ -49,6 +50,27 @@ struct FolderSelectorState {
             return false
         case .folder:
             return true
+        }
+    }
+
+    var isSelectable: Bool {
+        guard selectedFolder?.id != initialParentFolder?.id else {
+            return false
+        }
+
+        switch mode {
+        case .clip:
+            return selectedFolder != nil
+        case .folder:
+            return true
+        }
+    }
+
+    init(mode: FolderSelectorMode) {
+        self.mode = mode
+        switch mode {
+        case .clip(let parentFolder), .folder(let parentFolder):
+            self.initialParentFolder = parentFolder
         }
     }
 }
@@ -144,12 +166,13 @@ final class FolderSelectorViewModel {
                         print("\(Self.self): moved up from folder \(removed.title)")
                     }
                 case .selectButtonTapped:
-                    if let selected = state.selectedFolder {
-                        print("\(Self.self): selected folder \(selected.title)")
+                    if state.isSelectable {
+                        let selected = state.selectedFolder
+                        print("\(Self.self): selected folder \(selected?.title ?? "home")")
                         state.didFinishSelection = selected
                         state.shouldDismiss = true
                     } else {
-                        print("\(Self.self): no folder selected")
+                        print("\(Self.self): folder select failed")
                     }
                 case .addButtonTapped:
                     print("\(Self.self): add button tapped")
