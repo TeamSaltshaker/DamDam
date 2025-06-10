@@ -2,7 +2,7 @@ import Kingfisher
 import SnapKit
 import UIKit
 
-final class ClipCell: UICollectionViewCell {
+final class ClipCell: UITableViewCell {
     private let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -40,8 +40,8 @@ final class ClipCell: UICollectionViewCell {
         return view
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         configure()
     }
 

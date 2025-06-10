@@ -22,19 +22,19 @@ final class FolderView: UIView {
             frame: .zero,
             collectionViewLayout: createLayout(),
         )
-        collectionView.register(
-            SectionHeaderView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: "SectionHeaderView",
-        )
-        collectionView.register(
-            FolderCell.self,
-            forCellWithReuseIdentifier: "FolderCell",
-        )
-        collectionView.register(
-            ClipCell.self,
-            forCellWithReuseIdentifier: "ClipCell",
-        )
+//        collectionView.register(
+//            SectionHeaderView.self,
+//            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+//            withReuseIdentifier: "SectionHeaderView",
+//        )
+//        collectionView.register(
+//            FolderCell.self,
+//            forCellWithReuseIdentifier: "FolderCell",
+//        )
+//        collectionView.register(
+//            ClipCell.self,
+//            forCellWithReuseIdentifier: "ClipCell",
+//        )
         return collectionView
     }()
 
@@ -108,26 +108,26 @@ private extension FolderView {
     }
 
     func setDataSource() {
-        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-            switch item {
-            case .folder(let folderDisplay):
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: "FolderCell",
-                    for: indexPath,
-                ) as? FolderCell else { return UICollectionViewCell() }
-                cell.setDisplay(folderDisplay)
-
-                return cell
-            case .clip(let clipDisplay):
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: "ClipCell",
-                    for: indexPath,
-                ) as? ClipCell else { return UICollectionViewCell() }
-                cell.setDisplay(clipDisplay)
-
-                return cell
-            }
-        }
+//        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
+//            switch item {
+//            case .folder(let folderDisplay):
+//                guard let cell = collectionView.dequeueReusableCell(
+//                    withReuseIdentifier: "FolderCell",
+//                    for: indexPath,
+//                ) as? FolderCell else { return UICollectionViewCell() }
+//                cell.setDisplay(folderDisplay)
+//
+//                return cell
+//            case .clip(let clipDisplay):
+//                guard let cell = collectionView.dequeueReusableCell(
+//                    withReuseIdentifier: "ClipCell",
+//                    for: indexPath,
+//                ) as? ClipCell else { return UICollectionViewCell() }
+//                cell.setDisplay(clipDisplay)
+//
+//                return cell
+//            }
+//        }
 
         dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
             guard kind == UICollectionView.elementKindSectionHeader,
