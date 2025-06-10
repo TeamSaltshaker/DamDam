@@ -10,8 +10,10 @@ enum EditFolderMode {
 enum EditFolderAction {
     case folderTitleChanged(String)
     case saveButtonTapped
+    case folderViewTapped
     case saveSucceeded
     case saveFailed(Error)
+    case folderSelectorDismissed(selected: Folder?)
 }
 
 struct EditFolderState {
@@ -19,6 +21,8 @@ struct EditFolderState {
     var folderTitle: String
     let initialFolderTitle: String
     let navigationTitle: String
+    var parentFolder: Folder?
+    var parentFolderDisplay: FolderDisplay?
 
     var isSavable: Bool {
         let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -34,6 +38,7 @@ struct EditFolderState {
         }
     }
 
+    var shouldNavigateToFolderSelector = false
     var isProcessing: Bool = false
     var shouldDismiss: Bool = false
     var alertMessage: String?
@@ -41,14 +46,18 @@ struct EditFolderState {
     init(mode: EditFolderMode) {
         self.mode = mode
         switch mode {
-        case .add:
+        case .add(let parentFolder):
             self.folderTitle = ""
             self.initialFolderTitle = ""
             self.navigationTitle = "폴더 추가"
-        case .edit(_, let folder):
+            self.parentFolder = parentFolder
+            self.parentFolderDisplay = parentFolder.map { FolderDisplayMapper.map($0) }
+        case .edit(let parentFolder, let folder):
             self.folderTitle = folder.title
             self.initialFolderTitle = folder.title
             self.navigationTitle = "폴더 편집"
+            self.parentFolder = parentFolder
+            self.parentFolderDisplay = parentFolder.map { FolderDisplayMapper.map($0) }
         }
     }
 }
@@ -92,6 +101,9 @@ final class EditFolderViewModel {
                         print("\(Self.self): save button tapped")
                         newState.isProcessing = true
                     }
+                case .folderViewTapped:
+                    print("\(Self.self): folder view tapped")
+                    newState.shouldNavigateToFolderSelector = true
                 case .saveSucceeded:
                     print("\(Self.self): save succeeded")
                     newState.isProcessing = false
@@ -100,6 +112,15 @@ final class EditFolderViewModel {
                     print("\(Self.self): save failed with error: \(error.localizedDescription)")
                     newState.isProcessing = false
                     newState.alertMessage = error.localizedDescription
+                case .folderSelectorDismissed(let selected):
+                    newState.shouldNavigateToFolderSelector = false
+                    if let selected = selected {
+                        print("\(Self.self): folder selector dismissed with selection → \(selected.title)")
+                        newState.parentFolder = selected
+                        newState.parentFolderDisplay = FolderDisplayMapper.map(selected)
+                    } else {
+                        print("\(Self.self): folder selector dismissed with no selection")
+                    }
                 }
 
                 return newState

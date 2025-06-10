@@ -3,7 +3,6 @@ import UIKit
 final class BackButton: UIButton {
     convenience init(_ title: String) {
         self.init(frame: .zero)
-        configure()
         var config = configuration
         config?.title = title
         configuration = config

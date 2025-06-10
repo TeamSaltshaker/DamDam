@@ -2,13 +2,14 @@ import RxRelay
 import RxSwift
 
 enum FolderSelectorMode {
-    case clip
-    case folder
+    case clip(parentFolder: Folder?)
+    case folder(parentFolder: Folder?)
 }
 
 enum FolderSelectorAction {
     case viewDidLoad
-    case dataLoaded(folders: [Folder])
+    case viewWillDisappear
+    case dataLoadedSucceeded(folders: [Folder])
     case dataLoadFailed(Error)
     case openSubfolder(folder: Folder)
     case navigateUp
@@ -24,6 +25,7 @@ struct FolderSelectorState {
     var isLoading = true
     var errorMessage: String?
     var didFinishSelection: Folder?
+    var shouldDismiss = false
 
     var subfolders: [Folder] {
         currentPath.last?.folders ?? folders
@@ -42,7 +44,12 @@ struct FolderSelectorState {
     }
 
     var isAddButtonHidden: Bool {
-        mode == .folder
+        switch mode {
+        case .clip:
+            return false
+        case .folder:
+            return true
+        }
     }
 }
 
@@ -85,17 +92,18 @@ final class FolderSelectorViewModel {
                     }
                     return Disposables.create()
                 }
-                .map { .dataLoaded(folders: $0) }
+                .map { .dataLoadedSucceeded(folders: $0) }
                 .catch { .just(.dataLoadFailed($0)) }
                 .asObservable()
             }
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: action)
             .disposed(by: disposeBag)
 
         action
-            .do(onNext: { action in
+            .do { action in
                 print("\(Self.self): received action → \(action)")
-            })
+            }
             .scan(into: initialState) { state, action in
                 state.errorMessage = nil
                 state.didFinishSelection = nil
@@ -104,10 +112,25 @@ final class FolderSelectorViewModel {
                 case .viewDidLoad:
                     print("\(Self.self): viewDidLoad")
                     state.isLoading = true
-                case .dataLoaded(let folders):
+                case .viewWillDisappear:
+                    print("\(Self.self): viewWillDisappear")
+                    state.shouldDismiss = true
+                case .dataLoadedSucceeded(let folders):
                     print("\(Self.self): data load succeeded with \(folders.count) folders")
                     state.isLoading = false
                     state.folders = folders
+
+                    if let parentFolder = {
+                        switch state.mode {
+                        case .clip(let folder), .folder(let folder):
+                            return folder
+                        }
+                    }(), let path = self.path(to: parentFolder, in: folders) {
+                        state.currentPath = path
+                        print("\(Self.self): initial path set to → \(path.map { $0.title })")
+                    } else {
+                        print("\(Self.self): no initial folder or failed to find path")
+                    }
                 case .dataLoadFailed(let error):
                     print("\(Self.self): data load failed with error: \(error.localizedDescription)")
                     state.isLoading = false
@@ -122,11 +145,12 @@ final class FolderSelectorViewModel {
                     }
                 case .selectButtonTapped:
                     if let selected = state.selectedFolder {
-                         print("\(Self.self): selected folder \(selected.title)")
-                         state.didFinishSelection = selected
-                     } else {
-                         print("\(Self.self): no folder selected")
-                     }
+                        print("\(Self.self): selected folder \(selected.title)")
+                        state.didFinishSelection = selected
+                        state.shouldDismiss = true
+                    } else {
+                        print("\(Self.self): no folder selected")
+                    }
                 case .addButtonTapped:
                     print("\(Self.self): add button tapped")
                 case .folderAdded(let folder):
@@ -136,5 +160,16 @@ final class FolderSelectorViewModel {
             }
             .bind(to: stateRelay)
             .disposed(by: disposeBag)
+    }
+
+    private func path(to target: Folder, in folders: [Folder]) -> [Folder]? {
+        for folder in folders {
+            if folder.id == target.id {
+                return [folder]
+            } else if let subpath = path(to: target, in: folder.folders) {
+                return [folder] + subpath
+            }
+        }
+        return nil
     }
 }

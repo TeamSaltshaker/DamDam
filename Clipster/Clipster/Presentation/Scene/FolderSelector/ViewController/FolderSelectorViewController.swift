@@ -29,6 +29,11 @@ final class FolderSelectorViewController: UIViewController {
         configure()
         viewModel.action.accept(.viewDidLoad)
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.action.accept(.viewWillDisappear)
+    }
 }
 
 private extension FolderSelectorViewController {
@@ -74,12 +79,16 @@ private extension FolderSelectorViewController {
             .disposed(by: disposeBag)
 
         state
-            .compactMap(\.didFinishSelection)
+            .map(\.shouldDismiss)
+            .distinctUntilChanged()
+            .filter { $0 }
             .take(1)
-            .subscribe { [weak self] selectedFolder in
-                self?.dismiss(animated: true) {
-                    self?.onSelectionComplete?(selectedFolder)
-                }
+            .withLatestFrom(state)
+            .subscribe { [weak self] state in
+                guard let self else { return }
+
+                self.onSelectionComplete?(state.didFinishSelection)
+                self.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
     }

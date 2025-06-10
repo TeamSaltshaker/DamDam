@@ -17,7 +17,7 @@ final class EditFolderView: UIView {
 
     private let folderTitleTextField = EditFolderTextField()
 
-    private let folderLabel: UILabel = {
+    let folderLabel: UILabel = {
         let label = UILabel()
         label.text = "저장폴더"
         label.textColor = .label
@@ -25,8 +25,8 @@ final class EditFolderView: UIView {
         return label
     }()
 
-    private let folderView = UIView()
-    private let folderRowView = FolderRowView()
+    let folderView = UIView()
+    let folderRowView = FolderRowView()
 
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView()
@@ -43,6 +43,8 @@ final class EditFolderView: UIView {
     var folderTitleBinder: Binder<String?> {
         folderTitleTextField.rx.text
     }
+
+    let folderViewTapGesture = UITapGestureRecognizer()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -63,6 +65,7 @@ private extension EditFolderView {
         setAttributes()
         setHierarchy()
         setConstraints()
+        setBindings()
     }
 
     func setAttributes() {
@@ -119,5 +122,10 @@ private extension EditFolderView {
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
         }
+    }
+
+    func setBindings() {
+        folderView.addGestureRecognizer(folderViewTapGesture)
+        folderView.isUserInteractionEnabled = true
     }
 }
