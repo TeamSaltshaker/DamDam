@@ -3,14 +3,16 @@ import UIKit
 
 final class FolderSelectorViewController: UIViewController {
     private let viewModel: FolderSelectorViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let folderSelectorView = FolderSelectorView()
 
     var onSelectionComplete: ((Folder?) -> Void)?
 
-    init(viewModel: FolderSelectorViewModel) {
+    init(viewModel: FolderSelectorViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 

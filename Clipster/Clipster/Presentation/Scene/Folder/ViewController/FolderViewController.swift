@@ -6,12 +6,14 @@ import UIKit
 
 final class FolderViewController: UIViewController {
     private let viewModel: FolderViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let folderView = FolderView()
 
-    init(viewModel: FolderViewModel) {
+    init(viewModel: FolderViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -81,83 +83,35 @@ private extension FolderViewController {
                 guard let self else { return }
                 switch navigation {
                 case .editClipView(let clip):
-                    let urlValidationReposiotry = DefaultURLValidationRepository()
-                    let checkValidityUC = DefaultCheckVaildityUseCase(repository: urlValidationReposiotry)
-                    let urlMetadataRepository = DefaultURLMetadataRepository()
-                    let parseURLMetadataUC = DefaultParseURLMetadataUseCase(repository: urlMetadataRepository)
-                    let editClipVM: EditClipViewModel
+                    let vm: EditClipViewModel
                     if let clip = clip {
-                        editClipVM = EditClipViewModel(
-                            clip: clip,
-                            checkURLValidityUseCase: checkValidityUC,
-                            parseURLMetadataUseCase: parseURLMetadataUC,
-                        )
+                        vm = diContainer.makeEditClipViewModel(clip: clip)
                     } else {
-                        editClipVM = EditClipViewModel(
-                            checkURLValidityUseCase: checkValidityUC,
-                            parseURLMetadataUseCase: parseURLMetadataUC,
-                        )
+                        vm = diContainer.makeEditClipViewModel()
                     }
-                    let editClipVC = EditClipViewController(viewModel: editClipVM)
-                    navigationController?.pushViewController(editClipVC, animated: true)
+                    let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .editFolderView(let parentFolder, let folder):
-                    let folderStorage = DefaultFolderStorage(context: CoreDataStack.shared.context)
-                    let folderRepository = DefaultFolderRepository(
-                        storage: folderStorage,
-                        mapper: DomainMapper(),
-                    )
-                    let createFolderUC = DefaultCreateFolderUseCase(folderRepository: folderRepository)
-                    let updateFolderUC = DefaultUpdateFolderUseCase(folderRepository: folderRepository)
                     let mode: EditFolderMode
                     if let folder = folder {
                         mode = .edit(parentFolder: parentFolder, folder: folder)
                     } else {
                         mode = .add(parentFolder: parentFolder)
                     }
-                    let editFolderVM = EditFolderViewModel(
-                        createFolderUseCase: createFolderUC,
-                        updateFolderUseCase: updateFolderUC,
-                        mode: mode,
-                    )
-                    let editFolderVC = EditFolderViewController(viewModel: editFolderVM)
-                    navigationController?.pushViewController(editFolderVC, animated: true)
+                    let vm = diContainer.makeEditFolderViewModel(mode: mode)
+                    let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .folderView(let folder):
-                    let clipStorage = DefaultClipStorage(context: CoreDataStack.shared.context)
-                    let clipRepository = DefaultClipRepository(storage: clipStorage, mapper: DomainMapper())
-                    let deleteClipUC = DefaultDeleteClipUseCase(clipRepository: clipRepository)
-                    let childFolderVM = FolderViewModel(
-                        folder: folder,
-                        deleteFolderUseCase: DefaultDeleteFolderUseCase(),
-                        deleteClipUseCase: deleteClipUC,
-                    )
-                    let childFolderVC = FolderViewController(viewModel: childFolderVM)
-                    navigationController?.pushViewController(childFolderVC, animated: true)
+                    let vm = diContainer.makeFolderViewModel(folder: folder)
+                    let vc = FolderViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .clipDetailView(let clip):
-                    let folderStorage = DefaultFolderStorage(context: CoreDataStack.shared.context)
-                    let folderRepository = DefaultFolderRepository(
-                        storage: folderStorage,
-                        mapper: DomainMapper()
-                    )
-                    let clipStorage = DefaultClipStorage(context: CoreDataStack.shared.context)
-                    let clipRepository = DefaultClipRepository(
-                        storage: clipStorage,
-                        mapper: DomainMapper(),
-                    )
-                    let fetchFolderUC = DefaultFetchFolderUseCase(folderRepository: folderRepository)
-                    let deleteClipUC = DefaultDeleteClipUseCase(clipRepository: clipRepository)
-                    let fetchClipUC = DefaultFetchClipUseCase(clipRepository: clipRepository)
-                    let clipDetailVM = ClipDetailViewModel(
-                        fetchFolderUseCase: fetchFolderUC,
-                        deleteClipUseCase: deleteClipUC,
-                        fetchClipUseCase: fetchClipUC,
-                        clip: clip,
-                        navigationTitle: "상세정보",
-                    )
-                    let clipDetailVC = ClipDetailViewController(viewModel: clipDetailVM)
-                    navigationController?.pushViewController(clipDetailVC, animated: true)
+                    let vm = diContainer.makeClipDetailViewModel(clip: clip)
+                    let vc = ClipDetailViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .webView(let url):
-                    let safariVC = SFSafariViewController(url: url)
-                    present(safariVC, animated: true)
+                    let vc = SFSafariViewController(url: url)
+                    present(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)

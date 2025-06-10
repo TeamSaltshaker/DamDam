@@ -3,12 +3,14 @@ import UIKit
 
 final class ClipDetailViewController: UIViewController {
     private let viewModel: ClipDetailViewModel
+    private let diConatiner: DIContainer
     private let disposeBag = DisposeBag()
 
     private let clipDetailView = ClipDetailView()
 
-    init(viewModel: ClipDetailViewModel) {
+    init(viewModel: ClipDetailViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diConatiner = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
