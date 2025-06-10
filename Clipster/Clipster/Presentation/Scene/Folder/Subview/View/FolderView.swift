@@ -163,4 +163,27 @@ extension FolderView: UITableViewDelegate {
             return UIMenu(title: "", children: actions)
         }
     }
+
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath,
+    ) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(
+            style: .destructive,
+            title: "삭제",
+        ) { [weak self] _, _, completion in
+            guard let self else {
+                completion(false)
+                return
+            }
+            didTapDeleteButton.accept(indexPath)
+            completion(true)
+        }
+        deleteAction.image = .init(systemName: "trash.fill")
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = false
+
+        return configuration
+    }
 }
