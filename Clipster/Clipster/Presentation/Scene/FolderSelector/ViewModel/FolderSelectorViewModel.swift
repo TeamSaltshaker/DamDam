@@ -2,19 +2,20 @@ import RxRelay
 import RxSwift
 
 enum FolderSelectorMode {
-    case clip
-    case folder
+    case clip(parentFolder: Folder?)
+    case folder(parentFolder: Folder?)
 }
 
 enum FolderSelectorAction {
     case viewDidLoad
-    case dataLoaded(folders: [Folder])
+    case dataLoadedSucceeded(folders: [Folder])
     case dataLoadFailed(Error)
     case openSubfolder(folder: Folder)
     case navigateUp
     case selectButtonTapped
     case addButtonTapped
     case folderAdded(folder: Folder)
+    case initializePathIfNeeded
 }
 
 struct FolderSelectorState {
@@ -42,7 +43,12 @@ struct FolderSelectorState {
     }
 
     var isAddButtonHidden: Bool {
-        mode == .folder
+        switch mode {
+        case .clip:
+            return false
+        case .folder:
+            return true
+        }
     }
 }
 
@@ -85,7 +91,7 @@ final class FolderSelectorViewModel {
                     }
                     return Disposables.create()
                 }
-                .map { .dataLoaded(folders: $0) }
+                .map { .dataLoadedSucceeded(folders: $0) }
                 .catch { .just(.dataLoadFailed($0)) }
                 .asObservable()
             }
@@ -93,9 +99,9 @@ final class FolderSelectorViewModel {
             .disposed(by: disposeBag)
 
         action
-            .do(onNext: { action in
+            .do { action in
                 print("\(Self.self): received action → \(action)")
-            })
+            }
             .scan(into: initialState) { state, action in
                 state.errorMessage = nil
                 state.didFinishSelection = nil
@@ -104,7 +110,7 @@ final class FolderSelectorViewModel {
                 case .viewDidLoad:
                     print("\(Self.self): viewDidLoad")
                     state.isLoading = true
-                case .dataLoaded(let folders):
+                case .dataLoadedSucceeded(let folders):
                     print("\(Self.self): data load succeeded with \(folders.count) folders")
                     state.isLoading = false
                     state.folders = folders
@@ -132,9 +138,32 @@ final class FolderSelectorViewModel {
                 case .folderAdded(let folder):
                     print("\(Self.self): added folder \(folder.title)")
                     state.didFinishSelection = folder
+                case .initializePathIfNeeded:
+                    if let parentFolder = {
+                        switch state.mode {
+                        case .clip(let folder), .folder(let folder):
+                            return folder
+                        }
+                    }(), let path = self.path(to: parentFolder, in: state.folders) {
+                        state.currentPath = path
+                        print("\(Self.self): initial path set to → \(path.map { $0.title })")
+                    } else {
+                        print("\(Self.self): no initial folder or failed to find path")
+                    }
                 }
             }
             .bind(to: stateRelay)
             .disposed(by: disposeBag)
+    }
+
+    private func path(to target: Folder, in folders: [Folder]) -> [Folder]? {
+        for folder in folders {
+            if folder.id == target.id {
+                return [folder]
+            } else if let subpath = path(to: target, in: folder.folders) {
+                return [folder] + subpath
+            }
+        }
+        return nil
     }
 }
