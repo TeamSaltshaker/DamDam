@@ -112,24 +112,52 @@ private extension HomeViewController {
             .emit(with: self) { owner, route in
                 switch route {
                 case .showAddClip:
-                    print("클립 추가 화면 이동\n")
+                    let vm = owner.diContainer.makeEditClipViewModel()
+                    let vc = EditClipViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showAddFolder:
-                    print("폴더 추가 화면 이동\n")
+                    let vm = owner.diContainer.makeEditFolderViewModel(mode: .add(parentFolder: nil))
+                    let vc = EditFolderViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showWebView(let url):
                     print("웹 뷰")
                     print("\(url)\n")
                 case .showFolder(let folder):
-                    print("폴더 화면 이동")
-                    print("\(folder)\n")
+                    let vm = owner.diContainer.makeFolderViewModel(folder: folder)
+                    let vc = FolderViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showDetailClip(let clip):
-                    print("클립 상세 화면 이동")
-                    print("\(clip)\n")
+                    let vm = owner.diContainer.makeClipDetailViewModel(clip: clip)
+                    let vc = ClipDetailViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
-                    print("클립 편집 화면 이동")
-                    print("\(clip)\n")
+                    let vm = owner.diContainer.makeEditClipViewModel(clip: clip)
+                    let vc = EditClipViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showEditFolder(let folder):
-                    print("폴더 편집 화면 이동\n")
-                    print(folder)
+                    let vm = owner.diContainer.makeEditFolderViewModel(
+                        mode: .edit(parentFolder: nil, folder: folder)
+                    )
+                    let vc = EditFolderViewController(
+                        viewModel: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showUnvisitedClipList(let clips):
                     let vm = owner.diContainer.makeUnvisitedClipListViewModel(clips: clips)
                     let vc = UnvisitedClipListViewController(
