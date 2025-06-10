@@ -14,6 +14,9 @@ final class FolderView: UIView {
         case clip(ClipDisplay)
     }
 
+    let didTapBackButton = PublishRelay<Void>()
+    let didTapAddFolderButton = PublishRelay<Void>()
+    let didTapAddClipButton = PublishRelay<Void>()
     let didTapCell = PublishRelay<IndexPath>()
     let didTapDetailButton = PublishRelay<IndexPath>()
     let didTapEditButton = PublishRelay<IndexPath>()
@@ -55,6 +58,25 @@ final class FolderView: UIView {
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
+
+    private func makeAddButtonMenu() -> UIMenu {
+        let addFolderAction = UIAction(
+            title: "폴더 추가",
+            image: UIImage(systemName: "folder"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            didTapAddFolderButton.accept(())
+        }
+        let addClipAction = UIAction(
+            title: "클립 추가",
+            image: UIImage(systemName: "paperclip"),
+        ) { [weak self] _ in
+            guard let self else { return }
+            didTapAddClipButton.accept(())
+        }
+
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    }
 }
 
 private extension FolderView {
@@ -69,6 +91,9 @@ private extension FolderView {
     func setAttributes() {
         navigationView.setLeftItem(backButton)
         navigationView.setRightItem(addButton)
+
+        addButton.menu = makeAddButtonMenu()
+        addButton.showsMenuAsPrimaryAction = true
     }
 
     func setHierarchy() {
@@ -113,6 +138,14 @@ private extension FolderView {
     }
 
     func setBindings() {
+        backButton.rx.tap
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                didTapBackButton.accept(())
+            }
+            .disposed(by: disposeBag)
+
         tableView.rx.itemSelected
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] indexPath in
