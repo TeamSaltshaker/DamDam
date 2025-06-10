@@ -7,6 +7,7 @@ final class FolderViewModel {
         case didTapCell(IndexPath)
         case didTapAddFolderButton
         case didTapAddClipButton
+        case didTapDetailButton(IndexPath)
         case didTapEditButton(IndexPath)
         case didTapDeleteButton(IndexPath)
     }
@@ -19,7 +20,7 @@ final class FolderViewModel {
 
     enum Navigation {
         case editClipView(Clip?)
-        case editFolderView(Folder?)
+        case editFolderView(Folder, Folder?)
         case folderView(Folder)
         case clipDetailView(Clip)
         case webView(URL)
@@ -73,6 +74,8 @@ private extension FolderViewModel {
                     navigateToAddClipView()
                 case .didTapAddFolderButton:
                     navigateToAddFolderView()
+                case .didTapDetailButton(let indexPath):
+                    navigateToDetailView(at: indexPath)
                 case .didTapEditButton(let indexPath):
                     navigateToEditView(at: indexPath)
                 case .didTapDeleteButton(let indexPath):
@@ -97,17 +100,27 @@ private extension FolderViewModel {
     }
 
     func navigateToAddFolderView() {
-        navigation.accept(.editFolderView(nil))
+        navigation.accept(.editFolderView(folder, nil))
+    }
+
+    func navigateToDetailView(at indexPath: IndexPath) {
+        switch indexPath.section {
+        case 1:
+            let selectedClip = folder.clips[indexPath.item]
+            navigation.accept(.clipDetailView(selectedClip))
+        default:
+            break
+        }
     }
 
     func navigateToEditView(at indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
-            let folder = folder.folders[indexPath.item]
-            navigation.accept(.editFolderView(folder))
+            let selectedFolder = folder.folders[indexPath.item]
+            navigation.accept(.editFolderView(folder, selectedFolder))
         case 1:
-            let clip = folder.clips[indexPath.item]
-            navigation.accept(.editClipView(clip))
+            let selectedClip = folder.clips[indexPath.item]
+            navigation.accept(.editClipView(selectedClip))
         default:
             break
         }
