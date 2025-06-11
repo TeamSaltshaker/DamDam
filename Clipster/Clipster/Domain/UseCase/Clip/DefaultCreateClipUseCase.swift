@@ -1,10 +1,3 @@
-//
-//  DefaultCreateClipUseCase.swift
-//  Clipster
-//
-//  Created by 유현진 on 6/11/25.
-//
-
 import Foundation
 
 final class DefaultCreateClipUseCase: CreateClipUseCase {
