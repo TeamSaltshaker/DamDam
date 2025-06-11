@@ -3,6 +3,12 @@ import RxRelay
 import RxSwift
 
 final class EditClipViewModel: ViewModel {
+    enum EditClipType {
+        case edit
+        case create
+        case shareExtension
+    }
+
     enum Action {
         case editURLInputTextField(String)
         case editMomo(String)
@@ -16,6 +22,7 @@ final class EditClipViewModel: ViewModel {
     }
 
     struct State {
+        var type: EditClipType
         var urlInputText: String
         var isHiddenURLMetadataStackView = true
         var isHiddenURLValidationStackView = true
@@ -25,6 +32,8 @@ final class EditClipViewModel: ViewModel {
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
         var urlMetadata: URLMetadataDisplay?
+        var clip: Clip?
+        var currentFolder: Folder?
     }
 
     var state: BehaviorRelay<State>
@@ -36,11 +45,14 @@ final class EditClipViewModel: ViewModel {
 
     init(
         urlText: String = "",
+        currentFolder: Folder? = nil,
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase
     ) {
         state = BehaviorRelay(value: State(
-            urlInputText: urlText
+            type: urlText.isEmpty ? .create : .shareExtension,
+            urlInputText: urlText,
+            currentFolder: currentFolder
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
@@ -53,9 +65,11 @@ final class EditClipViewModel: ViewModel {
         parseURLMetadataUseCase: ParseURLMetadataUseCase
     ) {
         state = BehaviorRelay(value: State(
+            type: .edit,
             urlInputText: clip.urlMetadata.url.absoluteString,
             memoText: clip.memo,
-            memoLimit: "\(clip.memo.count)/100"
+            memoLimit: "\(clip.memo.count)/100",
+            clip: clip
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
