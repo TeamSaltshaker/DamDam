@@ -1,3 +1,5 @@
+import Foundation
+
 final class DefaultDeleteClipUseCase: DeleteClipUseCase {
     private let clipRepository: ClipRepository
 
@@ -6,6 +8,17 @@ final class DefaultDeleteClipUseCase: DeleteClipUseCase {
      }
 
     func execute(_ clip: Clip) async -> Result<Void, Error> {
-        clipRepository.deleteClip(clip).mapError { $0 as Error }
+        let deletedClip = Clip(
+            id: clip.id,
+            folderID: clip.folderID,
+            urlMetadata: clip.urlMetadata,
+            memo: clip.memo,
+            lastVisitedAt: clip.lastVisitedAt,
+            createdAt: clip.createdAt,
+            updatedAt: clip.updatedAt,
+            deletedAt: Date()
+        )
+
+        return clipRepository.deleteClip(deletedClip).mapError { $0 as Error }
     }
 }

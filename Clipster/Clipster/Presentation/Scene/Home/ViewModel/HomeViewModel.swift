@@ -7,8 +7,7 @@ final class HomeViewModel {
         case viewWillAppear
         case tapAddClip
         case tapAddFolder
-        case tapClip(Int)
-        case tapFolder(Int)
+        case tapCell(IndexPath)
         case tapDetail(IndexPath)
         case tapEdit(IndexPath)
         case tapDelete(IndexPath)
@@ -59,6 +58,7 @@ final class HomeViewModel {
 
     private func bind() {
         action
+            .do { print("\(Self.self): received action → \($0)") }
             .subscribe(with: self) { owner, action in
                 switch action {
                 case .viewWillAppear:
@@ -68,15 +68,8 @@ final class HomeViewModel {
                     owner.route.accept(.showAddClip(latestFolder))
                 case .tapAddFolder:
                     owner.route.accept(.showAddFolder)
-                case .tapClip(let index):
-                    guard index < owner.unvisitedClips.count else { return }
-                    let url = owner.unvisitedClips[index].urlMetadata.url
-                    owner.route.accept(.showWebView(url))
-                case .tapFolder(let index):
-                    guard index < owner.folders.count else { return }
-                    let folder = owner.folders[index]
-                    owner.route.accept(.showFolder(folder))
-                case .tapDetail(let indexPath),
+                case .tapCell(let indexPath),
+                     .tapDetail(let indexPath),
                      .tapEdit(let indexPath):
                     if let route = owner.route(for: action, at: indexPath) {
                         owner.route.accept(route)
@@ -95,6 +88,8 @@ final class HomeViewModel {
         case 0 where indexPath.item < unvisitedClips.count:
             let clip = unvisitedClips[indexPath.item]
             switch action {
+            case .tapCell:
+                return .showWebView(clip.urlMetadata.url)
             case .tapDetail:
                 return .showDetailClip(clip)
             case .tapEdit:
@@ -103,8 +98,10 @@ final class HomeViewModel {
                 return nil
             }
         case 1 where indexPath.item < folders.count:
-            let folder = folders[indexPath.item]
+            let folder = folders[indexPath.row]
             switch action {
+            case .tapCell:
+                return .showFolder(folder)
             case .tapEdit:
                 return .showEditFolder(folder)
             default:
@@ -116,11 +113,11 @@ final class HomeViewModel {
     }
 
     private func makeHomeDisplay() async {
-        async let clipsResult = makeClipCellDisplays()
-        async let foldersResult = makeFolderCellDisplays()
-
         do {
-            let homeDisplay = try await HomeDisplay(
+            let clipsResult = try await makeClipCellDisplays()
+            let foldersResult = try await makeFolderCellDisplays()
+
+            let homeDisplay = HomeDisplay(
                 unvitsedClips: clipsResult,
                 folders: foldersResult
             )
