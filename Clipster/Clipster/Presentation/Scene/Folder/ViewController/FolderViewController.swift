@@ -33,6 +33,7 @@ final class FolderViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
+        viewModel.action.accept(.viewWillAppear)
     }
 }
 
@@ -48,6 +49,7 @@ private extension FolderViewController {
                 guard let self else { return }
                 folderView.setDisplay(title: state.currentFolderTitle)
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
+                folderView.setDisplay(isEmptyViewHidden: state.isEmptyViewHidden)
             }
             .disposed(by: disposeBag)
 

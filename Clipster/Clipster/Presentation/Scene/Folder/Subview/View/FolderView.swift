@@ -31,6 +31,10 @@ final class FolderView: UIView {
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .white800
+        tableView.rowHeight = 80
+        tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 23.5
         tableView.register(
             FolderCell.self,
             forCellReuseIdentifier: FolderCell.identifier,
@@ -46,6 +50,8 @@ final class FolderView: UIView {
         tableView.delegate = self
         return tableView
     }()
+
+    private let emptyView = EmptyView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,22 +71,21 @@ final class FolderView: UIView {
         snapshot.appendSections([.folder, .clip])
         snapshot.appendItems(folders.map { .folder($0) }, toSection: .folder)
         snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
+        snapshot.reloadSections([.folder, .clip])
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
 
+    func setDisplay(isEmptyViewHidden: Bool) {
+        emptyView.isHidden = isEmptyViewHidden
+    }
+
     private func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: UIImage(systemName: "folder"),
-        ) { [weak self] _ in
+        let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
             guard let self else { return }
             didTapAddFolderButton.accept(())
         }
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
-        ) { [weak self] _ in
+        let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
             guard let self else { return }
             didTapAddClipButton.accept(())
         }
@@ -104,10 +109,12 @@ private extension FolderView {
 
         addButton.menu = makeAddButtonMenu()
         addButton.showsMenuAsPrimaryAction = true
+
+        backgroundColor = .white800
     }
 
     func setHierarchy() {
-        [navigationView, tableView].forEach {
+        [navigationView, tableView, emptyView].forEach {
             addSubview($0)
         }
     }
@@ -120,7 +127,12 @@ private extension FolderView {
 
         tableView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
-            make.directionalHorizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(24)
+            make.bottom.equalTo(safeAreaLayoutGuide)
+        }
+
+        emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 
@@ -172,11 +184,14 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         viewForHeaderInSection section: Int,
     ) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(
-            withIdentifier: TableHeaderView.identifier,
-        ) as? TableHeaderView else { return nil }
-        header.setTitle(section == 0 ? "폴더" : "클립")
+        guard let section = Section(rawValue: section),
+              let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
+              !items.isEmpty,
+              let header = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: TableHeaderView.identifier,
+              ) as? TableHeaderView else { return nil }
 
+        header.setTitle(section == .folder ? "폴더" : "클립")
         return header
     }
 
@@ -184,7 +199,7 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         heightForHeaderInSection section: Int,
     ) -> CGFloat {
-        44
+        36
     }
 
     func tableView(
@@ -195,23 +210,13 @@ extension FolderView: UITableViewDelegate {
         UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             guard let self else { return UIMenu() }
 
-            let detailAction = UIAction(
-                title: "상세정보",
-                image: UIImage(systemName: "info.circle"),
-            ) { _ in
+            let detailAction = UIAction(title: "상세정보", image: .info) { _ in
                 self.didTapDetailButton.accept(indexPath)
             }
-            let editAction = UIAction(
-                title: "편집",
-                image: UIImage(systemName: "pencil"),
-            ) { _ in
+            let editAction = UIAction(title: "편집", image: .pen) { _ in
                 self.didTapEditButton.accept(indexPath)
             }
-            let deleteAction = UIAction(
-                title: "삭제",
-                image: UIImage(systemName: "trash"),
-                attributes: .destructive,
-            ) { _ in
+            let deleteAction = UIAction(title: "삭제", image: .trashRed, attributes: .destructive) { _ in
                 guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
 
                 switch item {
@@ -250,11 +255,8 @@ extension FolderView: UITableViewDelegate {
 
             completion(true)
         }
-        deleteAction.image = .init(systemName: "trash.fill")
+        deleteAction.image = .trashWhite
 
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
-        configuration.performsFirstActionWithFullSwipe = false
-
-        return configuration
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }

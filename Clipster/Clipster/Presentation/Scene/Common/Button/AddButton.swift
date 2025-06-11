@@ -17,7 +17,6 @@ private extension AddButton {
     }
 
     func setAttributes() {
-        setImage(UIImage(systemName: "plus"), for: .normal)
-        tintColor = .label
+        setImage(.plus, for: .normal)
     }
 }

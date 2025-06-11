@@ -25,13 +25,13 @@ private extension BackButton {
 
     func setAttributes() {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "chevron.left")
+        config.image = .chevronLeft
         config.imagePadding = 8
-        config.baseForegroundColor = .label
         config.contentInsets = .zero
 
         configuration = config
 
-        titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel?.font = .pretendard(size: 14, weight: .medium)
+        titleLabel?.textColor = .black100
     }
 }

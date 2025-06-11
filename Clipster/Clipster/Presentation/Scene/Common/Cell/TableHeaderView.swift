@@ -4,7 +4,8 @@ import UIKit
 final class TableHeaderView: UITableViewHeaderFooterView {
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .init(name: "Pretendard-SemiBold", size: 18)
+        label.font = .pretendard(size: 18, weight: .semiBold)
+        label.textColor = .black100
         return label
     }()
 
