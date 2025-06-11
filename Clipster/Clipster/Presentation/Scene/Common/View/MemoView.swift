@@ -5,8 +5,8 @@ final class MemoView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "메모"
-        label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textColor = .label
+        label.font = .pretendard(size: 16, weight: .medium)
+        label.textColor = .black100
         return label
     }()
 
@@ -14,20 +14,21 @@ final class MemoView: UIView {
         let view = UIView()
         view.layer.cornerRadius = 12
         view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor.systemGray5.cgColor
+        view.layer.borderColor = UIColor.black900.cgColor
+        view.backgroundColor = .white900
         return view
     }()
 
     let memoTextView: UITextView = {
         let textView = UITextView()
-        textView.font = .systemFont(ofSize: 14)
+        textView.font = .pretendard(size: 14, weight: .regular)
         return textView
     }()
 
     let memoLimitLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
-        label.font = .systemFont(ofSize: 12)
+        label.textColor = .black600
+        label.font = .pretendard(size: 12, weight: .regular)
         label.textAlignment = .right
         return label
     }()
