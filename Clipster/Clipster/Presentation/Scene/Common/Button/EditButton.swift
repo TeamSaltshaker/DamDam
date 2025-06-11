@@ -17,7 +17,6 @@ private extension EditButton {
     }
 
     func setAttributes() {
-        setImage(UIImage(systemName: "applepencil"), for: .normal)
-        tintColor = .label
+        setImage(.pen, for: .normal)
     }
 }
