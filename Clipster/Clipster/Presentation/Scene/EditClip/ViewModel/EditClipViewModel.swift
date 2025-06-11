@@ -135,7 +135,7 @@ final class EditClipViewModel: ViewModel {
                     urlMetadata: URLMetadata(
                         url: urlMetadata.url,
                         title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
                         createdAt: clip.createdAt,
                         updatedAt: clip.urlMetadata.url != urlMetadata.url ? Date() : clip.updatedAt,
                         deletedAt: clip.deletedAt
@@ -163,7 +163,7 @@ final class EditClipViewModel: ViewModel {
                     urlMetadata: URLMetadata(
                         url: urlMetadata.url,
                         title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
                         createdAt: Date(),
                         updatedAt: Date(),
                         deletedAt: nil
