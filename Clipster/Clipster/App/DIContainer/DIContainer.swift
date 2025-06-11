@@ -100,6 +100,7 @@ final class DIContainer {
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )
@@ -111,6 +112,7 @@ final class DIContainer {
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )
@@ -133,6 +135,7 @@ final class DIContainer {
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )

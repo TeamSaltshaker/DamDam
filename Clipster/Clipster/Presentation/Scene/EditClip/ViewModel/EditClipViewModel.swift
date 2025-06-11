@@ -52,6 +52,7 @@ final class EditClipViewModel: ViewModel {
     private let checkURLValidityUseCase: CheckURLValidityUseCase
     private let parseURLMetadataUseCase: ParseURLMetadataUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
+    private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
 
@@ -61,6 +62,7 @@ final class EditClipViewModel: ViewModel {
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
@@ -72,6 +74,7 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
         bind()
@@ -82,6 +85,7 @@ final class EditClipViewModel: ViewModel {
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
@@ -95,6 +99,7 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
         bind()
