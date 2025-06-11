@@ -36,7 +36,7 @@ private extension TableHeaderView {
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(4)
-            make.bottom.equalToSuperview()
+            make.bottom.equalToSuperview().inset(8)
         }
     }
 }

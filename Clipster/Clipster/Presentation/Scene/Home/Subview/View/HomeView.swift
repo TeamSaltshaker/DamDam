@@ -254,20 +254,9 @@ extension HomeView: UITabBarDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let container = UIView()
-        container.backgroundColor = .clear
-
         let headerView = TableHeaderView()
         headerView.setTitle("폴더")
-
-        container.addSubview(headerView)
-        headerView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview().inset(8)
-        }
-
-        return container
+        return headerView
     }
 }
 
