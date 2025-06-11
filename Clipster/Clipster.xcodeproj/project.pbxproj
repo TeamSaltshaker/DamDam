@@ -320,7 +320,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_001;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_002;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -358,7 +358,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_001;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_002;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -511,7 +511,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_001;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_002;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -542,7 +542,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saltshaker.clipster.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_001;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = clipster_share_extension_002;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
