@@ -2,11 +2,18 @@ import SnapKit
 import UIKit
 
 final class FolderSelectorView: UIView {
-    let folderSelectorNavigationView = FolderSelectorNavigationView()
+    let commonNavigationView: CommonNavigationView = {
+        let commonNavigationView = CommonNavigationView()
+        commonNavigationView.backgroundColor = .white900
+        return commonNavigationView
+    }()
+
+    let backButton = BackButton("이전폴더")
+    let selectButton = SelectButton()
 
     private let separator: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray5
+        view.backgroundColor = .black800
         return view
     }()
 
@@ -20,29 +27,44 @@ final class FolderSelectorView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configureUI()
+        configure()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
 
-    private func configureUI() {
-        self.backgroundColor = .systemBackground
+private extension FolderSelectorView {
+    func configure() {
+        setAttributes()
+        setHierarchy()
+        setConstraints()
+    }
 
-        [folderSelectorNavigationView, separator, tableView]
+    func setAttributes() {
+        backgroundColor = .white900
+
+        commonNavigationView.setLeftItem(backButton)
+        commonNavigationView.setRightItem(selectButton)
+    }
+
+    func setHierarchy() {
+        [commonNavigationView, separator, tableView]
             .forEach { addSubview($0) }
+    }
 
-        folderSelectorNavigationView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(19)
+    func setConstraints() {
+        commonNavigationView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(21)
             make.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(84)
         }
 
         separator.snp.makeConstraints { make in
-            make.top.equalTo(folderSelectorNavigationView.snp.bottom)
+            make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()
-            make.height.equalTo(0.7)
+            make.height.equalTo(1)
         }
 
         tableView.snp.makeConstraints { make in

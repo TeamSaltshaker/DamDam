@@ -42,16 +42,15 @@ private extension FolderSelectorViewController {
     }
 
     func setBindings() {
-        let navigationView = folderSelectorView.folderSelectorNavigationView
         let tableView = folderSelectorView.tableView
         let state = viewModel.state.share(replay: 1)
 
-        navigationView.backButtonTap
+        folderSelectorView.backButton.rx.tap
             .map { .navigateUp }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
 
-        navigationView.selectButtonTap
+        folderSelectorView.selectButton.rx.tap
             .map { .selectButtonTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
@@ -75,12 +74,16 @@ private extension FolderSelectorViewController {
 
         state
             .map(\.title)
-            .bind(to: navigationView.titleLabel.rx.text)
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] title in
+                self?.folderSelectorView.commonNavigationView.setTitle(title)
+            }
             .disposed(by: disposeBag)
 
         state
             .map { !$0.canNavigateUp }
-            .bind(to: navigationView.backButton.rx.isHidden)
+            .bind(to: folderSelectorView.backButton.rx.isHidden)
             .disposed(by: disposeBag)
 
         state
@@ -101,7 +104,7 @@ private extension FolderSelectorViewController {
             .map { $0.isSelectable }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: folderSelectorView.folderSelectorNavigationView.selectButton.rx.isEnabled)
+            .bind(to: folderSelectorView.selectButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
 }
