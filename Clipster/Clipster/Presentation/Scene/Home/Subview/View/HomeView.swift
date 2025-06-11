@@ -150,13 +150,17 @@ final class HomeView: UIView {
 
     func setDisplay(_ display: HomeDisplay) {
         var collectionSnapshot = NSDiffableDataSourceSnapshot<Int, ClipDisplay>()
-        collectionSnapshot.appendSections([0])
-        collectionSnapshot.appendItems(display.unvitsedClips)
+        if !display.unvitsedClips.isEmpty {
+            collectionSnapshot.appendSections([0])
+            collectionSnapshot.appendItems(display.unvitsedClips)
+        }
         collectionDataSource?.apply(collectionSnapshot)
 
         var tableSnapshot = NSDiffableDataSourceSnapshot<Int, FolderDisplay>()
-        tableSnapshot.appendSections([0])
-        tableSnapshot.appendItems(display.folders)
+        if !display.folders.isEmpty {
+            tableSnapshot.appendSections([0])
+            tableSnapshot.appendItems(display.folders)
+        }
         tableDataSource?.apply(tableSnapshot, animatingDifferences: true) { [weak self] in
             guard let self else { return }
             let newHeight = tableView.contentSize.height
