@@ -13,15 +13,15 @@ final class ClipCell: UITableViewCell {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
-        label.textColor = .label
+        label.font = .pretendard(size: 16, weight: .semiBold)
+        label.textColor = .black100
         return label
     }()
 
     private let memoLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .systemGray
+        label.font = .pretendard(size: 12, weight: .regular)
+        label.textColor = .black500
         return label
     }()
 
@@ -65,7 +65,7 @@ private extension ClipCell {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
+        backgroundColor = .white900
 
         layer.cornerRadius = 16
         layer.shadowColor = UIColor.black.cgColor
