@@ -48,13 +48,17 @@ final class EditClipViewModel: ViewModel {
     private let checkURLValidityUseCase: CheckURLValidityUseCase
     private let parseURLMetadataUseCase: ParseURLMetadataUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
+    private let createClipUseCase: CreateClipUseCase
+    private let updateClipUseCase: UpdateClipUseCase
 
     init(
         urlText: String = "",
         currentFolder: Folder? = nil,
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
-        fetchFolderUseCase: FetchFolderUseCase
+        fetchFolderUseCase: FetchFolderUseCase,
+        createClipUseCase: CreateClipUseCase,
+        updateClipUseCase: UpdateClipUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: urlText.isEmpty ? .create : .shareExtension,
@@ -64,6 +68,8 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.createClipUseCase = createClipUseCase
+        self.updateClipUseCase = updateClipUseCase
         bind()
     }
 
@@ -71,7 +77,9 @@ final class EditClipViewModel: ViewModel {
         clip: Clip,
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
-        fetchFolderUseCase: FetchFolderUseCase
+        fetchFolderUseCase: FetchFolderUseCase,
+        createClipUseCase: CreateClipUseCase,
+        updateClipUseCase: UpdateClipUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: .edit,
@@ -83,6 +91,8 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.createClipUseCase = createClipUseCase
+        self.updateClipUseCase = updateClipUseCase
         bind()
     }
 

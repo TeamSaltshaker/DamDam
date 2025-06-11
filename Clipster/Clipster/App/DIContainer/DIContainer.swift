@@ -38,6 +38,14 @@ final class DIContainer {
         DefaultURLValidationRepository()
     }
 
+    func makeCreateClipUseCase() -> CreateClipUseCase {
+        DefaultCreateClipUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeUpdateClipUseCase() -> UpdateClipUseCase {
+        DefaultUpdateClipUseCase(clipRepository: makeClipRepository())
+    }
+
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
         DefaultDeleteClipUseCase(clipRepository: makeClipRepository())
     }
@@ -91,7 +99,9 @@ final class DIContainer {
         EditClipViewModel(
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
-            fetchFolderUseCase: makeFetchFolderUseCase()
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            createClipUseCase: makeCreateClipUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 
@@ -100,7 +110,9 @@ final class DIContainer {
             urlText: urlString,
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
-            fetchFolderUseCase: makeFetchFolderUseCase()
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            createClipUseCase: makeCreateClipUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 
@@ -109,7 +121,9 @@ final class DIContainer {
             clip: clip,
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
-            fetchFolderUseCase: makeFetchFolderUseCase()
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            createClipUseCase: makeCreateClipUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 
