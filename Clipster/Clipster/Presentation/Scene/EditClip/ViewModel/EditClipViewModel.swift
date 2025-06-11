@@ -12,7 +12,8 @@ final class EditClipViewModel: ViewModel {
     enum Action {
         case editURLInputTextField(String)
         case editMomo(String)
-        case addedFolder(Folder)
+        case folderViewTapped
+        case editFolder(Folder?)
     }
 
     enum Mutation {
@@ -20,7 +21,8 @@ final class EditClipViewModel: ViewModel {
         case updateMemo(String)
         case updateValidURL(Bool)
         case updateURLMetadata(URLMetadataDisplay?)
-        case updateCurrentFolder(Folder)
+        case updateFolderViewTapped(Bool)
+        case updateCurrentFolder(Folder?)
     }
 
     struct State {
@@ -34,6 +36,7 @@ final class EditClipViewModel: ViewModel {
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
         var urlMetadata: URLMetadataDisplay?
+        var isFolderViewTapped: Bool = false
         var clip: Clip?
         var currentFolder: Folder?
     }
@@ -101,7 +104,9 @@ final class EditClipViewModel: ViewModel {
             )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))
-        case .addedFolder(let newFolder):
+        case .folderViewTapped:
+            return .just(.updateFolderViewTapped(true))
+        case .editFolder(let newFolder):
             return .just(.updateCurrentFolder(newFolder))
         }
     }
@@ -127,6 +132,8 @@ final class EditClipViewModel: ViewModel {
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadata = urlMetaDisplay
             newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
+        case .updateFolderViewTapped(let value):
+            newState.isFolderViewTapped = value
         case .updateCurrentFolder(let newFolder):
             newState.currentFolder = newFolder
         }
