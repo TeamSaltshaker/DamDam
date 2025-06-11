@@ -5,6 +5,7 @@ final class TableHeaderView: UITableViewHeaderFooterView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(size: 18, weight: .semiBold)
+        label.textColor = .black100
         return label
     }()
 

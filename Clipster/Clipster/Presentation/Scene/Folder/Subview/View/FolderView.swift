@@ -98,6 +98,8 @@ private extension FolderView {
 
         addButton.menu = makeAddButtonMenu()
         addButton.showsMenuAsPrimaryAction = true
+
+        backgroundColor = .white800
     }
 
     func setHierarchy() {
