@@ -128,20 +128,13 @@ final class HomeViewModel {
     private func makeClipCellDisplays() async throws -> [ClipDisplay] {
         let clips = try await fetchUnvisitedClipsUseCase.execute().get()
         unvisitedClips = clips
-
         return clips.map { ClipDisplayMapper.map($0) }
     }
 
     private func makeFolderCellDisplays() async throws -> [FolderDisplay] {
         let folders = try await fetchTopLevelFoldersUseCase.execute().get()
-
-        if let root = folders.first {
-            self.folders = root.folders
-            return root.folders.map { FolderDisplayMapper.map($0) }
-        } else {
-            self.folders = []
-            return []
-        }
+        self.folders = folders
+        return folders.map { FolderDisplayMapper.map($0) }
     }
 
     private func handleTapDelete(at indexPath: IndexPath) {
