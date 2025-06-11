@@ -6,8 +6,8 @@ final class ClipGridCell: UICollectionViewCell {
     private let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .black800
         return imageView
     }()
 
@@ -21,7 +21,7 @@ final class ClipGridCell: UICollectionViewCell {
 
     private let titleTextView: UITextView = {
         let textView = UITextView()
-        textView.font = .systemFont(ofSize: 14, weight: .medium)
+        textView.font = .init(name: "Pretendard-Medium", size: 14)
         textView.textColor = .label
         textView.isEditable = false
         textView.isScrollEnabled = false
@@ -34,7 +34,7 @@ final class ClipGridCell: UICollectionViewCell {
 
     private let memoLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.font = .init(name: "Pretendard-Regular", size: 12)
         label.textColor = .systemGray
         return label
     }()
@@ -48,6 +48,10 @@ final class ClipGridCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareForReuse() {
+        thumbnailImageView.backgroundColor = .black800
+    }
+
     func setDisplay(_ display: ClipDisplay) {
         thumbnailImageView.kf.setImage(with: display.urlMetadata.thumbnailImageURL)
         titleTextView.text = display.urlMetadata.title
@@ -58,8 +62,15 @@ final class ClipGridCell: UICollectionViewCell {
 
 private extension ClipGridCell {
     func configure() {
+        setAttributes()
         setHierarchy()
         setConstraints()
+    }
+
+    func setAttributes() {
+        backgroundColor = .white900
+        layer.cornerRadius = 12
+        clipsToBounds = true
     }
 
     func setHierarchy() {
@@ -80,14 +91,14 @@ private extension ClipGridCell {
 
         titleTextView.snp.makeConstraints { make in
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(8)
-            make.horizontalEdges.equalToSuperview().inset(4)
+            make.horizontalEdges.equalToSuperview().inset(8)
             make.height.equalTo(44)
         }
 
         memoLabel.snp.makeConstraints { make in
             make.top.equalTo(titleTextView.snp.bottom)
-            make.horizontalEdges.equalToSuperview().inset(4)
-            make.height.equalTo(19)
+            make.horizontalEdges.equalToSuperview().inset(8)
+            make.height.equalTo(17.94)
         }
 
         visitIndicatorView.snp.makeConstraints { make in

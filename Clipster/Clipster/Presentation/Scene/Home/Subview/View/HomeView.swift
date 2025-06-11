@@ -177,7 +177,7 @@ private extension HomeView {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .absolute(144),
-            heightDimension: .absolute(179)
+            heightDimension: .absolute(185.94)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
