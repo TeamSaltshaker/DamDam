@@ -47,7 +47,8 @@ final class EditClipViewModel: ViewModel {
         urlText: String = "",
         currentFolder: Folder? = nil,
         checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase
+        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        fetchFolderUseCase: FetchFolderUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: urlText.isEmpty ? .create : .shareExtension,
@@ -56,13 +57,15 @@ final class EditClipViewModel: ViewModel {
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
         bind()
     }
 
     init(
         clip: Clip,
         checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase
+        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        fetchFolderUseCase: FetchFolderUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: .edit,
@@ -73,6 +76,7 @@ final class EditClipViewModel: ViewModel {
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
         bind()
     }
 

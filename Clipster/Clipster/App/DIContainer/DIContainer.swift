@@ -91,6 +91,7 @@ final class DIContainer {
         EditClipViewModel(
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            fetchFolderUseCase: makeFetchFolderUseCase()
         )
     }
 
@@ -99,6 +100,7 @@ final class DIContainer {
             urlText: urlString,
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
             parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            fetchFolderUseCase: makeFetchFolderUseCase()
         )
     }
 
@@ -106,7 +108,8 @@ final class DIContainer {
         EditClipViewModel(
             clip: clip,
             checkURLValidityUseCase: makeCheckURLValidityUseCase(),
-            parseURLMetadataUseCase: makeParseURLMetadataUseCase()
+            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            fetchFolderUseCase: makeFetchFolderUseCase()
         )
     }
 
