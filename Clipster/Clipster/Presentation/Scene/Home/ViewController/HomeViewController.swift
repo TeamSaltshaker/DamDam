@@ -83,8 +83,8 @@ private extension HomeViewController {
             .asSignal()
             .emit(with: self) { owner, route in
                 switch route {
-                case .showAddClip:
-                    let vm = owner.diContainer.makeEditClipViewModel()
+                case .showAddClip(let folder):
+                    let vm = owner.diContainer.makeEditClipViewModel(folder: folder)
                     let vc = EditClipViewController(
                         viewModel: vm,
                         diContainer: owner.diContainer

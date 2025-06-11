@@ -20,7 +20,7 @@ final class HomeViewModel {
     }
 
     enum Route {
-        case showAddClip
+        case showAddClip(Folder?)
         case showAddFolder
         case showWebView(URL)
         case showFolder(Folder)
@@ -64,7 +64,8 @@ final class HomeViewModel {
                 case .viewWillAppear:
                     Task { await owner.makeHomeDisplay() }
                 case .tapAddClip:
-                    owner.route.accept(.showAddClip)
+                    let latestFolder = owner.folders.max { $0.updatedAt < $1.updatedAt }
+                    owner.route.accept(.showAddClip(latestFolder))
                 case .tapAddFolder:
                     owner.route.accept(.showAddFolder)
                 case .tapClip(let index):
