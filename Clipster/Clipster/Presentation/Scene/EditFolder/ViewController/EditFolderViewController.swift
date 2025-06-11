@@ -10,6 +10,8 @@ final class EditFolderViewController: UIViewController {
 
     private let editFolderView = EditFolderView()
 
+    var onAdditionComplete: ((Folder) -> Void)?
+
     init(viewModel: EditFolderViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
         self.diContainer = diContainer
@@ -119,11 +121,14 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         state
-            .map { $0.shouldDismiss }
-            .distinctUntilChanged()
-            .filter { $0 }
+            .map { ($0.shouldDismiss, $0.didFinishAddtion) }
+            .distinctUntilChanged { $0.0 == $1.0 }
+            .filter { $0.0 }
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
+            .subscribe { [weak self] _, folder in
+                if let folder {
+                    self?.onAdditionComplete?(folder)
+                }
                 self?.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
