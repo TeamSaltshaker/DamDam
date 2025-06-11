@@ -12,6 +12,7 @@ final class EditClipViewModel: ViewModel {
     enum Action {
         case editURLInputTextField(String)
         case editMomo(String)
+        case addedFolder(Folder)
     }
 
     enum Mutation {
@@ -19,6 +20,7 @@ final class EditClipViewModel: ViewModel {
         case updateMemo(String)
         case updateValidURL(Bool)
         case updateURLMetadata(URLMetadataDisplay?)
+        case updateCurrentFolder(Folder)
     }
 
     struct State {
@@ -42,6 +44,7 @@ final class EditClipViewModel: ViewModel {
 
     private let checkURLValidityUseCase: CheckURLValidityUseCase
     private let parseURLMetadataUseCase: ParseURLMetadataUseCase
+    private let fetchFolderUseCase: FetchFolderUseCase
 
     init(
         urlText: String = "",
@@ -98,6 +101,8 @@ final class EditClipViewModel: ViewModel {
             )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))
+        case .addedFolder(let newFolder):
+            return .just(.updateCurrentFolder(newFolder))
         }
     }
 
@@ -122,6 +127,8 @@ final class EditClipViewModel: ViewModel {
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadata = urlMetaDisplay
             newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
+        case .updateCurrentFolder(let newFolder):
+            newState.currentFolder = newFolder
         }
         return newState
     }

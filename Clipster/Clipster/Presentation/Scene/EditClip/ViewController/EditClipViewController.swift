@@ -159,6 +159,11 @@ private extension EditClipViewController {
                     viewModel: vm,
                     diContainer: diContainer
                 )
+
+                vc.onAdditionComplete = {
+                    self.viewModel.action.accept(.addedFolder($0))
+                }
+
                 navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -168,6 +173,23 @@ private extension EditClipViewController {
             .tap
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .compactMap { state -> Folder? in
+                guard state.clip == nil else { return nil }
+                return state.currentFolder
+            }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.folderRowView.setDisplay(
+                    FolderDisplay(
+                        id: $0.id,
+                        title: $0.title,
+                        itemCount: "\($0.clips.count + $0.folders.count)개 항목"
+                    )
+                )
             }
             .disposed(by: disposeBag)
     }
