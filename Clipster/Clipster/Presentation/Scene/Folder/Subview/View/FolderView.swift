@@ -238,9 +238,6 @@ extension FolderView: UITableViewDelegate {
         }
         deleteAction.image = .trashWhite
 
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
-        configuration.performsFirstActionWithFullSwipe = false
-
-        return configuration
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }
