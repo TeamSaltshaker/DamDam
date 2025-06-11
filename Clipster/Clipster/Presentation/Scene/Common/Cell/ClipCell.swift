@@ -104,7 +104,7 @@ private extension ClipCell {
 
         stackView.snp.makeConstraints { make in
             make.leading.equalTo(thumbnailImageView.snp.trailing).offset(16)
-            make.trailing.equalTo(chevronImageView.snp.leading).offset(16)
+            make.trailing.equalTo(chevronImageView.snp.leading).offset(-16)
             make.centerY.equalToSuperview()
         }
 
