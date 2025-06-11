@@ -7,8 +7,7 @@ final class HomeView: UIView {
     enum Action {
         case tapAddFolder
         case tapAddClip
-        case tapClip(Int)
-        case tapFolder(Int)
+        case tapCell(IndexPath)
         case detail(IndexPath)
         case edit(IndexPath)
         case delete(IndexPath)
@@ -220,9 +219,11 @@ extension HomeView: UICollectionViewDelegate {
             previewProvider: nil
         ) { [weak self] _ in
             guard let self else { return UIMenu() }
-            let detail = makeDetailAction(for: indexPath)
-            let edit = makeEditAction(for: indexPath)
-            let delete = makeDeleteAction(for: indexPath)
+            let patchedIndexPath = IndexPath(item: indexPath.item, section: 0)
+
+            let detail = makeDetailAction(for: patchedIndexPath)
+            let edit = makeEditAction(for: patchedIndexPath)
+            let delete = makeDeleteAction(for: patchedIndexPath)
 
             return UIMenu(title: "", children: [detail, edit, delete])
         }
@@ -235,8 +236,9 @@ extension HomeView: UITableViewDelegate {
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
         let delete = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
-            guard let self = self else { return }
-            action.accept(.delete(indexPath))
+            guard let self else { return }
+            let patchedIndexPath = IndexPath(row: indexPath.item, section: 1)
+            action.accept(.delete(patchedIndexPath))
             completion(true)
         }
 
@@ -270,8 +272,9 @@ extension HomeView {
             previewProvider: nil
         ) { [weak self] _ in
             guard let self else { return UIMenu() }
-            let edit = makeEditAction(for: indexPath)
-            let delete = makeDeleteAction(for: indexPath)
+            let patchedIndexPath = IndexPath(row: indexPath.row, section: 1)
+            let edit = makeEditAction(for: patchedIndexPath)
+            let delete = makeDeleteAction(for: patchedIndexPath)
 
             return UIMenu(title: "", children: [edit, delete])
         }
@@ -382,14 +385,14 @@ private extension HomeView {
     }
 
     func setBindings() {
-        collectionView.rx.itemSelected
-            .map { Action.tapClip($0.item) }
-            .bind(to: action)
-            .disposed(by: disposeBag)
-
-        tableView.rx.itemSelected
-            .map { Action.tapFolder($0.row) }
-            .bind(to: action)
-            .disposed(by: disposeBag)
+        Observable.merge(
+            collectionView.rx.itemSelected
+                .map { IndexPath(item: $0.item, section: 0) },
+            tableView.rx.itemSelected
+                .map { IndexPath(row: $0.row, section: 1) }
+        )
+        .map { Action.tapCell($0) }
+        .bind(to: action)
+        .disposed(by: disposeBag)
     }
 }
