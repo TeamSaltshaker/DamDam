@@ -33,7 +33,6 @@ final class UnvisitedClipListView: UIView {
         let tableView = UITableView()
         tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
         tableView.separatorStyle = .none
-        tableView.allowsSelection = false
         tableView.rowHeight = 72
         tableView.register(ClipCell.self, forCellReuseIdentifier: ClipCell.identifier)
         tableView.delegate = self
@@ -57,6 +56,7 @@ final class UnvisitedClipListView: UIView {
                 for: indexPath
             ) as? ClipCell
             else { return UITableViewCell() }
+            cell.selectionStyle = .none
             cell.setDisplay(item)
             return cell
         }
@@ -67,34 +67,6 @@ final class UnvisitedClipListView: UIView {
         snapshot.appendSections([0])
         snapshot.appendItems(display, toSection: 0)
         dataSource?.apply(snapshot)
-    }
-}
-
-private extension UnvisitedClipListView {
-    func createCollectionViewLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { _, _ in
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(72)
-            )
-            let group = NSCollectionLayoutGroup.vertical(
-                layoutSize: groupSize,
-                subitems: [item]
-            )
-
-            let section = NSCollectionLayoutSection(group: group)
-            section.interGroupSpacing = 8
-            section.contentInsets = .init(top: 24, leading: 24, bottom: 0, trailing: 24)
-            return section
-        }
-
-        return layout
     }
 }
 
@@ -135,6 +107,27 @@ extension UnvisitedClipListView: UITableViewDelegate {
     }
 }
 
+extension UnvisitedClipListView {
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        let delete = UIContextualAction(
+            style: .destructive,
+            title: nil
+        ) { [weak self] _, _, completion in
+            guard let self = self else { return }
+            action.accept(.delete(indexPath.row))
+            completion(true)
+        }
+
+        delete.image = UIImage(systemName: "trash")
+        delete.backgroundColor = .systemRed
+
+        return UISwipeActionsConfiguration(actions: [delete])
+    }
+}
+
 private extension UnvisitedClipListView {
     func configure() {
         setAttributes()
@@ -144,7 +137,7 @@ private extension UnvisitedClipListView {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
+        backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
     }
 
     func setHierarchy() {
