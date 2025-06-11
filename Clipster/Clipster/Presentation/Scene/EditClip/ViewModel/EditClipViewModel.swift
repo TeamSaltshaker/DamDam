@@ -15,6 +15,7 @@ final class EditClipViewModel: ViewModel {
         case folderViewTapped
         case editFolder(Folder?)
         case saveClip
+        case fetchFolder
     }
 
     enum Mutation {
@@ -124,11 +125,10 @@ final class EditClipViewModel: ViewModel {
         case .saveClip:
             switch state.value.type {
             case .edit:
-                print("3")
                 guard let clip = state.value.clip else { return .empty() }
                 guard let currentFolder = state.value.currentFolder else { return .empty() }
                 guard let urlMetadata = state.value.urlMetadata else { return .empty() }
-                print("4")
+
                 let newClip = Clip(
                     id: clip.id,
                     folderID: currentFolder.id,
@@ -154,10 +154,9 @@ final class EditClipViewModel: ViewModel {
                 .map { .updateSuccessfullyEdited(true) }
                 .catchAndReturn(.updateSuccessfullyEdited(false))
             case .create, .shareExtension:
-                print("1")
                 guard let currentFolder = state.value.currentFolder else { return .empty() }
                 guard let urlMetadata = state.value.urlMetadata else { return .empty() }
-                print("2")
+
                 let newClip = Clip(
                     id: UUID(),
                     folderID: currentFolder.id,
@@ -181,6 +180,13 @@ final class EditClipViewModel: ViewModel {
                 .map { .updateSuccessfullyEdited(true) }
                 .catchAndReturn(.updateSuccessfullyEdited(false))
             }
+        case .fetchFolder:
+            guard let clip = state.value.clip else { return .empty() }
+            return .fromAsync {
+                try await self.fetchFolderUseCase.execute(id: clip.folderID).get()
+            }
+            .map { .updateCurrentFolder($0) }
+            .catchAndReturn(.updateCurrentFolder(nil))
         }
     }
 

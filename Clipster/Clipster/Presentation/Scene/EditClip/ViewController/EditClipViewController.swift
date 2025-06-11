@@ -55,6 +55,14 @@ private extension EditClipViewController {
             .drive(editClipView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .compactMap(\.clip)
+            .take(1)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.fetchFolder)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text
@@ -177,10 +185,7 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         viewModel.state
-            .compactMap { state -> Folder? in
-                guard state.clip == nil else { return nil }
-                return state.currentFolder
-            }
+            .compactMap(\.currentFolder)
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] in
                 self?.editClipView.folderRowView.setDisplay(
