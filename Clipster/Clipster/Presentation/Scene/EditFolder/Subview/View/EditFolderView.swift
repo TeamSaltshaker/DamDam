@@ -10,28 +10,30 @@ final class EditFolderView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "제목"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
         return label
     }()
 
     private let folderTitleTextField: CommonTextField = {
         let textField = CommonTextField()
-        textField.placeholder = "URL을 입력해주세요."
+        textField.placeholder = "제목을 입력해 주세요."
         return textField
     }()
 
     let folderLabel: UILabel = {
         let label = UILabel()
         label.text = "저장폴더"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
         return label
     }()
 
     let folderView: UIView = {
         let view = UIView()
         view.isUserInteractionEnabled = true
+        view.backgroundColor = .white900
+        view.layer.cornerRadius = 12
         return view
     }()
 
@@ -39,9 +41,8 @@ final class EditFolderView: UIView {
 
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.image = .chevronRight
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .label
         return imageView
     }()
 
@@ -78,7 +79,7 @@ private extension EditFolderView {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
+        backgroundColor = .white800
 
         commonNavigationView.setLeftItem(backButton)
         commonNavigationView.setRightItem(saveButton)
@@ -126,7 +127,7 @@ private extension EditFolderView {
         }
 
         chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
+            make.leading.equalTo(folderRowView.snp.trailing).offset(16)
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
