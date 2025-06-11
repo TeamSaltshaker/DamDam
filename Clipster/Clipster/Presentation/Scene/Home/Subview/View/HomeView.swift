@@ -64,13 +64,11 @@ final class HomeView: UIView {
         let tableView = UITableView()
         tableView.backgroundColor = .white800
         tableView.separatorStyle = .none
-        tableView.rowHeight = 72
+        tableView.rowHeight = 80
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
         tableView.isScrollEnabled = false
         tableView.delegate = self
-        if #available(iOS 15.0, *) {
-            tableView.sectionHeaderTopPadding = 0
-        }
+        tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
 
