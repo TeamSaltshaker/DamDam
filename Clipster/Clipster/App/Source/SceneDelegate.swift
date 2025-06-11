@@ -18,4 +18,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = UINavigationController(rootViewController: homeVC)
         window?.makeKeyAndVisible()
     }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.saltshaker.clipster"),
+           let urlString = sharedDefaults.string(forKey: "sharedURL") {
+            sharedDefaults.removeObject(forKey: "sharedURL")
+
+            DispatchQueue.main.async {
+                if let rootVC = self.window?.rootViewController as? UINavigationController {
+                    let diContainer = DIContainer()
+                    let editVM = diContainer.makeEditClipViewModel(urlString: urlString)
+                    let editClipVC = EditClipViewController(viewModel: editVM, diContainer: diContainer)
+                    rootVC.pushViewController(editClipVC, animated: true)
+                }
+            }
+        }
+    }
 }

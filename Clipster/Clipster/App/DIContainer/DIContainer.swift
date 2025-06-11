@@ -94,6 +94,14 @@ final class DIContainer {
         )
     }
 
+    func makeEditClipViewModel(urlString: String) -> EditClipViewModel {
+        EditClipViewModel(
+            urlText: urlString,
+            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
+            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+        )
+    }
+
     func makeEditClipViewModel(clip: Clip) -> EditClipViewModel {
         EditClipViewModel(
             clip: clip,
