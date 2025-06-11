@@ -1,3 +1,5 @@
+import Foundation
+
 final class DefaultDeleteFolderUseCase: DeleteFolderUseCase {
     private let folderRepository: FolderRepository
 
@@ -6,6 +8,18 @@ final class DefaultDeleteFolderUseCase: DeleteFolderUseCase {
     }
 
     func execute(_ folder: Folder) async -> Result<Void, Error> {
-        folderRepository.deleteFolder(folder).mapError { $0 as Error }
+        let deletedFolder  = Folder(
+            id: folder.id,
+            parentFolderID: folder.parentFolderID,
+            title: folder.title,
+            depth: folder.depth,
+            folders: folder.folders,
+            clips: folder.clips,
+            createdAt: folder.createdAt,
+            updatedAt: folder.updatedAt,
+            deletedAt: Date()
+        )
+
+        return folderRepository.deleteFolder(deletedFolder).mapError { $0 as Error }
     }
 }
