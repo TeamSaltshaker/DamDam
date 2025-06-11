@@ -15,12 +15,18 @@ final class ClipDetailView: UIView {
     private let folderLabel: UILabel = {
         let label = UILabel()
         label.text = "저장폴더"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
         return label
     }()
 
-    let folderView = UIView()
+    let folderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white900
+        view.layer.cornerRadius = 12
+        return view
+    }()
+
     private let folderRowView = FolderRowView()
 
     override init(frame: CGRect) {
@@ -36,9 +42,11 @@ final class ClipDetailView: UIView {
         urlMetadataView.thumbnailImageView.kf.setImage(with: clip.urlMetadata.thumbnailImageURL)
         urlMetadataView.titleLabel.text = clip.urlMetadata.title
         urlView.urlTextField.text = clip.urlMetadata.url.description
+        urlView.urlTextField.textColor = .black800
         urlView.statusImageView.isHidden = true
         urlView.statusLabel.isHidden = true
         memoView.memoTextView.text = clip.memo
+        memoView.memoTextView.textColor = .black800
         memoView.memoLimitLabel.text = clip.memoLimit
 
         folderRowView.setDisplay(folder)
@@ -77,7 +85,7 @@ private extension ClipDetailView {
     }
 
     func setAttributes() {
-        backgroundColor = .systemBackground
+        backgroundColor = .white800
 
         commonNavigationView.setTitle("클립 상세정보")
         commonNavigationView.setLeftItem(backButton)
