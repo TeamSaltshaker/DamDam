@@ -116,6 +116,17 @@ final class DIContainer {
         )
     }
 
+    func makeEditClipViewModel(folder: Folder?) -> EditClipViewModel {
+        EditClipViewModel(
+            currentFolder: folder,
+            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
+            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            createClipUseCase: makeCreateClipUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
+        )
+    }
+
     func makeEditClipViewModel(clip: Clip) -> EditClipViewModel {
         EditClipViewModel(
             clip: clip,
