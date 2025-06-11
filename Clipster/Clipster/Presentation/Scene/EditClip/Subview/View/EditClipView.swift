@@ -50,6 +50,12 @@ final class EditClipView: UIView {
         return label
     }()
 
+    let addFolderButton: UIButton = {
+        let button = UIButton()
+        button.setImage(.plus, for: .normal)
+        return button
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -85,7 +91,8 @@ private extension EditClipView {
             commonNavigationView,
             urlInfoStackView,
             memoTextView,
-            memoLimitLabel
+            memoLimitLabel,
+            addFolderButton
         ].forEach {
             addSubview($0)
         }
@@ -111,6 +118,10 @@ private extension EditClipView {
         memoLimitLabel.snp.makeConstraints { make in
             make.top.equalTo(memoTextView.snp.bottom).offset(10)
             make.right.equalToSuperview().inset(25)
+        }
+        addFolderButton.snp.makeConstraints { make in
+            make.top.equalTo(memoLimitLabel.snp.bottom).offset(40)
+            make.trailing.equalToSuperview().inset(28)
         }
     }
 }

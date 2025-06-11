@@ -149,6 +149,20 @@ private extension EditClipViewController {
         .drive(editClipView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
 
+        editClipView.addFolderButton
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                guard let self else { return }
+                let vm = diContainer.makeEditFolderViewModel(mode: .add(parentFolder: viewModel.state.value.currentFolder))
+                let vc = EditFolderViewController(
+                    viewModel: vm,
+                    diContainer: diContainer
+                )
+                navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.backButton
             .rx
             .tap
