@@ -71,6 +71,7 @@ final class FolderView: UIView {
         snapshot.appendSections([.folder, .clip])
         snapshot.appendItems(folders.map { .folder($0) }, toSection: .folder)
         snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
+        snapshot.reloadSections([.folder, .clip])
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
