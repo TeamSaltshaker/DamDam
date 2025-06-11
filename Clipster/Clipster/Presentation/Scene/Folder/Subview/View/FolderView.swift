@@ -34,7 +34,7 @@ final class FolderView: UIView {
         tableView.backgroundColor = .white800
         tableView.rowHeight = 80
         tableView.separatorStyle = .none
-        tableView.sectionHeaderTopPadding = 0
+        tableView.sectionHeaderTopPadding = 23.5
         tableView.register(
             FolderCell.self,
             forCellReuseIdentifier: FolderCell.identifier,
