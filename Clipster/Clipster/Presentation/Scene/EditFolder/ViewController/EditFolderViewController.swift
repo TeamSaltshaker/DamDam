@@ -49,18 +49,8 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         state
-            .map { $0.parentFolder == nil }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] isHidden in
-                self?.editFolderView.folderView.isHidden = isHidden
-                self?.editFolderView.folderLabel.isHidden = isHidden
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .compactMap { $0.parentFolderDisplay }
-            .distinctUntilChanged { $0.id == $1.id }
+            .map { $0.parentFolderDisplay }
+            .distinctUntilChanged { $0?.id == $1?.id }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] parentFolderDisplay in
                 self?.editFolderView.folderRowView.setDisplay(parentFolderDisplay)
