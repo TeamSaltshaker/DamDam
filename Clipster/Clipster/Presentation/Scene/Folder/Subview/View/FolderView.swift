@@ -70,17 +70,11 @@ final class FolderView: UIView {
     }
 
     private func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: UIImage(systemName: "folder"),
-        ) { [weak self] _ in
+        let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
             guard let self else { return }
             didTapAddFolderButton.accept(())
         }
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
-        ) { [weak self] _ in
+        let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
             guard let self else { return }
             didTapAddClipButton.accept(())
         }
@@ -195,23 +189,13 @@ extension FolderView: UITableViewDelegate {
         UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             guard let self else { return UIMenu() }
 
-            let detailAction = UIAction(
-                title: "상세정보",
-                image: UIImage(systemName: "info.circle"),
-            ) { _ in
+            let detailAction = UIAction(title: "상세정보", image: .info) { _ in
                 self.didTapDetailButton.accept(indexPath)
             }
-            let editAction = UIAction(
-                title: "편집",
-                image: UIImage(systemName: "pencil"),
-            ) { _ in
+            let editAction = UIAction(title: "편집", image: .pen) { _ in
                 self.didTapEditButton.accept(indexPath)
             }
-            let deleteAction = UIAction(
-                title: "삭제",
-                image: UIImage(systemName: "trash"),
-                attributes: .destructive,
-            ) { _ in
+            let deleteAction = UIAction(title: "삭제", image: .trashRed, attributes: .destructive) { _ in
                 guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
 
                 switch item {
@@ -250,7 +234,7 @@ extension FolderView: UITableViewDelegate {
 
             completion(true)
         }
-        deleteAction.image = .init(systemName: "trash.fill")
+        deleteAction.image = .trashWhite
 
         let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
         configuration.performsFirstActionWithFullSwipe = false
