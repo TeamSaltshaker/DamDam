@@ -17,6 +17,7 @@ final class FolderViewModel {
         let currentFolderTitle: String
         let folders: [FolderDisplay]
         let clips: [ClipDisplay]
+        let isEmptyViewHidden: Bool
     }
 
     enum Navigation {
@@ -52,6 +53,7 @@ final class FolderViewModel {
             currentFolderTitle: folder.title,
             folders: folder.folders.map { FolderDisplayMapper.map($0) },
             clips: folder.clips.map { ClipDisplayMapper.map($0) },
+            isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
         ))
         setBindings()
     }
@@ -104,7 +106,8 @@ private extension FolderViewModel {
             state.accept(.init(
                 currentFolderTitle: folder.title,
                 folders: folder.folders.map(FolderDisplayMapper.map),
-                clips: folder.clips.map(ClipDisplayMapper.map)
+                clips: folder.clips.map(ClipDisplayMapper.map),
+                isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
             ))
         }
     }

@@ -49,6 +49,7 @@ private extension FolderViewController {
                 guard let self else { return }
                 folderView.setDisplay(title: state.currentFolderTitle)
                 folderView.setDisplay(folders: state.folders, clips: state.clips)
+                folderView.setDisplay(isEmptyViewHidden: state.isEmptyViewHidden)
             }
             .disposed(by: disposeBag)
 

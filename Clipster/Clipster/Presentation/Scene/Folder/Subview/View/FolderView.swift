@@ -51,6 +51,8 @@ final class FolderView: UIView {
         return tableView
     }()
 
+    private let emptyView = EmptyView()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -71,6 +73,10 @@ final class FolderView: UIView {
         snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
 
         dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+
+    func setDisplay(isEmptyViewHidden: Bool) {
+        emptyView.isHidden = isEmptyViewHidden
     }
 
     private func makeAddButtonMenu() -> UIMenu {
@@ -107,7 +113,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, tableView].forEach {
+        [navigationView, tableView, emptyView].forEach {
             addSubview($0)
         }
     }
@@ -122,6 +128,10 @@ private extension FolderView {
             make.top.equalTo(navigationView.snp.bottom)
             make.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(24)
             make.bottom.equalTo(safeAreaLayoutGuide)
+        }
+
+        emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 
