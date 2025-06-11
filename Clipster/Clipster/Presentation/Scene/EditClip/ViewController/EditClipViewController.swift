@@ -63,6 +63,14 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .map { $0.type == .shareExtension }
+            .take(1)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.fetchTopLevelFolder)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text

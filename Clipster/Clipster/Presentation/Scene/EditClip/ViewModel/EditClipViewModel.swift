@@ -16,6 +16,7 @@ final class EditClipViewModel: ViewModel {
         case editFolder(Folder?)
         case saveClip
         case fetchFolder
+        case fetchTopLevelFolder
     }
 
     enum Mutation {
@@ -190,6 +191,13 @@ final class EditClipViewModel: ViewModel {
             return .fromAsync {
                 try await self.fetchFolderUseCase.execute(id: clip.folderID).get()
             }
+            .map { .updateCurrentFolder($0) }
+            .catchAndReturn(.updateCurrentFolder(nil))
+        case .fetchTopLevelFolder:
+            return .fromAsync {
+                try await self.fetchTopLevelFoldersUseCase.execute().get()
+            }
+            .map { $0.max(by: { $0.updatedAt < $1.updatedAt }) }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
         }
