@@ -58,6 +58,7 @@ final class HomeViewModel {
 
     private func bind() {
         action
+            .do { print("\(Self.self): received action → \($0)") }
             .subscribe(with: self) { owner, action in
                 switch action {
                 case .viewWillAppear:
