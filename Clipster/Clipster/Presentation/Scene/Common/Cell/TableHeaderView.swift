@@ -4,7 +4,7 @@ import UIKit
 final class TableHeaderView: UITableViewHeaderFooterView {
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.font = .init(name: "Pretendard-SemiBold", size: 18)
         return label
     }()
 
@@ -34,7 +34,9 @@ private extension TableHeaderView {
 
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(4)
+            make.bottom.equalToSuperview().inset(8)
         }
     }
 }

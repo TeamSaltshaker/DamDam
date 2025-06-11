@@ -9,15 +9,16 @@ final class CollectionHeaderView: UICollectionReusableView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.font = .init(name: "Pretendard-SemiBold", size: 18)
+        label.textColor = .black100
         return label
     }()
 
     private let showAllButton: UIButton = {
         let button = UIButton()
         button.setTitle("전체보기", for: .normal)
-        button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        button.setTitleColor(.black500, for: .normal)
+        button.titleLabel?.font = .init(name: "Pretendard-Medium", size: 14)
         button.titleLabel?.textAlignment = .center
         button.isHidden = true
         return button
@@ -58,13 +59,13 @@ private extension CollectionHeaderView {
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
-            make.leading.equalToSuperview()
+            make.leading.equalToSuperview().inset(4)
         }
 
         showAllButton.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
             make.leading.greaterThanOrEqualTo(titleLabel).offset(12)
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(3.49)
         }
     }
 

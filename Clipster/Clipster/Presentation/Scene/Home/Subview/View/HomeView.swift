@@ -28,15 +28,15 @@ final class HomeView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "아차차"
-        label.font = .systemFont(ofSize: 28, weight: .heavy)
-        label.textColor = .label
+        label.font = .init(name: "Pretendard-ExtraBold", size: 28)
+        label.textColor = .black100
         return label
     }()
 
     private lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "plus"), for: .normal)
-        button.tintColor = .label
+        button.setImage(.plus, for: .normal)
+        button.tintColor = .black100
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
         return button
@@ -57,18 +57,19 @@ final class HomeView: UIView {
         )
         collectionView.delegate = self
         collectionView.contentInset.top = 24
-        collectionView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        collectionView.backgroundColor = .white800
         return collectionView
     }()
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        tableView.backgroundColor = .white800
         tableView.separatorStyle = .none
-        tableView.rowHeight = 72
+        tableView.rowHeight = 80
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
         tableView.isScrollEnabled = false
         tableView.delegate = self
+        tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
 
@@ -175,7 +176,7 @@ private extension HomeView {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .absolute(144),
-            heightDimension: .absolute(179)
+            heightDimension: .absolute(185.94)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -239,10 +240,22 @@ extension HomeView: UITableViewDelegate {
             completion(true)
         }
 
-        delete.image = UIImage(systemName: "trash")
+        delete.image = .trashWhite
         delete.backgroundColor = .systemRed
 
         return UISwipeActionsConfiguration(actions: [delete])
+    }
+}
+
+extension HomeView: UITabBarDelegate {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        28 + 8
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = TableHeaderView()
+        headerView.setTitle("폴더")
+        return headerView
     }
 }
 
@@ -304,7 +317,7 @@ private extension HomeView {
     }
 
     func setAttributes() {
-        backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        backgroundColor = .white800
     }
 
     func setHierarchy() {
@@ -361,8 +374,8 @@ private extension HomeView {
         }
 
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(collectionView.snp.bottom).offset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.bottom.equalToSuperview()
             self.tableViewHeightConstraint = make.height.equalTo(0).constraint
         }
