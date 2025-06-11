@@ -4,6 +4,7 @@ import RxSwift
 
 final class FolderViewModel {
     enum Action {
+        case viewWillAppear
         case didTapCell(IndexPath)
         case didTapAddFolderButton
         case didTapAddClipButton
@@ -31,16 +32,19 @@ final class FolderViewModel {
     var navigation = PublishRelay<Navigation>()
     var disposeBag = DisposeBag()
 
-    private let folder: Folder
+    private var folder: Folder
+    private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
         folder: Folder,
+        fetchFolderUseCase: FetchFolderUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
+        self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
@@ -56,11 +60,14 @@ final class FolderViewModel {
 private extension FolderViewModel {
     func setBindings() {
         action
+            .skip(1)
             .subscribe { [weak self] action in
                 guard let self else { return }
                 print("\(Self.self): \(action)")
 
                 switch action {
+                case .viewWillAppear:
+                    reloadFolder()
                 case .didTapCell(let indexPath):
                     switch indexPath.section {
                     case 0:
@@ -83,6 +90,23 @@ private extension FolderViewModel {
                 }
             }
             .disposed(by: disposeBag)
+    }
+
+    func reloadFolder() {
+        print("\(Self.self): reloadFolder() called")
+        Task {
+            guard case let .success(folder) = await fetchFolderUseCase.execute(id: folder.id) else {
+                print("\(Self.self): Failed to reload")
+                return
+            }
+
+            self.folder = folder
+            state.accept(.init(
+                currentFolderTitle: folder.title,
+                folders: folder.folders.map(FolderDisplayMapper.map),
+                clips: folder.clips.map(ClipDisplayMapper.map)
+            ))
+        }
     }
 
     func navigateToWebView(at index: Int) {
@@ -127,19 +151,18 @@ private extension FolderViewModel {
     }
 
     func delete(at indexPath: IndexPath) {
-        switch indexPath.section {
-        case 0:
-            Task {
+        Task {
+            switch indexPath.section {
+            case 0:
                 let folder = folder.folders[indexPath.item]
                 _ = await deleteFolderUseCase.execute(folder)
-            }
-        case 1:
-            Task {
+            case 1:
                 let clip = folder.clips[indexPath.item]
                 _ = await deleteClipUseCase.execute(clip)
+            default:
+                break
             }
-        default:
-            break
+            reloadFolder()
         }
     }
 }
