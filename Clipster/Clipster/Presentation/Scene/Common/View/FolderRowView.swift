@@ -4,15 +4,16 @@ import UIKit
 final class FolderRowView: UIView {
     private let folderImageBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue.withAlphaComponent(0.1)
+        view.backgroundColor = .white900
+        view.layer.borderColor = UIColor.blue900.cgColor
+        view.layer.borderWidth = 1
         view.layer.cornerRadius = 8
         return view
     }()
 
     private let folderImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "folder")
-        imageView.tintColor = .systemBlue
+        imageView.image = .folderBlue
         return imageView
     }()
 
@@ -25,15 +26,15 @@ final class FolderRowView: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .semiBold)
         return label
     }()
 
     private let countLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 12)
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
         return label
     }()
 
@@ -46,9 +47,10 @@ final class FolderRowView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ folder: FolderDisplay) {
-        titleLabel.text = folder.title
-        countLabel.text = folder.itemCount
+    func setDisplay(_ folder: FolderDisplay?) {
+        titleLabel.text = folder?.title ?? "홈"
+        countLabel.text = folder?.itemCount
+        countLabel.isHidden = folder == nil
     }
 }
 
@@ -70,15 +72,13 @@ private extension FolderRowView {
 
     func setConstraints() {
         folderImageBackgroundView.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
-            make.centerY.equalToSuperview()
+            make.leading.centerY.equalToSuperview()
             make.size.equalTo(48)
         }
 
         labelStackView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(0.5)
+            make.trailing.centerY.equalToSuperview()
             make.leading.equalTo(folderImageBackgroundView.snp.trailing).offset(16)
-            make.trailing.equalToSuperview()
         }
 
         folderImageView.snp.makeConstraints { make in
