@@ -38,7 +38,6 @@ private extension EditClipViewController {
 
     func setAttributes() {
         view.backgroundColor = .systemBackground
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: editClipView.saveButton)
     }
 
     func setBindings() {
@@ -149,5 +148,13 @@ private extension EditClipViewController {
         .asDriver(onErrorDriveWith: .empty())
         .drive(editClipView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
+
+        editClipView.backButton
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }

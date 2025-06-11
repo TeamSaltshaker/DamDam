@@ -2,15 +2,9 @@ import SnapKit
 import UIKit
 
 final class EditClipView: UIView {
-    let saveButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("저장", for: .normal)
-        button.setTitleColor(.tintColor, for: .normal)
-        button.setTitleColor(.lightGray, for: .disabled)
-        button.frame = .init(x: 0, y: 0, width: 44, height: 44)
-        button.isEnabled = false
-        return button
-    }()
+    let commonNavigationView = CommonNavigationView()
+    let backButton = BackButton()
+    let saveButton = SaveButton()
 
     private let urlInfoStackView: UIStackView = {
         let stackView = UIStackView()
@@ -68,8 +62,14 @@ final class EditClipView: UIView {
 
 private extension EditClipView {
     func configure() {
+        setAttributes()
         setHierarchy()
         setConstraints()
+    }
+
+    func setAttributes() {
+        commonNavigationView.setLeftItem(backButton)
+        commonNavigationView.setRightItem(saveButton)
     }
 
     func setHierarchy() {
@@ -82,6 +82,7 @@ private extension EditClipView {
         }
 
         [
+            commonNavigationView,
             urlInfoStackView,
             memoTextView,
             memoLimitLabel
@@ -91,8 +92,13 @@ private extension EditClipView {
     }
 
     func setConstraints() {
+        commonNavigationView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalToSuperview()
+        }
+
         urlInfoStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(20)
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(20)
             make.directionalHorizontalEdges.equalToSuperview().inset(20)
         }
 
