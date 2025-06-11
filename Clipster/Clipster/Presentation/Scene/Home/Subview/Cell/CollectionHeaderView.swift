@@ -9,7 +9,7 @@ final class CollectionHeaderView: UICollectionReusableView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.font = .init(name: "Pretendard-SemiBold", size: 18)
         return label
     }()
 
