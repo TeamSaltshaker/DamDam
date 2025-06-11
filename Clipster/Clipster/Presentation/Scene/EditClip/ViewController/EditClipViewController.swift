@@ -226,5 +226,23 @@ private extension EditClipViewController {
                 present(vc, animated: true)
             }
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.isSuccessfullyEdited)
+            .filter { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.saveButton
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.saveClip)
+            }
+            .disposed(by: disposeBag)
     }
 }

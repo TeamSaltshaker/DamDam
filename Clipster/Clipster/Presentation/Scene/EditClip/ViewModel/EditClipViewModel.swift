@@ -14,6 +14,7 @@ final class EditClipViewModel: ViewModel {
         case editMomo(String)
         case folderViewTapped
         case editFolder(Folder?)
+        case saveClip
     }
 
     enum Mutation {
@@ -23,6 +24,7 @@ final class EditClipViewModel: ViewModel {
         case updateURLMetadata(URLMetadataDisplay?)
         case updateFolderViewTapped(Bool)
         case updateCurrentFolder(Folder?)
+        case updateSuccessfullyEdited(Bool)
     }
 
     struct State {
@@ -39,6 +41,7 @@ final class EditClipViewModel: ViewModel {
         var isFolderViewTapped: Bool = false
         var clip: Clip?
         var currentFolder: Folder?
+        var isSuccessfullyEdited: Bool = false // binding
     }
 
     var state: BehaviorRelay<State>
@@ -118,6 +121,66 @@ final class EditClipViewModel: ViewModel {
             return .just(.updateFolderViewTapped(true))
         case .editFolder(let newFolder):
             return .just(.updateCurrentFolder(newFolder))
+        case .saveClip:
+            switch state.value.type {
+            case .edit:
+                print("3")
+                guard let clip = state.value.clip else { return .empty() }
+                guard let currentFolder = state.value.currentFolder else { return .empty() }
+                guard let urlMetadata = state.value.urlMetadata else { return .empty() }
+                print("4")
+                let newClip = Clip(
+                    id: clip.id,
+                    folderID: currentFolder.id,
+                    urlMetadata: URLMetadata(
+                        url: urlMetadata.url,
+                        title: urlMetadata.title,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        createdAt: clip.createdAt,
+                        updatedAt: clip.urlMetadata.url != urlMetadata.url ? Date() : clip.updatedAt,
+                        deletedAt: clip.deletedAt
+                    ),
+                    memo: state.value.memoText,
+                    lastVisitedAt: clip.lastVisitedAt,
+                    createdAt: clip.createdAt,
+                    updatedAt: clip.memo != state.value.memoText &&
+                                clip.urlMetadata.url != urlMetadata.url &&
+                                clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
+                    deletedAt: clip.deletedAt
+                )
+                return .fromAsync {
+                    try await self.updateClipUseCase.execute(clip: newClip).get()
+                }
+                .map { .updateSuccessfullyEdited(true) }
+                .catchAndReturn(.updateSuccessfullyEdited(false))
+            case .create, .shareExtension:
+                print("1")
+                guard let currentFolder = state.value.currentFolder else { return .empty() }
+                guard let urlMetadata = state.value.urlMetadata else { return .empty() }
+                print("2")
+                let newClip = Clip(
+                    id: UUID(),
+                    folderID: currentFolder.id,
+                    urlMetadata: URLMetadata(
+                        url: urlMetadata.url,
+                        title: urlMetadata.title,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        createdAt: Date(),
+                        updatedAt: Date(),
+                        deletedAt: nil
+                    ),
+                    memo: state.value.memoText,
+                    lastVisitedAt: nil,
+                    createdAt: Date(),
+                    updatedAt: Date(),
+                    deletedAt: nil
+                )
+                return .fromAsync {
+                    try await self.createClipUseCase.execute(newClip).get()
+                }
+                .map { .updateSuccessfullyEdited(true) }
+                .catchAndReturn(.updateSuccessfullyEdited(false))
+            }
         }
     }
 
@@ -146,6 +209,8 @@ final class EditClipViewModel: ViewModel {
             newState.isFolderViewTapped = value
         case .updateCurrentFolder(let newFolder):
             newState.currentFolder = newFolder
+        case .updateSuccessfullyEdited(let value):
+            newState.isSuccessfullyEdited = value
         }
         return newState
     }
