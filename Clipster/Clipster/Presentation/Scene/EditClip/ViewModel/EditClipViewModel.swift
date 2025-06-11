@@ -16,6 +16,7 @@ final class EditClipViewModel: ViewModel {
         case editFolder(Folder?)
         case saveClip
         case fetchFolder
+        case fetchTopLevelFolder
     }
 
     enum Mutation {
@@ -52,6 +53,7 @@ final class EditClipViewModel: ViewModel {
     private let checkURLValidityUseCase: CheckURLValidityUseCase
     private let parseURLMetadataUseCase: ParseURLMetadataUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
+    private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
 
@@ -61,6 +63,7 @@ final class EditClipViewModel: ViewModel {
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
@@ -72,6 +75,7 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
         bind()
@@ -82,6 +86,7 @@ final class EditClipViewModel: ViewModel {
         checkURLValidityUseCase: CheckURLValidityUseCase,
         parseURLMetadataUseCase: ParseURLMetadataUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
@@ -95,6 +100,7 @@ final class EditClipViewModel: ViewModel {
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
         bind()
@@ -103,6 +109,7 @@ final class EditClipViewModel: ViewModel {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .editURLInputTextField(let urlText):
+            print("\(Self.self) \(action)")
             return .merge(
                 .just(.updateURLInputText(urlText)),
                 .fromAsync {
@@ -117,14 +124,19 @@ final class EditClipViewModel: ViewModel {
                 .catchAndReturn(.updateURLMetadata(nil))
             )
         case .editMomo(let memoText):
+            print("\(Self.self) \(action)")
             return .just(.updateMemo(memoText))
         case .folderViewTapped:
+            print("\(Self.self) \(action)")
             return .just(.updateFolderViewTapped(true))
         case .editFolder(let newFolder):
+            print("\(Self.self) \(action)")
             return .just(.updateCurrentFolder(newFolder))
         case .saveClip:
+            print("\(Self.self) \(action)")
             switch state.value.type {
             case .edit:
+                print("\(Self.self) edit clip")
                 guard let clip = state.value.clip else { return .empty() }
                 guard let currentFolder = state.value.currentFolder else { return .empty() }
                 guard let urlMetadata = state.value.urlMetadata else { return .empty() }
@@ -135,7 +147,7 @@ final class EditClipViewModel: ViewModel {
                     urlMetadata: URLMetadata(
                         url: urlMetadata.url,
                         title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
                         createdAt: clip.createdAt,
                         updatedAt: clip.urlMetadata.url != urlMetadata.url ? Date() : clip.updatedAt,
                         deletedAt: clip.deletedAt
@@ -154,6 +166,7 @@ final class EditClipViewModel: ViewModel {
                 .map { .updateSuccessfullyEdited(true) }
                 .catchAndReturn(.updateSuccessfullyEdited(false))
             case .create, .shareExtension:
+                print("\(Self.self) save clip")
                 guard let currentFolder = state.value.currentFolder else { return .empty() }
                 guard let urlMetadata = state.value.urlMetadata else { return .empty() }
 
@@ -163,7 +176,7 @@ final class EditClipViewModel: ViewModel {
                     urlMetadata: URLMetadata(
                         url: urlMetadata.url,
                         title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL!,
+                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
                         createdAt: Date(),
                         updatedAt: Date(),
                         deletedAt: nil
@@ -181,10 +194,19 @@ final class EditClipViewModel: ViewModel {
                 .catchAndReturn(.updateSuccessfullyEdited(false))
             }
         case .fetchFolder:
+            print("\(Self.self) \(action)")
             guard let clip = state.value.clip else { return .empty() }
             return .fromAsync {
                 try await self.fetchFolderUseCase.execute(id: clip.folderID).get()
             }
+            .map { .updateCurrentFolder($0) }
+            .catchAndReturn(.updateCurrentFolder(nil))
+        case .fetchTopLevelFolder:
+            print("\(Self.self) \(action)")
+            return .fromAsync {
+                try await self.fetchTopLevelFoldersUseCase.execute().get()
+            }
+            .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
         }

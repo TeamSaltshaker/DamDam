@@ -41,7 +41,7 @@ struct DomainMapper {
 
     private func urlMetadata(from entity: URLMetadataEntity) -> URLMetadata? {
         guard let url = URL(string: entity.urlString),
-              let thumbnailImageURL = URL(string: entity.thumbnailImageURLString) else {
+              let thumbnailImageURL = URL(string: entity.thumbnailImageURLString ?? "") else {
             return nil
         }
 

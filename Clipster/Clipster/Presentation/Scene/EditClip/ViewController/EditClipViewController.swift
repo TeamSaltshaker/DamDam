@@ -63,6 +63,14 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .map { $0.type == .shareExtension }
+            .take(1)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.fetchTopLevelFolder)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text
@@ -146,12 +154,17 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         Observable.combineLatest(
+            viewModel.state.map(\.clip),
             viewModel.state.map(\.memoText),
             viewModel.state.map(\.isURLValid),
             viewModel.state.map(\.currentFolder)
         )
-        .map { memoText, isURLValid, currentFolder in
-            !memoText.isEmpty && isURLValid && currentFolder != nil
+        .map { clip, memoText, isURLValid, currentFolder in
+            if let clip = clip {
+                return clip.memo != memoText || !isURLValid || currentFolder?.id != clip.folderID
+            } else {
+                return !memoText.isEmpty && isURLValid && currentFolder != nil
+            }
         }
         .distinctUntilChanged()
         .asDriver(onErrorDriveWith: .empty())
