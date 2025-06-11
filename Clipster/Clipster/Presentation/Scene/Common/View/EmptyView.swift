@@ -57,10 +57,7 @@ private extension EmptyView {
     func setConstraints() {
         stackView.snp.makeConstraints { make in
             make.directionalHorizontalEdges.centerY.equalToSuperview()
-        }
-
-        imageView.snp.makeConstraints { make in
-            make.size.equalTo(100)
+            make.width.greaterThanOrEqualTo(200)
         }
     }
 }
