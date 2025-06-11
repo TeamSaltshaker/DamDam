@@ -31,8 +31,18 @@ final class FolderView: UIView {
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
-        tableView.register(ClipCell.self, forCellReuseIdentifier: ClipCell.identifier)
+        tableView.register(
+            FolderCell.self,
+            forCellReuseIdentifier: FolderCell.identifier,
+        )
+        tableView.register(
+            ClipCell.self,
+            forCellReuseIdentifier: ClipCell.identifier,
+        )
+        tableView.register(
+            TableHeaderView.self,
+            forHeaderFooterViewReuseIdentifier: TableHeaderView.identifier,
+        )
         tableView.delegate = self
         return tableView
     }()
@@ -162,21 +172,12 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         viewForHeaderInSection section: Int,
     ) -> UIView? {
-        let headerView = UIView()
-        headerView.backgroundColor = .clear
+        guard let header = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: TableHeaderView.identifier,
+        ) as? TableHeaderView else { return nil }
+        header.setTitle(section == 0 ? "폴더" : "클립")
 
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
-        label.textColor = .label
-        label.text = section == 0 ? "폴더" : "클립"
-        headerView.addSubview(label)
-
-        label.snp.makeConstraints { make in
-            make.directionalHorizontalEdges.equalToSuperview().inset(16)
-            make.centerY.equalToSuperview()
-        }
-
-        return headerView
+        return header
     }
 
     func tableView(
