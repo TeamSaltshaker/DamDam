@@ -115,7 +115,6 @@ private extension EditClipView {
         }
 
         [
-            commonNavigationView,
             folderRowView,
             chevronImageView
         ].forEach {
@@ -123,6 +122,7 @@ private extension EditClipView {
         }
 
         [
+            commonNavigationView,
             urlInfoStackView,
             memoTextView,
             memoLimitLabel,
