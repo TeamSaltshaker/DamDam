@@ -3,7 +3,7 @@ import UIKit
 final class CommonNavigationView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 22, weight: .bold)
+        label.font = .pretendard(size: 22, weight: .bold)
         label.textColor = .label
         return label
     }()

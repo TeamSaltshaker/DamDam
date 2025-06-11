@@ -32,6 +32,6 @@ private extension BackButton {
 
         configuration = config
 
-        titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel?.font = .pretendard(size: 14, weight: .medium)
     }
 }
