@@ -6,7 +6,7 @@ final class ClipCell: UITableViewCell {
     private let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 12
+        imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -32,9 +32,16 @@ final class ClipCell: UITableViewCell {
         return stackView
     }()
 
+    private let chevronImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = .chevronRight
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
     private let visitIndicatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .blue400
         view.layer.cornerRadius = 4
         view.isHidden = true
         return view
@@ -47,6 +54,12 @@ final class ClipCell: UITableViewCell {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let inset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
+        contentView.frame = contentView.frame.inset(by: inset)
     }
 
     func setDisplay(_ display: ClipDisplay) {
@@ -65,42 +78,45 @@ private extension ClipCell {
     }
 
     func setAttributes() {
-        backgroundColor = .white900
+        backgroundColor = .white800
+        selectionStyle = .none
 
-        layer.cornerRadius = 16
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.25
-        layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowRadius = 4
-        layer.shadowPath = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: layer.cornerRadius
-        ).cgPath
+        contentView.backgroundColor = .white900
+        contentView.layer.cornerRadius = 12
+        contentView.layer.masksToBounds = true
     }
 
     func setHierarchy() {
         [
             thumbnailImageView,
             stackView,
+            chevronImageView,
             visitIndicatorView
         ].forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(16)
+            make.leading.equalToSuperview().inset(20)
             make.verticalEdges.equalToSuperview().inset(12)
-            make.width.equalTo(thumbnailImageView.snp.height)
+            make.width.equalTo(64)
         }
 
         stackView.snp.makeConstraints { make in
-            make.leading.equalTo(thumbnailImageView.snp.trailing).offset(8)
-            make.trailing.equalToSuperview().inset(16)
+            make.leading.equalTo(thumbnailImageView.snp.trailing).offset(16)
+            make.trailing.equalTo(chevronImageView.snp.leading).offset(16)
             make.centerY.equalToSuperview()
         }
 
+        chevronImageView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(20)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(24)
+        }
+
         visitIndicatorView.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().inset(8)
+            make.leading.equalTo(thumbnailImageView.snp.leading).inset(6)
+            make.top.equalTo(thumbnailImageView.snp.top).inset(6)
             make.size.equalTo(8)
         }
     }
