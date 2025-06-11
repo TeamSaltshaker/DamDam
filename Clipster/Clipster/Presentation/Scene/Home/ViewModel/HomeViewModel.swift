@@ -7,7 +7,8 @@ final class HomeViewModel {
         case viewWillAppear
         case tapAddClip
         case tapAddFolder
-        case tapCell(IndexPath)
+        case tapClip(Int)
+        case tapFolder(Int)
         case tapDetail(IndexPath)
         case tapEdit(IndexPath)
         case tapDelete(IndexPath)
@@ -66,8 +67,15 @@ final class HomeViewModel {
                     owner.route.accept(.showAddClip)
                 case .tapAddFolder:
                     owner.route.accept(.showAddFolder)
-                case .tapCell(let indexPath),
-                     .tapDetail(let indexPath),
+                case .tapClip(let index):
+                    guard index < owner.unvisitedClips.count else { return }
+                    let url = owner.unvisitedClips[index].urlMetadata.url
+                    owner.route.accept(.showWebView(url))
+                case .tapFolder(let index):
+                    guard index < owner.folders.count else { return }
+                    let folder = owner.folders[index]
+                    owner.route.accept(.showFolder(folder))
+                case .tapDetail(let indexPath),
                      .tapEdit(let indexPath):
                     if let route = owner.route(for: action, at: indexPath) {
                         owner.route.accept(route)
@@ -86,8 +94,6 @@ final class HomeViewModel {
         case 0 where indexPath.item < unvisitedClips.count:
             let clip = unvisitedClips[indexPath.item]
             switch action {
-            case .tapCell:
-                return .showWebView(clip.urlMetadata.url)
             case .tapDetail:
                 return .showDetailClip(clip)
             case .tapEdit:
@@ -98,8 +104,6 @@ final class HomeViewModel {
         case 1 where indexPath.item < folders.count:
             let folder = folders[indexPath.item]
             switch action {
-            case .tapCell:
-                return .showFolder(folder)
             case .tapEdit:
                 return .showEditFolder(folder)
             default:
