@@ -148,9 +148,10 @@ private extension EditClipViewController {
         Observable.combineLatest(
             viewModel.state.map(\.memoText),
             viewModel.state.map(\.isURLValid),
+            viewModel.state.map(\.currentFolder)
         )
-        .map { memoText, isURLValid in
-            !memoText.isEmpty && isURLValid
+        .map { memoText, isURLValid, currentFolder in
+            !memoText.isEmpty && isURLValid && currentFolder != nil
         }
         .distinctUntilChanged()
         .asDriver(onErrorDriveWith: .empty())
