@@ -5,14 +5,20 @@ final class URLView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "URL"
-        label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textColor = .label
+        label.font = .pretendard(size: 16, weight: .medium)
+        label.textColor = .black100
         return label
     }()
 
     let urlTextField: CommonTextField = {
         let textField = CommonTextField()
-        textField.placeholder = "URL을 입력해주세요."
+        textField.attributedPlaceholder = NSAttributedString(
+            string: "URL을 입력해 주세요.",
+            attributes: [
+                .foregroundColor: UIColor.black800,
+                .font: UIFont.pretendard(size: 14, weight: .regular)
+            ]
+        )
         return textField
     }()
 
@@ -20,8 +26,8 @@ final class URLView: UIView {
 
     let statusLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
-        label.font = .systemFont(ofSize: 12)
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
         return label
     }()
 

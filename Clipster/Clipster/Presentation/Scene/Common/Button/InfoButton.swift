@@ -17,7 +17,6 @@ private extension InfoButton {
     }
 
     func setAttributes() {
-        setImage(UIImage(systemName: "info.circle"), for: .normal)
-        tintColor = .label
+        setImage(.info, for: .normal)
     }
 }

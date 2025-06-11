@@ -13,9 +13,10 @@ final class URLMetadataView: UIView {
 
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .label
+        label.font = .pretendard(size: 16, weight: .semiBold)
+        label.textColor = .black100
         label.numberOfLines = 0
+        label.backgroundColor = .clear
         return label
     }()
 
@@ -39,7 +40,8 @@ private extension URLMetadataView {
     func setAttributes() {
         layer.cornerRadius = 12
         layer.borderWidth = 1
-        layer.borderColor = UIColor.systemGray5.cgColor
+        layer.borderColor = UIColor.black900.cgColor
+        backgroundColor = .white900
     }
 
     func setHierarchy() {

@@ -33,6 +33,7 @@ extension CommonTextField {
     func setAttributes() {
         layer.borderWidth = 1
         layer.cornerRadius = 12
-        layer.borderColor = UIColor.systemGray5.cgColor
+        layer.borderColor = UIColor.black900.cgColor
+        backgroundColor = .white900
     }
 }
