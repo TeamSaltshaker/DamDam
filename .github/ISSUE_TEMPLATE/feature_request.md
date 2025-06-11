@@ -1,8 +1,8 @@
 ---
 name: Feature Template
 about: 기능 요청 템플릿
-title: "[Feat] "
-labels: "feature"
+title: ""
+labels: ""
 assignees: ''
 ---
 
