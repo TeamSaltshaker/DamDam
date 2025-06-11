@@ -64,11 +64,13 @@ final class HomeView: UIView {
         let tableView = UITableView()
         tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
         tableView.separatorStyle = .none
-        tableView.allowsSelection = false
         tableView.rowHeight = 72
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
         tableView.isScrollEnabled = false
         tableView.delegate = self
+        if #available(iOS 15.0, *) {
+            tableView.sectionHeaderTopPadding = 0
+        }
         return tableView
     }()
 
@@ -246,6 +248,29 @@ extension HomeView: UITableViewDelegate {
     }
 }
 
+extension HomeView: UITabBarDelegate {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        28 + 8
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let container = UIView()
+        container.backgroundColor = .clear
+
+        let headerView = TableHeaderView()
+        headerView.setTitle("폴더")
+
+        container.addSubview(headerView)
+        headerView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().inset(8)
+        }
+
+        return container
+    }
+}
+
 extension HomeView {
     func tableView(
         _ tableView: UITableView,
@@ -361,8 +386,8 @@ private extension HomeView {
         }
 
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(collectionView.snp.bottom).offset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.bottom.equalToSuperview()
             self.tableViewHeightConstraint = make.height.equalTo(0).constraint
         }

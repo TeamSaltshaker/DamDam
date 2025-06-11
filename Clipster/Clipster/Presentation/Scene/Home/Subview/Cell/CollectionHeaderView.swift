@@ -58,13 +58,13 @@ private extension CollectionHeaderView {
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
-            make.leading.equalToSuperview()
+            make.leading.equalToSuperview().inset(4)
         }
 
         showAllButton.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
             make.leading.greaterThanOrEqualTo(titleLabel).offset(12)
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(3.49)
         }
     }
 

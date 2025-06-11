@@ -34,7 +34,9 @@ private extension TableHeaderView {
 
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(4)
+            make.bottom.equalToSuperview()
         }
     }
 }
