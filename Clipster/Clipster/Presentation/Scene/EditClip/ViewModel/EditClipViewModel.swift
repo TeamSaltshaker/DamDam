@@ -197,7 +197,7 @@ final class EditClipViewModel: ViewModel {
             return .fromAsync {
                 try await self.fetchTopLevelFoldersUseCase.execute().get()
             }
-            .map { $0.max(by: { $0.updatedAt < $1.updatedAt }) }
+            .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
         }
