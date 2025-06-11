@@ -17,6 +17,10 @@ final class DefaultFolderStorage: FolderStorage {
                 print("\(Self.self): ❌ Failed to fetch: Entity not found")
                 return .failure(.entityNotFound)
             }
+
+            entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+            entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
             print("\(Self.self): ✅ Fetch successfully")
             return .success(entity)
         } catch {
@@ -31,6 +35,12 @@ final class DefaultFolderStorage: FolderStorage {
 
         do {
             let entities = try context.fetch(request)
+
+            for entity in entities {
+                entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+                entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+            }
+
             print("\(Self.self): ✅ Fetch successfully")
             return .success(entities)
         } catch {
