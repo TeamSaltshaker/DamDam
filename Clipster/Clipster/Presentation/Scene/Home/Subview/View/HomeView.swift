@@ -28,15 +28,15 @@ final class HomeView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "아차차"
-        label.font = .systemFont(ofSize: 28, weight: .heavy)
-        label.textColor = .label
+        label.font = .init(name: "Pretendard-ExtraBold", size: 28)
+        label.textColor = .black100
         return label
     }()
 
     private lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "plus"), for: .normal)
-        button.tintColor = .label
+        button.setImage(.plus, for: .normal)
+        button.tintColor = .black100
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
         return button
@@ -240,7 +240,7 @@ extension HomeView: UITableViewDelegate {
             completion(true)
         }
 
-        delete.image = UIImage(systemName: "trash")
+        delete.image = .trashWhite
         delete.backgroundColor = .systemRed
 
         return UISwipeActionsConfiguration(actions: [delete])

@@ -10,14 +10,15 @@ final class CollectionHeaderView: UICollectionReusableView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .init(name: "Pretendard-SemiBold", size: 18)
+        label.textColor = .black100
         return label
     }()
 
     private let showAllButton: UIButton = {
         let button = UIButton()
         button.setTitle("전체보기", for: .normal)
-        button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        button.setTitleColor(.black500, for: .normal)
+        button.titleLabel?.font = .init(name: "Pretendard-Medium", size: 14)
         button.titleLabel?.textAlignment = .center
         button.isHidden = true
         return button
