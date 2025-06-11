@@ -12,6 +12,8 @@ final class EditClipViewModel: ViewModel {
     enum Action {
         case editURLInputTextField(String)
         case editMomo(String)
+        case folderViewTapped
+        case editFolder(Folder?)
     }
 
     enum Mutation {
@@ -19,6 +21,8 @@ final class EditClipViewModel: ViewModel {
         case updateMemo(String)
         case updateValidURL(Bool)
         case updateURLMetadata(URLMetadataDisplay?)
+        case updateFolderViewTapped(Bool)
+        case updateCurrentFolder(Folder?)
     }
 
     struct State {
@@ -32,6 +36,7 @@ final class EditClipViewModel: ViewModel {
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
         var urlMetadata: URLMetadataDisplay?
+        var isFolderViewTapped: Bool = false
         var clip: Clip?
         var currentFolder: Folder?
     }
@@ -42,12 +47,14 @@ final class EditClipViewModel: ViewModel {
 
     private let checkURLValidityUseCase: CheckURLValidityUseCase
     private let parseURLMetadataUseCase: ParseURLMetadataUseCase
+    private let fetchFolderUseCase: FetchFolderUseCase
 
     init(
         urlText: String = "",
         currentFolder: Folder? = nil,
         checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase
+        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        fetchFolderUseCase: FetchFolderUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: urlText.isEmpty ? .create : .shareExtension,
@@ -56,13 +63,15 @@ final class EditClipViewModel: ViewModel {
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
         bind()
     }
 
     init(
         clip: Clip,
         checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase
+        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        fetchFolderUseCase: FetchFolderUseCase
     ) {
         state = BehaviorRelay(value: State(
             type: .edit,
@@ -73,6 +82,7 @@ final class EditClipViewModel: ViewModel {
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
         bind()
     }
 
@@ -94,6 +104,10 @@ final class EditClipViewModel: ViewModel {
             )
         case .editMomo(let memoText):
             return .just(.updateMemo(memoText))
+        case .folderViewTapped:
+            return .just(.updateFolderViewTapped(true))
+        case .editFolder(let newFolder):
+            return .just(.updateCurrentFolder(newFolder))
         }
     }
 
@@ -118,6 +132,10 @@ final class EditClipViewModel: ViewModel {
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadata = urlMetaDisplay
             newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
+        case .updateFolderViewTapped(let value):
+            newState.isFolderViewTapped = value
+        case .updateCurrentFolder(let newFolder):
+            newState.currentFolder = newFolder
         }
         return newState
     }

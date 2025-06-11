@@ -11,7 +11,7 @@ enum EditFolderAction {
     case folderTitleChanged(String)
     case saveButtonTapped
     case folderViewTapped
-    case saveSucceeded
+    case saveSucceeded(Folder)
     case saveFailed(Error)
     case folderSelectorDismissed(selected: Folder?)
 }
@@ -21,6 +21,7 @@ struct EditFolderState {
     var folderTitle: String
     let initialFolderTitle: String
     let navigationTitle: String
+    var didFinishAddtion: Folder?
     var parentFolder: Folder?
     var parentFolderDisplay: FolderDisplay?
 
@@ -39,8 +40,8 @@ struct EditFolderState {
     }
 
     var shouldNavigateToFolderSelector = false
-    var isProcessing: Bool = false
-    var shouldDismiss: Bool = false
+    var isProcessing = false
+    var shouldDismiss = false
     var alertMessage: String?
 
     init(mode: EditFolderMode) {
@@ -104,10 +105,14 @@ final class EditFolderViewModel {
                 case .folderViewTapped:
                     print("\(Self.self): folder view tapped")
                     newState.shouldNavigateToFolderSelector = true
-                case .saveSucceeded:
+                case .saveSucceeded(let folder):
                     print("\(Self.self): save succeeded")
                     newState.isProcessing = false
                     newState.shouldDismiss = true
+
+                    if case .add = newState.mode {
+                        newState.didFinishAddtion = folder
+                    }
                 case .saveFailed(let error):
                     print("\(Self.self): save failed with error: \(error.localizedDescription)")
                     newState.isProcessing = false
@@ -179,7 +184,7 @@ final class EditFolderViewModel {
                         let result = await useCase(newFolder)
                         switch result {
                         case .success:
-                            observer.onNext(.saveSucceeded)
+                            observer.onNext(.saveSucceeded(newFolder))
                         case .failure(let error):
                             observer.onNext(.saveFailed(error))
                         }

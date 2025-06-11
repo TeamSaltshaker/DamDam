@@ -159,6 +159,11 @@ private extension EditClipViewController {
                     viewModel: vm,
                     diContainer: diContainer
                 )
+
+                vc.onAdditionComplete = {
+                    self.viewModel.action.accept(.editFolder($0))
+                }
+
                 navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
@@ -168,6 +173,57 @@ private extension EditClipViewController {
             .tap
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .compactMap { state -> Folder? in
+                guard state.clip == nil else { return nil }
+                return state.currentFolder
+            }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.folderRowView.setDisplay(
+                    FolderDisplay(
+                        id: $0.id,
+                        title: $0.title,
+                        itemCount: "\($0.clips.count + $0.folders.count)개 항목"
+                    )
+                )
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.folderViewTapGesture
+            .rx
+            .event
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.folderViewTapped)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .compactMap { state -> Folder? in
+                guard state.isFolderViewTapped else { return nil }
+                return state.currentFolder
+            }
+            .distinctUntilChanged { $0.id == $1.id }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] currentFolder in
+                guard let self else { return }
+
+                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .folder(parentFolder: currentFolder))
+                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                vc.onSelectionComplete = {
+                    self.viewModel.action.accept(.editFolder($0))
+                }
+                vc.modalPresentationStyle = .pageSheet
+
+                if let sheet = vc.sheetPresentationController {
+                    sheet.detents = [.custom { context in context.maximumDetentValue * (2.0 / 3.0) }]
+                    sheet.prefersGrabberVisible = true
+                }
+
+                present(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }
