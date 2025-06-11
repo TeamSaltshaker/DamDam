@@ -55,6 +55,14 @@ private extension EditClipViewController {
             .drive(editClipView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .compactMap(\.clip)
+            .take(1)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.fetchFolder)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text
@@ -140,9 +148,10 @@ private extension EditClipViewController {
         Observable.combineLatest(
             viewModel.state.map(\.memoText),
             viewModel.state.map(\.isURLValid),
+            viewModel.state.map(\.currentFolder)
         )
-        .map { memoText, isURLValid in
-            !memoText.isEmpty && isURLValid
+        .map { memoText, isURLValid, currentFolder in
+            !memoText.isEmpty && isURLValid && currentFolder != nil
         }
         .distinctUntilChanged()
         .asDriver(onErrorDriveWith: .empty())
@@ -177,10 +186,7 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         viewModel.state
-            .compactMap { state -> Folder? in
-                guard state.clip == nil else { return nil }
-                return state.currentFolder
-            }
+            .compactMap(\.currentFolder)
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] in
                 self?.editClipView.folderRowView.setDisplay(
@@ -224,6 +230,24 @@ private extension EditClipViewController {
                 }
 
                 present(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.isSuccessfullyEdited)
+            .filter { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.saveButton
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.saveClip)
             }
             .disposed(by: disposeBag)
     }
