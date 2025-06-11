@@ -173,11 +173,14 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         viewForHeaderInSection section: Int,
     ) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(
-            withIdentifier: TableHeaderView.identifier,
-        ) as? TableHeaderView else { return nil }
-        header.setTitle(section == 0 ? "폴더" : "클립")
+        guard let section = Section(rawValue: section),
+              let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
+              !items.isEmpty,
+              let header = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: TableHeaderView.identifier,
+              ) as? TableHeaderView else { return nil }
 
+        header.setTitle(section == .folder ? "폴더" : "클립")
         return header
     }
 
