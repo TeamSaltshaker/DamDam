@@ -17,7 +17,6 @@ private extension DeleteButton {
     }
 
     func setAttributes() {
-        setImage(UIImage(systemName: "trash"), for: .normal)
-        tintColor = .systemRed
+        setImage(.trashRed, for: .normal)
     }
 }
