@@ -56,13 +56,13 @@ final class HomeView: UIView {
         )
         collectionView.delegate = self
         collectionView.contentInset.top = 24
-        collectionView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        collectionView.backgroundColor = .white800
         return collectionView
     }()
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        tableView.backgroundColor = .white800
         tableView.separatorStyle = .none
         tableView.rowHeight = 72
         tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
@@ -329,7 +329,7 @@ private extension HomeView {
     }
 
     func setAttributes() {
-        backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        backgroundColor = .white800
     }
 
     func setHierarchy() {
