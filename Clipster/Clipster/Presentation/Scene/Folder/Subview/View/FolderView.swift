@@ -31,6 +31,10 @@ final class FolderView: UIView {
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .white800
+        tableView.rowHeight = 80
+        tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 0
         tableView.register(
             FolderCell.self,
             forCellReuseIdentifier: FolderCell.identifier,
@@ -116,7 +120,8 @@ private extension FolderView {
 
         tableView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
-            make.directionalHorizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
+            make.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(24)
+            make.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 
@@ -180,7 +185,7 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         heightForHeaderInSection section: Int,
     ) -> CGFloat {
-        44
+        36
     }
 
     func tableView(

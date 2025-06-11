@@ -20,6 +20,12 @@ final class FolderCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let inset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
+        contentView.frame = contentView.frame.inset(by: inset)
+    }
+
     func setDisplay(_ folder: FolderDisplay) {
         folderRowView.setDisplay(folder)
     }
@@ -33,6 +39,12 @@ private extension FolderCell {
     }
 
     func setAttributes() {
+        backgroundColor = .white800
+        selectionStyle = .none
+
+        contentView.backgroundColor = .white900
+        contentView.layer.cornerRadius = 12
+        contentView.layer.masksToBounds = true
     }
 
     func setHierarchy() {
