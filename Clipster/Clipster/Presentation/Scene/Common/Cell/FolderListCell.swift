@@ -38,6 +38,7 @@ final class FolderListCell: UICollectionViewListCell {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, itemCountLabel])
         stackView.axis = .vertical
         stackView.spacing = 8
+        stackView.distribution = .fillProportionally
         return stackView
     }()
 
