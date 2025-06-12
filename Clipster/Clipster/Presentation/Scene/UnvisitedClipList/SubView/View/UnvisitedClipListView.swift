@@ -188,7 +188,7 @@ private extension UnvisitedClipListView {
         }
 
         backButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
+            make.size.equalTo(48)
         }
 
         collectionView.snp.makeConstraints { make in
