@@ -22,6 +22,13 @@ final class HomeView: UIView {
     enum Item: Hashable {
         case clip(ClipDisplay)
         case folder(FolderDisplay)
+
+        var displayTitle: String {
+            switch self {
+            case .clip(let clip): return clip.urlMetadata.title
+            case .folder(let folder): return folder.title
+            }
+        }
     }
 
     private let disposeBag = DisposeBag()
@@ -232,13 +239,7 @@ private extension HomeView {
                 style: .destructive,
                 title: "삭제"
             ) { [weak self] _, _, completion in
-                guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return }
-                switch item {
-                case .clip(let clip):
-                    self?.action.accept(.delete(indexPath: indexPath, title: clip.urlMetadata.title))
-                case .folder(let folder):
-                    self?.action.accept(.delete(indexPath: indexPath, title: folder.title))
-                }
+                self?.performAction(for: indexPath) { .delete(indexPath: $0, title: $1.displayTitle) }
                 completion(true)
             }
 
@@ -247,35 +248,35 @@ private extension HomeView {
 
             return UISwipeActionsConfiguration(actions: [delete])
         }
-        let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
-        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
-        section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
-        section.interGroupSpacing = 8
-        return section
-    }
-
-    func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(28)
-        )
-
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top
-        )
-
-        switch section {
-        case .clip:
-            header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-        case .folder:
-            header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+            let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+            section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
+            section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
+            section.interGroupSpacing = 8
+            return section
         }
 
-        return header
+        func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
+            let headerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(28)
+            )
+
+            let header = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+
+            switch section {
+            case .clip:
+                header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+            case .folder:
+                header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+            }
+
+            return header
+        }
     }
-}
 
 extension HomeView: UICollectionViewDelegate {
     func collectionView(
@@ -303,7 +304,7 @@ private extension HomeView {
             title: "상세정보",
             image: UIImage(systemName: "magnifyingglass")
         ) { [weak self] _ in
-            self?.action.accept(.detail(indexPath))
+            self?.performAction(for: indexPath) { .detail($0) }
         }
     }
 
@@ -312,7 +313,7 @@ private extension HomeView {
             title: "편집",
             image: UIImage(systemName: "pencil")
         ) { [weak self] _ in
-            self?.action.accept(.edit(indexPath))
+            self?.performAction(for: indexPath) { .edit($0) }
         }
     }
 
@@ -322,13 +323,38 @@ private extension HomeView {
             image: UIImage(systemName: "trash"),
             attributes: .destructive
         ) { [weak self] _ in
-            guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return }
-            switch item {
-            case .clip(let clip):
-                self?.action.accept(.delete(indexPath: indexPath, title: clip.urlMetadata.title))
-            case .folder(let folder):
-                self?.action.accept(.delete(indexPath: indexPath, title: folder.title))
-            }
+            self?.performAction(for: indexPath) { .delete(indexPath: $0, title: $1.displayTitle) }
+        }
+    }
+}
+
+private extension HomeView {
+    func performAction(
+        for indexPath: IndexPath,
+        transform: (IndexPath, Item) -> Action
+    ) {
+        guard let item = dataSource?.itemIdentifier(for: indexPath) else { return }
+        let logical = logicalIndexPath(indexPath)
+        action.accept(transform(logical, item))
+    }
+
+    func performAction(
+        for indexPath: IndexPath,
+        transform: (IndexPath) -> Action
+    ) {
+        let logical = logicalIndexPath(indexPath)
+        action.accept(transform(logical))
+    }
+
+    func logicalIndexPath(_ indexPath: IndexPath) -> IndexPath {
+        guard let section = self.dataSource?.sectionIdentifier(for: indexPath.section)
+        else { return indexPath }
+
+        switch section {
+        case .clip:
+            return IndexPath(item: indexPath.item, section: 0)
+        case .folder:
+            return IndexPath(item: indexPath.item, section: 1)
         }
     }
 }
@@ -389,6 +415,9 @@ private extension HomeView {
 
     func setBindings() {
         collectionView.rx.itemSelected
+            .map { [weak self] indexPath in
+                self?.logicalIndexPath(indexPath) ?? indexPath
+            }
             .map { Action.tapCell($0) }
             .bind(to: action)
             .disposed(by: disposeBag)
