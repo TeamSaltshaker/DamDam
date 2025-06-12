@@ -141,7 +141,7 @@ private extension ClipDetailView {
 
         folderRowView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(12)
-            make.leading.equalToSuperview().offset(20)
+            make.directionalHorizontalEdges.equalToSuperview().inset(20)
         }
 
         activityIndicator.snp.makeConstraints { make in
