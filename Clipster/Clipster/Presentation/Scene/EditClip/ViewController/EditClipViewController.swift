@@ -37,7 +37,7 @@ private extension EditClipViewController {
     }
 
     func setAttributes() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white800
     }
 
     func setBindings() {
