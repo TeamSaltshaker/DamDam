@@ -12,6 +12,15 @@ final class EditClipView: UIView {
         return stackView
     }()
 
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.alwaysBounceVertical = true
+        scrollView.showsHorizontalScrollIndicator = false
+        return scrollView
+    }()
+
+    private let scrollContainerView = UIView()
+
     private let urlStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -103,6 +112,19 @@ private extension EditClipView {
 
     func setHierarchy() {
         [
+            urlStackView,
+            memoView,
+            folderLabel,
+            addFolderButton,
+            emptyView,
+            folderView
+        ].forEach {
+            scrollContainerView.addSubview($0)
+        }
+
+        scrollView.addSubview(scrollContainerView)
+
+        [
             urlMetadataStackView,
             urlLabel,
             urlInputTextField,
@@ -120,12 +142,7 @@ private extension EditClipView {
 
         [
             commonNavigationView,
-            urlStackView,
-            memoView,
-            folderLabel,
-            addFolderButton,
-            folderView,
-            emptyView
+            scrollView
         ].forEach {
             addSubview($0)
         }
@@ -137,11 +154,25 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
+        scrollView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom)
+            make.directionalHorizontalEdges.equalToSuperview()
+            make.bottom.equalTo(keyboardLayoutGuide.snp.top)
+            make.width.equalToSuperview()
+        }
+
+        scrollContainerView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+            make.bottom.equalTo(emptyView.snp.bottom)
+        }
+
         urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
 
         urlStackView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
+            make.top.equalToSuperview().offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.width.equalToSuperview().inset(24)
         }
 
         urlInputTextField.snp.makeConstraints { make in
@@ -170,7 +201,7 @@ private extension EditClipView {
         }
 
         folderRowView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(12)
+            make.verticalEdges.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
         }
 
@@ -182,9 +213,10 @@ private extension EditClipView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.top.equalTo(folderLabel.snp.bottom).offset(12)
-            make.height.equalTo(160)
-            make.centerX.equalToSuperview()
+            make.top.equalTo(folderView.snp.top)
+            make.height.greaterThanOrEqualTo(155)
+            make.directionalHorizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().inset(20)
         }
     }
 }
