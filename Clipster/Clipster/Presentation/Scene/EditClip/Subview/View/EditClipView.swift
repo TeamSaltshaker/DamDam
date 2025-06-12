@@ -19,6 +19,14 @@ final class EditClipView: UIView {
         return stackView
     }()
 
+    let urlLabel: UILabel = {
+        let label = UILabel()
+        label.text = "URL"
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
+        return label
+    }()
+
     let urlInputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "URL 입력"
@@ -121,7 +129,7 @@ private extension EditClipView {
 
     func setHierarchy() {
         [
-            urlMetadataStackView,
+            urlLabel,
             urlInputTextField,
             urlValidationStacKView
         ].forEach {
@@ -137,6 +145,7 @@ private extension EditClipView {
 
         [
             commonNavigationView,
+            urlMetadataStackView,
             urlInfoStackView,
             memoLabel,
             memoTextView,
@@ -155,13 +164,14 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
-        saveButton.snp.makeConstraints { make in
-            make.size.equalTo(48)
+        urlMetadataStackView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         urlInfoStackView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(20)
-            make.directionalHorizontalEdges.equalToSuperview().inset(20)
+            make.top.equalTo(urlMetadataStackView.snp.bottom).offset(32)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         memoLabel.snp.makeConstraints { make in
