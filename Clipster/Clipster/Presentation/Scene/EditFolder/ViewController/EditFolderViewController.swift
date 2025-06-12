@@ -66,14 +66,14 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         state
-            .map { ($0.shouldNavigateToFolderSelector, $0.parentFolder) }
+            .map { ($0.shouldNavigateToFolderSelector, $0.folder, $0.parentFolder) }
             .distinctUntilChanged { $0.0 == $1.0 }
             .filter { $0.0 }
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _, parentFolder in
+            .subscribe { [weak self] _, folder, parentFolder in
                 guard let self else { return }
 
-                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .folder(parentFolder: parentFolder))
+                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .editFolder(folder: folder, parentFolder: parentFolder))
                 let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
                 vc.onSelectionComplete = { selected in
                     self.viewModel.action.accept(.folderSelectorDismissed(selected: selected))

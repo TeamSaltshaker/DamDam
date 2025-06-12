@@ -2,8 +2,24 @@ import RxRelay
 import RxSwift
 
 enum FolderSelectorMode {
-    case clip(parentFolder: Folder?)
-    case folder(parentFolder: Folder?)
+    case editClip(parentFolder: Folder?)
+    case editFolder(folder: Folder?, parentFolder: Folder?)
+
+    var folder: Folder? {
+        switch self {
+        case .editClip:
+            return nil
+        case .editFolder(let folder, _):
+            return folder
+        }
+    }
+
+    var parentFolder: Folder? {
+        switch self {
+        case .editClip(let parentFolder), .editFolder(_, let parentFolder):
+            return parentFolder
+        }
+    }
 }
 
 enum FolderSelectorAction {
@@ -29,7 +45,8 @@ struct FolderSelectorState {
     var shouldDismiss = false
 
     var subfolders: [Folder] {
-        currentPath.last?.folders ?? folders
+        let original = currentPath.last?.folders ?? folders
+        return original.filter { $0.id != mode.folder?.id }
     }
 
     var selectedFolder: Folder? {
@@ -46,9 +63,9 @@ struct FolderSelectorState {
 
     var isAddButtonHidden: Bool {
         switch mode {
-        case .clip:
+        case .editClip:
             return false
-        case .folder:
+        case .editFolder:
             return true
         }
     }
@@ -59,19 +76,16 @@ struct FolderSelectorState {
         }
 
         switch mode {
-        case .clip:
+        case .editClip:
             return selectedFolder != nil
-        case .folder:
+        case .editFolder:
             return true
         }
     }
 
     init(mode: FolderSelectorMode) {
         self.mode = mode
-        switch mode {
-        case .clip(let parentFolder), .folder(let parentFolder):
-            self.initialParentFolder = parentFolder
-        }
+        self.initialParentFolder = mode.parentFolder
     }
 }
 
@@ -144,7 +158,7 @@ final class FolderSelectorViewModel {
 
                     if let parentFolder = {
                         switch state.mode {
-                        case .clip(let folder), .folder(let folder):
+                        case .editClip(let folder), .editFolder(_, let folder):
                             return folder
                         }
                     }(), let path = self.path(to: parentFolder, in: folders) {

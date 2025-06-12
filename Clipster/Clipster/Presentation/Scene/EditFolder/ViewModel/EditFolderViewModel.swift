@@ -25,6 +25,15 @@ struct EditFolderState {
     var parentFolder: Folder?
     var parentFolderDisplay: FolderDisplay?
 
+    var folder: Folder? {
+        switch mode {
+        case .add:
+            return nil
+        case .edit(_, let folder):
+            return folder
+        }
+    }
+
     var isSavable: Bool {
         let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
