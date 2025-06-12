@@ -36,17 +36,20 @@ final class FolderViewModel {
     private var folder: Folder
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
+    private let updateClipUseCase: UpdateClipUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
         folder: Folder,
         fetchFolderUseCase: FetchFolderUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
+        updateClipUseCase: UpdateClipUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
+        self.updateClipUseCase = updateClipUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
         state = BehaviorRelay(value: State(
@@ -75,6 +78,7 @@ private extension FolderViewModel {
                     case 0:
                         navigateToFolderView(at: indexPath.item)
                     case 1:
+                        updateLastVisitedDate(at: indexPath.item)
                         navigateToWebView(at: indexPath.item)
                     default:
                         break
@@ -109,6 +113,23 @@ private extension FolderViewModel {
                 clips: folder.clips.map(ClipDisplayMapper.map),
                 isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
             ))
+        }
+    }
+
+    func updateLastVisitedDate(at index: Int) {
+        Task {
+            let clip = folder.clips[index]
+            let updatedClip = Clip(
+                id: clip.id,
+                folderID: clip.folderID,
+                urlMetadata: clip.urlMetadata,
+                memo: clip.memo,
+                lastVisitedAt: Date.now,
+                createdAt: clip.createdAt,
+                updatedAt: Date.now,
+                deletedAt: clip.deletedAt,
+            )
+            _ = await updateClipUseCase.execute(clip: updatedClip)
         }
     }
 
