@@ -32,21 +32,35 @@ final class EditClipView: UIView {
         return stackView
     }()
 
+    let memoLabel: UILabel = {
+        let label = UILabel()
+        label.text = "메모"
+        label.font = .pretendard(size: 16, weight: .medium)
+        label.textColor = .black100
+        return label
+    }()
+
     let memoTextView: UITextView = {
         let textView = UITextView()
+        textView.font = .pretendard(size: 14, weight: .regular)
+        textView.textColor = .black100
+        textView.backgroundColor = .white900
+        textView.contentInset = .init(top: 12, left: 12, bottom: 24, right: 12)
         textView.layer.cornerRadius = 12
         textView.clipsToBounds = true
-        textView.textContainerInset = .init(top: 16, left: 16, bottom: 16, right: 16)
-        textView.font = .systemFont(ofSize: 16)
         textView.layer.borderWidth = 1
-        textView.layer.borderColor = UIColor.systemGray5.cgColor
+        textView.layer.borderColor = UIColor.black900.cgColor
+        textView.layer.shadowPath = UIBezierPath(
+            roundedRect: textView.bounds,
+            cornerRadius: textView.layer.cornerRadius
+        ).cgPath
         return textView
     }()
 
     let memoLimitLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
-        label.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
         return label
     }()
 
@@ -124,6 +138,7 @@ private extension EditClipView {
         [
             commonNavigationView,
             urlInfoStackView,
+            memoLabel,
             memoTextView,
             memoLimitLabel,
             folderLabel,
@@ -149,24 +164,28 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview().inset(20)
         }
 
+        memoLabel.snp.makeConstraints { make in
+            make.top.equalTo(urlInfoStackView.snp.bottom).offset(32)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
         memoTextView.snp.makeConstraints { make in
-            make.top.equalTo(urlInfoStackView.snp.bottom).offset(20)
-            make.directionalHorizontalEdges.equalToSuperview().inset(20)
-            make.height.equalTo(120)
+            make.top.equalTo(memoLabel.snp.bottom).offset(8)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(96)
         }
 
         memoLimitLabel.snp.makeConstraints { make in
-            make.top.equalTo(memoTextView.snp.bottom).offset(10)
-            make.right.equalToSuperview().inset(25)
+            make.right.bottom.equalTo(memoTextView).inset(12)
         }
 
         folderLabel.snp.makeConstraints { make in
-            make.top.equalTo(memoLimitLabel.snp.bottom).offset(40)
+            make.top.equalTo(memoTextView.snp.bottom).offset(40)
             make.leading.equalToSuperview().inset(28)
         }
 
         addFolderButton.snp.makeConstraints { make in
-            make.top.equalTo(memoLimitLabel.snp.bottom).offset(40)
+            make.top.equalTo(memoTextView.snp.bottom).offset(40)
             make.trailing.equalToSuperview().inset(28)
         }
 
