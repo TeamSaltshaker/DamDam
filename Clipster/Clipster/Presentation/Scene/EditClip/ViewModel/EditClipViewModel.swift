@@ -116,16 +116,17 @@ final class EditClipViewModel: ViewModel {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .editURLInputTextField(let urlText):
+            let trimmed = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
             print("\(Self.self) \(action)")
             return .merge(
-                .just(.updateURLInputText(urlText.trimmingCharacters(in: .whitespacesAndNewlines))),
+                .just(.updateURLInputText(trimmed)),
                 .fromAsync {
-                    try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
+                    try await self.checkURLValidityUseCase.execute(urlString: trimmed).get()
                 }
                 .map { .updateValidURL($0) }
                 .catchAndReturn(.updateValidURL(false)),
                 .fromAsync {
-                    try await self.parseURLMetadataUseCase.execute(urlString: urlText).get()
+                    try await self.parseURLMetadataUseCase.execute(urlString: trimmed).get()
                 }
                 .map { .updateURLMetadata(self.toURLMetaDisplay(entity: $0)) }
                 .catchAndReturn(.updateURLMetadata(nil))
