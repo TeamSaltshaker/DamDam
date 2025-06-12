@@ -18,5 +18,6 @@ private extension DeleteButton {
 
     func setAttributes() {
         setImage(.trashRed, for: .normal)
+        contentHorizontalAlignment = .trailing
     }
 }

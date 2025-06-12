@@ -140,6 +140,10 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
+        saveButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         urlInfoStackView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom).offset(20)
             make.directionalHorizontalEdges.equalToSuperview().inset(20)

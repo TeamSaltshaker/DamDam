@@ -11,7 +11,6 @@ final class CommonNavigationView: UIView {
     private let leftStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 26
         stackView.alignment = .center
         stackView.distribution = .equalSpacing
         return stackView
@@ -20,7 +19,6 @@ final class CommonNavigationView: UIView {
     private let rightStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 26
         stackView.alignment = .center
         stackView.distribution = .equalSpacing
         return stackView

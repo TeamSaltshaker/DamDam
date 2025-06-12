@@ -31,5 +31,7 @@ private extension SelectButton {
 
         setAttributedTitle(NSAttributedString(string: "선택", attributes: normalAttributes), for: .normal)
         setAttributedTitle(NSAttributedString(string: "선택", attributes: disabledAttributes), for: .disabled)
+
+        contentHorizontalAlignment = .trailing
     }
 }

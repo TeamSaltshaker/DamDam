@@ -349,7 +349,7 @@ private extension HomeView {
         addButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(24)
             make.centerY.equalToSuperview()
-            make.size.equalTo(44)
+            make.size.equalTo(48)
         }
 
         collectionView.snp.makeConstraints { make in
