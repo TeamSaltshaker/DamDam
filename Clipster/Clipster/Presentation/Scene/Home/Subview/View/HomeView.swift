@@ -39,10 +39,8 @@ final class HomeView: UIView {
         return label
     }()
 
-    private lazy var addButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(.plus, for: .normal)
-        button.tintColor = .black100
+    private lazy var addButton: AddButton = {
+        let button = AddButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
         return button
