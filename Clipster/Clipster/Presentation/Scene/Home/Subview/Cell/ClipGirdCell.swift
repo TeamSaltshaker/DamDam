@@ -29,6 +29,7 @@ final class ClipGridCell: UICollectionViewCell {
         textView.backgroundColor = .clear
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
+        textView.isUserInteractionEnabled = false
         return textView
     }()
 
