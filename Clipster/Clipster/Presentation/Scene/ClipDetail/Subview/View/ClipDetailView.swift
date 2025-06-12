@@ -105,6 +105,14 @@ private extension ClipDetailView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
+        editButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
+        deleteButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         urlMetadataView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)

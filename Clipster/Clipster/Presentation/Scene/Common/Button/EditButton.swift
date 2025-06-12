@@ -18,5 +18,6 @@ private extension EditButton {
 
     func setAttributes() {
         setImage(.pen, for: .normal)
+        contentHorizontalAlignment = .trailing
     }
 }

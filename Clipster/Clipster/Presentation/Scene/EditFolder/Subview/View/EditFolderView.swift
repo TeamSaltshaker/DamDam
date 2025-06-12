@@ -99,6 +99,14 @@ private extension EditFolderView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
+        backButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
+        saveButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)

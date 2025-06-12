@@ -1,11 +1,12 @@
 import UIKit
 
 final class BackButton: UIButton {
-    convenience init(_ title: String) {
+    convenience init(_ title: String?) {
         self.init(frame: .zero)
-        var config = configuration
-        config?.title = title
-        configuration = config
+
+        if let title = title {
+            setTitle(title, for: .normal)
+        }
     }
 
     override init(frame: CGRect) {
@@ -24,14 +25,24 @@ private extension BackButton {
     }
 
     func setAttributes() {
+        let hasTitle = (title(for: .normal)?.isEmpty == false)
+        let pointSize: CGFloat = hasTitle ? 12 : 16
+
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: pointSize, weight: .medium)
+        let image = UIImage(systemName: "chevron.left", withConfiguration: symbolConfig)?
+            .withTintColor(.black100, renderingMode: .alwaysOriginal)
+
         var config = UIButton.Configuration.plain()
-        config.image = .chevronLeft
-        config.imagePadding = 8
+        config.image = image
+        config.imagePadding = 4
         config.contentInsets = .zero
 
         configuration = config
 
         titleLabel?.font = .pretendard(size: 14, weight: .medium)
-        titleLabel?.textColor = .black100
+        setTitleColor(.black100, for: .normal)
+        setTitleColor(.black100, for: .highlighted)
+
+        contentHorizontalAlignment = .leading
     }
 }

@@ -61,6 +61,14 @@ private extension FolderSelectorView {
             make.height.equalTo(84)
         }
 
+        backButton.snp.makeConstraints { make in
+            make.height.equalTo(48)
+        }
+
+        selectButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         separator.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()

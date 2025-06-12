@@ -31,5 +31,7 @@ private extension SaveButton {
 
         setAttributedTitle(NSAttributedString(string: "저장", attributes: normalAttributes), for: .normal)
         setAttributedTitle(NSAttributedString(string: "저장", attributes: disabledAttributes), for: .disabled)
+
+        contentHorizontalAlignment = .trailing
     }
 }
