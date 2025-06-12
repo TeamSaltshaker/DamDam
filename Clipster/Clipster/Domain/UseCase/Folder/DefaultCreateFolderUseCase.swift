@@ -6,6 +6,6 @@ final class DefaultCreateFolderUseCase: CreateFolderUseCase {
     }
 
     func execute(_ folder: Folder) async -> Result<Void, DomainError> {
-        folderRepository.insertFolder(folder)
+        await folderRepository.insertFolder(folder)
     }
 }

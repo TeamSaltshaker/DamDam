@@ -8,6 +8,6 @@ final class DefaultFetchFolderUseCase: FetchFolderUseCase {
     }
 
     func execute(id: UUID) async -> Result<Folder, Error> {
-        folderRepository.fetchFolder(by: id).mapError { $0 as Error }
+        await folderRepository.fetchFolder(by: id).mapError { $0 as Error }
     }
 }

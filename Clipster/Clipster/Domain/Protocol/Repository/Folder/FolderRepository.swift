@@ -1,9 +1,9 @@
 import Foundation
 
 protocol FolderRepository {
-    func fetchFolder(by id: UUID) -> Result<Folder, DomainError>
-    func fetchTopLevelFolders() -> Result<[Folder], DomainError>
-    func insertFolder(_ folder: Folder) -> Result<Void, DomainError>
-    func updateFolder(_ folder: Folder) -> Result<Void, DomainError>
-    func deleteFolder(_ folder: Folder) -> Result<Void, DomainError>
+    func fetchFolder(by id: UUID) async -> Result<Folder, DomainError>
+    func fetchTopLevelFolders() async -> Result<[Folder], DomainError>
+    func insertFolder(_ folder: Folder) async -> Result<Void, DomainError>
+    func updateFolder(_ folder: Folder) async -> Result<Void, DomainError>
+    func deleteFolder(_ folder: Folder) async -> Result<Void, DomainError>
 }

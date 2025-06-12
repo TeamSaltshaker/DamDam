@@ -19,6 +19,6 @@ final class DefaultDeleteClipUseCase: DeleteClipUseCase {
             deletedAt: Date()
         )
 
-        return clipRepository.deleteClip(deletedClip).mapError { $0 as Error }
+        return await clipRepository.deleteClip(deletedClip).mapError { $0 as Error }
     }
 }

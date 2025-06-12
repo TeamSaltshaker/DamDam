@@ -6,6 +6,6 @@ final class DefaultUpdateFolderUseCase: UpdateFolderUseCase {
     }
 
     func execute(_ folder: Folder) async -> Result<Void, DomainError> {
-        folderRepository.updateFolder(folder)
+        await folderRepository.updateFolder(folder)
     }
 }
