@@ -79,18 +79,20 @@ private extension ClipDetailViewController {
             .map { $0.showDeleteConfirmation }
             .distinctUntilChanged()
             .filter { $0 }
+            .withLatestFrom(state.map { $0.clipDisplay.urlMetadata.title })
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
+            .subscribe { [weak self] title in
                 guard let self else { return }
 
-                let alert = UIAlertController(title: "삭제 확인", message: "이 클립을 정말 삭제하시겠습니까?", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "취소", style: .cancel) { _ in
-                    self.viewModel.action.accept(.deleteCanceled)
-                })
-                alert.addAction(UIAlertAction(title: "삭제", style: .destructive) { _ in
-                    self.viewModel.action.accept(.deleteConfirmed)
-                })
-                self.present(alert, animated: true)
+                self.presentDeleteAlert(
+                    title: title,
+                    onCancel: {
+                        self.viewModel.action.accept(.deleteCanceled)
+                    },
+                    onConfirm: {
+                        self.viewModel.action.accept(.deleteConfirmed)
+                    }
+                )
             }
             .disposed(by: disposeBag)
 
