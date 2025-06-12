@@ -92,7 +92,6 @@ final class HomeView: UIView {
         }
 
         dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-            print(item)
             switch item {
             case .clip(let clipItem):
                 return collectionView.dequeueConfiguredReusableCell(

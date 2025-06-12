@@ -9,7 +9,7 @@ final class UnvisitedClipListView: UIView {
         case tapCell(Int)
         case detail(Int)
         case edit(Int)
-        case delete(Int)
+        case delete(index: Int, title: String)
     }
 
     typealias Section = Int
@@ -18,7 +18,7 @@ final class UnvisitedClipListView: UIView {
     private let disposeBag = DisposeBag()
     let action = PublishRelay<Action>()
 
-    private var dataSource: UITableViewDiffableDataSource<Section, Item>?
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
     private lazy var navigationView: CommonNavigationView = {
         let view = CommonNavigationView()
@@ -29,14 +29,15 @@ final class UnvisitedClipListView: UIView {
 
     private let backButton = BackButton()
 
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
-        tableView.separatorStyle = .none
-        tableView.rowHeight = 72
-        tableView.register(ClipCell.self, forCellReuseIdentifier: ClipCell.identifier)
-        tableView.delegate = self
-        return tableView
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: createCollectionViewLayout()
+        )
+        collectionView.delegate = self
+        collectionView.contentInset.top = 24
+        collectionView.backgroundColor = .white800
+        return collectionView
     }()
 
     override init(frame: CGRect) {
@@ -50,36 +51,73 @@ final class UnvisitedClipListView: UIView {
     }
 
     private func configureDataSource() {
-        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: ClipCell.identifier,
-                for: indexPath
-            ) as? ClipCell
-            else { return UITableViewCell() }
-            cell.selectionStyle = .none
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipListCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
-            return cell
+        }
+
+        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
+            collectionView.dequeueConfiguredReusableCell(
+                using: clipCellRegistration,
+                for: indexPath,
+                item: item
+            )
         }
     }
 
     func setDisplay(_ display: [ClipDisplay]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([0])
-        snapshot.appendItems(display, toSection: 0)
+        snapshot.appendItems(display)
         dataSource?.apply(snapshot)
     }
 }
 
-extension UnvisitedClipListView: UITableViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        contextMenuConfigurationForRowAt indexPath: IndexPath,
+private extension UnvisitedClipListView {
+    func createCollectionViewLayout() -> UICollectionViewLayout {
+        UICollectionViewCompositionalLayout { [weak self] _, env in
+            var config = UICollectionLayoutListConfiguration(appearance: .plain)
+            config.showsSeparators = false
+            config.backgroundColor = .white800
+            config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
+                guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return nil }
+
+                let delete = UIContextualAction(
+                    style: .destructive,
+                    title: "삭제"
+                ) { [weak self] _, _, completion in
+                    self?.action.accept(.delete(
+                        index: indexPath.item,
+                        title: item.urlMetadata.title
+                    ))
+                    completion(true)
+                }
+
+                delete.image = .trashWhite
+                delete.backgroundColor = .red600
+
+                return UISwipeActionsConfiguration(actions: [delete])
+            }
+            let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+            section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
+            section.interGroupSpacing = 8
+
+            return section
+        }
+    }
+}
+
+extension UnvisitedClipListView: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
         UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil
-        ) { _ in
+        ) { [weak self] _ in
+            guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return nil }
+
             let info = UIAction(
                 title: "상세정보",
                 image: UIImage(systemName: "magnifyingglass")
@@ -99,32 +137,11 @@ extension UnvisitedClipListView: UITableViewDelegate {
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { [weak self] _ in
-                self?.action.accept(.delete(indexPath.item))
+                self?.action.accept(.delete(index: indexPath.item, title: item.urlMetadata.title))
             }
 
         return UIMenu(title: "", children: [info, edit, delete])
         }
-    }
-}
-
-extension UnvisitedClipListView {
-    func tableView(
-        _ tableView: UITableView,
-        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
-    ) -> UISwipeActionsConfiguration? {
-        let delete = UIContextualAction(
-            style: .destructive,
-            title: nil
-        ) { [weak self] _, _, completion in
-            guard let self = self else { return }
-            action.accept(.delete(indexPath.row))
-            completion(true)
-        }
-
-        delete.image = UIImage(systemName: "trash")
-        delete.backgroundColor = .systemRed
-
-        return UISwipeActionsConfiguration(actions: [delete])
     }
 }
 
@@ -137,13 +154,13 @@ private extension UnvisitedClipListView {
     }
 
     func setAttributes() {
-        backgroundColor = #colorLiteral(red: 0.9813517928, green: 0.9819430709, blue: 1, alpha: 1)
+        backgroundColor = .white800
     }
 
     func setHierarchy() {
         [
-            tableView,
-            navigationView
+            navigationView,
+            collectionView
         ].forEach { addSubview($0) }
     }
 
@@ -154,7 +171,11 @@ private extension UnvisitedClipListView {
             make.height.equalTo(56)
         }
 
-        tableView.snp.makeConstraints { make in
+        backButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
+        collectionView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -162,13 +183,13 @@ private extension UnvisitedClipListView {
     }
 
     func setBindings() {
-        tableView.rx.itemSelected
-            .map { Action.tapCell($0.row) }
+        backButton.rx.tap
+            .map { Action.tapBack }
             .bind(to: action)
             .disposed(by: disposeBag)
 
-        backButton.rx.tap
-            .map { Action.tapBack }
+        collectionView.rx.itemSelected
+            .map { Action.tapCell($0.item) }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
