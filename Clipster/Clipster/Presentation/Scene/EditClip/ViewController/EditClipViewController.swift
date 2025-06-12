@@ -71,6 +71,14 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .map(\.navigationTitle)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.commonNavigationView.setTitle($0)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text

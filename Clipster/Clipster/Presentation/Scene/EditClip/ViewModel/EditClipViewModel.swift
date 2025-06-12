@@ -48,6 +48,7 @@ final class EditClipViewModel: ViewModel {
         var currentFolder: Folder?
         var isSuccessfullyEdited: Bool = false
         var urlTextFieldBorderColor: ColorResource = .black900
+        var navigationTitle: String
     }
 
     var state: BehaviorRelay<State>
@@ -74,7 +75,8 @@ final class EditClipViewModel: ViewModel {
         state = BehaviorRelay(value: State(
             type: urlText.isEmpty ? .create : .shareExtension,
             urlInputText: urlText,
-            currentFolder: currentFolder
+            currentFolder: currentFolder,
+            navigationTitle: "클립 추가"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
@@ -99,7 +101,8 @@ final class EditClipViewModel: ViewModel {
             urlInputText: clip.urlMetadata.url.absoluteString,
             memoText: clip.memo,
             memoLimit: "\(clip.memo.count)/100",
-            clip: clip
+            clip: clip,
+            navigationTitle: "클립 수정"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
