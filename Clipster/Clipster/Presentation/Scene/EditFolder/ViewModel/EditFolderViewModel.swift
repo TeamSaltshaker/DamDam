@@ -13,7 +13,8 @@ enum EditFolderAction {
     case folderViewTapped
     case saveSucceeded(Folder)
     case saveFailed(Error)
-    case folderSelectorDismissed(selected: Folder?)
+    case selectFolder(selected: Folder?)
+    case folderSelectorDismissed
 }
 
 struct EditFolderState {
@@ -128,15 +129,17 @@ final class EditFolderViewModel {
                     print("\(Self.self): save failed with error: \(error.localizedDescription)")
                     newState.isProcessing = false
                     newState.alertMessage = error.localizedDescription
-                case .folderSelectorDismissed(let selected):
-                    print("\(Self.self): folder selector dismissed with selection → \(selected?.title ?? "home")")
-                    newState.shouldNavigateToFolderSelector = false
+                case .selectFolder(let selected):
+                    print("\(Self.self): selected folder  \(selected?.title ?? "home")")
                     newState.parentFolder = selected
                     if let selected {
                         newState.parentFolderDisplay = FolderDisplayMapper.map(selected)
                     } else {
                         newState.parentFolderDisplay = nil
                     }
+                case .folderSelectorDismissed:
+                    print("\(Self.self): folder selector dismissed")
+                    newState.shouldNavigateToFolderSelector = false
                 }
 
                 return newState

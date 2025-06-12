@@ -9,6 +9,7 @@ final class FolderSelectorViewController: UIViewController {
     private let folderSelectorView = FolderSelectorView()
 
     var onSelectionComplete: ((Folder?) -> Void)?
+    var onDismissed: (() -> Void)?
 
     init(viewModel: FolderSelectorViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
@@ -32,7 +33,7 @@ final class FolderSelectorViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        viewModel.action.accept(.viewWillDisappear)
+        onDismissed?()
     }
 }
 
