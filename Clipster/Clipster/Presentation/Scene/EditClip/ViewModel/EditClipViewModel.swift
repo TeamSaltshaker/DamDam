@@ -11,6 +11,7 @@ final class EditClipViewModel: ViewModel {
 
     enum Action {
         case editURLInputTextField(String)
+        case editingURLTextField
         case editMomo(String)
         case folderViewTapped
         case editFolder(Folder?)
@@ -30,11 +31,13 @@ final class EditClipViewModel: ViewModel {
         case updateCurrentFolder(Folder?)
         case updateSuccessfullyEdited(Bool)
         case updateURLTextFieldBorderColor(ColorResource)
+        case updateIsLoading(Bool)
     }
 
     struct State {
         var type: EditClipType
         var urlInputText: String
+        var isLoading = false
         var isHiddenURLMetadataStackView = true
         var isHiddenURLValidationStackView = true
         var memoText: String = ""
@@ -131,6 +134,8 @@ final class EditClipViewModel: ViewModel {
                 .map { .updateURLMetadata(self.toURLMetaDisplay(entity: $0)) }
                 .catchAndReturn(.updateURLMetadata(nil))
             )
+        case .editingURLTextField:
+            return .just(.updateIsLoading(true))
         case .editMomo(let memoText):
             print("\(Self.self) \(action)")
             return .just(.updateMemo(memoText))
@@ -164,8 +169,8 @@ final class EditClipViewModel: ViewModel {
                     lastVisitedAt: clip.lastVisitedAt,
                     createdAt: clip.createdAt,
                     updatedAt: clip.memo != state.value.memoText &&
-                                clip.urlMetadata.url != urlMetadata.url &&
-                                clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
+                    clip.urlMetadata.url != urlMetadata.url &&
+                    clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
                     deletedAt: clip.deletedAt
                 )
                 return .fromAsync {
@@ -244,6 +249,7 @@ final class EditClipViewModel: ViewModel {
             if !state.urlInputText.isEmpty {
                 newState.isHiddenURLValidationStackView = false
             }
+            newState.isLoading = false
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadata = urlMetaDisplay
             newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
@@ -255,6 +261,10 @@ final class EditClipViewModel: ViewModel {
             newState.isSuccessfullyEdited = value
         case .updateURLTextFieldBorderColor(let colorResource):
             newState.urlTextFieldBorderColor = colorResource
+        case .updateIsLoading(let value):
+            newState.isLoading = value
+            newState.urlValidationLabelText = "URL 분석 중..."
+            newState.urlValidationImageName = ""
         }
         return newState
     }
