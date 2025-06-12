@@ -13,7 +13,7 @@ final class ClipGridCell: UICollectionViewCell {
 
     private let visitIndicatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .blue400
         view.layer.cornerRadius = 6
         view.isHidden = true
         return view
