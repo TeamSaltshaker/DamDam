@@ -52,7 +52,7 @@ private extension EditClipViewController {
             .map(\.memoText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.memoTextView.rx.text)
+            .drive(editClipView.memoView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -131,7 +131,7 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.memoTextView
+        editClipView.memoView.memoTextView
             .rx
             .text
             .orEmpty
@@ -142,21 +142,21 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.memoTextView
+        editClipView.memoView.memoTextView
             .rx
             .text
             .orEmpty
             .distinctUntilChanged()
             .map { String($0.prefix(100)) }
             .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.memoTextView.rx.text)
+            .drive(editClipView.memoView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
             .map(\.memoLimit)
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: "0/100")
-            .drive(editClipView.memoLimitLabel.rx.text)
+            .drive(editClipView.memoView.memoLimitLabel.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
