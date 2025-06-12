@@ -6,6 +6,10 @@ final class DefaultFetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase {
     }
 
     func execute() async -> Result<[Clip], Error> {
-        await clipRepository.fetchUnvisitedClips().mapError { $0 as Error }
+        await clipRepository.fetchUnvisitedClips()
+            .map { clips in
+                clips.sorted { $0.createdAt > $1.createdAt }
+            }
+            .mapError { $0 as Error }
     }
 }
