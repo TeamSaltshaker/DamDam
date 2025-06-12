@@ -17,6 +17,15 @@ final class HomeView: UIView {
     enum Section: Int, CaseIterable {
         case clip
         case folder
+
+        func logicalIndexPath(for item: Int) -> IndexPath {
+            switch self {
+            case .clip:
+                return IndexPath(item: item, section: 0)
+            case .folder:
+                return IndexPath(item: item, section: 1)
+            }
+        }
     }
 
     enum Item: Hashable {
@@ -25,8 +34,8 @@ final class HomeView: UIView {
 
         var displayTitle: String {
             switch self {
-            case .clip(let clip): return clip.urlMetadata.title
-            case .folder(let folder): return folder.title
+            case .clip(let clip): clip.urlMetadata.title
+            case .folder(let folder): folder.title
             }
         }
     }
@@ -360,12 +369,7 @@ private extension HomeView {
         guard let section = self.dataSource?.sectionIdentifier(for: indexPath.section)
         else { return indexPath }
 
-        switch section {
-        case .clip:
-            return IndexPath(item: indexPath.item, section: 0)
-        case .folder:
-            return IndexPath(item: indexPath.item, section: 1)
-        }
+        return section.logicalIndexPath(for: indexPath.item)
     }
 }
 
