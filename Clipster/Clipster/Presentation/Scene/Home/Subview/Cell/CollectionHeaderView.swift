@@ -5,7 +5,7 @@ import UIKit
 
 final class CollectionHeaderView: UICollectionReusableView {
     let showAllTapped = PublishRelay<Void>()
-    private let disposeBag = DisposeBag()
+    private(set) var disposeBag = DisposeBag()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -40,13 +40,19 @@ final class CollectionHeaderView: UICollectionReusableView {
     func setShowAllButtonVisible(_ isVisible: Bool) {
         showAllButton.isHidden = !isVisible
     }
+
+    func setBindings() {
+        disposeBag = DisposeBag()
+        showAllButton.rx.tap
+            .bind(to: showAllTapped)
+            .disposed(by: disposeBag)
+    }
 }
 
 private extension CollectionHeaderView {
     func configure() {
         setHierarchy()
         setConstraints()
-        setBindings()
     }
 
     func setHierarchy() {
@@ -67,11 +73,5 @@ private extension CollectionHeaderView {
             make.leading.greaterThanOrEqualTo(titleLabel).offset(12)
             make.trailing.equalToSuperview().inset(3.49)
         }
-    }
-
-    func setBindings() {
-        showAllButton.rx.tap
-            .bind(to: showAllTapped)
-            .disposed(by: disposeBag)
     }
 }
