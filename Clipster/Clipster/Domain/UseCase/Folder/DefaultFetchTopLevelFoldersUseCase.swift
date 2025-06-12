@@ -6,6 +6,10 @@ final class DefaultFetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase {
     }
 
     func execute() async -> Result<[Folder], Error> {
-        await folderRepository.fetchTopLevelFolders().mapError { $0 as Error }
+        await folderRepository.fetchTopLevelFolders()
+            .map { folders in
+                folders.sorted { $0.createdAt < $1.createdAt }
+            }
+            .mapError { $0 as Error }
     }
 }
