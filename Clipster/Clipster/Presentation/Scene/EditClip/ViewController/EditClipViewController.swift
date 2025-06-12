@@ -294,5 +294,19 @@ private extension EditClipViewController {
                 self?.viewModel.action.accept(.saveClip)
             }
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map { $0.currentFolder == nil }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.folderView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map { $0.currentFolder != nil }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.emptyView.rx.isHidden)
+            .disposed(by: disposeBag)
     }
 }

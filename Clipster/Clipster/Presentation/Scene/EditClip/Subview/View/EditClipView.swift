@@ -101,6 +101,8 @@ final class EditClipView: UIView {
         return imageView
     }()
 
+    let emptyView = EmptyView()
+
     let folderViewTapGesture = UITapGestureRecognizer()
 
     override init(frame: CGRect) {
@@ -150,7 +152,8 @@ private extension EditClipView {
             memoLimitLabel,
             folderLabel,
             addFolderButton,
-            folderView
+            folderView,
+            emptyView
         ].forEach {
             addSubview($0)
         }
@@ -214,6 +217,12 @@ private extension EditClipView {
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
+        }
+
+        emptyView.snp.makeConstraints { make in
+            make.top.equalTo(folderLabel.snp.bottom).offset(12)
+            make.height.equalTo(160)
+            make.centerX.equalToSuperview()
         }
     }
 }
