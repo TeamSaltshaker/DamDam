@@ -34,8 +34,10 @@ struct EditFolderState {
         switch mode {
         case .add:
             return true
-        case .edit:
-            return trimmed != initialFolderTitle
+        case .edit(_, let initialFolder):
+            let isTitleChanged = trimmed != initialFolderTitle
+            let isParentChanged = initialFolder.parentFolderID != parentFolder?.id
+            return isTitleChanged || isParentChanged
         }
     }
 
