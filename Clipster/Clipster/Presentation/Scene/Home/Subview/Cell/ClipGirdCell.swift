@@ -13,7 +13,7 @@ final class ClipGridCell: UICollectionViewCell {
 
     private let visitIndicatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .blue400
         view.layer.cornerRadius = 6
         view.isHidden = true
         return view
@@ -29,6 +29,7 @@ final class ClipGridCell: UICollectionViewCell {
         textView.backgroundColor = .clear
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
+        textView.isUserInteractionEnabled = false
         return textView
     }()
 
@@ -68,9 +69,9 @@ private extension ClipGridCell {
     }
 
     func setAttributes() {
-        backgroundColor = .white900
-        layer.cornerRadius = 12
-        clipsToBounds = true
+        contentView.backgroundColor = .white900
+        contentView.layer.cornerRadius = 12
+        contentView.clipsToBounds = true
     }
 
     func setHierarchy() {
