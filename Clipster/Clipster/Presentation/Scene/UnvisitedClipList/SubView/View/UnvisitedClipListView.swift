@@ -9,7 +9,7 @@ final class UnvisitedClipListView: UIView {
         case tapCell(Int)
         case detail(Int)
         case edit(Int)
-        case delete(Int)
+        case delete(index: Int, title: String)
     }
 
     typealias Section = Int
@@ -75,17 +75,20 @@ final class UnvisitedClipListView: UIView {
 private extension UnvisitedClipListView {
     func createCollectionViewLayout() -> UICollectionViewLayout {
         UICollectionViewCompositionalLayout { [weak self] _, env in
-            guard let self else { return nil }
-
             var config = UICollectionLayoutListConfiguration(appearance: .plain)
             config.showsSeparators = false
             config.backgroundColor = .white800
-            config.trailingSwipeActionsConfigurationProvider = { indexPath in
+            config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
+                guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return nil }
+
                 let delete = UIContextualAction(
                     style: .destructive,
                     title: "삭제"
-                ) { _, _, completion in
-                    self.action.accept(.delete(indexPath.item))
+                ) { [weak self] _, _, completion in
+                    self?.action.accept(.delete(
+                        index: indexPath.item,
+                        title: item.urlMetadata.title
+                    ))
                     completion(true)
                 }
 
@@ -112,7 +115,9 @@ extension UnvisitedClipListView: UICollectionViewDelegate {
         UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil
-        ) { _ in
+        ) { [weak self] _ in
+            guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return nil }
+
             let info = UIAction(
                 title: "상세정보",
                 image: UIImage(systemName: "magnifyingglass")
@@ -132,32 +137,11 @@ extension UnvisitedClipListView: UICollectionViewDelegate {
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { [weak self] _ in
-                self?.action.accept(.delete(indexPath.item))
+                self?.action.accept(.delete(index: indexPath.item, title: item.urlMetadata.title))
             }
 
         return UIMenu(title: "", children: [info, edit, delete])
         }
-    }
-}
-
-extension UnvisitedClipListView {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        trailingSwipeActionsConfigurationForItemAt indexPath: IndexPath
-    ) -> UISwipeActionsConfiguration? {
-        let delete = UIContextualAction(
-            style: .destructive,
-            title: nil
-        ) { [weak self] _, _, completion in
-            guard let self = self else { return }
-            action.accept(.delete(indexPath.row))
-            completion(true)
-        }
-
-        delete.image = UIImage(systemName: "trash")
-        delete.backgroundColor = .systemRed
-
-        return UISwipeActionsConfiguration(actions: [delete])
     }
 }
 

@@ -56,8 +56,10 @@ private extension UnvisitedClipListViewController {
                     owner.unvisitedClipListViewModel.action.accept(.tapDetail(index))
                 case .edit(let index):
                     owner.unvisitedClipListViewModel.action.accept(.tapEdit(index))
-                case .delete(let index):
-                    owner.unvisitedClipListViewModel.action.accept(.tapDelete(index))
+                case .delete(let index, let title):
+                    owner.presentDeleteAlert(title: title) { [weak self] in
+                        self?.unvisitedClipListViewModel.action.accept(.tapDelete(index))
+                    }
                 }
             }
             .disposed(by: disposeBag)
