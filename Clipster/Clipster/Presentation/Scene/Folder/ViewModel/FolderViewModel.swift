@@ -21,7 +21,8 @@ final class FolderViewModel {
     }
 
     enum Navigation {
-        case editClipView(Clip?)
+        case editClipViewForAdd(Folder)
+        case editClipViewForEdit(Clip)
         case editFolderView(Folder, Folder?)
         case folderView(Folder)
         case clipDetailView(Clip)
@@ -144,7 +145,7 @@ private extension FolderViewModel {
     }
 
     func navigateToAddClipView() {
-        navigation.accept(.editClipView(nil))
+        navigation.accept(.editClipViewForAdd(folder))
     }
 
     func navigateToAddFolderView() {
@@ -168,7 +169,7 @@ private extension FolderViewModel {
             navigation.accept(.editFolderView(folder, selectedFolder))
         case 1:
             let selectedClip = folder.clips[indexPath.item]
-            navigation.accept(.editClipView(selectedClip))
+            navigation.accept(.editClipViewForEdit(selectedClip))
         default:
             break
         }

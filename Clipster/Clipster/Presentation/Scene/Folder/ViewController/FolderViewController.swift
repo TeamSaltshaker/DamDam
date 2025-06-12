@@ -58,13 +58,12 @@ private extension FolderViewController {
             .drive { [weak self] navigation in
                 guard let self else { return }
                 switch navigation {
-                case .editClipView(let clip):
-                    let vm: EditClipViewModel
-                    if let clip = clip {
-                        vm = diContainer.makeEditClipViewModel(clip: clip)
-                    } else {
-                        vm = diContainer.makeEditClipViewModel()
-                    }
+                case .editClipViewForAdd(let folder):
+                    let vm = diContainer.makeEditClipViewModel(folder: folder)
+                    let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
+                case .editClipViewForEdit(let clip):
+                    let vm = diContainer.makeEditClipViewModel(clip: clip)
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .editFolderView(let parentFolder, let folder):
