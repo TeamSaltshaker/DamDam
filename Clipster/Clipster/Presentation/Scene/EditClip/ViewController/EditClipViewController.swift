@@ -33,11 +33,16 @@ final class EditClipViewController: UIViewController {
 private extension EditClipViewController {
     func configure() {
         setAttributes()
+        setDelegates()
         setBindings()
     }
 
     func setAttributes() {
         view.backgroundColor = .white800
+    }
+
+    func setDelegates() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
@@ -309,5 +314,11 @@ private extension EditClipViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.emptyView.rx.isHidden)
             .disposed(by: disposeBag)
+    }
+}
+
+extension EditClipViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }

@@ -1,6 +1,6 @@
 import RxCocoa
-import SafariServices
 import RxSwift
+import SafariServices
 import UIKit
 
 final class UnvisitedClipListViewController: UIViewController {
@@ -38,11 +38,16 @@ final class UnvisitedClipListViewController: UIViewController {
 private extension UnvisitedClipListViewController {
     func configure() {
         setAttributes()
+        setDelegates()
         setBindings()
     }
 
     func setAttributes() {
         title = "방문하지 않은 클립"
+    }
+
+    func setDelegates() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
@@ -101,5 +106,11 @@ private extension UnvisitedClipListViewController {
                 }
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension UnvisitedClipListViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }

@@ -35,7 +35,12 @@ final class EditFolderViewController: UIViewController {
 
 private extension EditFolderViewController {
     func configure() {
+        setDelegates()
         setBindings()
+    }
+
+    func setDelegates() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
@@ -153,5 +158,11 @@ private extension EditFolderViewController {
             .map { _ in .folderViewTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
+    }
+}
+
+extension EditFolderViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }
