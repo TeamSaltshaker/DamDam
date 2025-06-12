@@ -225,7 +225,7 @@ final class EditClipViewModel: ViewModel {
             newState.memoLimit = "\(memoText.count)/100"
         case .updateValidURL(let result):
             newState.isURLValid = result
-            newState.urlValidationImageName = result ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+            newState.urlValidationImageName = result ? "CheckBlue" : "XRed"
             newState.urlValidationLabelText = result ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
             if !state.urlInputText.isEmpty {
                 newState.isHiddenURLValidationStackView = false

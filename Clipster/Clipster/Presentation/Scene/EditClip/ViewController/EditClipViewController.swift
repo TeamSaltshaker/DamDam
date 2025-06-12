@@ -130,7 +130,7 @@ private extension EditClipViewController {
 
         viewModel.state
             .map(\.urlValidationImageName)
-            .map { UIImage(systemName: $0) }
+            .map { UIImage(named: $0) }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
