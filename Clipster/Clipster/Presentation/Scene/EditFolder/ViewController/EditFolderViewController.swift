@@ -29,6 +29,7 @@ final class EditFolderViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        hideKeyboardWhenTappedBackground()
     }
 }
 
