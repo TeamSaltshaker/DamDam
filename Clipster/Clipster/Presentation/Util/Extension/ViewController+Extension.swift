@@ -14,6 +14,7 @@ extension UIViewController {
     func presentDeleteAlert(
         title: String,
         message: String = "삭제하겠습니까?",
+        onCancel: @escaping () -> Void = {},
         onConfirm: @escaping () -> Void
     ) {
         let trimmedTitle = title.count > 20
