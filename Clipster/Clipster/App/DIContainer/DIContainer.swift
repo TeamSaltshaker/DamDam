@@ -158,7 +158,8 @@ final class DIContainer {
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
-            deleteFolderUseCase: makeDeleteFolderUseCase()
+            deleteFolderUseCase: makeDeleteFolderUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 
