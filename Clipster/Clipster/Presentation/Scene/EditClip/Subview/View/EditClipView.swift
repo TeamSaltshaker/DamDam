@@ -128,6 +128,7 @@ private extension EditClipView {
 
     func setHierarchy() {
         [
+            urlMetadataStackView,
             urlLabel,
             urlInputTextField,
             urlValidationStacKView
@@ -144,7 +145,6 @@ private extension EditClipView {
 
         [
             commonNavigationView,
-            urlMetadataStackView,
             urlStackView,
             memoLabel,
             memoTextView,
@@ -163,13 +163,10 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
-        urlMetadataStackView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
-        }
+        urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
 
         urlStackView.snp.makeConstraints { make in
-            make.top.equalTo(urlMetadataStackView.snp.bottom).offset(32)
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 

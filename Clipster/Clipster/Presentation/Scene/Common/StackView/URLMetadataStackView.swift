@@ -30,9 +30,9 @@ final class URLMetadataStackView: UIStackView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.font = .pretendard(size: 16, weight: .semiBold)
         label.numberOfLines = 2
-        label.textColor = .label
+        label.textColor = .black100
         label.text = " "
         return label
     }()
@@ -76,6 +76,17 @@ private extension URLMetadataStackView {
         spacing = 12
         distribution = .fillProportionally
         alignment = .top
+        backgroundColor = .white900
+        layer.cornerRadius = 12
+        clipsToBounds = true
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.black900.cgColor
+        layer.shadowPath = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: layer.cornerRadius
+        ).cgPath
+        layoutMargins = UIEdgeInsets(top: 12, left: 20, bottom: 12, right: 20)
+        isLayoutMarginsRelativeArrangement = true
     }
 
     func setHierarchy() {
@@ -90,8 +101,9 @@ private extension URLMetadataStackView {
 
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints { make in
-            make.width.equalTo(80)
-            make.height.equalTo(thumbnailImageView.snp.width)
+            make.width.equalTo(96)
+//            make.height.equalTo(thumbnailImageView.snp.width)
+            make.height.equalTo(72)
         }
     }
 }
