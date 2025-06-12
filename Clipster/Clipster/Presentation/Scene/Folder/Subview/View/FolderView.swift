@@ -125,6 +125,10 @@ private extension FolderView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
+        backButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         addButton.snp.makeConstraints { make in
             make.size.equalTo(48)
         }
