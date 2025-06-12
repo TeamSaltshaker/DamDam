@@ -17,6 +17,8 @@ final class EditClipViewModel: ViewModel {
         case saveClip
         case fetchFolder
         case fetchTopLevelFolder
+        case editBeginURLTextField
+        case editEndURLTextField
     }
 
     enum Mutation {
@@ -27,6 +29,7 @@ final class EditClipViewModel: ViewModel {
         case updateFolderViewTapped(Bool)
         case updateCurrentFolder(Folder?)
         case updateSuccessfullyEdited(Bool)
+        case updateURLTextFieldBorderColor(ColorResource)
     }
 
     struct State {
@@ -43,7 +46,9 @@ final class EditClipViewModel: ViewModel {
         var isFolderViewTapped: Bool = false
         var clip: Clip?
         var currentFolder: Folder?
-        var isSuccessfullyEdited: Bool = false // binding
+        var isSuccessfullyEdited: Bool = false
+        var urlTextFieldBorderColor: ColorResource = .black900
+        var navigationTitle: String
     }
 
     var state: BehaviorRelay<State>
@@ -70,7 +75,8 @@ final class EditClipViewModel: ViewModel {
         state = BehaviorRelay(value: State(
             type: urlText.isEmpty ? .create : .shareExtension,
             urlInputText: urlText,
-            currentFolder: currentFolder
+            currentFolder: currentFolder,
+            navigationTitle: "클립 추가"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
@@ -95,7 +101,8 @@ final class EditClipViewModel: ViewModel {
             urlInputText: clip.urlMetadata.url.absoluteString,
             memoText: clip.memo,
             memoLimit: "\(clip.memo.count)/100",
-            clip: clip
+            clip: clip,
+            navigationTitle: "클립 수정"
         ))
         self.checkURLValidityUseCase = checkURLValidityUseCase
         self.parseURLMetadataUseCase = parseURLMetadataUseCase
@@ -111,7 +118,7 @@ final class EditClipViewModel: ViewModel {
         case .editURLInputTextField(let urlText):
             print("\(Self.self) \(action)")
             return .merge(
-                .just(.updateURLInputText(urlText)),
+                .just(.updateURLInputText(urlText.trimmingCharacters(in: .whitespacesAndNewlines))),
                 .fromAsync {
                     try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
                 }
@@ -209,6 +216,12 @@ final class EditClipViewModel: ViewModel {
             .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
+        case .editBeginURLTextField:
+            print("\(Self.self) \(action)")
+            return .just(.updateURLTextFieldBorderColor(.blue600))
+        case .editEndURLTextField:
+            print("\(Self.self) \(action)")
+            return .just(.updateURLTextFieldBorderColor(.black900))
         }
     }
 
@@ -225,7 +238,7 @@ final class EditClipViewModel: ViewModel {
             newState.memoLimit = "\(memoText.count)/100"
         case .updateValidURL(let result):
             newState.isURLValid = result
-            newState.urlValidationImageName = result ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+            newState.urlValidationImageName = result ? "CheckBlue" : "XRed"
             newState.urlValidationLabelText = result ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
             if !state.urlInputText.isEmpty {
                 newState.isHiddenURLValidationStackView = false
@@ -239,6 +252,8 @@ final class EditClipViewModel: ViewModel {
             newState.currentFolder = newFolder
         case .updateSuccessfullyEdited(let value):
             newState.isSuccessfullyEdited = value
+        case .updateURLTextFieldBorderColor(let colorResource):
+            newState.urlTextFieldBorderColor = colorResource
         }
         return newState
     }

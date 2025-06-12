@@ -5,14 +5,13 @@ final class URLValidationStackView: UIStackView {
     let statusImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .none
-        imageView.tintColor = .green
         return imageView
     }()
 
     let statusLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
-        label.font = .systemFont(ofSize: 13, weight: .light)
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
         label.text = " "
         return label
     }()

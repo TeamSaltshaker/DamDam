@@ -37,7 +37,7 @@ private extension EditClipViewController {
     }
 
     func setAttributes() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white800
     }
 
     func setBindings() {
@@ -52,7 +52,7 @@ private extension EditClipViewController {
             .map(\.memoText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.memoTextView.rx.text)
+            .drive(editClipView.memoView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -71,6 +71,14 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
+        viewModel.state
+            .map(\.navigationTitle)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.commonNavigationView.setTitle($0)
+            }
+            .disposed(by: disposeBag)
+
         editClipView.urlInputTextField
             .rx
             .text
@@ -80,6 +88,29 @@ private extension EditClipViewController {
             .drive { [weak self] in
                 self?.viewModel.action.accept(.editURLInputTextField($0))
             }
+            .disposed(by: disposeBag)
+
+        editClipView.urlInputTextField
+            .rx
+            .controlEvent(.editingDidBegin)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.editBeginURLTextField)
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.urlInputTextField
+            .rx
+            .controlEvent(.editingDidEnd)
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.editEndURLTextField)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.urlTextFieldBorderColor)
+            .map { UIColor(resource: $0).cgColor }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlInputTextField.layer.rx.borderColor)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -100,7 +131,7 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.memoTextView
+        editClipView.memoView.memoTextView
             .rx
             .text
             .orEmpty
@@ -111,26 +142,26 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.memoTextView
+        editClipView.memoView.memoTextView
             .rx
             .text
             .orEmpty
             .distinctUntilChanged()
             .map { String($0.prefix(100)) }
             .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.memoTextView.rx.text)
+            .drive(editClipView.memoView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
             .map(\.memoLimit)
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: "0/100")
-            .drive(editClipView.memoLimitLabel.rx.text)
+            .drive(editClipView.memoView.memoLimitLabel.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
             .map(\.urlValidationImageName)
-            .map { UIImage(systemName: $0) }
+            .map { UIImage(named: $0) }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
@@ -262,6 +293,20 @@ private extension EditClipViewController {
             .subscribe { [weak self] _ in
                 self?.viewModel.action.accept(.saveClip)
             }
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map { $0.currentFolder == nil }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.folderView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map { $0.currentFolder != nil }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.emptyView.rx.isHidden)
             .disposed(by: disposeBag)
     }
 }

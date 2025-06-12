@@ -6,23 +6,30 @@ final class EditClipView: UIView {
     let backButton = BackButton()
     let saveButton = SaveButton()
 
-    private let urlInfoStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        return stackView
-    }()
-
     let urlMetadataStackView: URLMetadataStackView = {
         let stackView = URLMetadataStackView(type: .edit)
         stackView.isHidden = true
         return stackView
     }()
 
-    let urlInputTextField: UITextField = {
-        let textField = UITextField()
+    private let urlStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        return stackView
+    }()
+
+    let urlLabel: UILabel = {
+        let label = UILabel()
+        label.text = "URL"
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
+        return label
+    }()
+
+    let urlInputTextField: CommonTextField = {
+        let textField = CommonTextField()
         textField.placeholder = "URL 입력"
-        textField.borderStyle = .roundedRect
         return textField
     }()
 
@@ -32,29 +39,13 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    let memoTextView: UITextView = {
-        let textView = UITextView()
-        textView.layer.cornerRadius = 12
-        textView.clipsToBounds = true
-        textView.textContainerInset = .init(top: 16, left: 16, bottom: 16, right: 16)
-        textView.font = .systemFont(ofSize: 16)
-        textView.layer.borderWidth = 1
-        textView.layer.borderColor = UIColor.systemGray5.cgColor
-        return textView
-    }()
-
-    let memoLimitLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .secondaryLabel
-        label.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-        return label
-    }()
+    let memoView = MemoView()
 
     let folderLabel: UILabel = {
         let label = UILabel()
         label.text = "저장폴더"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
         return label
     }()
 
@@ -68,6 +59,9 @@ final class EditClipView: UIView {
         let view = UIView()
         view.addGestureRecognizer(folderViewTapGesture)
         view.isUserInteractionEnabled = true
+        view.backgroundColor = .white900
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
         return view
     }()
 
@@ -80,6 +74,8 @@ final class EditClipView: UIView {
         imageView.tintColor = .label
         return imageView
     }()
+
+    let emptyView = EmptyView()
 
     let folderViewTapGesture = UITapGestureRecognizer()
 
@@ -108,10 +104,11 @@ private extension EditClipView {
     func setHierarchy() {
         [
             urlMetadataStackView,
+            urlLabel,
             urlInputTextField,
             urlValidationStacKView
         ].forEach {
-            urlInfoStackView.addArrangedSubview($0)
+            urlStackView.addArrangedSubview($0)
         }
 
         [
@@ -123,12 +120,12 @@ private extension EditClipView {
 
         [
             commonNavigationView,
-            urlInfoStackView,
-            memoTextView,
-            memoLimitLabel,
+            urlStackView,
+            memoView,
             folderLabel,
             addFolderButton,
-            folderView
+            folderView,
+            emptyView
         ].forEach {
             addSubview($0)
         }
@@ -140,33 +137,29 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
-        saveButton.snp.makeConstraints { make in
-            make.size.equalTo(48)
+        urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
+
+        urlStackView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
-        urlInfoStackView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(20)
-            make.directionalHorizontalEdges.equalToSuperview().inset(20)
+        urlInputTextField.snp.makeConstraints { make in
+            make.height.equalTo(48)
         }
 
-        memoTextView.snp.makeConstraints { make in
-            make.top.equalTo(urlInfoStackView.snp.bottom).offset(20)
-            make.directionalHorizontalEdges.equalToSuperview().inset(20)
-            make.height.equalTo(120)
-        }
-
-        memoLimitLabel.snp.makeConstraints { make in
-            make.top.equalTo(memoTextView.snp.bottom).offset(10)
-            make.right.equalToSuperview().inset(25)
+        memoView.snp.makeConstraints { make in
+            make.top.equalTo(urlStackView.snp.bottom).offset(32)
+            make.directionalHorizontalEdges.equalToSuperview()
         }
 
         folderLabel.snp.makeConstraints { make in
-            make.top.equalTo(memoLimitLabel.snp.bottom).offset(40)
+            make.top.equalTo(memoView.snp.bottom).offset(40)
             make.leading.equalToSuperview().inset(28)
         }
 
         addFolderButton.snp.makeConstraints { make in
-            make.top.equalTo(memoLimitLabel.snp.bottom).offset(40)
+            make.top.equalTo(memoView.snp.bottom).offset(40)
             make.trailing.equalToSuperview().inset(28)
         }
 
@@ -186,6 +179,12 @@ private extension EditClipView {
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
+        }
+
+        emptyView.snp.makeConstraints { make in
+            make.top.equalTo(folderLabel.snp.bottom).offset(12)
+            make.height.equalTo(160)
+            make.centerX.equalToSuperview()
         }
     }
 }
