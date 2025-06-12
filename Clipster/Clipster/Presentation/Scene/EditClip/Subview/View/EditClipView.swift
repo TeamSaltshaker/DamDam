@@ -6,16 +6,16 @@ final class EditClipView: UIView {
     let backButton = BackButton()
     let saveButton = SaveButton()
 
-    private let urlInfoStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        return stackView
-    }()
-
     let urlMetadataStackView: URLMetadataStackView = {
         let stackView = URLMetadataStackView(type: .edit)
         stackView.isHidden = true
+        return stackView
+    }()
+
+    private let urlInfoStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
         return stackView
     }()
 
@@ -27,10 +27,9 @@ final class EditClipView: UIView {
         return label
     }()
 
-    let urlInputTextField: UITextField = {
-        let textField = UITextField()
+    let urlInputTextField: CommonTextField = {
+        let textField = CommonTextField()
         textField.placeholder = "URL 입력"
-        textField.borderStyle = .roundedRect
         return textField
     }()
 
@@ -172,6 +171,10 @@ private extension EditClipView {
         urlInfoStackView.snp.makeConstraints { make in
             make.top.equalTo(urlMetadataStackView.snp.bottom).offset(32)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
+        }
+
+        urlInputTextField.snp.makeConstraints { make in
+            make.height.equalTo(48)
         }
 
         memoLabel.snp.makeConstraints { make in

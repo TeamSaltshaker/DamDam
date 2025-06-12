@@ -17,6 +17,8 @@ final class EditClipViewModel: ViewModel {
         case saveClip
         case fetchFolder
         case fetchTopLevelFolder
+        case editBeginURLTextField
+        case editEndURLTextField
     }
 
     enum Mutation {
@@ -27,6 +29,7 @@ final class EditClipViewModel: ViewModel {
         case updateFolderViewTapped(Bool)
         case updateCurrentFolder(Folder?)
         case updateSuccessfullyEdited(Bool)
+        case updateURLTextFieldBorderColor(ColorResource)
     }
 
     struct State {
@@ -43,7 +46,8 @@ final class EditClipViewModel: ViewModel {
         var isFolderViewTapped: Bool = false
         var clip: Clip?
         var currentFolder: Folder?
-        var isSuccessfullyEdited: Bool = false // binding
+        var isSuccessfullyEdited: Bool = false
+        var urlTextFieldBorderColor: ColorResource = .black900
     }
 
     var state: BehaviorRelay<State>
@@ -209,6 +213,12 @@ final class EditClipViewModel: ViewModel {
             .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
+        case .editBeginURLTextField:
+            print("\(Self.self) \(action)")
+            return .just(.updateURLTextFieldBorderColor(.blue600))
+        case .editEndURLTextField:
+            print("\(Self.self) \(action)")
+            return .just(.updateURLTextFieldBorderColor(.black900))
         }
     }
 
@@ -239,6 +249,8 @@ final class EditClipViewModel: ViewModel {
             newState.currentFolder = newFolder
         case .updateSuccessfullyEdited(let value):
             newState.isSuccessfullyEdited = value
+        case .updateURLTextFieldBorderColor(let colorResource):
+            newState.urlTextFieldBorderColor = colorResource
         }
         return newState
     }
