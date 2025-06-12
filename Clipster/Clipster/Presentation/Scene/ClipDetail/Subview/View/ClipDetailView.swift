@@ -42,11 +42,11 @@ final class ClipDetailView: UIView {
         urlMetadataView.thumbnailImageView.kf.setImage(with: clip.urlMetadata.thumbnailImageURL)
         urlMetadataView.titleLabel.text = clip.urlMetadata.title
         urlView.urlTextField.text = clip.urlMetadata.url.description
-        urlView.urlTextField.textColor = .black800
+        urlView.urlTextField.textColor = .black500
         urlView.statusImageView.isHidden = true
         urlView.statusLabel.isHidden = true
         memoView.memoTextView.text = clip.memo
-        memoView.memoTextView.textColor = .black800
+        memoView.memoTextView.textColor = .black500
         memoView.memoLimitLabel.text = clip.memoLimit
 
         folderRowView.setDisplay(folder)

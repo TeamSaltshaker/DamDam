@@ -27,7 +27,7 @@ final class MemoView: UIView {
 
     let memoLimitLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black600
+        label.textColor = .black500
         label.font = .pretendard(size: 12, weight: .regular)
         label.textAlignment = .right
         return label
