@@ -18,8 +18,8 @@ extension UIViewController {
         onConfirm: @escaping () -> Void
     ) {
         let trimmedTitle = title.count > 20
-            ? String(title.prefix(20)) + "...는"
-            : title + "는"
+            ? String(title.prefix(20)) + "..."
+            : title
 
         let alert = UIAlertController(
             title: trimmedTitle,
@@ -27,7 +27,9 @@ extension UIViewController {
             preferredStyle: .alert
         )
 
-        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel) { _ in
+            onCancel()
+        })
         alert.addAction(UIAlertAction(title: "삭제", style: .destructive) { _ in
             onConfirm()
         })
