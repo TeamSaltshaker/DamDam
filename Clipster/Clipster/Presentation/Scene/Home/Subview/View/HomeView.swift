@@ -10,7 +10,7 @@ final class HomeView: UIView {
         case tapCell(IndexPath)
         case detail(IndexPath)
         case edit(IndexPath)
-        case delete(IndexPath)
+        case delete(indexPath: IndexPath, title: String)
         case showAllClips
     }
 
@@ -228,18 +228,17 @@ private extension HomeView {
         config.backgroundColor = .white800
         config.headerMode = .supplementary
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
-            guard let self,
-                  let item = self.dataSource?.itemIdentifier(for: indexPath),
-                  case .folder = item
-            else {
-                return nil
-            }
-
             let delete = UIContextualAction(
                 style: .destructive,
                 title: "삭제"
-            ) { _, _, completion in
-                self.action.accept(.delete(indexPath))
+            ) { [weak self] _, _, completion in
+                guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return }
+                switch item {
+                case .clip(let clip):
+                    self?.action.accept(.delete(indexPath: indexPath, title: clip.urlMetadata.title))
+                case .folder(let folder):
+                    self?.action.accept(.delete(indexPath: indexPath, title: folder.title))
+                }
                 completion(true)
             }
 
@@ -248,7 +247,6 @@ private extension HomeView {
 
             return UISwipeActionsConfiguration(actions: [delete])
         }
-
         let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
         section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
         section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
@@ -324,7 +322,13 @@ private extension HomeView {
             image: UIImage(systemName: "trash"),
             attributes: .destructive
         ) { [weak self] _ in
-            self?.action.accept(.delete(indexPath))
+            guard let item = self?.dataSource?.itemIdentifier(for: indexPath) else { return }
+            switch item {
+            case .clip(let clip):
+                self?.action.accept(.delete(indexPath: indexPath, title: clip.urlMetadata.title))
+            case .folder(let folder):
+                self?.action.accept(.delete(indexPath: indexPath, title: folder.title))
+            }
         }
     }
 }
