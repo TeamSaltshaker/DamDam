@@ -2,32 +2,26 @@ import CoreData
 import Foundation
 
 final class DIContainer {
-    private let context: NSManagedObjectContext
+    private let container: NSPersistentContainer
 
-    init(context: NSManagedObjectContext? = nil) {
-        self.context = context ?? CoreDataStack.shared.context
+    init(container: NSPersistentContainer? = nil) {
+        self.container = container ?? CoreDataStack.shared.container
     }
 
     func makeClipStorage() -> ClipStorage {
-         DefaultClipStorage(context: context)
+         DefaultClipStorage(container: container, mapper: DomainMapper())
      }
 
     func makeFolderStorage() -> FolderStorage {
-         DefaultFolderStorage(context: context)
+         DefaultFolderStorage(container: container, mapper: DomainMapper())
      }
 
     func makeClipRepository() -> ClipRepository {
-        DefaultClipRepository(
-            storage: makeClipStorage(),
-            mapper: DomainMapper()
-        )
+        DefaultClipRepository(storage: makeClipStorage())
     }
 
     func makeFolderRepository() -> FolderRepository {
-        DefaultFolderRepository(
-            storage: makeFolderStorage(),
-            mapper: DomainMapper()
-        )
+        DefaultFolderRepository(storage: makeFolderStorage())
     }
 
     func makeURLMetadataRepository() -> URLMetadataRepository {
