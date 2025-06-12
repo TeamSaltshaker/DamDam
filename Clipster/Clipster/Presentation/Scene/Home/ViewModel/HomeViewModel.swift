@@ -98,7 +98,7 @@ final class HomeViewModel {
                 return nil
             }
         case 1 where indexPath.item < folders.count:
-            let folder = folders[indexPath.row]
+            let folder = folders[indexPath.item]
             switch action {
             case .tapCell:
                 return .showFolder(folder)
