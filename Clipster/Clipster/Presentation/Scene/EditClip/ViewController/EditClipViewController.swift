@@ -65,6 +65,7 @@ private extension EditClipViewController {
 
         viewModel.state
             .map { $0.type == .shareExtension }
+            .filter { $0 }
             .take(1)
             .subscribe { [weak self] _ in
                 self?.viewModel.action.accept(.fetchTopLevelFolder)
