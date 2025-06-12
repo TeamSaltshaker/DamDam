@@ -5,6 +5,7 @@ final class CommonNavigationView: UIView {
         let label = UILabel()
         label.font = .pretendard(size: 22, weight: .bold)
         label.textColor = .black100
+        label.textAlignment = .center
         return label
     }()
 
@@ -72,16 +73,17 @@ private extension CommonNavigationView {
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(12)
-            make.centerX.equalToSuperview()
         }
 
         leftStackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
+            make.trailing.equalTo(titleLabel.snp.leading).offset(-24)
             make.centerY.equalToSuperview()
         }
 
         rightStackView.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(24)
+            make.leading.equalTo(titleLabel.snp.trailing).offset(24)
             make.centerY.equalToSuperview()
         }
     }
