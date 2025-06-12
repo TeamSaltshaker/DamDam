@@ -57,10 +57,6 @@ final class EditClipView: UIView {
         textView.clipsToBounds = true
         textView.layer.borderWidth = 1
         textView.layer.borderColor = UIColor.black900.cgColor
-        textView.layer.shadowPath = UIBezierPath(
-            roundedRect: textView.bounds,
-            cornerRadius: textView.layer.cornerRadius
-        ).cgPath
         return textView
     }()
 

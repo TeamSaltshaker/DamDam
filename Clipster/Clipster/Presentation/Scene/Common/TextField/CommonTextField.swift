@@ -35,9 +35,5 @@ extension CommonTextField {
         layer.cornerRadius = 12
         layer.borderColor = UIColor.black900.cgColor
         backgroundColor = .white900
-        layer.shadowPath = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: layer.cornerRadius
-        ).cgPath
     }
 }
