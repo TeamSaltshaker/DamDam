@@ -1,4 +1,5 @@
 import RxCocoa
+import SafariServices
 import RxSwift
 import UIKit
 
@@ -81,8 +82,8 @@ private extension UnvisitedClipListViewController {
                 case .back:
                     owner.navigationController?.popViewController(animated: true)
                 case .showWebView(let url):
-                    print("웹 뷰")
-                    print("\(url)\n")
+                    let vc = SFSafariViewController(url: url)
+                    owner.present(vc, animated: true)
                 case .showDetailClip(let clip):
                     let vm = owner.diContainer.makeClipDetailViewModel(clip: clip)
                     let vc = ClipDetailViewController(
