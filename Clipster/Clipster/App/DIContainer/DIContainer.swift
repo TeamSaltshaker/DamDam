@@ -149,6 +149,7 @@ final class DIContainer {
             folder: folder,
             fetchFolderUseCase: makeFetchFolderUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase()
         )
     }
