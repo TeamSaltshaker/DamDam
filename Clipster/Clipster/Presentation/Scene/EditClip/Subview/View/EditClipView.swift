@@ -74,8 +74,8 @@ final class EditClipView: UIView {
     let folderLabel: UILabel = {
         let label = UILabel()
         label.text = "저장폴더"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black100
+        label.font = .pretendard(size: 16, weight: .medium)
         return label
     }()
 
@@ -89,6 +89,9 @@ final class EditClipView: UIView {
         let view = UIView()
         view.addGestureRecognizer(folderViewTapGesture)
         view.isUserInteractionEnabled = true
+        view.backgroundColor = .white900
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
         return view
     }()
 
