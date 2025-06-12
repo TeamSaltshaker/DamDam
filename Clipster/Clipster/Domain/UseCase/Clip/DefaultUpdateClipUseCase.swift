@@ -6,6 +6,6 @@ final class DefaultUpdateClipUseCase: UpdateClipUseCase {
     }
 
     func execute(clip: Clip) async -> Result<Void, Error> {
-        clipRepository.updateClip(clip).mapError { $0 as Error }
+        await clipRepository.updateClip(clip).mapError { $0 as Error }
     }
 }

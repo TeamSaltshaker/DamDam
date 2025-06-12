@@ -8,6 +8,6 @@ final class DefaultFetchClipUseCase: FetchClipUseCase {
      }
 
     func execute(id: UUID) async -> Result<Clip, Error> {
-        clipRepository.fetchClip(by: id).mapError { $0 as Error }
+        await clipRepository.fetchClip(by: id).mapError { $0 as Error }
     }
 }

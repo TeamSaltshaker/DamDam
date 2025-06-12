@@ -20,6 +20,6 @@ final class DefaultDeleteFolderUseCase: DeleteFolderUseCase {
             deletedAt: Date()
         )
 
-        return folderRepository.deleteFolder(deletedFolder).mapError { $0 as Error }
+        return await folderRepository.deleteFolder(deletedFolder).mapError { $0 as Error }
     }
 }
