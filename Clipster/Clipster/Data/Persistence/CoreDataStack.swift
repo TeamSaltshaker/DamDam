@@ -5,7 +5,7 @@ final class CoreDataStack {
 
     private let appGroupID = "group.com.saltshaker.clipster"
 
-    private lazy var container: NSPersistentContainer = {
+    lazy var container: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Clipster")
 
         if let appGroupURL = FileManager.default.containerURL(
@@ -27,10 +27,6 @@ final class CoreDataStack {
         }
         return container
     }()
-
-    var context: NSManagedObjectContext {
-        container.viewContext
-    }
 
     private init() {}
 }
