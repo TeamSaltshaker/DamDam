@@ -157,13 +157,13 @@ private extension EditClipView {
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()
-            make.bottom.equalTo(safeAreaLayoutGuide)
+            make.bottom.equalTo(keyboardLayoutGuide.snp.top)
             make.width.equalToSuperview()
         }
 
         scrollContainerView.snp.makeConstraints { make in
-            make.edges.equalTo(scrollView)
-            make.width.equalTo(scrollView)
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
             make.bottom.equalTo(emptyView.snp.bottom)
         }
 
@@ -214,9 +214,9 @@ private extension EditClipView {
 
         emptyView.snp.makeConstraints { make in
             make.top.equalTo(folderView.snp.top)
-            make.height.equalTo(160)
+            make.height.greaterThanOrEqualTo(155)
             make.directionalHorizontalEdges.equalToSuperview()
-            make.bottom.greaterThanOrEqualToSuperview().inset(20)
+            make.bottom.equalToSuperview().inset(20)
         }
     }
 }
