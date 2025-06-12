@@ -22,6 +22,7 @@ final class FolderListCell: UICollectionViewListCell {
         let label = UILabel()
         label.font = .pretendard(size: 16, weight: .semiBold)
         label.textColor = .black100
+        label.numberOfLines = 1
         return label
     }()
 
@@ -29,6 +30,7 @@ final class FolderListCell: UICollectionViewListCell {
         let label = UILabel()
         label.font = .pretendard(size: 12, weight: .regular)
         label.textColor = .black500
+        label.numberOfLines = 1
         return label
     }()
 
