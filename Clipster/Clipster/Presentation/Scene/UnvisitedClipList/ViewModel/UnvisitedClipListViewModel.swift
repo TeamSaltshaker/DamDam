@@ -131,7 +131,7 @@ final class UnvisitedClipListViewModel {
         let result = await updateClipUseCase.execute(clip: visitedClip)
         switch result {
         case .success:
-            print("update")
+            break
         case .failure(let error):
             print(error)
         }
