@@ -1,6 +1,6 @@
 import RxCocoa
-import SafariServices
 import RxSwift
+import SafariServices
 import UIKit
 
 final class UnvisitedClipListViewController: UIViewController {
