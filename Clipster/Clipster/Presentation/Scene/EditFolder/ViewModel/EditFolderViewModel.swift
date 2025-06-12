@@ -145,14 +145,14 @@ final class EditFolderViewModel {
                 let useCase: (Folder) async -> Result<Void, DomainError>
 
                 switch currentState.mode {
-                case .add(let parentFolder):
-                    print("\(Self.self): attempting to add folder '\(title)' to parent '\(parentFolder?.title ?? "root")'")
+                case .add:
+                    print("\(Self.self): attempting to add folder '\(title)' to parent '\(currentState.parentFolder?.title ?? "root")'")
 
                     newFolder = Folder(
                         id: UUID(),
-                        parentFolderID: parentFolder?.id,
+                        parentFolderID: currentState.parentFolder?.id,
                         title: title,
-                        depth: (parentFolder?.depth ?? -1) + 1,
+                        depth: (currentState.parentFolder?.depth ?? -1) + 1,
                         folders: [],
                         clips: [],
                         createdAt: date,
@@ -161,14 +161,14 @@ final class EditFolderViewModel {
                     )
 
                     useCase = self.createFolderUseCase.execute
-                case .edit(let parentFolder, let folder):
-                    print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(parentFolder?.title ?? "root")'")
+                case .edit(_, let folder):
+                    print("\(Self.self): attempting to edit folder \(folder.id) set title to '\(title)', parent to '\(currentState.parentFolder?.title ?? "root")'")
 
                     newFolder = Folder(
                         id: folder.id,
-                        parentFolderID: parentFolder?.id,
+                        parentFolderID: currentState.parentFolder?.id,
                         title: title,
-                        depth: (parentFolder?.depth ?? -1) + 1,
+                        depth: (currentState.parentFolder?.depth ?? -1) + 1,
                         folders: folder.folders,
                         clips: folder.clips,
                         createdAt: folder.createdAt,
