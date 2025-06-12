@@ -34,7 +34,7 @@ final class FolderView: UIView {
         tableView.backgroundColor = .white800
         tableView.rowHeight = 80
         tableView.separatorStyle = .none
-        tableView.sectionHeaderTopPadding = 23.5
+        tableView.sectionHeaderTopPadding = 0
         tableView.register(
             FolderCell.self,
             forCellReuseIdentifier: FolderCell.identifier,
@@ -134,7 +134,7 @@ private extension FolderView {
         }
 
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(navigationView.snp.bottom)
+            make.top.equalTo(navigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(24)
             make.bottom.equalTo(safeAreaLayoutGuide)
         }
@@ -207,7 +207,36 @@ extension FolderView: UITableViewDelegate {
         _ tableView: UITableView,
         heightForHeaderInSection section: Int,
     ) -> CGFloat {
-        36
+        guard let section = Section(rawValue: section),
+              let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
+              !items.isEmpty else { return .leastNonzeroMagnitude }
+
+        return 36
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        heightForFooterInSection section: Int
+    ) -> CGFloat {
+        guard section == 0,
+              let items = dataSource?.snapshot().itemIdentifiers(inSection: .folder),
+              !items.isEmpty else {
+            return 0
+        }
+
+        return 24
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        viewForFooterInSection section: Int,
+    ) -> UIView? {
+        guard section == 0 else { return nil }
+
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+
+        return spacer
     }
 
     func tableView(
