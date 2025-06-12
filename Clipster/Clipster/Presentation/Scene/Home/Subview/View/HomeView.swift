@@ -33,9 +33,24 @@ final class HomeView: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "아차차"
-        label.font = .init(name: "Pretendard-ExtraBold", size: 28)
-        label.textColor = .black100
+        let text = "담담"
+        let font = UIFont(name: "locus_sangsang", size: 28) ?? UIFont.boldSystemFont(ofSize: 28)
+        let attributedText = NSMutableAttributedString(string: text)
+        attributedText.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: NSRange(location: 0, length: 1))
+        attributedText.addAttribute(.foregroundColor, value: UIColor.systemYellow, range: NSRange(location: 1, length: 1))
+
+        attributedText.addAttributes([
+            .foregroundColor: UIColor.blue600,
+            .font: font
+        ], range: NSRange(location: 0, length: 1))
+
+        attributedText.addAttributes([
+            .foregroundColor: UIColor.blue700,
+            .font: font
+        ], range: NSRange(location: 1, length: 1))
+
+        label.attributedText = attributedText
+
         return label
     }()
 
