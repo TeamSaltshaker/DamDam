@@ -14,13 +14,20 @@ final class HomeView: UIView {
         case showAllClips
     }
 
+    enum Section: Int, CaseIterable {
+        case clip
+        case folder
+    }
+
+    enum Item: Hashable {
+        case clip(ClipDisplay)
+        case folder(FolderDisplay)
+    }
+
     private let disposeBag = DisposeBag()
     let action = PublishRelay<Action>()
 
-    private var collectionDataSource: UICollectionViewDiffableDataSource<Int, ClipDisplay>?
-    private var tableDataSource: UITableViewDiffableDataSource<Int, FolderDisplay>?
-
-    private var tableViewHeightConstraint: Constraint?
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
     private let navigationView = UIView()
 
@@ -32,22 +39,12 @@ final class HomeView: UIView {
         return label
     }()
 
-    private lazy var addButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(.plus, for: .normal)
-        button.tintColor = .black100
+    private lazy var addButton: AddButton = {
+        let button = AddButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
         return button
     }()
-
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.showsVerticalScrollIndicator = false
-        return scrollView
-    }()
-
-    let contentView = UIView()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -60,73 +57,70 @@ final class HomeView: UIView {
         return collectionView
     }()
 
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.backgroundColor = .white800
-        tableView.separatorStyle = .none
-        tableView.rowHeight = 80
-        tableView.register(FolderCell.self, forCellReuseIdentifier: FolderCell.identifier)
-        tableView.isScrollEnabled = false
-        tableView.delegate = self
-        tableView.sectionHeaderTopPadding = 0
-        return tableView
-    }()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
-        configureCollectionDataSource()
-        configureTableDataSource()
+        configureDataSource()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func configureCollectionDataSource() {
+    private func configureDataSource() {
         let clipCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
-        collectionDataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
-            collectionView.dequeueConfiguredReusableCell(
-                using: clipCellRegistration,
-                for: indexPath,
-                item: item
-            )
+        let folderCellRegistration = UICollectionView.CellRegistration<FolderListCell, FolderDisplay> { cell, _, item in
+            cell.setDisplay(item)
+        }
+
+        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
+            print(item)
+            switch item {
+            case .clip(let clipItem):
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: clipCellRegistration,
+                    for: indexPath,
+                    item: clipItem
+                )
+            case .folder(let folderItem):
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: folderCellRegistration,
+                    for: indexPath,
+                    item: folderItem
+                )
+            }
         }
 
         let headerRegistration = UICollectionView.SupplementaryRegistration<CollectionHeaderView>(
             elementKind: UICollectionView.elementKindSectionHeader
-        ) { header, _, _ in
-            header.setTitle("방문하지 않은 클립")
-            header.setShowAllButtonVisible(true)
+        ) { [weak self] header, _, indexPath in
+            guard
+                let self,
+                let sectionIdentifier = dataSource?.snapshot().sectionIdentifiers[indexPath.section]
+            else { return }
 
-            header.showAllTapped
-                .map { Action.showAllClips }
-                .bind(to: self.action)
-                .disposed(by: self.disposeBag)
+            switch sectionIdentifier {
+            case .clip:
+                header.setTitle("방문하지 않은 클립")
+                header.setShowAllButtonVisible(true)
+
+                header.showAllTapped
+                    .map { Action.showAllClips }
+                    .bind(to: action)
+                    .disposed(by: disposeBag)
+            case .folder:
+                header.setTitle("폴더")
+            }
         }
 
-        collectionDataSource?.supplementaryViewProvider = { collectionView, _, indexPath in
+        dataSource?.supplementaryViewProvider = { collectionView, _, indexPath in
             collectionView.dequeueConfiguredReusableSupplementary(
                 using: headerRegistration,
                 for: indexPath
             )
-        }
-    }
-
-    private func configureTableDataSource() {
-        tableDataSource = UITableViewDiffableDataSource<Int, FolderDisplay>(
-            tableView: tableView
-        ) { tableView, indexPath, item in
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: FolderCell.identifier,
-                for: indexPath
-            ) as? FolderCell
-            else { return UITableViewCell() }
-            cell.setDisplay(item)
-            return cell
         }
     }
 
@@ -149,28 +143,42 @@ final class HomeView: UIView {
     }
 
     func setDisplay(_ display: HomeDisplay) {
-        var collectionSnapshot = NSDiffableDataSourceSnapshot<Int, ClipDisplay>()
-        if !display.unvitsedClips.isEmpty {
-            collectionSnapshot.appendSections([0])
-            collectionSnapshot.appendItems(display.unvitsedClips)
-        }
-        collectionDataSource?.apply(collectionSnapshot)
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
 
-        var tableSnapshot = NSDiffableDataSourceSnapshot<Int, FolderDisplay>()
+        if !display.unvitsedClips.isEmpty {
+            let clipItems = display.unvitsedClips.map { Item.clip($0) }
+            snapshot.appendSections([.clip])
+            snapshot.appendItems(clipItems, toSection: .clip)
+        }
+
         if !display.folders.isEmpty {
-            tableSnapshot.appendSections([0])
-            tableSnapshot.appendItems(display.folders)
+            let folderItems = display.folders.map { Item.folder($0) }
+            snapshot.appendSections([.folder])
+            snapshot.appendItems(folderItems, toSection: .folder)
         }
-        tableDataSource?.apply(tableSnapshot, animatingDifferences: true) { [weak self] in
-            guard let self else { return }
-            let newHeight = tableView.contentSize.height
-            tableViewHeightConstraint?.update(offset: newHeight)
-        }
+
+        dataSource?.apply(snapshot)
     }
 }
 
 private extension HomeView {
     func createCollectionViewLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { [weak self] index, env -> NSCollectionLayoutSection? in
+            guard let self,
+                  let sectionKind = self.dataSource?.snapshot().sectionIdentifiers[index]
+            else { return nil }
+
+            switch sectionKind {
+            case .clip:
+                return makeClipSectionLayout()
+            case .folder:
+                return makeFolderListSectionLayout(using: env)
+            }
+        }
+        return layout
+    }
+
+    func makeClipSectionLayout() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -189,24 +197,64 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
         section.interGroupSpacing = 16
-        section.contentInsets = .init(top: 16, leading: 24, bottom: 0, trailing: 24)
+        section.contentInsets = .init(top: 16, leading: 24, bottom: 24, trailing: 24)
+        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .clip)]
 
-        let header = makeHeaderItemLayout()
-        section.boundarySupplementaryItems = [header]
-
-        return UICollectionViewCompositionalLayout(section: section)
+        return section
     }
 
-    func makeHeaderItemLayout() -> NSCollectionLayoutBoundarySupplementaryItem {
+    func makeFolderListSectionLayout(using env: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        var config = UICollectionLayoutListConfiguration(appearance: .plain)
+        config.showsSeparators = false
+        config.backgroundColor = .white800
+        config.headerMode = .supplementary
+        config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
+            guard let self,
+                  let item = self.dataSource?.itemIdentifier(for: indexPath),
+                  case .folder = item
+            else {
+                return nil
+            }
+
+            let delete = UIContextualAction(
+                style: .destructive,
+                title: "삭제"
+            ) { _, _, completion in
+                self.action.accept(.delete(indexPath))
+                completion(true)
+            }
+
+            delete.image = .trashWhite
+            delete.backgroundColor = .red600
+
+            return UISwipeActionsConfiguration(actions: [delete])
+        }
+
+        let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
+        section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
+        section.interGroupSpacing = 8
+        return section
+    }
+
+    func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .absolute(28)
         )
+
         let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
+
+        switch section {
+        case .clip:
+            header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+        case .folder:
+            header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+        }
 
         return header
     }
@@ -223,64 +271,11 @@ extension HomeView: UICollectionViewDelegate {
             previewProvider: nil
         ) { [weak self] _ in
             guard let self else { return UIMenu() }
-            let patchedIndexPath = IndexPath(item: indexPath.item, section: 0)
-
-            let detail = makeDetailAction(for: patchedIndexPath)
-            let edit = makeEditAction(for: patchedIndexPath)
-            let delete = makeDeleteAction(for: patchedIndexPath)
+            let detail = makeDetailAction(for: indexPath)
+            let edit = makeEditAction(for: indexPath)
+            let delete = makeDeleteAction(for: indexPath)
 
             return UIMenu(title: "", children: [detail, edit, delete])
-        }
-    }
-}
-
-extension HomeView: UITableViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
-    ) -> UISwipeActionsConfiguration? {
-        let delete = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
-            guard let self else { return }
-            let patchedIndexPath = IndexPath(row: indexPath.item, section: 1)
-            action.accept(.delete(patchedIndexPath))
-            completion(true)
-        }
-
-        delete.image = .trashWhite
-        delete.backgroundColor = .systemRed
-
-        return UISwipeActionsConfiguration(actions: [delete])
-    }
-}
-
-extension HomeView: UITabBarDelegate {
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        28 + 8
-    }
-
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = TableHeaderView()
-        headerView.setTitle("폴더")
-        return headerView
-    }
-}
-
-extension HomeView {
-    func tableView(
-        _ tableView: UITableView,
-        contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        .init(
-            identifier: indexPath as NSCopying,
-            previewProvider: nil
-        ) { [weak self] _ in
-            guard let self else { return UIMenu() }
-            let patchedIndexPath = IndexPath(row: indexPath.row, section: 1)
-            let edit = makeEditAction(for: patchedIndexPath)
-            let delete = makeDeleteAction(for: patchedIndexPath)
-
-            return UIMenu(title: "", children: [edit, delete])
         }
     }
 }
@@ -330,20 +325,13 @@ private extension HomeView {
     func setHierarchy() {
         [
             navigationView,
-            scrollView
+            collectionView
         ].forEach { addSubview($0) }
 
         [
             titleLabel,
             addButton
         ].forEach { navigationView.addSubview($0) }
-
-        [contentView].forEach { scrollView.addSubview($0) }
-
-        [
-            collectionView,
-            tableView
-        ].forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {
@@ -361,42 +349,20 @@ private extension HomeView {
         addButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(24)
             make.centerY.equalToSuperview()
+            make.size.equalTo(44)
         }
 
-        scrollView.snp.makeConstraints { make in
+        collectionView.snp.makeConstraints { make in
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-
-        contentView.snp.makeConstraints {
-            $0.verticalEdges.equalTo(scrollView.contentLayoutGuide)
-            $0.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
-        }
-
-        collectionView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(263)
-        }
-
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom).offset(24)
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview()
-            self.tableViewHeightConstraint = make.height.equalTo(0).constraint
-        }
     }
 
     func setBindings() {
-        Observable.merge(
-            collectionView.rx.itemSelected
-                .map { IndexPath(item: $0.item, section: 0) },
-            tableView.rx.itemSelected
-                .map { IndexPath(row: $0.row, section: 1) }
-        )
-        .map { Action.tapCell($0) }
-        .bind(to: action)
-        .disposed(by: disposeBag)
+        collectionView.rx.itemSelected
+            .map { Action.tapCell($0) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
     }
 }

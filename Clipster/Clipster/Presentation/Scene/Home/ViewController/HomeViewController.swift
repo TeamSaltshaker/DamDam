@@ -1,5 +1,6 @@
 import RxCocoa
 import RxSwift
+import SafariServices
 import UIKit
 
 final class HomeViewController: UIViewController {
@@ -96,8 +97,8 @@ private extension HomeViewController {
                     )
                     owner.navigationController?.pushViewController(vc, animated: true)
                 case .showWebView(let url):
-                    print("웹 뷰")
-                    print("\(url)\n")
+                    let vc = SFSafariViewController(url: url)
+                    owner.present(vc, animated: true)
                 case .showFolder(let folder):
                     let vm = owner.diContainer.makeFolderViewModel(folder: folder)
                     let vc = FolderViewController(
