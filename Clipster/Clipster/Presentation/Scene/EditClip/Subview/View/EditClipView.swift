@@ -12,7 +12,7 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    private let urlInfoStackView: UIStackView = {
+    private let urlStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 8
@@ -132,7 +132,7 @@ private extension EditClipView {
             urlInputTextField,
             urlValidationStacKView
         ].forEach {
-            urlInfoStackView.addArrangedSubview($0)
+            urlStackView.addArrangedSubview($0)
         }
 
         [
@@ -145,7 +145,7 @@ private extension EditClipView {
         [
             commonNavigationView,
             urlMetadataStackView,
-            urlInfoStackView,
+            urlStackView,
             memoLabel,
             memoTextView,
             memoLimitLabel,
@@ -168,7 +168,7 @@ private extension EditClipView {
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
-        urlInfoStackView.snp.makeConstraints { make in
+        urlStackView.snp.makeConstraints { make in
             make.top.equalTo(urlMetadataStackView.snp.bottom).offset(32)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
@@ -178,7 +178,7 @@ private extension EditClipView {
         }
 
         memoLabel.snp.makeConstraints { make in
-            make.top.equalTo(urlInfoStackView.snp.bottom).offset(32)
+            make.top.equalTo(urlStackView.snp.bottom).offset(32)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
