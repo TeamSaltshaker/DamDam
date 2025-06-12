@@ -118,7 +118,7 @@ final class EditClipViewModel: ViewModel {
         case .editURLInputTextField(let urlText):
             print("\(Self.self) \(action)")
             return .merge(
-                .just(.updateURLInputText(urlText)),
+                .just(.updateURLInputText(urlText.trimmingCharacters(in: .whitespacesAndNewlines))),
                 .fromAsync {
                     try await self.checkURLValidityUseCase.execute(urlString: urlText).get()
                 }
