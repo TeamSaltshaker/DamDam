@@ -131,18 +131,19 @@ final class HomeView: UIView {
         ) { [weak self] header, _, indexPath in
             guard
                 let self,
-                let sectionIdentifier = dataSource?.snapshot().sectionIdentifiers[indexPath.section]
+                let sectionIdentifier = dataSource?.sectionIdentifier(for: indexPath.section)
             else { return }
 
             switch sectionIdentifier {
             case .clip:
                 header.setTitle("방문하지 않은 클립")
                 header.setShowAllButtonVisible(true)
+                header.setBindings()
 
                 header.showAllTapped
                     .map { Action.showAllClips }
                     .bind(to: action)
-                    .disposed(by: disposeBag)
+                    .disposed(by: header.disposeBag)
             case .folder:
                 header.setTitle("폴더")
             }
