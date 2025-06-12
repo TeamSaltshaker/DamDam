@@ -288,12 +288,22 @@ extension HomeView: UICollectionViewDelegate {
             identifier: indexPath as NSCopying,
             previewProvider: nil
         ) { [weak self] _ in
-            guard let self else { return UIMenu() }
-            let detail = makeDetailAction(for: indexPath)
-            let edit = makeEditAction(for: indexPath)
-            let delete = makeDeleteAction(for: indexPath)
+            guard let self,
+                  let item = self.dataSource?.itemIdentifier(for: indexPath)
+            else {
+                return UIMenu()
+            }
 
-            return UIMenu(title: "", children: [detail, edit, delete])
+            let edit = self.makeEditAction(for: indexPath)
+            let delete = self.makeDeleteAction(for: indexPath)
+
+            switch item {
+            case .clip:
+                let detail = self.makeDetailAction(for: indexPath)
+                return UIMenu(title: "", children: [detail, edit, delete])
+            case .folder:
+                return UIMenu(title: "", children: [edit, delete])
+            }
         }
     }
 }
