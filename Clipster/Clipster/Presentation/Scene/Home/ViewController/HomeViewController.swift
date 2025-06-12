@@ -60,8 +60,10 @@ private extension HomeViewController {
                     owner.homeviewModel.action.accept(.tapDetail(indexPath))
                 case .edit(let indexPath):
                     owner.homeviewModel.action.accept(.tapEdit(indexPath))
-                case .delete(let indexPath):
-                    owner.homeviewModel.action.accept(.tapDelete(indexPath))
+                case .delete(let indexPath, let title):
+                    owner.presentDeleteAlert(title: title) { [weak self] in
+                        self?.homeviewModel.action.accept(.tapDelete(indexPath))
+                    }
                 case .showAllClips:
                     owner.homeviewModel.action.accept(.tapShowAllClips)
                 }
