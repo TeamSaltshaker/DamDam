@@ -72,6 +72,8 @@ final class HomeView: UIView {
         return collectionView
     }()
 
+    private let emptyView = EmptyView()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -170,6 +172,9 @@ final class HomeView: UIView {
             snapshot.appendSections([.folder])
             snapshot.appendItems(folderItems, toSection: .folder)
         }
+
+        let isEmptyViewHidden = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
+        emptyView.isHidden = isEmptyViewHidden
 
         dataSource?.apply(snapshot)
     }
@@ -339,7 +344,8 @@ private extension HomeView {
     func setHierarchy() {
         [
             navigationView,
-            collectionView
+            collectionView,
+            emptyView
         ].forEach { addSubview($0) }
 
         [
@@ -370,6 +376,10 @@ private extension HomeView {
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+
+        emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 
