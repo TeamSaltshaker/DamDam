@@ -51,7 +51,7 @@ final class FolderView: UIView {
         return tableView
     }()
 
-    private let emptyView = EmptyView()
+    private let emptyView = EmptyView(type: .folderView)
 
     override init(frame: CGRect) {
         super.init(frame: frame)

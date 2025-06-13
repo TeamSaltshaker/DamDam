@@ -90,7 +90,7 @@ final class EditClipView: UIView {
         return imageView
     }()
 
-    let emptyView = EmptyView()
+    let emptyView = EmptyView(type: .editClipView)
 
     let folderViewTapGesture = UITapGestureRecognizer()
 
