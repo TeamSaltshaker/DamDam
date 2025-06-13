@@ -124,7 +124,7 @@ final class UnvisitedClipListViewModel {
             memo: clip.memo,
             lastVisitedAt: Date(),
             createdAt: clip.createdAt,
-            updatedAt: clip.updatedAt,
+            updatedAt: Date(),
             deletedAt: clip.deletedAt
         )
 

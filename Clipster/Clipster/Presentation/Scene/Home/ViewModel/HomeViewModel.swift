@@ -177,7 +177,7 @@ final class HomeViewModel {
             memo: clip.memo,
             lastVisitedAt: Date(),
             createdAt: clip.createdAt,
-            updatedAt: clip.updatedAt,
+            updatedAt: Date(),
             deletedAt: clip.deletedAt
         )
 
