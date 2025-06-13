@@ -41,7 +41,7 @@ final class EditClipViewModel: ViewModel {
         var isHiddenURLMetadataStackView = true
         var isHiddenURLValidationStackView = true
         var memoText: String = ""
-        var memoLimit: String = "0/100"
+        var memoLimit: String = "0 / 100"
         var isURLValid = false
         var urlValidationImageName: String = ""
         var urlValidationLabelText: String = ""
@@ -103,7 +103,7 @@ final class EditClipViewModel: ViewModel {
             type: .edit,
             urlInputText: clip.urlMetadata.url.absoluteString,
             memoText: clip.memo,
-            memoLimit: "\(clip.memo.count)/100",
+            memoLimit: "\(clip.memo.count) / 100",
             clip: clip,
             navigationTitle: "클립 수정"
         ))
@@ -241,7 +241,7 @@ final class EditClipViewModel: ViewModel {
             }
         case .updateMemo(let memoText):
             newState.memoText = memoText
-            newState.memoLimit = "\(memoText.count)/100"
+            newState.memoLimit = "\(memoText.count) / 100"
         case .updateValidURL(let result):
             newState.isURLValid = result
             newState.urlValidationImageName = result ? "CheckBlue" : "XRed"
