@@ -144,7 +144,7 @@ private extension EditFolderView {
 
         folderTitleLimitLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(12)
-            make.bottom.equalToSuperview().inset(4)
+            make.centerY.equalToSuperview()
         }
 
         folderLabel.snp.makeConstraints { make in
