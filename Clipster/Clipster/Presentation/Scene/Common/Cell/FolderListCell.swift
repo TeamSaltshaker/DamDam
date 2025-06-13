@@ -92,8 +92,9 @@ private extension FolderListCell {
 
     func setConstraints() {
         folderImageContainerView.snp.makeConstraints { make in
+            make.top.equalToSuperview().inset(12)
             make.leading.equalToSuperview().inset(44)
-            make.verticalEdges.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(12).priority(.high)
             make.size.equalTo(48)
         }
 
@@ -103,14 +104,14 @@ private extension FolderListCell {
 
         stackView.snp.makeConstraints { make in
             make.leading.equalTo(folderImageContainerView.snp.trailing).offset(16)
-            make.verticalEdges.equalToSuperview().inset(12.5)
+            make.centerY.equalToSuperview()
         }
 
         chevronImageView.snp.makeConstraints { make in
             make.leading.equalTo(stackView.snp.trailing).offset(16)
             make.trailing.equalToSuperview().inset(24)
-            make.verticalEdges.equalToSuperview().inset(24)
             make.size.equalTo(24)
+            make.centerY.equalToSuperview()
         }
     }
 }
