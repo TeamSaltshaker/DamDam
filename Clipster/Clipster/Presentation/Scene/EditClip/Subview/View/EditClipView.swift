@@ -203,10 +203,10 @@ private extension EditClipView {
         folderRowView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
+            make.trailing.equalTo(chevronImageView.snp.leading).offset(-16)
         }
 
         chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
