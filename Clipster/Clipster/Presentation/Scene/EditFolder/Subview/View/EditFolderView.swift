@@ -15,7 +15,7 @@ final class EditFolderView: UIView {
         return label
     }()
 
-    private let filderTitleContainerView: UIView = {
+    private let folderTitleContainerView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 12
         view.layer.borderWidth = 1
@@ -103,11 +103,11 @@ private extension EditFolderView {
     }
 
     func setHierarchy() {
-        [commonNavigationView, titleLabel, filderTitleContainerView, folderLabel, folderView]
+        [commonNavigationView, titleLabel, folderTitleContainerView, folderLabel, folderView]
             .forEach { addSubview($0) }
 
         [folderTitleTextField, folderTitleLimitLabel]
-            .forEach { filderTitleContainerView.addSubview($0) }
+            .forEach { folderTitleContainerView.addSubview($0) }
 
         [folderRowView, chevronImageView]
             .forEach { folderView.addSubview($0) }
@@ -129,10 +129,10 @@ private extension EditFolderView {
 
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(28)
         }
 
-        filderTitleContainerView.snp.makeConstraints { make in
+        folderTitleContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(48)
@@ -148,12 +148,12 @@ private extension EditFolderView {
         }
 
         folderLabel.snp.makeConstraints { make in
-            make.top.equalTo(filderTitleContainerView.snp.bottom).offset(40)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.top.equalTo(folderTitleContainerView.snp.bottom).offset(52)
+            make.directionalHorizontalEdges.equalToSuperview().inset(28)
         }
 
         folderView.snp.makeConstraints { make in
-            make.top.equalTo(folderLabel.snp.bottom).offset(12)
+            make.top.equalTo(folderLabel.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(72)
         }
