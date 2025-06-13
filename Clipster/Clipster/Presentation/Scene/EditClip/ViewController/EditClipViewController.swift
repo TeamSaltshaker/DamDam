@@ -175,10 +175,10 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         viewModel.state
-            .map(\.urlValidationImageName)
-            .map { UIImage(named: $0) }
+            .compactMap(\.urlValidationImageName)
+            .compactMap { UIImage(named: $0) }
             .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
+            .asDriver(onErrorJustReturn: .none)
             .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
             .disposed(by: disposeBag)
 
@@ -250,11 +250,7 @@ private extension EditClipViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] in
                 self?.editClipView.folderRowView.setDisplay(
-                    FolderDisplay(
-                        id: $0.id,
-                        title: $0.title,
-                        itemCount: "\($0.clips.count + $0.folders.count)개 항목"
-                    )
+                    FolderDisplayMapper.map($0)
                 )
             }
             .disposed(by: disposeBag)
@@ -272,7 +268,6 @@ private extension EditClipViewController {
                 guard state.isFolderViewTapped else { return nil }
                 return state.currentFolder
             }
-            .distinctUntilChanged { $0.id == $1.id }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
@@ -281,6 +276,7 @@ private extension EditClipViewController {
                 let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
                 vc.onSelectionComplete = {
                     self.viewModel.action.accept(.editFolder($0))
+                    self.viewModel.action.accept(.folderSelectorViewDisappeared)
                 }
                 vc.modalPresentationStyle = .pageSheet
 

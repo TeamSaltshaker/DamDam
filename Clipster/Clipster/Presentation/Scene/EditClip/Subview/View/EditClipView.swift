@@ -14,7 +14,6 @@ final class EditClipView: UIView {
 
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.alwaysBounceVertical = true
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView
     }()
@@ -116,8 +115,8 @@ private extension EditClipView {
             memoView,
             folderLabel,
             addFolderButton,
-            emptyView,
-            folderView
+            folderView,
+            emptyView
         ].forEach {
             scrollContainerView.addSubview($0)
         }
@@ -172,6 +171,7 @@ private extension EditClipView {
             make.top.equalToSuperview().offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.width.equalToSuperview().inset(24)
+            make.height.equalTo(0).priority(.low)
         }
 
         urlInputTextField.snp.makeConstraints { make in
@@ -196,7 +196,9 @@ private extension EditClipView {
         folderView.snp.makeConstraints { make in
             make.top.equalTo(folderLabel.snp.bottom).offset(12)
             make.directionalHorizontalEdges.equalToSuperview().inset(28)
+            make.bottom.lessThanOrEqualToSuperview().inset(20)
             make.height.equalTo(72)
+            make.width.equalToSuperview().inset(28)
         }
 
         folderRowView.snp.makeConstraints { make in
@@ -212,7 +214,7 @@ private extension EditClipView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.top.equalTo(folderView.snp.top)
+            make.top.equalTo(folderLabel.snp.bottom).offset(12)
             make.height.greaterThanOrEqualTo(155)
             make.directionalHorizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview().inset(20)
