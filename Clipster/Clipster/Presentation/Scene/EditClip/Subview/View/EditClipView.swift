@@ -164,7 +164,6 @@ private extension EditClipView {
         scrollContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
-            make.bottom.equalTo(emptyView.snp.bottom)
         }
 
         urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
