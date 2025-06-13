@@ -20,6 +20,7 @@ final class EditClipViewModel: ViewModel {
         case fetchTopLevelFolder
         case editBeginURLTextField
         case editEndURLTextField
+        case folderSelectorViewDisappeared
     }
 
     enum Mutation {
@@ -228,6 +229,9 @@ final class EditClipViewModel: ViewModel {
         case .editEndURLTextField:
             print("\(Self.self) \(action)")
             return .just(.updateURLTextFieldBorderColor(.black900))
+        case .folderSelectorViewDisappeared:
+            print("\(Self.self) \(action)")
+            return .just(.updateFolderViewTapped(false))
         }
     }
 
