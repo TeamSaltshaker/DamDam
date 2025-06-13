@@ -78,7 +78,7 @@ final class EditClipView: UIView {
 
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.image = .chevronRight
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .label
         return imageView
