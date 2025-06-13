@@ -253,7 +253,7 @@ private extension EditClipViewController {
                     FolderDisplay(
                         id: $0.id,
                         title: $0.title,
-                        itemCount: "\($0.clips.count + $0.folders.count)개 항목"
+                        itemCount: "\($0.clips.count + $0.folders.count) 개 항목"
                     )
                 )
             }
