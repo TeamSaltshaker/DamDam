@@ -62,7 +62,7 @@ final class ClipDetailView: UIView {
     func setInteraction(enabled: Bool) {
         thumbnailView.isUserInteractionEnabled = enabled
         urlView.isUserInteractionEnabled = enabled
-        memoView.isUserInteractionEnabled = enabled
+//        memoView.isUserInteractionEnabled = enabled
 
         if enabled {
             urlView.urlTextField.textColor = .black50
