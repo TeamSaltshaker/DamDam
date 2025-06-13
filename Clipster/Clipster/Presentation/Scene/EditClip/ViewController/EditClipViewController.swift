@@ -222,7 +222,6 @@ private extension EditClipViewController {
             }
         }
         .distinctUntilChanged()
-        .debug()
         .asDriver(onErrorDriveWith: .empty())
         .drive(editClipView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
@@ -256,6 +255,7 @@ private extension EditClipViewController {
 
         viewModel.state
             .compactMap(\.currentFolder)
+            .distinctUntilChanged { $0.id == $1.id }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] in
                 self?.editClipView.folderRowView.setDisplay(
@@ -277,6 +277,7 @@ private extension EditClipViewController {
                 guard state.isFolderViewTapped else { return nil }
                 return state.currentFolder
             }
+            .distinctUntilChanged { $0.id == $1.id }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
