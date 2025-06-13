@@ -175,7 +175,7 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         viewModel.state
-            .map(\.urlValidationImageName)
+            .compactMap(\.urlValidationImageName)
             .compactMap { UIImage(named: $0) }
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: .none)

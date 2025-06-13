@@ -43,7 +43,7 @@ final class EditClipViewModel: ViewModel {
         var memoText: String = ""
         var memoLimit: String = "0 / 100"
         var isURLValid = false
-        var urlValidationImageName: String = ""
+        var urlValidationImageName: String?
         var urlValidationLabelText: String = ""
         var urlMetadata: URLMetadataDisplay?
         var isFolderViewTapped: Bool = false
@@ -264,7 +264,7 @@ final class EditClipViewModel: ViewModel {
         case .updateIsLoading(let value):
             newState.isLoading = value
             newState.urlValidationLabelText = "URL 분석 중..."
-            newState.urlValidationImageName = ""
+            newState.urlValidationImageName = nil
         }
         return newState
     }
