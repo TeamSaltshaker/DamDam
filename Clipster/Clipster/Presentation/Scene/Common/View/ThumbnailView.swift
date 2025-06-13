@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class URLMetadataView: UIView {
+final class ThumbnailView: UIView {
     let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -15,7 +15,7 @@ final class URLMetadataView: UIView {
         let label = UILabel()
         label.font = .pretendard(size: 16, weight: .semiBold)
         label.textColor = .black100
-        label.numberOfLines = 0
+        label.numberOfLines = 2
         label.backgroundColor = .clear
         return label
     }()
@@ -30,7 +30,7 @@ final class URLMetadataView: UIView {
     }
 }
 
-private extension URLMetadataView {
+private extension ThumbnailView {
     func configure() {
         setAttributes()
         setHierarchy()
@@ -58,8 +58,7 @@ private extension URLMetadataView {
         }
 
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(12)
-            make.bottom.lessThanOrEqualToSuperview().inset(12)
+            make.verticalEdges.lessThanOrEqualToSuperview().inset(12)
             make.leading.equalTo(thumbnailImageView.snp.trailing).offset(16)
             make.trailing.equalToSuperview().inset(20)
         }
