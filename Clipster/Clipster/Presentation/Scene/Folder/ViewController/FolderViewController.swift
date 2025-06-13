@@ -1,7 +1,6 @@
 import RxCocoa
 import RxSwift
 import SafariServices
-import SnapKit
 import UIKit
 
 final class FolderViewController: UIViewController {
@@ -39,7 +38,12 @@ final class FolderViewController: UIViewController {
 
 private extension FolderViewController {
     func configure() {
+        setDelegates()
         setBindings()
+    }
+
+    func setDelegates() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
@@ -148,5 +152,11 @@ private extension FolderViewController {
                 }
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension FolderViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }

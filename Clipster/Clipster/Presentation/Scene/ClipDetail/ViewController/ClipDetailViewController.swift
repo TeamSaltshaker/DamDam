@@ -35,7 +35,12 @@ final class ClipDetailViewController: UIViewController {
 
 private extension ClipDetailViewController {
     func configure() {
+        setDelegates()
         setBindings()
+    }
+
+    func setDelegates() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
@@ -147,5 +152,11 @@ private extension ClipDetailViewController {
             .map { ClipDetailAction.deleteButtonTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
+    }
+}
+
+extension ClipDetailViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }
