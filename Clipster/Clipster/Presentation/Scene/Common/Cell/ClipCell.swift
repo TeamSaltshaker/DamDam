@@ -43,6 +43,8 @@ final class ClipCell: UITableViewCell {
         let view = UIView()
         view.backgroundColor = .blue400
         view.layer.cornerRadius = 4
+        view.layer.borderWidth = 1.5
+        view.layer.borderColor = UIColor.white900.cgColor
         view.isHidden = true
         return view
     }()
