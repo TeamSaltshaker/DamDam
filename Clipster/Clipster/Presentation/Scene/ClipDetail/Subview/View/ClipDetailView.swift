@@ -8,8 +8,21 @@ final class ClipDetailView: UIView {
     let editButton = EditButton()
     let deleteButton = DeleteButton()
     private let urlMetadataView = URLMetadataView()
-    private let urlView = URLView()
-    private let memoView = MemoView()
+
+    private let urlView: URLView = {
+        let view = URLView()
+        view.urlTextField.textColor = .black500
+        view.statusImageView.isHidden = true
+        view.statusLabel.isHidden = true
+        return view
+    }()
+
+    private let memoView: MemoView = {
+        let view = MemoView()
+        view.memoTextView.textColor = .black500
+        return view
+    }()
+
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 
     private let folderLabel: UILabel = {
@@ -42,13 +55,8 @@ final class ClipDetailView: UIView {
         urlMetadataView.thumbnailImageView.kf.setImage(with: clip.urlMetadata.thumbnailImageURL)
         urlMetadataView.titleLabel.text = clip.urlMetadata.title
         urlView.urlTextField.text = clip.urlMetadata.url.description
-        urlView.urlTextField.textColor = .black500
-        urlView.statusImageView.isHidden = true
-        urlView.statusLabel.isHidden = true
         memoView.memoTextView.text = clip.memo
-        memoView.memoTextView.textColor = .black500
         memoView.memoLimitLabel.text = clip.memoLimit
-
         folderRowView.setDisplay(folder)
     }
 
