@@ -176,9 +176,9 @@ private extension EditClipViewController {
 
         viewModel.state
             .map(\.urlValidationImageName)
-            .map { UIImage(named: $0) }
+            .compactMap { UIImage(named: $0) }
             .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
+            .asDriver(onErrorJustReturn: .none)
             .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
             .disposed(by: disposeBag)
 
