@@ -67,11 +67,11 @@ private extension MemoView {
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.bottom.equalToSuperview().inset(16)
+            make.height.equalTo(96)
         }
 
         memoTextView.snp.makeConstraints { make in
             make.top.directionalHorizontalEdges.equalToSuperview().inset(12)
-            make.height.equalTo(96)
         }
 
         memoLimitLabel.snp.makeConstraints { make in
