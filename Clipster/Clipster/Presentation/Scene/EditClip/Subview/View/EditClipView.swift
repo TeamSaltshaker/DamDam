@@ -41,6 +41,10 @@ final class EditClipView: UIView {
         let textField = CommonTextField()
         textField.keyboardType = .URL
         textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
+        textField.smartDashesType = .no
+        textField.smartInsertDeleteType = .no
         textField.attributedPlaceholder = NSAttributedString(
             string: "URL을 입력해 주세요.",
             attributes: [
