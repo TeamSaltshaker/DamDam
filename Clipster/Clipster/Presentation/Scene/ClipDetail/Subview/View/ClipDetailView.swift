@@ -66,11 +66,11 @@ final class ClipDetailView: UIView {
         memoView.isUserInteractionEnabled = enabled
 
         if enabled {
-            urlView.urlTextField.textColor = .label
-            memoView.memoTextView.textColor = .label
+            urlView.urlTextField.textColor = .black50
+            memoView.memoTextView.textColor = .black50
         } else {
-            urlView.urlTextField.textColor = .secondaryLabel
-            memoView.memoTextView.textColor = .secondaryLabel
+            urlView.urlTextField.textColor = .black500
+            memoView.memoTextView.textColor = .black500
         }
     }
 

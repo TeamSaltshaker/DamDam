@@ -22,7 +22,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let homeVC = HomeViewController(homeviewModel: homeVM, diContainer: diContainer)
 
         window = UIWindow(windowScene: windowScene)
-        window?.backgroundColor = .systemBackground
+        window?.backgroundColor = .white800
         window?.rootViewController = UINavigationController(rootViewController: homeVC)
         window?.makeKeyAndVisible()
     }
