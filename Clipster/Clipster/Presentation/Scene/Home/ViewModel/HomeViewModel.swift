@@ -42,17 +42,20 @@ final class HomeViewModel {
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let deleteClipUseCase: DeleteClipUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
+    private let updateClipUseCase: UpdateClipUseCase
 
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         deleteClipUseCase: DeleteClipUseCase,
-        deleteFolderUseCase: DeleteFolderUseCase
+        deleteFolderUseCase: DeleteFolderUseCase,
+        updateClipUseCase: UpdateClipUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.deleteClipUseCase = deleteClipUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
+        self.updateClipUseCase = updateClipUseCase
         bind()
     }
 
@@ -89,6 +92,7 @@ final class HomeViewModel {
             let clip = unvisitedClips[indexPath.item]
             switch action {
             case .tapCell:
+                Task { await updateClipAsVisited(clip) }
                 return .showWebView(clip.urlMetadata.url)
             case .tapDetail:
                 return .showDetailClip(clip)
@@ -160,6 +164,27 @@ final class HomeViewModel {
         switch result {
         case .success:
             await makeHomeDisplay()
+        case .failure(let error):
+            print(error)
+        }
+    }
+
+    private func updateClipAsVisited(_ clip: Clip) async {
+        let visitedClip = Clip(
+            id: clip.id,
+            folderID: clip.folderID,
+            urlMetadata: clip.urlMetadata,
+            memo: clip.memo,
+            lastVisitedAt: Date(),
+            createdAt: clip.createdAt,
+            updatedAt: Date(),
+            deletedAt: clip.deletedAt
+        )
+
+        let result = await updateClipUseCase.execute(clip: visitedClip)
+        switch result {
+        case .success:
+            break
         case .failure(let error):
             print(error)
         }

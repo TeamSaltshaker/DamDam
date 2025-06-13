@@ -159,7 +159,8 @@ final class DIContainer {
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
-            deleteFolderUseCase: makeDeleteFolderUseCase()
+            deleteFolderUseCase: makeDeleteFolderUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 
@@ -167,7 +168,8 @@ final class DIContainer {
         UnvisitedClipListViewModel(
             clips: clips,
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
-            deleteClipUseCase: makeDeleteClipUseCase()
+            deleteClipUseCase: makeDeleteClipUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase()
         )
     }
 

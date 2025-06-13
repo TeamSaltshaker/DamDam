@@ -34,15 +34,18 @@ final class UnvisitedClipListViewModel {
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let deleteClipUseCase: DeleteClipUseCase
+    private let updateClipUseCase: UpdateClipUseCase
 
     init(
         clips: [Clip],
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
-        deleteClipUseCase: DeleteClipUseCase
+        deleteClipUseCase: DeleteClipUseCase,
+        updateClipUseCase: UpdateClipUseCase
     ) {
         self.clips = clips
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.deleteClipUseCase = deleteClipUseCase
+        self.updateClipUseCase = updateClipUseCase
         bind()
     }
 
@@ -92,6 +95,7 @@ final class UnvisitedClipListViewModel {
         let clip = clips[index]
         switch action {
         case .tapCell:
+            Task { await updateClipAsVisited(clip) }
             return .showWebView(clip.urlMetadata.url)
         case .tapDetail:
             return .showDetailClip(clip)
@@ -107,6 +111,27 @@ final class UnvisitedClipListViewModel {
         switch result {
         case .success:
             await handleViewWillAppear()
+        case .failure(let error):
+            print(error)
+        }
+    }
+
+    private func updateClipAsVisited(_ clip: Clip) async {
+        let visitedClip = Clip(
+            id: clip.id,
+            folderID: clip.folderID,
+            urlMetadata: clip.urlMetadata,
+            memo: clip.memo,
+            lastVisitedAt: Date(),
+            createdAt: clip.createdAt,
+            updatedAt: Date(),
+            deletedAt: clip.deletedAt
+        )
+
+        let result = await updateClipUseCase.execute(clip: visitedClip)
+        switch result {
+        case .success:
+            break
         case .failure(let error):
             print(error)
         }
