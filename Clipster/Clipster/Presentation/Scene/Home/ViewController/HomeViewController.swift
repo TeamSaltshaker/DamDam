@@ -42,7 +42,6 @@ private extension HomeViewController {
     }
 
     func setAttributes() {
-        title = "Clipster"
         navigationController?.isNavigationBarHidden = true
     }
 
