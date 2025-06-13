@@ -201,11 +201,12 @@
 				};
 			};
 			buildConfigurationList = 44DFD9B02DE9D0E000B6CD87 /* Build configuration list for PBXProject "Clipster" */;
-			developmentRegion = en;
+			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 44DFD9AC2DE9D0E000B6CD87;
 			minimizedProjectReferenceProxies = 1;
