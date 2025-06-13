@@ -8,6 +8,7 @@ final class ClipListCell: UICollectionViewListCell {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .black800
         return imageView
     }()
 
@@ -57,10 +58,9 @@ final class ClipListCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        let inset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
-        contentView.frame = contentView.frame.inset(by: inset)
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        thumbnailImageView.image = nil
     }
 
     func setDisplay(_ display: ClipDisplay) {
