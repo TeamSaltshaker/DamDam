@@ -209,16 +209,20 @@ private extension EditClipViewController {
             viewModel.state.map(\.memoText),
             viewModel.state.map(\.isURLValid),
             viewModel.state.map(\.currentFolder),
-            viewModel.state.map(\.isLoading)
+            viewModel.state.map(\.isLoading),
+            viewModel.state.map(\.urlInputText)
         )
-        .map { clip, memoText, isURLValid, currentFolder, isLoading in
+        .map { clip, memoText, isURLValid, currentFolder, isLoading, urlText in
+            guard !isLoading else { return false }
+            guard isURLValid else { return false }
             if let clip = clip {
-                return clip.memo != memoText || !isURLValid || currentFolder?.id != clip.folderID || !isLoading
+                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.urlMetadata.url.absoluteString != urlText
             } else {
-                return !memoText.isEmpty && isURLValid && currentFolder != nil && !isLoading
+                return currentFolder != nil
             }
         }
         .distinctUntilChanged()
+        .debug()
         .asDriver(onErrorDriveWith: .empty())
         .drive(editClipView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
