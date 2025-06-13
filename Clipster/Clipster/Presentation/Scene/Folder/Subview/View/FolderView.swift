@@ -211,7 +211,7 @@ extension FolderView: UITableViewDelegate {
               let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
               !items.isEmpty else { return .leastNonzeroMagnitude }
 
-        return 36
+        return 48
     }
 
     func tableView(
