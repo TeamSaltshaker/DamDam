@@ -46,7 +46,6 @@ final class FolderListCell: UICollectionViewListCell {
         let imageView = UIImageView()
         imageView.image = .chevronRight
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .systemGray
         return imageView
     }()
 

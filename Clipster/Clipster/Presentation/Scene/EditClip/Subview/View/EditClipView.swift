@@ -87,7 +87,6 @@ final class EditClipView: UIView {
         let imageView = UIImageView()
         imageView.image = .chevronRight
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .label
         return imageView
     }()
 

@@ -22,7 +22,7 @@ final class ClipGridCell: UICollectionViewCell {
     private let titleTextView: UITextView = {
         let textView = UITextView()
         textView.font = .init(name: "Pretendard-Medium", size: 14)
-        textView.textColor = .label
+        textView.textColor = .black100
         textView.isEditable = false
         textView.isScrollEnabled = false
         textView.isSelectable = false
@@ -36,7 +36,7 @@ final class ClipGridCell: UICollectionViewCell {
     private let memoLabel: UILabel = {
         let label = UILabel()
         label.font = .init(name: "Pretendard-Regular", size: 12)
-        label.textColor = .systemGray
+        label.textColor = .black300
         return label
     }()
 
