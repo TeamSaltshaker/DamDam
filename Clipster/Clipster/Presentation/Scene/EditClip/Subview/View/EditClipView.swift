@@ -78,7 +78,7 @@ final class EditClipView: UIView {
 
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.image = .chevronRight
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .label
         return imageView
@@ -164,7 +164,6 @@ private extension EditClipView {
         scrollContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
-            make.bottom.equalTo(emptyView.snp.bottom)
         }
 
         urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
@@ -203,10 +202,10 @@ private extension EditClipView {
         folderRowView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
+            make.trailing.equalTo(chevronImageView.snp.leading).offset(-16)
         }
 
         chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(folderRowView.snp.trailing).inset(16)
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalToSuperview()
             make.size.equalTo(24)
