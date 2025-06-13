@@ -90,7 +90,7 @@ final class EditClipView: UIView {
         return imageView
     }()
 
-    let emptyView = EmptyView()
+    let emptyView = EmptyView(type: .editClipView)
 
     let folderViewTapGesture = UITapGestureRecognizer()
 
@@ -221,10 +221,9 @@ private extension EditClipView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.top.equalTo(folderLabel.snp.bottom).offset(12)
-            make.height.greaterThanOrEqualTo(155)
-            make.directionalHorizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview().inset(20)
+            make.top.equalTo(folderLabel.snp.bottom).offset(34)
+            make.directionalHorizontalEdges.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().inset(22)
         }
     }
 }

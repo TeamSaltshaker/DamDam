@@ -85,7 +85,7 @@ final class HomeView: UIView {
     }()
 
     private let emptyView: EmptyView = {
-        let view = EmptyView()
+        let view = EmptyView(type: .homeView)
         view.isHidden = true
         return view
     }()
