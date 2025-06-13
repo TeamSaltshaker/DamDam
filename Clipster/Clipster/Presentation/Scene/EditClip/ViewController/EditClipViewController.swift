@@ -156,7 +156,7 @@ private extension EditClipViewController {
         viewModel.state
             .map(\.memoLimit)
             .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: "0/100")
+            .asDriver(onErrorJustReturn: "0 / 100")
             .drive(editClipView.memoView.memoLimitLabel.rx.text)
             .disposed(by: disposeBag)
 
