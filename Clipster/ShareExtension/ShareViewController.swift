@@ -11,6 +11,14 @@ final class ShareViewController: SLComposeViewController {
         #endif
     }()
 
+    private let urlScheme: String = {
+        #if DEBUG
+        return "damdamdebug://"
+        #else
+        return "damdam://"
+        #endif
+    }()
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         extractURL()
@@ -53,7 +61,7 @@ final class ShareViewController: SLComposeViewController {
     }
 
     private func openMainApp() {
-        if let url = URL(string: "clipster://") {
+        if let url = URL(string: urlScheme) {
             if openURLScheme(url) {
                 print("\(Self.self) ✅ URL Scheme open 성공")
             } else {

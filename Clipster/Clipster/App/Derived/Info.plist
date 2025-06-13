@@ -11,7 +11,19 @@
 			<string>com.saltshaker.clipster</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>clipster</string>
+				<string>damdam</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
+			<key>CFBundleURLName</key>
+			<string>com.saltshaker.clipster.debug</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>damdamdebug</string>
 			</array>
 		</dict>
 	</array>

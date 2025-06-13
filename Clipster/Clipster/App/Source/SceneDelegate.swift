@@ -1,6 +1,14 @@
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    private let appGroupID: String = {
+        #if DEBUG
+        return "group.com.saltshaker.clipster.debug"
+        #else
+        return "group.com.saltshaker.clipster"
+        #endif
+    }()
+
     var window: UIWindow?
 
     func scene(
@@ -20,7 +28,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.saltshaker.clipster"),
+        if let sharedDefaults = UserDefaults(suiteName: appGroupID),
            let urlString = sharedDefaults.string(forKey: "sharedURL") {
             sharedDefaults.removeObject(forKey: "sharedURL")
 
