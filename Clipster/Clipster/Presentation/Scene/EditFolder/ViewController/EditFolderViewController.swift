@@ -31,16 +31,16 @@ final class EditFolderViewController: UIViewController {
         configure()
         hideKeyboardWhenTappedBackground()
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+    }
 }
 
 private extension EditFolderViewController {
     func configure() {
-        setDelegates()
         setBindings()
-    }
-
-    func setDelegates() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {

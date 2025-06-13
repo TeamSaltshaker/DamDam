@@ -31,6 +31,7 @@ final class UnvisitedClipListViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
         unvisitedClipListViewModel.action.accept(.viewWillAppear)
     }
 }
@@ -38,16 +39,11 @@ final class UnvisitedClipListViewController: UIViewController {
 private extension UnvisitedClipListViewController {
     func configure() {
         setAttributes()
-        setDelegates()
         setBindings()
     }
 
     func setAttributes() {
         title = "방문하지 않은 클립"
-    }
-
-    func setDelegates() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
