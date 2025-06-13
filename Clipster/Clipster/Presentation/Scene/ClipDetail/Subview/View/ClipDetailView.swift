@@ -18,6 +18,7 @@ final class ClipDetailView: UIView {
     private let memoView: MemoView = {
         let view = MemoView()
         view.memoTextView.textColor = .black500
+        view.memoTextView.isEditable = false
         return view
     }()
 
