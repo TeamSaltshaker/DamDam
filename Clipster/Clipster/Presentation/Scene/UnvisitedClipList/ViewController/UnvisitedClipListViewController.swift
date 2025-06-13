@@ -77,7 +77,8 @@ private extension UnvisitedClipListViewController {
             .disposed(by: disposeBag)
 
         unvisitedClipListViewModel.route
-            .asSignal()
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .asSignal(onErrorSignalWith: .empty())
             .emit(with: self) { owner, route in
                 switch route {
                 case .back:
