@@ -83,7 +83,7 @@ private extension FolderRowView {
 
         folderImageView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.size.equalTo(22)
+            make.size.equalTo(20)
         }
     }
 }
