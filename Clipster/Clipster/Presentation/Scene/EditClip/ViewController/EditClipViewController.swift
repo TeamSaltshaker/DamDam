@@ -290,7 +290,7 @@ private extension EditClipViewController {
                 vc.modalPresentationStyle = .pageSheet
 
                 if let sheet = vc.sheetPresentationController {
-                    sheet.detents = [.custom { context in context.maximumDetentValue * (2.0 / 3.0) }]
+                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
                     sheet.prefersGrabberVisible = true
                 }
 

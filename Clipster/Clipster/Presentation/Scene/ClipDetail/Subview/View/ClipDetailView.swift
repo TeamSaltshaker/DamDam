@@ -93,7 +93,7 @@ private extension ClipDetailView {
     func setAttributes() {
         backgroundColor = .white800
 
-        commonNavigationView.setTitle("클립 상세정보")
+        commonNavigationView.setTitle("상세정보")
         commonNavigationView.setLeftItem(backButton)
         commonNavigationView.setRightItems([editButton, deleteButton])
     }
