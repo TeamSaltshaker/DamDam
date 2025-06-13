@@ -84,7 +84,11 @@ final class HomeView: UIView {
         return collectionView
     }()
 
-    private let emptyView = EmptyView()
+    private let emptyView: EmptyView = {
+        let view = EmptyView()
+        view.isHidden = true
+        return view
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
