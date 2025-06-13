@@ -22,7 +22,6 @@ final class MemoView: UIView {
     let memoTextView: UITextView = {
         let textView = UITextView()
         textView.font = .pretendard(size: 14, weight: .regular)
-        textView.isEditable = false
         textView.isScrollEnabled = true
         return textView
     }()

@@ -18,6 +18,7 @@ final class ClipDetailView: UIView {
     private let memoView: MemoView = {
         let view = MemoView()
         view.memoTextView.textColor = .black500
+        view.memoTextView.isEditable = false
         return view
     }()
 
@@ -61,7 +62,6 @@ final class ClipDetailView: UIView {
     func setInteraction(enabled: Bool) {
         thumbnailView.isUserInteractionEnabled = enabled
         urlView.isUserInteractionEnabled = enabled
-        memoView.isUserInteractionEnabled = enabled
 
         if enabled {
             urlView.urlTextField.textColor = .black50
