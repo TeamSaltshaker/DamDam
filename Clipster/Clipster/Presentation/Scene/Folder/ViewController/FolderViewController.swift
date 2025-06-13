@@ -54,6 +54,7 @@ private extension FolderViewController {
             .disposed(by: disposeBag)
 
         viewModel.navigation
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] navigation in
                 guard let self else { return }
