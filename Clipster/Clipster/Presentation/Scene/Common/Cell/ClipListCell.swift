@@ -99,15 +99,16 @@ private extension ClipListCell {
 
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().inset(12)
             make.leading.equalToSuperview().inset(44)
+            make.bottom.equalToSuperview().inset(12).priority(.high)
             make.width.equalTo(64)
             make.height.equalTo(48)
-            make.centerY.equalToSuperview()
         }
 
         stackView.snp.makeConstraints { make in
             make.leading.equalTo(thumbnailImageView.snp.trailing).offset(16)
-            make.verticalEdges.equalToSuperview().inset(12.95)
+            make.centerY.equalToSuperview()
         }
 
         chevronImageView.snp.makeConstraints { make in
