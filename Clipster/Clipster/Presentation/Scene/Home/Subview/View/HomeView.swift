@@ -201,7 +201,7 @@ private extension HomeView {
     func createCollectionViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { [weak self] index, env -> NSCollectionLayoutSection? in
             guard let self,
-                  let sectionKind = self.dataSource?.snapshot().sectionIdentifiers[index]
+                  let sectionKind = dataSource?.sectionIdentifier(for: index)
             else { return nil }
 
             switch sectionKind {
@@ -244,6 +244,7 @@ private extension HomeView {
         config.showsSeparators = false
         config.backgroundColor = .white800
         config.headerMode = .supplementary
+        config.headerTopPadding = 0
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             let delete = UIContextualAction(
                 style: .destructive,
