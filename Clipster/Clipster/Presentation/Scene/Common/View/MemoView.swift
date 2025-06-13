@@ -22,6 +22,8 @@ final class MemoView: UIView {
     let memoTextView: UITextView = {
         let textView = UITextView()
         textView.font = .pretendard(size: 14, weight: .regular)
+        textView.isEditable = false
+        textView.isScrollEnabled = true
         return textView
     }()
 
@@ -59,14 +61,13 @@ private extension MemoView {
 
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.top.equalToSuperview()
+            make.directionalHorizontalEdges.equalToSuperview().inset(4)
         }
 
         memoContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview().inset(16)
+            make.bottom.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(96)
         }
 

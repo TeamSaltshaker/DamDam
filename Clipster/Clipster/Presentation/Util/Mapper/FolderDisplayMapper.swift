@@ -5,7 +5,7 @@ struct FolderDisplayMapper {
         return FolderDisplay(
             id: folder.id,
             title: folder.title,
-            itemCount: "\(totalCount) 개의 항목"
+            itemCount: "\(totalCount)개의 항목"
         )
     }
 }

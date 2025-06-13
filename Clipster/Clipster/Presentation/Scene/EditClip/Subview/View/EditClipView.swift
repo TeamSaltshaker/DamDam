@@ -27,6 +27,8 @@ final class EditClipView: UIView {
         return stackView
     }()
 
+    let urlLabelView = UIView()
+
     let urlLabel: UILabel = {
         let label = UILabel()
         label.text = "URL"
@@ -65,11 +67,7 @@ final class EditClipView: UIView {
         return label
     }()
 
-    let addFolderButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.plus, for: .normal)
-        return button
-    }()
+    let addFolderButton = AddButton()
 
     lazy var folderView: UIView = {
         let view = UIView()
@@ -130,9 +128,11 @@ private extension EditClipView {
 
         scrollView.addSubview(scrollContainerView)
 
+        urlLabelView.addSubview(urlLabel)
+
         [
             urlMetadataStackView,
-            urlLabel,
+            urlLabelView,
             urlInputTextField,
             urlValidationStacKView
         ].forEach {
@@ -181,13 +181,18 @@ private extension EditClipView {
             make.height.equalTo(0).priority(.low)
         }
 
+        urlLabel.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview()
+            make.directionalHorizontalEdges.equalToSuperview().offset(4)
+        }
+
         urlInputTextField.snp.makeConstraints { make in
             make.height.equalTo(48)
         }
 
         memoView.snp.makeConstraints { make in
             make.top.equalTo(urlStackView.snp.bottom).offset(32)
-            make.directionalHorizontalEdges.equalToSuperview()
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         folderLabel.snp.makeConstraints { make in
@@ -196,20 +201,20 @@ private extension EditClipView {
         }
 
         addFolderButton.snp.makeConstraints { make in
-            make.top.equalTo(memoView.snp.bottom).offset(40)
+            make.centerY.equalTo(folderLabel)
             make.trailing.equalToSuperview().inset(28)
+            make.size.equalTo(48)
         }
 
         folderView.snp.makeConstraints { make in
-            make.top.equalTo(folderLabel.snp.bottom).offset(12)
-            make.directionalHorizontalEdges.equalToSuperview().inset(28)
-            make.bottom.lessThanOrEqualToSuperview().inset(20)
+            make.top.equalTo(folderLabel.snp.bottom).offset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.bottom.lessThanOrEqualToSuperview().inset(24)
             make.height.equalTo(72)
-            make.width.equalToSuperview().inset(28)
         }
 
         folderRowView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview()
+            make.verticalEdges.equalToSuperview().inset(12)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalTo(chevronImageView.snp.leading).offset(-16)
         }

@@ -7,13 +7,11 @@ final class ClipDetailView: UIView {
     let backButton = BackButton()
     let editButton = EditButton()
     let deleteButton = DeleteButton()
-    private let urlMetadataView = URLMetadataView()
+    private let thumbnailView = ThumbnailView()
 
     private let urlView: URLView = {
         let view = URLView()
         view.urlTextField.textColor = .black500
-        view.statusImageView.isHidden = true
-        view.statusLabel.isHidden = true
         return view
     }()
 
@@ -52,8 +50,8 @@ final class ClipDetailView: UIView {
     }
 
     func setDisplay(_ clip: ClipDisplay, folder: FolderDisplay) {
-        urlMetadataView.thumbnailImageView.kf.setImage(with: clip.urlMetadata.thumbnailImageURL)
-        urlMetadataView.titleLabel.text = clip.urlMetadata.title
+        thumbnailView.thumbnailImageView.kf.setImage(with: clip.urlMetadata.thumbnailImageURL)
+        thumbnailView.titleLabel.text = clip.urlMetadata.title
         urlView.urlTextField.text = clip.urlMetadata.url.description
         memoView.memoTextView.text = clip.memo
         memoView.memoLimitLabel.text = clip.memoLimit
@@ -61,7 +59,7 @@ final class ClipDetailView: UIView {
     }
 
     func setInteraction(enabled: Bool) {
-        urlMetadataView.isUserInteractionEnabled = enabled
+        thumbnailView.isUserInteractionEnabled = enabled
         urlView.isUserInteractionEnabled = enabled
         memoView.isUserInteractionEnabled = enabled
 
@@ -101,7 +99,7 @@ private extension ClipDetailView {
     }
 
     func setHierarchy() {
-        [commonNavigationView, urlMetadataView, urlView, memoView, activityIndicator, folderLabel, folderView]
+        [commonNavigationView, thumbnailView, urlView, memoView, folderLabel, folderView, activityIndicator]
             .forEach { addSubview($0) }
 
         folderView.addSubview(folderRowView)
@@ -121,19 +119,19 @@ private extension ClipDetailView {
             make.size.equalTo(48)
         }
 
-        urlMetadataView.snp.makeConstraints { make in
+        thumbnailView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         urlView.snp.makeConstraints { make in
-            make.top.equalTo(urlMetadataView.snp.bottom).offset(16)
-            make.directionalHorizontalEdges.equalToSuperview()
+            make.top.equalTo(thumbnailView.snp.bottom).offset(32)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         memoView.snp.makeConstraints { make in
-            make.top.equalTo(urlView.snp.bottom)
-            make.directionalHorizontalEdges.equalToSuperview()
+            make.top.equalTo(urlView.snp.bottom).offset(32)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         folderLabel.snp.makeConstraints { make in
@@ -142,7 +140,7 @@ private extension ClipDetailView {
         }
 
         folderView.snp.makeConstraints { make in
-            make.top.equalTo(folderLabel.snp.bottom).offset(12)
+            make.top.equalTo(folderLabel.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(72)
         }
