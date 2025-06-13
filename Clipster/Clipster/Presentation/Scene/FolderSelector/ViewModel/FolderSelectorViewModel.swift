@@ -24,7 +24,6 @@ enum FolderSelectorMode {
 
 enum FolderSelectorAction {
     case viewDidLoad
-    case viewWillDisappear
     case dataLoadedSucceeded(folders: [Folder])
     case dataLoadFailed(Error)
     case openSubfolder(folder: Folder)
@@ -148,9 +147,6 @@ final class FolderSelectorViewModel {
                 case .viewDidLoad:
                     print("\(Self.self): viewDidLoad")
                     state.isLoading = true
-                case .viewWillDisappear:
-                    print("\(Self.self): viewWillDisappear")
-                    state.shouldDismiss = true
                 case .dataLoadedSucceeded(let folders):
                     print("\(Self.self): data load succeeded with \(folders.count) folders")
                     state.isLoading = false
