@@ -80,13 +80,13 @@ private extension CommonNavigationView {
 
         leftStackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
-            make.trailing.lessThanOrEqualTo(titleLabel.snp.leading).offset(-24)
+            make.trailing.lessThanOrEqualTo(titleLabel.snp.leading).offset(-16)
             make.centerY.equalToSuperview()
         }
 
         rightStackView.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(24)
-            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(24)
+            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(16)
             make.centerY.equalToSuperview()
         }
     }
