@@ -254,6 +254,31 @@ private extension EditClipViewController {
             .disposed(by: disposeBag)
 
         viewModel.state
+            .map { ($0.isFolderViewTapped, $0.currentFolder) }
+            .filter { $0 && $1 != nil }
+            .map { $1 }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] currentFolder in
+                guard let self else { return }
+
+                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .editClip(parentFolder: currentFolder))
+                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                vc.onSelectionComplete = {
+                    self.viewModel.action.accept(.editFolder($0))
+                }
+                vc.modalPresentationStyle = .pageSheet
+
+                if let sheet = vc.sheetPresentationController {
+                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
+                    sheet.prefersGrabberVisible = true
+                }
+
+                present(vc, animated: true)
+                self.viewModel.action.accept(.folderSelectorViewDisappeared)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.state
             .compactMap(\.currentFolder)
             .distinctUntilChanged { $0.id == $1.id }
             .asDriver(onErrorDriveWith: .empty())
@@ -269,33 +294,6 @@ private extension EditClipViewController {
             .event
             .subscribe { [weak self] _ in
                 self?.viewModel.action.accept(.folderViewTapped)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .compactMap { state -> Folder? in
-                guard state.isFolderViewTapped else { return nil }
-                return state.currentFolder
-            }
-            .distinctUntilChanged { $0.id == $1.id }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] currentFolder in
-                guard let self else { return }
-
-                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .editClip(parentFolder: currentFolder))
-                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
-                vc.onSelectionComplete = {
-                    self.viewModel.action.accept(.editFolder($0))
-                    self.viewModel.action.accept(.folderSelectorViewDisappeared)
-                }
-                vc.modalPresentationStyle = .pageSheet
-
-                if let sheet = vc.sheetPresentationController {
-                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
-                    sheet.prefersGrabberVisible = true
-                }
-
-                present(vc, animated: true)
             }
             .disposed(by: disposeBag)
 
