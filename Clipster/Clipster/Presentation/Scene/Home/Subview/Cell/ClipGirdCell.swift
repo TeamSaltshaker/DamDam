@@ -50,7 +50,8 @@ final class ClipGridCell: UICollectionViewCell {
     }
 
     override func prepareForReuse() {
-        thumbnailImageView.backgroundColor = .black800
+        super.prepareForReuse()
+        thumbnailImageView.image = nil
     }
 
     func setDisplay(_ display: ClipDisplay) {

@@ -8,6 +8,7 @@ final class ClipCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .black800
         return imageView
     }()
 
@@ -54,6 +55,11 @@ final class ClipCell: UITableViewCell {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        thumbnailImageView.image = nil
     }
 
     override func layoutSubviews() {
