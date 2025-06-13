@@ -134,9 +134,23 @@ private extension EditFolderViewController {
 
         state
             .map { $0.folderTitle }
-            .distinctUntilChanged()
+            .take(1)
             .observe(on: MainScheduler.instance)
-            .bind(to: editFolderView.folderTitleBinder)
+            .bind(to: editFolderView.folderTitleTextField.rx.text)
+            .disposed(by: disposeBag)
+
+        state
+            .map { $0.folderTitleLimit }
+            .bind(to: editFolderView.folderTitleLimitLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        editFolderView.folderTitleTextField.rx.text.orEmpty
+            .map { String($0.prefix(10)) }
+            .do { [weak self] limited in
+                self?.editFolderView.folderTitleTextField.text = limited
+            }
+            .map { .folderTitleChanged($0) }
+            .bind(to: viewModel.action)
             .disposed(by: disposeBag)
 
         editFolderView.backButton.rx.tap
@@ -144,12 +158,6 @@ private extension EditFolderViewController {
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
             }
-            .disposed(by: disposeBag)
-
-        editFolderView.folderTitleChanges
-            .distinctUntilChanged()
-            .map { .folderTitleChanged($0) }
-            .bind(to: viewModel.action)
             .disposed(by: disposeBag)
 
         editFolderView.saveButton.rx.tap

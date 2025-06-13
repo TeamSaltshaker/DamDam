@@ -26,6 +26,10 @@ struct EditFolderState {
     var parentFolder: Folder?
     var parentFolderDisplay: FolderDisplay?
 
+    var folderTitleLimit: String {
+        "\(folderTitle.count) / 10"
+    }
+
     var folder: Folder? {
         switch mode {
         case .add:
