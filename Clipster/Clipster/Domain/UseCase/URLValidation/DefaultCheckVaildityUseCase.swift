@@ -8,7 +8,10 @@ final class DefaultCheckValidityUseCase: CheckURLValidityUseCase {
     }
 
     func execute(urlString: String) async -> Result<Bool, Error> {
-        guard let url = URL(string: urlString) else {
+        let correctedURLString = urlString.lowercased().hasPrefix("https://") ?
+        urlString : "https://\(urlString)"
+        
+        guard let url = URL(string: correctedURLString) else {
             return .failure(URLError(.badURL))
         }
         return await urlValidationRepository.execute(url: url)

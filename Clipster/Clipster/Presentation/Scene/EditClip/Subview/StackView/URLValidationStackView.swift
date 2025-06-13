@@ -16,6 +16,12 @@ final class URLValidationStackView: UIStackView {
         return label
     }()
 
+    let activityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicatorView = UIActivityIndicatorView(style: .medium)
+        activityIndicatorView.hidesWhenStopped = true
+        return activityIndicatorView
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -44,11 +50,17 @@ private extension URLValidationStackView {
         ].forEach {
             addArrangedSubview($0)
         }
+
+        statusImageView.addSubview(activityIndicatorView)
     }
 
     func setConstraints() {
         statusImageView.snp.makeConstraints { make in
             make.size.equalTo(20)
+        }
+
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 }

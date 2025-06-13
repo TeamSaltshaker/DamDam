@@ -8,7 +8,10 @@ final class DefaultParseURLMetadataUseCase: ParseURLMetadataUseCase {
     }
 
     func execute(urlString: String) async -> Result<ParsedURLMetadata, Error> {
-        guard let url = URL(string: urlString) else {
+        let correctedURLString = urlString.lowercased().hasPrefix("https://") ?
+        urlString : "https://\(urlString)"
+
+        guard let url = URL(string: correctedURLString) else {
             return .failure(URLError(.badURL))
         }
         return await urlMetadataRepository.execute(url: url)

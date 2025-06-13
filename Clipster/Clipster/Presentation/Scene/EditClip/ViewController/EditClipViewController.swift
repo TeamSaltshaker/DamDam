@@ -89,10 +89,19 @@ private extension EditClipViewController {
             .rx
             .text
             .orEmpty
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .subscribe { [weak self] in
                 self?.viewModel.action.accept(.editURLInputTextField($0))
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.urlInputTextField
+            .rx
+            .text
+            .orEmpty
+            .distinctUntilChanged()
+            .subscribe { [weak self] _ in
+                self?.viewModel.action.accept(.editingURLTextField)
             }
             .disposed(by: disposeBag)
 
@@ -194,13 +203,14 @@ private extension EditClipViewController {
             viewModel.state.map(\.clip),
             viewModel.state.map(\.memoText),
             viewModel.state.map(\.isURLValid),
-            viewModel.state.map(\.currentFolder)
+            viewModel.state.map(\.currentFolder),
+            viewModel.state.map(\.isLoading)
         )
-        .map { clip, memoText, isURLValid, currentFolder in
+        .map { clip, memoText, isURLValid, currentFolder, isLoading in
             if let clip = clip {
-                return clip.memo != memoText || !isURLValid || currentFolder?.id != clip.folderID
+                return clip.memo != memoText || !isURLValid || currentFolder?.id != clip.folderID || !isLoading
             } else {
-                return !memoText.isEmpty && isURLValid && currentFolder != nil
+                return !memoText.isEmpty && isURLValid && currentFolder != nil && !isLoading
             }
         }
         .distinctUntilChanged()
@@ -313,6 +323,19 @@ private extension EditClipViewController {
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.emptyView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        viewModel.state
+            .map(\.isLoading)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] isLoading in
+                if isLoading {
+                    self?.editClipView.urlValidationStacKView.activityIndicatorView.startAnimating()
+                } else {
+                    self?.editClipView.urlValidationStacKView.activityIndicatorView.stopAnimating()
+                }
+            }
             .disposed(by: disposeBag)
     }
 }
