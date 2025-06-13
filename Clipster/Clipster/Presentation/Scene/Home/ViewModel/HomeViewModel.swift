@@ -118,10 +118,10 @@ final class HomeViewModel {
 
     private func makeHomeDisplay() async {
         do {
-            let clipsResult = try await makeClipCellDisplays()
-            let foldersResult = try await makeFolderCellDisplays()
+            async let clipsResult = makeClipCellDisplays()
+            async let foldersResult = makeFolderCellDisplays()
 
-            let homeDisplay = HomeDisplay(
+            let homeDisplay = try await HomeDisplay(
                 unvitsedClips: clipsResult,
                 folders: foldersResult
             )
