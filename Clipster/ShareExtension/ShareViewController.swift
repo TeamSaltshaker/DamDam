@@ -3,6 +3,14 @@ import UIKit
 import UniformTypeIdentifiers
 
 final class ShareViewController: SLComposeViewController {
+    private let appGroupID: String = {
+        #if DEBUG
+        return "group.com.saltshaker.clipster.debug"
+        #else
+        return "group.com.saltshaker.clipster"
+        #endif
+    }()
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         extractURL()
@@ -68,7 +76,7 @@ final class ShareViewController: SLComposeViewController {
     }
 
     private func saveURLToUserDefaults(_ url: URL) -> Bool {
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.saltshaker.clipster") {
+        if let sharedDefaults = UserDefaults(suiteName: appGroupID) {
             sharedDefaults.set(url.absoluteString, forKey: "sharedURL")
             print("\(Self.self) ✅ UserDefaults에 URL 저장 완료: \(url.absoluteString)")
             return true
