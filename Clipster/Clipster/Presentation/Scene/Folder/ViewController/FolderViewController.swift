@@ -31,6 +31,7 @@ final class FolderViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.setNavigationBarHidden(true, animated: true)
         viewModel.action.accept(.viewWillAppear)
     }
@@ -38,12 +39,7 @@ final class FolderViewController: UIViewController {
 
 private extension FolderViewController {
     func configure() {
-        setDelegates()
         setBindings()
-    }
-
-    func setDelegates() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {

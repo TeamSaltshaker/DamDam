@@ -29,18 +29,14 @@ final class ClipDetailViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
         viewModel.action.accept(.viewWillAppear)
     }
 }
 
 private extension ClipDetailViewController {
     func configure() {
-        setDelegates()
         setBindings()
-    }
-
-    func setDelegates() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {

@@ -28,21 +28,21 @@ final class EditClipViewController: UIViewController {
         configure()
         hideKeyboardWhenTappedBackground()
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+    }
 }
 
 private extension EditClipViewController {
     func configure() {
         setAttributes()
-        setDelegates()
         setBindings()
     }
 
     func setAttributes() {
         view.backgroundColor = .white800
-    }
-
-    func setDelegates() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     func setBindings() {
