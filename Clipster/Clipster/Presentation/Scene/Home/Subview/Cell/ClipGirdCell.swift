@@ -70,8 +70,8 @@ private extension ClipGridCell {
 
     func setAttributes() {
         contentView.backgroundColor = .white900
-        contentView.layer.cornerRadius = 12
-        contentView.clipsToBounds = true
+        layer.cornerRadius = 12
+        clipsToBounds = true
     }
 
     func setHierarchy() {
