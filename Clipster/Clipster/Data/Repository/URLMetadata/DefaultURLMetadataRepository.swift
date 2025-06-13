@@ -23,7 +23,7 @@ private extension DefaultURLMetadataRepository {
     func parseHTML(url: URL, html: String) throws -> ParsedURLMetadataDTO {
         ParsedURLMetadataDTO(
             url: url,
-            title: extractMetaContent(html: html, property: "og:title") ?? "",
+            title: extractMetaContent(html: html, property: "og:title") ?? "제목 없음",
             thumbnailImageURL: extractMetaContent(html: html, property: "og:image") ?? ""
         )
     }
