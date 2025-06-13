@@ -37,12 +37,6 @@ final class EmptyView: UIView {
 
     private let emptyViewType: EmptyViewType
 
-    private let stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        return stackView
-    }()
-
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .empty
@@ -50,7 +44,7 @@ final class EmptyView: UIView {
         return imageView
     }()
 
-    private let label: UILabel = {
+    private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(size: 16, weight: .medium)
         label.textColor = .black400
@@ -80,26 +74,26 @@ private extension EmptyView {
     func setAttributes() {
         backgroundColor = .white800
 
-        stackView.spacing = emptyViewType.spacing
-        label.text = emptyViewType.description
+        descriptionLabel.text = emptyViewType.description
     }
 
     func setHierarchy() {
-        [imageView, label].forEach {
-            stackView.addArrangedSubview($0)
+        [imageView, descriptionLabel].forEach {
+            addSubview($0)
         }
-        addSubview(stackView)
     }
 
     func setConstraints() {
-        stackView.snp.makeConstraints { make in
-            make.directionalHorizontalEdges.centerY.equalToSuperview()
-            make.width.greaterThanOrEqualTo(200)
-        }
-
         imageView.snp.makeConstraints { make in
+            make.top.centerX.equalToSuperview()
             make.width.equalTo(emptyViewType.imageSize.width)
             make.height.equalTo(emptyViewType.imageSize.height)
+        }
+
+        descriptionLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom).offset(emptyViewType.spacing)
+            make.directionalHorizontalEdges.centerX.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
 }
