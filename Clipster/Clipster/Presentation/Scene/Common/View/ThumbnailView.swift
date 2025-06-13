@@ -7,6 +7,7 @@ final class ThumbnailView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .black800
         imageView.image = .none
         return imageView
     }()

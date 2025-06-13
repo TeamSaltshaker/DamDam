@@ -16,6 +16,7 @@ final class URLMetadataStackView: UIStackView {
         imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
         imageView.image = .none
+        imageView.backgroundColor = .black800
         return imageView
     }()
 
@@ -60,7 +61,11 @@ final class URLMetadataStackView: UIStackView {
     func setDisplay(model: URLMetadataDisplay) {
         titleLabel.text = model.title
         linkLabel.text = model.url.absoluteString
-        thumbnailImageView.kf.setImage(with: model.thumbnailImageURL)
+        if let urlString = model.thumbnailImageURL?.absoluteString, urlString.isEmpty {
+            thumbnailImageView.image = .none
+        } else {
+            thumbnailImageView.kf.setImage(with: model.thumbnailImageURL)
+        }
     }
 }
 
