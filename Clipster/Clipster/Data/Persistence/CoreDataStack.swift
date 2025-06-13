@@ -3,7 +3,13 @@ import CoreData
 final class CoreDataStack {
     static let shared = CoreDataStack()
 
-    private let appGroupID = "group.com.saltshaker.clipster"
+    private let appGroupID: String = {
+        #if DEBUG
+        return "group.com.saltshaker.clipster.debug"
+        #else
+        return "group.com.saltshaker.clipster"
+        #endif
+    }()
 
     lazy var container: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Clipster")
