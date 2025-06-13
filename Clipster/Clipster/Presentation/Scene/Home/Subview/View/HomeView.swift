@@ -52,9 +52,6 @@ final class HomeView: UIView {
         let text = "담담"
         let font = UIFont(name: "locus_sangsang", size: 28) ?? UIFont.boldSystemFont(ofSize: 28)
         let attributedText = NSMutableAttributedString(string: text)
-        attributedText.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: NSRange(location: 0, length: 1))
-        attributedText.addAttribute(.foregroundColor, value: UIColor.systemYellow, range: NSRange(location: 1, length: 1))
-
         attributedText.addAttributes([
             .foregroundColor: UIColor.blue600,
             .font: font
@@ -64,7 +61,6 @@ final class HomeView: UIView {
             .foregroundColor: UIColor.blue700,
             .font: font
         ], range: NSRange(location: 1, length: 1))
-
         label.attributedText = attributedText
 
         return label
@@ -88,7 +84,11 @@ final class HomeView: UIView {
         return collectionView
     }()
 
-    private let emptyView = EmptyView()
+    private let emptyView: EmptyView = {
+        let view = EmptyView()
+        view.isHidden = true
+        return view
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -201,7 +201,7 @@ private extension HomeView {
     func createCollectionViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { [weak self] index, env -> NSCollectionLayoutSection? in
             guard let self,
-                  let sectionKind = self.dataSource?.snapshot().sectionIdentifiers[index]
+                  let sectionKind = dataSource?.sectionIdentifier(for: index)
             else { return nil }
 
             switch sectionKind {
@@ -244,6 +244,7 @@ private extension HomeView {
         config.showsSeparators = false
         config.backgroundColor = .white800
         config.headerMode = .supplementary
+        config.headerTopPadding = 0
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             let delete = UIContextualAction(
                 style: .destructive,
@@ -268,7 +269,7 @@ private extension HomeView {
         func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(28)
+                heightDimension: .absolute(48)
             )
 
             let header = NSCollectionLayoutBoundarySupplementaryItem(
