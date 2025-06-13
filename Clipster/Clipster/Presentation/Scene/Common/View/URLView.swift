@@ -22,15 +22,6 @@ final class URLView: UIView {
         return textField
     }()
 
-    let statusImageView = UIImageView()
-
-    let statusLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .black500
-        label.font = .pretendard(size: 12, weight: .regular)
-        return label
-    }()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -48,34 +39,20 @@ private extension URLView {
     }
 
     func setHierarchy() {
-        [titleLabel, urlTextField, statusImageView, statusLabel]
+        [titleLabel, urlTextField]
             .forEach { addSubview($0) }
     }
 
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.top.equalToSuperview()
+            make.directionalHorizontalEdges.equalToSuperview().inset(4)
         }
 
         urlTextField.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.directionalHorizontalEdges.equalToSuperview().inset(24)
+            make.bottom.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(48)
-        }
-
-        statusImageView.snp.makeConstraints { make in
-            make.top.equalTo(urlTextField.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(36)
-            make.bottom.equalToSuperview().inset(16)
-            make.size.equalTo(19)
-        }
-
-        statusLabel.snp.makeConstraints { make in
-            make.top.equalTo(urlTextField.snp.bottom).offset(8)
-            make.leading.equalTo(statusImageView.snp.trailing).offset(4)
-            make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview().inset(16)
         }
     }
 }
