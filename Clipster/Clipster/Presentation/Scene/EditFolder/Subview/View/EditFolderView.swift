@@ -15,10 +15,35 @@ final class EditFolderView: UIView {
         return label
     }()
 
-    private let folderTitleTextField: CommonTextField = {
-        let textField = CommonTextField()
-        textField.placeholder = "제목을 입력해 주세요."
+    private let filderTitleContainerView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 12
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.black900.cgColor
+        view.backgroundColor = .white900
+        return view
+    }()
+
+    let folderTitleTextField: UITextField = {
+        let textField = UITextField()
+        textField.textColor = .black100
+        textField.font = .pretendard(size: 14, weight: .regular)
+        textField.attributedPlaceholder = NSAttributedString(
+            string: "제목을 입력해 주세요.",
+            attributes: [
+                .foregroundColor: UIColor.black800,
+                .font: UIFont.pretendard(size: 14, weight: .regular)
+            ]
+        )
         return textField
+    }()
+
+    let folderTitleLimitLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
+        label.textAlignment = .right
+        return label
     }()
 
     let folderLabel: UILabel = {
@@ -45,14 +70,6 @@ final class EditFolderView: UIView {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-
-    var folderTitleChanges: Observable<String> {
-        folderTitleTextField.rx.text.orEmpty.asObservable()
-    }
-
-    var folderTitleBinder: Binder<String?> {
-        folderTitleTextField.rx.text
-    }
 
     let folderViewTapGesture = UITapGestureRecognizer()
 
@@ -86,8 +103,11 @@ private extension EditFolderView {
     }
 
     func setHierarchy() {
-        [commonNavigationView, titleLabel, folderTitleTextField, folderLabel, folderView]
+        [commonNavigationView, titleLabel, filderTitleContainerView, folderLabel, folderView]
             .forEach { addSubview($0) }
+
+        [folderTitleTextField, folderTitleLimitLabel]
+            .forEach { filderTitleContainerView.addSubview($0) }
 
         [folderRowView, chevronImageView]
             .forEach { folderView.addSubview($0) }
@@ -112,14 +132,23 @@ private extension EditFolderView {
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
-        folderTitleTextField.snp.makeConstraints { make in
+        filderTitleContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(48)
         }
 
+        folderTitleTextField.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(12)
+        }
+
+        folderTitleLimitLabel.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(4)
+        }
+
         folderLabel.snp.makeConstraints { make in
-            make.top.equalTo(folderTitleTextField.snp.bottom).offset(40)
+            make.top.equalTo(filderTitleContainerView.snp.bottom).offset(40)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
