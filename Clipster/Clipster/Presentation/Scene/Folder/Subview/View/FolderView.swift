@@ -73,7 +73,7 @@ final class FolderView: UIView {
         snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
         snapshot.reloadSections([.folder, .clip])
 
-        dataSource?.apply(snapshot, animatingDifferences: true)
+        dataSource?.apply(snapshot, animatingDifferences: false)
     }
 
     func setDisplay(isEmptyViewHidden: Bool) {

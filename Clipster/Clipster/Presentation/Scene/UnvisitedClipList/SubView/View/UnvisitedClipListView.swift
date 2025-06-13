@@ -68,7 +68,7 @@ final class UnvisitedClipListView: UIView {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([0])
         snapshot.appendItems(display)
-        dataSource?.apply(snapshot)
+        dataSource?.apply(snapshot, animatingDifferences: false)
     }
 }
 
