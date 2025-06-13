@@ -193,7 +193,7 @@ final class HomeView: UIView {
         let isEmptyViewHidden = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
         emptyView.isHidden = isEmptyViewHidden
 
-        dataSource?.apply(snapshot)
+        dataSource?.apply(snapshot, animatingDifferences: false)
     }
 }
 
