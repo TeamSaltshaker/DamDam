@@ -25,15 +25,26 @@ final class CommonTextField: UITextField {
     }
 }
 
-extension CommonTextField {
+private extension CommonTextField {
     func configure() {
         setAttributes()
     }
 
     func setAttributes() {
+        let commonFont = UIFont.pretendard(size: 14, weight: .regular)
+
         layer.borderWidth = 1
         layer.cornerRadius = 12
         layer.borderColor = UIColor.black900.cgColor
         backgroundColor = .white900
+        font = commonFont
+        textColor = .black100
+        attributedPlaceholder = NSAttributedString(
+            string: "URL을 입력해 주세요.",
+            attributes: [
+                .foregroundColor: UIColor.black800,
+                .font: commonFont
+            ]
+        )
     }
 }
