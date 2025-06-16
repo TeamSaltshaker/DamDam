@@ -21,7 +21,10 @@ final class CommonTextField: UITextField {
 
     let clearButton: UIButton = {
         let button = UIButton()
-        button.setImage(.xGray, for: .normal)
+        var config = UIButton.Configuration.plain()
+        config.image = .xGray
+        config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 14, bottom: 14, trailing: 14)
+        button.configuration = config
         return button
     }()
 
@@ -61,7 +64,6 @@ final class CommonTextField: UITextField {
 private extension CommonTextField {
     func configure() {
         setAttributes()
-        setConstraints()
     }
 
     func setAttributes() {
@@ -95,11 +97,5 @@ private extension CommonTextField {
                 .font: commontFont
             ]
         )
-    }
-
-    func setConstraints() {
-        clearButton.snp.makeConstraints { make in
-            make.size.equalTo(48)
-        }
     }
 }
