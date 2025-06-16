@@ -50,7 +50,7 @@ private extension EditClipViewController {
             .map(\.urlInputText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.urlInputTextField.rx.text)
+            .drive(editClipView.urlView.urlTextField.rx.text)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -85,7 +85,7 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.urlInputTextField
+        editClipView.urlView.urlTextField
             .rx
             .text
             .orEmpty
@@ -95,7 +95,7 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.urlInputTextField
+        editClipView.urlView.urlTextField
             .rx
             .text
             .orEmpty
@@ -109,7 +109,7 @@ private extension EditClipViewController {
             .map(\.urlTextFieldBorderColor)
             .map { UIColor(resource: $0).cgColor }
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlInputTextField.layer.rx.borderColor)
+            .drive(editClipView.urlView.urlTextField.layer.rx.borderColor)
             .disposed(by: disposeBag)
 
         viewModel.state
@@ -210,7 +210,7 @@ private extension EditClipViewController {
         .drive(editClipView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
 
-        editClipView.addFolderButton
+        editClipView.selectedFolderView.addButton
             .rx
             .tap
             .subscribe { [weak self] _ in
@@ -267,13 +267,13 @@ private extension EditClipViewController {
             .distinctUntilChanged { $0.id == $1.id }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] in
-                self?.editClipView.folderRowView.setDisplay(
+                self?.editClipView.selectedFolderView.folderRowView.setDisplay(
                     FolderDisplayMapper.map($0)
                 )
             }
             .disposed(by: disposeBag)
 
-        editClipView.folderViewTapGesture
+        editClipView.selectedFolderView.folderViewTapGesture
             .rx
             .event
             .subscribe { [weak self] _ in
@@ -303,14 +303,14 @@ private extension EditClipViewController {
             .map { $0.currentFolder == nil }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.folderView.rx.isHidden)
+            .drive(editClipView.selectedFolderView.folderView.rx.isHidden)
             .disposed(by: disposeBag)
 
         viewModel.state
             .map { $0.currentFolder != nil }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.emptyView.rx.isHidden)
+            .drive(editClipView.selectedFolderView.emptyView.rx.isHidden)
             .disposed(by: disposeBag)
 
         viewModel.state

@@ -11,14 +11,7 @@ final class URLView: UIView {
     }()
 
     let urlTextField: CommonTextField = {
-        let textField = CommonTextField()
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "URL을 입력해 주세요.",
-            attributes: [
-                .foregroundColor: UIColor.black800,
-                .font: UIFont.pretendard(size: 14, weight: .regular)
-            ]
-        )
+        let textField = CommonTextField(type: .clip)
         return textField
     }()
 

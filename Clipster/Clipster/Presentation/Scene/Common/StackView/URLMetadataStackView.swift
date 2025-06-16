@@ -3,13 +3,6 @@ import SnapKit
 import UIKit
 
 final class URLMetadataStackView: UIStackView {
-    enum URLMetadataType {
-        case edit
-        case detail
-    }
-
-    let type: URLMetadataType
-
     private let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -38,19 +31,8 @@ final class URLMetadataStackView: UIStackView {
         return label
     }()
 
-    private lazy var linkLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 13, weight: .medium)
-        label.numberOfLines = 2
-        label.textColor = .link
-        label.text = " "
-        if case .edit = type { label.isHidden = true }
-        return label
-    }()
-
-    init(type: URLMetadataType) {
-        self.type = type
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configure()
     }
 
@@ -60,7 +42,6 @@ final class URLMetadataStackView: UIStackView {
 
     func setDisplay(model: URLMetadataDisplay) {
         titleLabel.text = model.title
-        linkLabel.text = model.url.absoluteString
         if let urlString = model.thumbnailImageURL?.absoluteString, urlString.isEmpty {
             thumbnailImageView.image = .none
         } else {
@@ -99,7 +80,7 @@ private extension URLMetadataStackView {
             addArrangedSubview($0)
         }
 
-        [titleLabel, linkLabel].forEach {
+        [titleLabel].forEach {
             infoStackView.addArrangedSubview($0)
         }
     }
