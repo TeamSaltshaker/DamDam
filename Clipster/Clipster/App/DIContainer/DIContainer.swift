@@ -154,8 +154,8 @@ final class DIContainer {
         )
     }
 
-    func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(
+    func makeHomeReactor() -> HomeReactor {
+        HomeReactor(
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
