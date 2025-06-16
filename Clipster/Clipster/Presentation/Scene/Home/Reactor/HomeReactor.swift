@@ -74,6 +74,7 @@ final class HomeReactor: Reactor {
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
+        print("\(Self.self): received action → \(action)")
         switch action {
         case .viewWillAppear:
             return fetchHomeData()
