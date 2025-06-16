@@ -164,7 +164,7 @@ final class EditClipViewModel: ViewModel {
                         deletedAt: clip.deletedAt
                     ),
                     memo: state.value.memoText,
-                    lastVisitedAt: clip.lastVisitedAt,
+                    lastVisitedAt: clip.urlMetadata.url != urlMetadata.url ? nil : clip.lastVisitedAt,
                     createdAt: clip.createdAt,
                     updatedAt: clip.memo != state.value.memoText &&
                     clip.urlMetadata.url != urlMetadata.url &&
