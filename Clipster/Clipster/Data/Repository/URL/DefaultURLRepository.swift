@@ -1,7 +1,7 @@
 import Foundation
 
-final class DefaultURLMetadataRepository: URLMetadataRepository {
-    func execute(url: URL) async -> Result<ParsedURLMetadata, any Error> {
+final class DefaultURLRepository: URLRepository {
+    func execute(url: URL) async -> Result<(ParsedURLMetadata, Bool), Error> {
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
 
@@ -11,7 +11,7 @@ final class DefaultURLMetadataRepository: URLMetadataRepository {
             }
             let html = String(data: data, encoding: .utf8)
             let urlMetadata = try parseHTML(url: url, html: html ?? "")
-            return .success(urlMetadata.toEntity())
+            return .success((urlMetadata.toEntity(), html != nil))
         } catch {
             print(error)
             return .failure(error)
@@ -19,7 +19,7 @@ final class DefaultURLMetadataRepository: URLMetadataRepository {
     }
 }
 
-private extension DefaultURLMetadataRepository {
+private extension DefaultURLRepository {
     func parseHTML(url: URL, html: String) throws -> ParsedURLMetadataDTO {
         ParsedURLMetadataDTO(
             url: url,

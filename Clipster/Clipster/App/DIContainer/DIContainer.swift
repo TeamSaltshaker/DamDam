@@ -24,12 +24,8 @@ final class DIContainer {
         DefaultFolderRepository(storage: makeFolderStorage())
     }
 
-    func makeURLMetadataRepository() -> URLMetadataRepository {
-        DefaultURLMetadataRepository()
-    }
-
-    func makeURLValidationRepository() -> URLValidationRepository {
-        DefaultURLValidationRepository()
+    func makeURLRepository() -> URLRepository {
+        DefaultURLRepository()
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
@@ -72,12 +68,8 @@ final class DIContainer {
         DefaultUpdateFolderUseCase(folderRepository: makeFolderRepository())
     }
 
-    func makeParseURLMetadataUseCase() -> ParseURLMetadataUseCase {
-        DefaultParseURLMetadataUseCase(urlMetadataRepository: makeURLMetadataRepository())
-    }
-
-    func makeCheckURLValidityUseCase() -> CheckURLValidityUseCase {
-        DefaultCheckValidityUseCase(urlValidationRepository: makeURLValidationRepository())
+    func makeParseURLUseCase() -> ParseURLUseCase {
+        DefaultParseURLUseCase(urlRepository: makeURLRepository())
     }
 
     func makeClipDetailViewModel(clip: Clip) -> ClipDetailViewModel {
@@ -91,8 +83,7 @@ final class DIContainer {
 
     func makeEditClipViewModel() -> EditClipViewModel {
         EditClipViewModel(
-            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
-            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
@@ -103,8 +94,7 @@ final class DIContainer {
     func makeEditClipViewModel(urlString: String) -> EditClipViewModel {
         EditClipViewModel(
             urlText: urlString,
-            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
-            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
@@ -115,8 +105,7 @@ final class DIContainer {
     func makeEditClipViewModel(folder: Folder?) -> EditClipViewModel {
         EditClipViewModel(
             currentFolder: folder,
-            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
-            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
@@ -127,8 +116,7 @@ final class DIContainer {
     func makeEditClipViewModel(clip: Clip) -> EditClipViewModel {
         EditClipViewModel(
             clip: clip,
-            checkURLValidityUseCase: makeCheckURLValidityUseCase(),
-            parseURLMetadataUseCase: makeParseURLMetadataUseCase(),
+            parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
