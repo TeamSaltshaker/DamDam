@@ -23,7 +23,7 @@ final class ClipDetailView: UIView {
         return view
     }()
 
-    private let selectedFolderView = SelectedFolderView(mode: .detail)
+    private let selectedFolderView = SelectedFolderView(type: .clip, mode: .detail)
 
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 

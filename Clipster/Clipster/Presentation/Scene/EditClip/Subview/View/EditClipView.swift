@@ -41,7 +41,7 @@ final class EditClipView: UIView {
 
     let memoView = MemoView()
 
-    let selectedFolderView = SelectedFolderView(mode: .edit)
+    let selectedFolderView = SelectedFolderView(type: .clip, mode: .edit)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
