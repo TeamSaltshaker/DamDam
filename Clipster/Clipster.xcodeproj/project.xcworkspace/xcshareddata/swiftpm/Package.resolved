@@ -1,15 +1,6 @@
 {
-  "originHash" : "0143051f6d9a47c192a2fefb8a0d3bd617ba5c09b79f1aeac9f7d902e62003df",
+  "originHash" : "a639d737af8f27f38d15d97184b156c16dec8ee92af19ab4d46d6c5c09a3e856",
   "pins" : [
-    {
-      "identity" : "alamofire",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Alamofire/Alamofire",
-      "state" : {
-        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
-        "version" : "5.10.2"
-      }
-    },
     {
       "identity" : "kingfisher",
       "kind" : "remoteSourceControl",
@@ -17,6 +8,15 @@
       "state" : {
         "revision" : "7deda23bbdca612076c5c315003d8638a08ed0f1",
         "version" : "8.3.2"
+      }
+    },
+    {
+      "identity" : "reactorkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactorKit/ReactorKit",
+      "state" : {
+        "revision" : "8fa33f09c6f6621a2aa536d739956d53b84dd139",
+        "version" : "3.2.0"
       }
     },
     {
@@ -35,6 +35,15 @@
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "weakmaptable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactorKit/WeakMapTable.git",
+      "state" : {
+        "revision" : "cb05d64cef2bbf51e85c53adee937df46540a74e",
+        "version" : "1.2.1"
       }
     }
   ],
