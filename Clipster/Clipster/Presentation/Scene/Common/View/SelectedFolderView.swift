@@ -111,13 +111,13 @@ private extension SelectedFolderView {
         }
 
         folderRowView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
+            make.verticalEdges.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
         }
 
         chevronImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(folderRowView.snp.trailing).offset(16)
+            make.leading.equalTo(folderRowView.snp.trailing)
             make.trailing.equalToSuperview().inset(20)
             make.size.equalTo(48)
         }
