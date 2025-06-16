@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		442D5AB02DFFB069002E4E68 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 442D5AAF2DFFB069002E4E68 /* ReactorKit */; };
 		4468B8B72DEC961600AD2F57 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 4468B8B62DEC961600AD2F57 /* .swiftlint.yml */; };
 		44DFD9CF2DE9D36400B6CD87 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9CE2DE9D36400B6CD87 /* RxCocoa */; };
 		44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D02DE9D36400B6CD87 /* RxRelay */; };
@@ -91,6 +92,7 @@
 				44DFD9D32DE9D36400B6CD87 /* RxSwift in Frameworks */,
 				44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */,
 				44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */,
+				442D5AB02DFFB069002E4E68 /* ReactorKit in Frameworks */,
 				44DFD9CF2DE9D36400B6CD87 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -152,6 +154,7 @@
 				44DFD9D22DE9D36400B6CD87 /* RxSwift */,
 				44DFD9D52DE9D37000B6CD87 /* SnapKit */,
 				44DFD9DB2DE9D39300B6CD87 /* Kingfisher */,
+				442D5AAF2DFFB069002E4E68 /* ReactorKit */,
 			);
 			productName = Clipster;
 			productReference = 44DFD9B52DE9D0E000B6CD87 /* Clipster.app */;
@@ -187,7 +190,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					44DFD9B42DE9D0E000B6CD87 = {
 						CreatedOnToolsVersion = 16.3;
@@ -211,6 +214,7 @@
 				44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				44DFD9D42DE9D37000B6CD87 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 44DFD9B62DE9D0E000B6CD87 /* Products */;
@@ -373,6 +377,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -436,6 +441,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -591,6 +597,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactorKit/ReactorKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
 		44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift";
@@ -618,6 +632,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		442D5AAF2DFFB069002E4E68 /* ReactorKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			productName = ReactorKit;
+		};
 		44DFD9CE2DE9D36400B6CD87 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */;
