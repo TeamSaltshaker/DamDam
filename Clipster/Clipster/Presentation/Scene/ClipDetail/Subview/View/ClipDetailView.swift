@@ -8,10 +8,7 @@ final class ClipDetailView: UIView {
     let editButton = EditButton()
     let deleteButton = DeleteButton()
 
-    private let urlMetadataStackView: URLMetadataStackView = {
-        let urlMetadataStackView = URLMetadataStackView()
-        return urlMetadataStackView
-    }()
+    private let urlMetadataStackView = URLMetadataStackView()
 
     private let urlView: URLView = {
         let view = URLView()
