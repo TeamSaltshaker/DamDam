@@ -1,6 +1,4 @@
 import ReactorKit
-import RxCocoa
-import RxSwift
 import SafariServices
 import UIKit
 

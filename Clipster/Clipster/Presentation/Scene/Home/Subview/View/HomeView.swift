@@ -184,8 +184,8 @@ final class HomeView: UIView {
     func setDisplay(_ display: HomeDisplay) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
 
-        if !display.unvitsedClips.isEmpty {
-            let clipItems = display.unvitsedClips.map { Item.clip($0) }
+        if !display.unvisitedClips.isEmpty {
+            let clipItems = display.unvisitedClips.map { Item.clip($0) }
             snapshot.appendSections([.clip])
             snapshot.appendItems(clipItems, toSection: .clip)
         }
@@ -196,7 +196,7 @@ final class HomeView: UIView {
             snapshot.appendItems(folderItems, toSection: .folder)
         }
 
-        let isEmptyViewHidden = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
+        let isEmptyViewHidden = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
         emptyView.isHidden = isEmptyViewHidden
 
         dataSource?.apply(snapshot, animatingDifferences: false)

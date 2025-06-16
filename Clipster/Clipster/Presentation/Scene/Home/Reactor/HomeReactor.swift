@@ -111,7 +111,7 @@ private extension HomeReactor {
     func makeHomeDisplay() async throws -> [Mutation] {
         async let clips = self.makeClipDisplays()
         async let folders = self.makeFolderDisplays()
-        let display = try await HomeDisplay(unvitsedClips: clips, folders: folders)
+        let display = try await HomeDisplay(unvisitedClips: clips, folders: folders)
         return [.setHomeDisplay(display)]
     }
 
