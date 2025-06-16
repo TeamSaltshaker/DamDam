@@ -134,7 +134,7 @@ private extension EditFolderViewController {
 
         state
             .map { $0.folderTitle }
-            .take(1)
+            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: editFolderView.folderTitleTextField.rx.text)
             .disposed(by: disposeBag)
@@ -162,6 +162,11 @@ private extension EditFolderViewController {
 
         editFolderView.selectedFolderView.folderViewTapGesture.rx.event
             .map { _ in .folderViewTapped }
+            .bind(to: viewModel.action)
+            .disposed(by: disposeBag)
+
+        editFolderView.folderTitleTextField.clearButton.rx.tap
+            .map { EditFolderAction.clearButtonTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
     }
