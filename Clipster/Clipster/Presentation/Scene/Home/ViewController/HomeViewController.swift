@@ -76,6 +76,24 @@ private extension HomeViewController {
                 self?.homeView.setDisplay(display)
             }
             .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self else { return }
+
+                switch phase {
+                case .loading:
+                    homeView.showLoading()
+                case .success:
+                    homeView.hideLoading()
+                case .error(let message):
+                    print(message)
+                case .idle:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
     }
 
     func bindRoute(from reactor: HomeReactor) {

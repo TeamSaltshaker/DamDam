@@ -90,6 +90,12 @@ final class HomeView: UIView {
         return view
     }()
 
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -194,6 +200,16 @@ final class HomeView: UIView {
         emptyView.isHidden = isEmptyViewHidden
 
         dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        isUserInteractionEnabled = true
     }
 }
 
@@ -391,7 +407,8 @@ private extension HomeView {
         [
             navigationView,
             collectionView,
-            emptyView
+            emptyView,
+            loadingIndicator
         ].forEach { addSubview($0) }
 
         [
@@ -425,6 +442,10 @@ private extension HomeView {
         }
 
         emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+
+        loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
