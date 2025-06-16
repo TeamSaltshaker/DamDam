@@ -49,7 +49,6 @@ private extension ClipDetailViewController {
                 guard let folder else { return }
 
                 self?.clipDetailView.setDisplay(clip, folder: folder)
-                self?.clipDetailView.setInteraction(enabled: false)
             }
             .disposed(by: disposeBag)
 
