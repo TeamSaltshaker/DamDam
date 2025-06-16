@@ -2,11 +2,17 @@ import SnapKit
 import UIKit
 
 final class SelectedFolderView: UIView {
+    enum SelectedFolderType {
+        case clip
+        case folder
+    }
+
     enum SelectedFolderMode {
         case edit
         case detail
     }
 
+    private let type: SelectedFolderType
     private let mode: SelectedFolderMode
 
     private let titleLabel: UILabel = {
@@ -39,7 +45,8 @@ final class SelectedFolderView: UIView {
 
     let folderViewTapGesture = UITapGestureRecognizer()
 
-    init(mode: SelectedFolderMode) {
+    init(type: SelectedFolderType, mode: SelectedFolderMode) {
+        self.type = type
         self.mode = mode
         super.init(frame: .zero)
         configure()
@@ -59,13 +66,20 @@ private extension SelectedFolderView {
     }
 
     func setAttributes() {
-        switch mode {
-        case .edit:
+        switch (type, mode) {
+        case (.clip, .edit):
             addButton.isHidden = false
             chevronImageView.isHidden = false
-        case .detail:
+            emptyView.isHidden = false
+
+        case (.clip, .detail):
             addButton.isHidden = true
             chevronImageView.isHidden = true
+            emptyView.isHidden = true
+
+        case (.folder, _):
+            addButton.isHidden = true
+            chevronImageView.isHidden = false
             emptyView.isHidden = true
         }
     }
