@@ -96,6 +96,7 @@ final class HomeView: UIView {
         button.setImage(.addButtonBlue, for: .highlighted)
         button.imageView?.contentMode = .scaleAspectFit
         button.backgroundColor = .clear
+        button.isHidden = true
         return button
     }()
 
@@ -199,8 +200,9 @@ final class HomeView: UIView {
             snapshot.appendItems(folderItems, toSection: .folder)
         }
 
-        let isEmptyViewHidden = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
-        emptyView.isHidden = isEmptyViewHidden
+        let isEmpty = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
+        emptyView.isHidden = isEmpty
+        emptyAddButton.isHidden = isEmpty
 
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -454,6 +456,11 @@ private extension HomeView {
                 self?.logicalIndexPath(indexPath) ?? indexPath
             }
             .map { Action.tapCell($0) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
+
+        emptyAddButton.rx.tap
+            .map { Action.tapAddClip }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
