@@ -53,12 +53,12 @@ private extension FolderViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.navigation
+        viewModel.route
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] navigation in
+            .drive { [weak self] route in
                 guard let self else { return }
-                switch navigation {
+                switch route {
                 case .editClipViewForAdd(let folder):
                     let vm = diContainer.makeEditClipViewModel(folder: folder)
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)

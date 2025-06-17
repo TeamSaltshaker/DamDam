@@ -20,7 +20,7 @@ final class FolderViewModel {
         let isEmptyViewHidden: Bool
     }
 
-    enum Navigation {
+    enum Route {
         case editClipViewForAdd(Folder)
         case editClipViewForEdit(Clip)
         case editFolderView(Folder, Folder?)
@@ -31,7 +31,7 @@ final class FolderViewModel {
 
     var action = PublishRelay<Action>()
     var state: BehaviorRelay<State>
-    var navigation = PublishRelay<Navigation>()
+    var route = PublishRelay<Route>()
     var disposeBag = DisposeBag()
 
     private var folder: Folder
@@ -77,21 +77,21 @@ private extension FolderViewModel {
                 case .didTapCell(let indexPath):
                     switch indexPath.section {
                     case 0:
-                        navigateToFolderView(at: indexPath.item)
+                        routeToFolderView(at: indexPath.item)
                     case 1:
                         updateLastVisitedDate(at: indexPath.item)
-                        navigateToWebView(at: indexPath.item)
+                        routeToWebView(at: indexPath.item)
                     default:
                         break
                     }
                 case .didTapAddClipButton:
-                    navigateToAddClipView()
+                    routeToAddClipView()
                 case .didTapAddFolderButton:
-                    navigateToAddFolderView()
+                    routeToAddFolderView()
                 case .didTapDetailButton(let indexPath):
-                    navigateToDetailView(at: indexPath)
+                    routeToDetailView(at: indexPath)
                 case .didTapEditButton(let indexPath):
-                    navigateToEditView(at: indexPath)
+                    routeToEditView(at: indexPath)
                 case .didTapDeleteButton(let indexPath):
                     delete(at: indexPath)
                 }
@@ -134,42 +134,42 @@ private extension FolderViewModel {
         }
     }
 
-    func navigateToWebView(at index: Int) {
+    func routeToWebView(at index: Int) {
         let url = folder.clips[index].urlMetadata.url
-        navigation.accept(.webView(url))
+        route.accept(.webView(url))
     }
 
-    func navigateToFolderView(at index: Int) {
+    func routeToFolderView(at index: Int) {
         let folder = folder.folders[index]
-        navigation.accept(.folderView(folder))
+        route.accept(.folderView(folder))
     }
 
-    func navigateToAddClipView() {
-        navigation.accept(.editClipViewForAdd(folder))
+    func routeToAddClipView() {
+        route.accept(.editClipViewForAdd(folder))
     }
 
-    func navigateToAddFolderView() {
-        navigation.accept(.editFolderView(folder, nil))
+    func routeToAddFolderView() {
+        route.accept(.editFolderView(folder, nil))
     }
 
-    func navigateToDetailView(at indexPath: IndexPath) {
+    func routeToDetailView(at indexPath: IndexPath) {
         switch indexPath.section {
         case 1:
             let selectedClip = folder.clips[indexPath.item]
-            navigation.accept(.clipDetailView(selectedClip))
+            route.accept(.clipDetailView(selectedClip))
         default:
             break
         }
     }
 
-    func navigateToEditView(at indexPath: IndexPath) {
+    func routeToEditView(at indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
             let selectedFolder = folder.folders[indexPath.item]
-            navigation.accept(.editFolderView(folder, selectedFolder))
+            route.accept(.editFolderView(folder, selectedFolder))
         case 1:
             let selectedClip = folder.clips[indexPath.item]
-            navigation.accept(.editClipViewForEdit(selectedClip))
+            route.accept(.editClipViewForEdit(selectedClip))
         default:
             break
         }
