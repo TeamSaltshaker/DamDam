@@ -40,19 +40,7 @@ struct EditFolderState {
     }
 
     var isSavable: Bool {
-        let trimmed = folderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            return false
-        }
-
-        switch mode {
-        case .add:
-            return true
-        case .edit(_, let initialFolder):
-            let isTitleChanged = trimmed != initialFolderTitle
-            let isParentChanged = initialFolder.parentFolderID != parentFolder?.id
-            return isTitleChanged || isParentChanged
-        }
+        !folderTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var shouldNavigateToFolderSelector = false
