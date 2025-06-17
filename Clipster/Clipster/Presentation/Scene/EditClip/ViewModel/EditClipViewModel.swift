@@ -56,8 +56,7 @@ final class EditClipViewModel: ViewModel {
     var action = PublishRelay<Action>()
     var disposeBag = DisposeBag()
 
-    private let checkURLValidityUseCase: CheckURLValidityUseCase
-    private let parseURLMetadataUseCase: ParseURLMetadataUseCase
+    private let parseURLUseCase: ParseURLUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
@@ -66,8 +65,7 @@ final class EditClipViewModel: ViewModel {
     init(
         urlText: String = "",
         currentFolder: Folder? = nil,
-        checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
@@ -79,8 +77,7 @@ final class EditClipViewModel: ViewModel {
             currentFolder: currentFolder,
             navigationTitle: "클립 추가"
         ))
-        self.checkURLValidityUseCase = checkURLValidityUseCase
-        self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
@@ -90,8 +87,7 @@ final class EditClipViewModel: ViewModel {
 
     init(
         clip: Clip,
-        checkURLValidityUseCase: CheckURLValidityUseCase,
-        parseURLMetadataUseCase: ParseURLMetadataUseCase,
+        parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
@@ -105,8 +101,7 @@ final class EditClipViewModel: ViewModel {
             clip: clip,
             navigationTitle: "클립 수정"
         ))
-        self.checkURLValidityUseCase = checkURLValidityUseCase
-        self.parseURLMetadataUseCase = parseURLMetadataUseCase
+        self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
@@ -119,19 +114,23 @@ final class EditClipViewModel: ViewModel {
         case .editURLInputTextField(let urlText):
             let trimmed = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
             print("\(Self.self) \(action)")
-            return .merge(
-                .just(.updateURLInputText(trimmed)),
-                .fromAsync {
-                    try await self.checkURLValidityUseCase.execute(urlString: trimmed).get()
-                }
-                .map { .updateValidURL($0) }
-                .catchAndReturn(.updateValidURL(false)),
-                .fromAsync {
-                    try await self.parseURLMetadataUseCase.execute(urlString: trimmed).get()
-                }
-                .map { .updateURLMetadata(self.toURLMetaDisplay(entity: $0)) }
-                .catchAndReturn(.updateURLMetadata(nil))
-            )
+            let updateURLInputText = Observable.just(Mutation.updateURLInputText(trimmed))
+            let urlPrasingResult = Observable<Mutation>.fromAsync { [weak self] in
+                guard let self = self else { throw URLError(.cancelled) }
+                let (metadata, isValid) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                return Observable.merge(
+                    .just(Mutation.updateValidURL(isValid)),
+                    .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata)))
+                )
+            }
+            .flatMap { $0 }
+            .catch { _ in
+                Observable.merge(
+                    .just(Mutation.updateValidURL(false)),
+                    .just(Mutation.updateURLMetadata(nil))
+                )
+            }
+            return Observable.merge(updateURLInputText, urlPrasingResult)
         case .editingURLTextField:
             return .just(.updateIsLoading(true))
         case .editMomo(let memoText):
