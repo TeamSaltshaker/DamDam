@@ -132,6 +132,16 @@ final class DIContainer {
         )
     }
 
+    func makeFolderReactor(folder: Folder) -> FolderReactor {
+        FolderReactor(
+            folder: folder,
+            fetchFolderUseCase: makeFetchFolderUseCase(),
+            deleteFolderUseCase: makeDeleteFolderUseCase(),
+            updateClipUseCase: makeUpdateClipUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase(),
+        )
+    }
+
     func makeFolderViewModel(folder: Folder) -> FolderViewModel {
         FolderViewModel(
             folder: folder,
