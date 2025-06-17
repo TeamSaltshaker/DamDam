@@ -4,6 +4,16 @@ import SnapKit
 import UIKit
 
 final class FolderView: UIView {
+    enum Action {
+        case didTapBackButton
+        case didTapAddFolderButton
+        case didTapAddClipButton
+        case didTapCell(IndexPath)
+        case didTapDetailButton(IndexPath)
+        case didTapEditButton(IndexPath)
+        case didTapDeleteButton((IndexPath, String))
+    }
+
     enum Section: Int {
         case folder
         case clip
@@ -14,14 +24,7 @@ final class FolderView: UIView {
         case clip(ClipDisplay)
     }
 
-    let didTapBackButton = PublishRelay<Void>()
-    let didTapAddFolderButton = PublishRelay<Void>()
-    let didTapAddClipButton = PublishRelay<Void>()
-    let didTapCell = PublishRelay<IndexPath>()
-    let didTapDetailButton = PublishRelay<IndexPath>()
-    let didTapEditButton = PublishRelay<IndexPath>()
-    let didTapDeleteButton = PublishRelay<(IndexPath, String)>()
-
+    let action = PublishRelay<Action>()
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
@@ -83,11 +86,11 @@ final class FolderView: UIView {
     private func makeAddButtonMenu() -> UIMenu {
         let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
             guard let self else { return }
-            didTapAddFolderButton.accept(())
+            action.accept(.didTapBackButton)
         }
         let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
             guard let self else { return }
-            didTapAddClipButton.accept(())
+            action.accept(.didTapAddClipButton)
         }
 
         return UIMenu(title: "", children: [addFolderAction, addClipAction])
@@ -172,7 +175,7 @@ private extension FolderView {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] _ in
                 guard let self else { return }
-                didTapBackButton.accept(())
+                action.accept(.didTapBackButton)
             }
             .disposed(by: disposeBag)
 
@@ -181,7 +184,7 @@ private extension FolderView {
             .drive { [weak self] indexPath in
                 guard let self else { return }
                 tableView.deselectRow(at: indexPath, animated: true)
-                didTapCell.accept(indexPath)
+                action.accept(.didTapCell(indexPath))
             }
             .disposed(by: disposeBag)
     }
@@ -248,19 +251,19 @@ extension FolderView: UITableViewDelegate {
             guard let self else { return UIMenu() }
 
             let detailAction = UIAction(title: "상세정보", image: .info) { _ in
-                self.didTapDetailButton.accept(indexPath)
+                self.action.accept(.didTapDetailButton(indexPath))
             }
             let editAction = UIAction(title: "편집", image: .pen) { _ in
-                self.didTapEditButton.accept(indexPath)
+                self.action.accept(.didTapEditButton(indexPath))
             }
             let deleteAction = UIAction(title: "삭제", image: .trashRed, attributes: .destructive) { _ in
                 guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
 
                 switch item {
                 case .folder(let display):
-                    self.didTapDeleteButton.accept((indexPath, display.title))
+                    self.action.accept(.didTapDeleteButton((indexPath, display.title)))
                 case .clip(let display):
-                    self.didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+                    self.action.accept(.didTapDeleteButton((indexPath, display.urlMetadata.title)))
                 }
             }
             let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
@@ -285,9 +288,9 @@ extension FolderView: UITableViewDelegate {
 
             switch item {
             case .folder(let display):
-                didTapDeleteButton.accept((indexPath, display.title))
+                action.accept(.didTapDeleteButton((indexPath, display.title)))
             case .clip(let display):
-                didTapDeleteButton.accept((indexPath, display.urlMetadata.title))
+                action.accept(.didTapDeleteButton((indexPath, display.urlMetadata.title)))
             }
 
             completion(true)

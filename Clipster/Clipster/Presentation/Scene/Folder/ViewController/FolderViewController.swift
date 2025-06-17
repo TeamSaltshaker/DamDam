@@ -40,44 +40,27 @@ final class FolderViewController: UIViewController, View {
 
 private extension FolderViewController {
     func bindAction(to reactor: FolderReactor) {
-        folderView.didTapBackButton
-            .bind { [weak self] in
+        folderView.action
+            .bind { [weak self] action in
                 guard let self else { return }
-                navigationController?.popViewController(animated: true)
-            }
-            .disposed(by: disposeBag)
 
-        folderView.didTapAddFolderButton
-            .map { Reactor.Action.didTapAddFolderButton }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        folderView.didTapAddClipButton
-            .map { Reactor.Action.didTapAddClipButton }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        folderView.didTapCell
-            .map { Reactor.Action.didTapCell($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        folderView.didTapDetailButton
-            .map { Reactor.Action.didTapDetailButton($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        folderView.didTapEditButton
-            .map { Reactor.Action.didTapEditButton($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        folderView.didTapDeleteButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] (indexPath, title) in
-                guard let self else { return }
-                presentDeleteAlert(title: title) { [weak self] in
-                    self?.reactor?.action.onNext(.didTapDeleteButton(indexPath))
+                switch action {
+                case .didTapBackButton:
+                    navigationController?.popViewController(animated: true)
+                case .didTapAddFolderButton:
+                    reactor.action.onNext(.didTapAddFolderButton)
+                case .didTapAddClipButton:
+                    reactor.action.onNext(.didTapAddClipButton)
+                case .didTapCell(let indexPath):
+                    reactor.action.onNext(.didTapCell(indexPath))
+                case .didTapDetailButton(let indexPath):
+                    reactor.action.onNext(.didTapDetailButton(indexPath))
+                case .didTapEditButton(let indexPath):
+                    reactor.action.onNext(.didTapEditButton(indexPath))
+                case .didTapDeleteButton((let indexPath, let title)):
+                    presentDeleteAlert(title: title) {
+                        reactor.action.onNext(.didTapDeleteButton(indexPath))
+                    }
                 }
             }
             .disposed(by: disposeBag)
