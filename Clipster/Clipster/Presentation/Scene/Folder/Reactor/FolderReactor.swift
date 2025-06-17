@@ -151,7 +151,6 @@ private extension FolderReactor {
 
             return Disposables.create()
         }
-        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
         .asObservable()
     }
 
@@ -181,7 +180,6 @@ private extension FolderReactor {
 
             return Disposables.create()
         }
-        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
         .asObservable()
     }
 
@@ -241,7 +239,6 @@ private extension FolderReactor {
 
             return Disposables.create()
         }
-        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
         .asObservable()
     }
 }
