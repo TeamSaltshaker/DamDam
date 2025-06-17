@@ -1,5 +1,5 @@
 import Foundation
 
 protocol URLRepository {
-    func execute(url: URL) async -> Result<(ParsedURLMetadata, Bool), Error>
+    func execute(url: URL) async -> Result<(ParsedURLMetadata?, Bool), Error>
 }

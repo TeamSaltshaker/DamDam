@@ -57,6 +57,7 @@ final class EditClipViewModel: ViewModel {
     var disposeBag = DisposeBag()
 
     private let parseURLUseCase: ParseURLUseCase
+
     private let fetchFolderUseCase: FetchFolderUseCase
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
@@ -118,6 +119,7 @@ final class EditClipViewModel: ViewModel {
             let urlPrasingResult = Observable<Mutation>.fromAsync { [weak self] in
                 guard let self = self else { throw URLError(.cancelled) }
                 let (metadata, isValid) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                guard let metadata else { throw URLError(.cancelled) }
                 return Observable.merge(
                     .just(Mutation.updateValidURL(isValid)),
                     .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata)))
@@ -274,7 +276,8 @@ private extension EditClipViewModel {
         URLMetadataDisplay(
             url: entity.url,
             title: entity.title,
-            thumbnailImageURL: entity.thumbnailImageURL
+            thumbnailImageURL: entity.thumbnailImageURL,
+            screenshotImageData: entity.screenshotData
         )
     }
 }

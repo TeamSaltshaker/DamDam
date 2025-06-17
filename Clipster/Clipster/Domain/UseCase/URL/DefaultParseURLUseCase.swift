@@ -1,19 +1,19 @@
 import Foundation
 
 final class DefaultParseURLUseCase: ParseURLUseCase {
-    let urlRepository: URLRepository
+    let urlMetaRepository: URLRepository
 
-    init(urlRepository: URLRepository) {
-        self.urlRepository = urlRepository
+    init(urlMetaRepository: URLRepository) {
+        self.urlMetaRepository = urlMetaRepository
     }
 
-    func execute(urlString: String) async -> Result<(ParsedURLMetadata, Bool), Error> {
+    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), Error> {
         let correctedURLString = urlString.lowercased().hasPrefix("https://") ?
         urlString : "https://\(urlString)"
 
         guard let url = URL(string: correctedURLString) else {
             return .failure(URLError(.badURL))
         }
-        return await urlRepository.execute(url: url)
+        return await urlMetaRepository.execute(url: url)
     }
 }
