@@ -123,7 +123,7 @@ private extension SelectedFolderView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(24)
+            make.top.equalTo(titleLabel.snp.bottom).offset(38)
             make.directionalHorizontalEdges.centerX.equalToSuperview()
             make.bottom.equalToSuperview().inset(22)
         }
