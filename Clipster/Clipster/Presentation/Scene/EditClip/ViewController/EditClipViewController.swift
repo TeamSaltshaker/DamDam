@@ -335,6 +335,16 @@ private extension EditClipViewController {
                 self?.viewModel.action.accept(.editURLInputTextField(""))
             }
             .disposed(by: disposeBag)
+
+        viewModel.state
+            .map { $0.type }
+            .filter { $0 == .create }
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.editClipView.urlView.urlTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
     }
 }
 
