@@ -23,11 +23,6 @@ final class HomeViewController: UIViewController, View {
         view = homeView
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         reactor?.action.onNext(.viewWillAppear)
@@ -141,15 +136,5 @@ private extension HomeViewController {
                 }
             }
             .disposed(by: disposeBag)
-    }
-}
-
-private extension HomeViewController {
-    func configure() {
-        setAttributes()
-    }
-
-    func setAttributes() {
-        navigationController?.isNavigationBarHidden = true
     }
 }
