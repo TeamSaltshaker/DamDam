@@ -104,15 +104,15 @@ private extension HomeReactor {
     func fetchHomeData() -> Observable<Mutation> {
         Observable.concat([
             .just(.setPhase(.loading)),
-            asyncMutate { try await self.makeHomeDisplay() }
+            asyncMutate { try await self.makeHomeDisplayMutation() }
         ])
     }
 
-    func makeHomeDisplay() async throws -> [Mutation] {
+    func makeHomeDisplayMutation() async throws -> Mutation {
         async let clips = self.makeClipDisplays()
         async let folders = self.makeFolderDisplays()
         let display = try await HomeDisplay(unvisitedClips: clips, folders: folders)
-        return [.setHomeDisplay(display)]
+        return .setHomeDisplay(display)
     }
 
     func makeClipDisplays() async throws -> [ClipDisplay] {
@@ -131,7 +131,9 @@ private extension HomeReactor {
         Observable.concat([
             .just(.setPhase(.loading)),
             asyncMutate {
-                guard let section = self.section(at: indexPath) else { return [] }
+                guard let section = self.section(at: indexPath) else {
+                    return .setPhase(.error("삭제할 항목을 찾을 수 없습니다."))
+                }
 
                 switch section {
                 case .unvisitedClip(let clip):
@@ -140,7 +142,7 @@ private extension HomeReactor {
                     try await self.deleteFolderUseCase.execute(folder).get()
                 }
 
-                return try await self.makeHomeDisplay()
+                return try await self.makeHomeDisplayMutation()
             }
         ])
     }
@@ -197,12 +199,12 @@ private extension HomeReactor {
 }
 
 private extension HomeReactor {
-    func asyncMutate(_ task: @escaping () async throws -> [Mutation]) -> Observable<Mutation> {
+    func asyncMutate(_ task: @escaping () async throws -> Mutation) -> Observable<Mutation> {
         Observable.create { observer in
             Task {
                 do {
-                    let mutations = try await task()
-                    mutations.forEach { observer.onNext($0) }
+                    let mutation = try await task()
+                    observer.onNext(mutation)
                     observer.onNext(.setPhase(.success))
                 } catch {
                     observer.onNext(.setPhase(.error(error.localizedDescription)))
