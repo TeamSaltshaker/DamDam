@@ -66,6 +66,26 @@ extension UnvisitedClipListViewController {
                 self?.unvisitedClipListView.setDisplay(display)
             }
             .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self else { return }
+
+                switch phase {
+                case .loading:
+                    unvisitedClipListView.showLoading()
+                case .success:
+                    unvisitedClipListView.hideLoading()
+                case .error(let message):
+                    let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
+                    present(alert, animated: true)
+                case .idle:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
     }
 
     func bindRoute(from reactor: Reactor) {
