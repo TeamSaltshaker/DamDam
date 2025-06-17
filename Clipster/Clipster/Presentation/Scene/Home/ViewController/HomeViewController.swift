@@ -33,7 +33,7 @@ final class HomeViewController: UIViewController, View {
         reactor?.action.onNext(.viewWillAppear)
     }
 
-    func bind(reactor: HomeReactor) {
+    func bind(reactor: Reactor) {
         bindAction(to: reactor)
         bindState(from: reactor)
         bindRoute(from: reactor)
@@ -41,7 +41,7 @@ final class HomeViewController: UIViewController, View {
 }
 
 private extension HomeViewController {
-    func bindAction(to reactor: HomeReactor) {
+    func bindAction(to reactor: Reactor) {
         homeView.action
             .bind { [weak self] action in
                 switch action {
@@ -66,7 +66,7 @@ private extension HomeViewController {
             .disposed(by: disposeBag)
     }
 
-    func bindState(from reactor: HomeReactor) {
+    func bindState(from reactor: Reactor) {
         reactor.state
             .compactMap { $0.homeDisplay }
             .observe(on: MainScheduler.instance)
@@ -96,7 +96,7 @@ private extension HomeViewController {
             .disposed(by: disposeBag)
     }
 
-    func bindRoute(from reactor: HomeReactor) {
+    func bindRoute(from reactor: Reactor) {
         reactor.pulse(\.$route)
             .compactMap { $0 }
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
