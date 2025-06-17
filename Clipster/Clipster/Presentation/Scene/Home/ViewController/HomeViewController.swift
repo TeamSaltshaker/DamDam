@@ -132,12 +132,9 @@ private extension HomeViewController {
                     )
                     owner.navigationController?.pushViewController(vc, animated: true)
                 case .showUnvisitedClipList(let clips):
-                    let vm = owner.diContainer.makeUnvisitedClipListViewModel(clips: clips)
-                    let vc = UnvisitedClipListViewController(
-                        unvisitedClipListViewModel: vm,
-                        diContainer: owner.diContainer,
-                    )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    let reactor = diContainer.makeUnvisitedClipListReactor(clips: clips)
+                    let vc = UnvisitedClipListViewController(reactor: reactor, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)

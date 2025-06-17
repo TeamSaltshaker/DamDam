@@ -152,8 +152,8 @@ final class DIContainer {
         )
     }
 
-    func makeUnvisitedClipListViewModel(clips: [Clip]) -> UnvisitedClipListViewModel {
-        UnvisitedClipListViewModel(
+    func makeUnvisitedClipListReactor(clips: [Clip]) -> UnvisitedClipListReactor {
+        UnvisitedClipListReactor(
             clips: clips,
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
