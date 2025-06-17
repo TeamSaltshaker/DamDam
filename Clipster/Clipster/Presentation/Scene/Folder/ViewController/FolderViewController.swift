@@ -3,12 +3,14 @@ import SafariServices
 import UIKit
 
 final class FolderViewController: UIViewController, View {
+    typealias Reactor = FolderReactor
+
     var disposeBag = DisposeBag()
     private let diContainer: DIContainer
 
     private let folderView = FolderView()
 
-    init(reactor: FolderReactor, diContainer: DIContainer) {
+    init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -116,6 +118,7 @@ private extension FolderViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] route in
                 guard let self = self else { return }
+
                 switch route {
                 case .editClipViewForAdd(let folder):
                     let vm = diContainer.makeEditClipViewModel(folder: folder)
