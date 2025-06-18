@@ -54,6 +54,7 @@ extension EditClipViewController: View {
             .text
             .orEmpty
             .distinctUntilChanged()
+            .skip(1)
             .map { _ in Reactor.Action.editingURLTextField }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
