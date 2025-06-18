@@ -256,7 +256,7 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
         section.interGroupSpacing = 16
-        section.contentInsets = .init(top: 8, leading: 24, bottom: 24, trailing: 24)
+        section.contentInsets = .init(top: 8, leading: 24, bottom: 40, trailing: 24)
         section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .clip)]
 
         return section
@@ -284,27 +284,15 @@ private extension HomeView {
         }
             let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
             section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
-            section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 24)
+            section.contentInsets = .init(top: 8, leading: 0, bottom: 24, trailing: 24)
             section.interGroupSpacing = 8
             return section
         }
 
         func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
-            let heightDimension: NSCollectionLayoutDimension
-            var contentInsets: NSDirectionalEdgeInsets
-
-            switch section {
-            case .clip:
-                heightDimension = .absolute(48)
-                contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-            case .folder:
-                heightDimension = .absolute(56)
-                contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
-            }
-
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: heightDimension
+                heightDimension: .absolute(48)
             )
 
             let header = NSCollectionLayoutBoundarySupplementaryItem(
@@ -312,7 +300,14 @@ private extension HomeView {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            header.contentInsets = contentInsets
+
+            switch section {
+            case .clip:
+                header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+            case .folder:
+                header.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
+            }
+
             return header
         }
     }
