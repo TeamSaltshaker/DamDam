@@ -102,12 +102,12 @@ extension UnvisitedClipListViewController {
                     let vc = SFSafariViewController(url: url)
                     present(vc, animated: true)
                 case .showDetailClip(let clip):
-                    let vm = owner.diContainer.makeClipDetailReactor(clip: clip)
+                    let vm = self.diContainer.makeClipDetailReactor(clip: clip)
                     let vc = ClipDetailViewController(
                         reactor: vm,
-                        diContainer: owner.diContainer
+                        diContainer: self.diContainer
                     )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
                     let vm = diContainer.makeEditClipViewModel(clip: clip)
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
