@@ -132,21 +132,21 @@ extension UnvisitedClipListView: UICollectionViewDelegate {
 
             let info = UIAction(
                 title: "상세정보",
-                image: UIImage(systemName: "magnifyingglass")
+                image: .info
             ) { [weak self] _ in
                 self?.action.accept(.detail(indexPath.item))
             }
 
             let edit = UIAction(
                 title: "편집",
-                image: UIImage(systemName: "pencil")
+                image: .pen
             ) { [weak self] _ in
                 self?.action.accept(.edit(indexPath.item))
             }
 
             let delete = UIAction(
                 title: "삭제",
-                image: UIImage(systemName: "trash"),
+                image: .trashRed,
                 attributes: .destructive
             ) { [weak self] _ in
                 self?.action.accept(.delete(index: indexPath.item, title: item.urlMetadata.title))

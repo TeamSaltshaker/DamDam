@@ -188,14 +188,18 @@ extension FolderView: UICollectionViewDelegate {
 
 private extension FolderView {
     func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
-            guard let self else { return }
-            action.accept(.didTapAddFolderButton)
+        let addFolderAction = UIAction(
+            title: "폴더 추가",
+            image: .folderPlus
+        ) { [weak self] _ in
+            self?.action.accept(.didTapAddFolderButton)
         }
 
-        let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
-            guard let self else { return }
-            action.accept(.didTapAddClipButton)
+        let addClipAction = UIAction(
+            title: "클립 추가",
+            image: .clip
+        ) { [weak self] _ in
+            self?.action.accept(.didTapAddClipButton)
         }
 
         return UIMenu(title: "", children: [addFolderAction, addClipAction])
@@ -204,7 +208,7 @@ private extension FolderView {
     func makeDetailAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "상세정보",
-            image: UIImage(systemName: "magnifyingglass")
+            image: .info
         ) { [weak self] _ in
             self?.performAction(for: indexPath) { .didTapDetailButton($0) }
         }
@@ -213,7 +217,7 @@ private extension FolderView {
     func makeEditAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "편집",
-            image: UIImage(systemName: "pencil")
+            image: .pen
         ) { [weak self] _ in
             self?.performAction(for: indexPath) { .didTapEditButton($0) }
         }
@@ -222,7 +226,7 @@ private extension FolderView {
     func makeDeleteAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "삭제",
-            image: UIImage(systemName: "trash"),
+            image: .trashRed,
             attributes: .destructive
         ) { [weak self] _ in
             self?.performAction(for: indexPath) {

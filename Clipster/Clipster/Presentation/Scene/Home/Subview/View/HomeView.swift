@@ -172,14 +172,14 @@ final class HomeView: UIView {
     private func makeAddButtonMenu() -> UIMenu {
         let addFolderAction = UIAction(
             title: "폴더 추가",
-            image: UIImage(systemName: "folder")
+            image: .folderPlus
         ) { [weak self] _ in
             self?.action.accept(.tapAddFolder)
         }
 
         let addClipAction = UIAction(
             title: "클립 추가",
-            image: UIImage(systemName: "paperclip"),
+            image: .clip,
         ) { [weak self] _ in
             self?.action.accept(.tapAddClip)
         }
@@ -346,7 +346,7 @@ private extension HomeView {
     private func makeDetailAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "상세정보",
-            image: UIImage(systemName: "magnifyingglass")
+            image: .info
         ) { [weak self] _ in
             self?.performAction(for: indexPath) { .detail($0) }
         }
@@ -355,7 +355,7 @@ private extension HomeView {
     func makeEditAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "편집",
-            image: UIImage(systemName: "pencil")
+            image: .pen
         ) { [weak self] _ in
             self?.performAction(for: indexPath) { .edit($0) }
         }
@@ -364,7 +364,7 @@ private extension HomeView {
     func makeDeleteAction(for indexPath: IndexPath) -> UIAction {
         .init(
             title: "삭제",
-            image: UIImage(systemName: "trash"),
+            image: .trashRed,
             attributes: .destructive
         ) { [weak self] _ in
             self?.performAction(for: indexPath) { .delete(indexPath: $0, title: $1.displayTitle) }
