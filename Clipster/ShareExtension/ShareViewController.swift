@@ -39,7 +39,6 @@ final class ShareViewController: SLComposeViewController {
         for type in types {
             provider.loadItem(forTypeIdentifier: type, options: nil) { [weak self] (item, error) in
                 guard let self else {
-                    self?.close()
                     return
                 }
 
