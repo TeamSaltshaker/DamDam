@@ -57,7 +57,6 @@ final class EditClipViewModel: ViewModel {
     var disposeBag = DisposeBag()
 
     private let parseURLUseCase: ParseURLUseCase
-
     private let fetchFolderUseCase: FetchFolderUseCase
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
@@ -282,19 +281,19 @@ private extension EditClipViewModel {
     }
 }
 
-extension Observable {
-    static func fromAsync<T>(_ block: @escaping () async throws -> T) -> Observable<T> {
-        Single.create { emitter in
-            Task {
-                do {
-                    let result = try await block()
-                    emitter(.success(result))
-                } catch {
-                    emitter(.failure(error))
-                }
-            }
-            return Disposables.create()
-        }
-        .asObservable()
-    }
-}
+//extension Observable {
+//    static func fromAsync<T>(_ block: @escaping () async throws -> T) -> Observable<T> {
+//        Single.create { emitter in
+//            Task {
+//                do {
+//                    let result = try await block()
+//                    emitter(.success(result))
+//                } catch {
+//                    emitter(.failure(error))
+//                }
+//            }
+//            return Disposables.create()
+//        }
+//        .asObservable()
+//    }
+//}
