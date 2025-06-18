@@ -16,6 +16,7 @@ final class FolderReactor: Reactor {
     enum Mutation {
         case reloadFolder(Folder)
         case updateClipLastVisitedDate(Clip)
+        case delete
         case route(Route)
     }
 
@@ -66,54 +67,101 @@ final class FolderReactor: Reactor {
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
+        print("\(Self.self): action → \(action)")
+
         switch action {
         case .viewWillAppear:
-            return reloadFolder()
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                return try await fetchFolderUseCase.execute(id: folder.id).get()
+            }
+            .map { .reloadFolder($0) }
+            .catch { _ in .empty() }
         case .didTapCell(let indexPath):
             switch indexPath.section {
             case 0:
-                return routeToFolderView(at: indexPath.item)
+                let folder = folder.folders[indexPath.item]
+                return .just(.route(.folderView(folder)))
             case 1:
-                return Observable.concat(
-                    updateLastVisitedDate(at: indexPath.item),
-                    routeToWebView(at: indexPath.item),
+                let url = folder.clips[indexPath.item].urlMetadata.url
+                return .concat(
+                    .fromAsync { [weak self] in
+                        guard let self else { throw DomainError.unknownError }
+                        let clip = folder.clips[indexPath.item]
+                        let updatedClip = Clip(
+                            id: clip.id,
+                            folderID: clip.folderID,
+                            urlMetadata: clip.urlMetadata,
+                            memo: clip.memo,
+                            lastVisitedAt: Date.now,
+                            createdAt: clip.createdAt,
+                            updatedAt: Date.now,
+                            deletedAt: clip.deletedAt,
+                        )
+                        _ = await updateClipUseCase.execute(clip: updatedClip)
+                        return updatedClip
+                    }
+                    .map { .updateClipLastVisitedDate($0) }
+                    .catch { _ in .empty() },
+                    .just(.route(.webView(url)))
                 )
             default:
                 return .empty()
             }
         case .didTapAddFolderButton:
-            return routeToAddFolderView()
+            return .just(.route(.editFolderView(folder, nil)))
         case .didTapAddClipButton:
-            return routeToAddClipView()
+            return .just(.route(.editClipViewForAdd(folder)))
         case .didTapDetailButton(let indexPath):
             switch indexPath.section {
             case 1:
-                return routeToClipDetailView(at: indexPath.item)
+                let clip = folder.clips[indexPath.item]
+                return .just(.route(.clipDetailView(clip)))
             default:
                 return .empty()
             }
         case .didTapEditButton(let indexPath):
             switch indexPath.section {
             case 0:
-                return routeToEditFolderView(at: indexPath.item)
+                let selectedFolder = folder.folders[indexPath.item]
+                return .just(.route(.editFolderView(folder, selectedFolder)))
             case 1:
-                return routeToEditClipView(at: indexPath.item)
+                let clip = folder.clips[indexPath.item]
+                return .just(.route(.editClipViewForEdit(clip)))
             default:
                 return .empty()
             }
         case .didTapDeleteButton(let indexPath):
             return Observable.concat(
-                delete(at: indexPath),
-                reloadFolder(),
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+                    switch indexPath.section {
+                    case 0:
+                        let folder = self.folder.folders[indexPath.item]
+                        _ = await self.deleteFolderUseCase.execute(folder)
+                    case 1:
+                        let clip = self.folder.clips[indexPath.item]
+                        _ = await self.deleteClipUseCase.execute(clip)
+                    default:
+                        break
+                    }
+                    return .delete
+                },
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+                    return try await fetchFolderUseCase.execute(id: folder.id).get()
+                }
+                .map { .reloadFolder($0) }
+                .catch { _ in .empty() },
             )
         }
     }
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-
         switch mutation {
         case .reloadFolder(let folder):
+            self.folder = folder
             newState.currentFolderTitle = folder.title
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
             newState.clips = folder.clips.map(ClipDisplayMapper.map)
@@ -122,123 +170,11 @@ final class FolderReactor: Reactor {
             if let index = newState.clips.firstIndex(where: { $0.id == updatedClip.id }) {
                 newState.clips[index] = ClipDisplayMapper.map(updatedClip)
             }
+        case .delete:
+            break
         case .route(let route):
             self.route.accept(route)
         }
-
         return newState
-    }
-}
-
-private extension FolderReactor {
-    func reloadFolder() -> Observable<Mutation> {
-        Observable.create { [weak self] observer in
-            guard let self else {
-                observer.onCompleted()
-                return Disposables.create()
-            }
-
-            Task {
-                guard case let .success(folder) = await self.fetchFolderUseCase.execute(id: self.folder.id) else {
-                    print("\(Self.self): Failed to reload")
-                    observer.onCompleted()
-                    return
-                }
-                self.folder = folder
-                observer.onNext(.reloadFolder(folder))
-                observer.onCompleted()
-            }
-
-            return Disposables.create()
-        }
-        .asObservable()
-    }
-
-    func updateLastVisitedDate(at index: Int) -> Observable<Mutation> {
-        Observable.create { [weak self] observer in
-            guard let self else {
-                observer.onCompleted()
-                return Disposables.create()
-            }
-
-            Task {
-                let clip = self.folder.clips[index]
-                let updatedClip = Clip(
-                    id: clip.id,
-                    folderID: clip.folderID,
-                    urlMetadata: clip.urlMetadata,
-                    memo: clip.memo,
-                    lastVisitedAt: Date.now,
-                    createdAt: clip.createdAt,
-                    updatedAt: Date.now,
-                    deletedAt: clip.deletedAt,
-                )
-                _ = await self.updateClipUseCase.execute(clip: updatedClip)
-                observer.onNext(.updateClipLastVisitedDate(updatedClip))
-                observer.onCompleted()
-            }
-
-            return Disposables.create()
-        }
-        .asObservable()
-    }
-
-    func routeToWebView(at index: Int) -> Observable<Mutation> {
-        let url = folder.clips[index].urlMetadata.url
-        return Observable.just(.route(.webView(url)))
-    }
-
-    func routeToFolderView(at index: Int) -> Observable<Mutation> {
-        let folder = folder.folders[index]
-        return Observable.just(.route(.folderView(folder)))
-    }
-
-    func routeToAddFolderView() -> Observable<Mutation> {
-        Observable.just(.route(.editFolderView(folder, nil)))
-    }
-
-    func routeToAddClipView() -> Observable<Mutation> {
-        Observable.just(.route(.editClipViewForAdd(folder)))
-    }
-
-    func routeToClipDetailView(at index: Int) -> Observable<Mutation> {
-        let clip = folder.clips[index]
-        return Observable.just(.route(.clipDetailView(clip)))
-    }
-
-    func routeToEditFolderView(at index: Int) -> Observable<Mutation> {
-        let selectedFolder = folder.folders[index]
-        return Observable.just(.route(.editFolderView(folder, selectedFolder)))
-    }
-
-    func routeToEditClipView(at index: Int) -> Observable<Mutation> {
-        let clip = folder.clips[index]
-        return Observable.just(.route(.editClipViewForEdit(clip)))
-    }
-
-    func delete(at indexPath: IndexPath) -> Observable<Mutation> {
-        Observable.create { [weak self] observer in
-            guard let self else {
-                observer.onCompleted()
-                return Disposables.create()
-            }
-
-            Task {
-                switch indexPath.section {
-                case 0:
-                    let folder = self.folder.folders[indexPath.item]
-                    _ = await self.deleteFolderUseCase.execute(folder)
-                case 1:
-                    let clip = self.folder.clips[indexPath.item]
-                    _ = await self.deleteClipUseCase.execute(clip)
-                default:
-                    break
-                }
-                observer.onCompleted()
-            }
-
-            return Disposables.create()
-        }
-        .asObservable()
     }
 }
