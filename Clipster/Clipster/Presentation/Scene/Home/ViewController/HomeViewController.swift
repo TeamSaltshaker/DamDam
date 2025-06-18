@@ -104,9 +104,12 @@ private extension HomeViewController {
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .showAddFolder:
-                    let vm = diContainer.makeEditFolderViewModel(mode: .add(parentFolder: nil))
-                    let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    let vm = owner.diContainer.makeEditFolderReactor(parentFolder: nil, folder: nil)
+                    let vc = EditFolderViewController(
+                        reactor: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showWebView(let url):
                     let vc = SFSafariViewController(url: url)
                     present(vc, animated: true)
@@ -123,9 +126,15 @@ private extension HomeViewController {
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .showEditFolder(let folder):
-                    let vm = diContainer.makeEditFolderViewModel(mode: .edit(parentFolder: nil, folder: folder))
-                    let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    let vm = owner.diContainer.makeEditFolderReactor(
+                        parentFolder: nil,
+                        folder: folder
+                    )
+                    let vc = EditFolderViewController(
+                        reactor: vm,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 case .showUnvisitedClipList(let clips):
                     let reactor = diContainer.makeUnvisitedClipListReactor(clips: clips)
                     let vc = UnvisitedClipListViewController(reactor: reactor, diContainer: diContainer)

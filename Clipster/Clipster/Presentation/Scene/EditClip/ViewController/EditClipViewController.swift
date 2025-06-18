@@ -216,9 +216,9 @@ private extension EditClipViewController {
             .tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
-                let vm = diContainer.makeEditFolderViewModel(mode: .add(parentFolder: viewModel.state.value.currentFolder))
+                let vm = diContainer.makeEditFolderReactor(parentFolder: viewModel.state.value.currentFolder, folder: nil)
                 let vc = EditFolderViewController(
-                    viewModel: vm,
+                    reactor: vm,
                     diContainer: diContainer
                 )
 

@@ -1,21 +1,22 @@
+import ReactorKit
 import RxCocoa
 import RxSwift
 import SnapKit
 import UIKit
 
-final class EditFolderViewController: UIViewController {
-    private let viewModel: EditFolderViewModel
+final class EditFolderViewController: UIViewController, View {
+    typealias Reactor = EditFolderReactor
     private let diContainer: DIContainer
-    private let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     private let editFolderView = EditFolderView()
 
     var onAdditionComplete: ((Folder) -> Void)?
 
-    init(viewModel: EditFolderViewModel, diContainer: DIContainer) {
-        self.viewModel = viewModel
+    init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -28,139 +29,24 @@ final class EditFolderViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
         hideKeyboardWhenTappedBackground()
+        editFolderView.folderTitleTextField.delegate = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
+
+    func bind(reactor: Reactor) {
+        bindAction(to: reactor)
+        bindState(from: reactor)
+        bindRoute(from: reactor)
+    }
 }
 
 private extension EditFolderViewController {
-    func configure() {
-        setBindings()
-    }
-
-    func setBindings() {
-        let state = viewModel.state.share(replay: 1)
-
-        state
-            .map { $0.navigationTitle }
-            .observe(on: MainScheduler.instance)
-            .bind { [weak self] title in
-                self?.editFolderView.commonNavigationView.setTitle(title)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.parentFolderDisplay }
-            .distinctUntilChanged { $0?.id == $1?.id }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] parentFolderDisplay in
-                self?.editFolderView.selectedFolderView.folderRowView.setDisplay(parentFolderDisplay)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.mode }
-            .filter { mode in
-                if case .add = mode { return true }
-                return false
-            }
-            .take(1)
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.editFolderView.folderTitleTextField.becomeFirstResponder()
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.isSavable }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: editFolderView.saveButton.rx.isEnabled)
-            .disposed(by: disposeBag)
-
-        state
-            .map { ($0.shouldNavigateToFolderSelector, $0.folder, $0.parentFolder) }
-            .distinctUntilChanged { $0.0 == $1.0 }
-            .filter { $0.0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _, folder, parentFolder in
-                guard let self else { return }
-
-                let reactor = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: parentFolder, folder: folder)
-                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
-                vc.onSelectionComplete = { selected in
-                    self.viewModel.action.accept(.selectFolder(selected: selected))
-                }
-                vc.onDismissed = {
-                    self.viewModel.action.accept(.folderSelectorDismissed)
-                }
-                vc.modalPresentationStyle = .pageSheet
-
-                if let sheet = vc.sheetPresentationController {
-                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
-                    sheet.prefersGrabberVisible = true
-                }
-
-                present(vc, animated: true)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.isProcessing }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] isProcessing in
-                guard let self else { return }
-                self.editFolderView.saveButton.isUserInteractionEnabled = !isProcessing
-                self.editFolderView.saveButton.alpha = isProcessing ? 0.5 : 1.0
-                self.editFolderView.setTextFieldInteraction(enabled: !isProcessing)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .compactMap { $0.alertMessage }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] message in
-                let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { ($0.shouldDismiss, $0.didFinishAddtion) }
-            .distinctUntilChanged { $0.0 == $1.0 }
-            .filter { $0.0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _, folder in
-                if let folder {
-                    self?.onAdditionComplete?(folder)
-                }
-                self?.navigationController?.popViewController(animated: true)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.folderTitle }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: editFolderView.folderTitleTextField.rx.text)
-            .disposed(by: disposeBag)
-
-        editFolderView.folderTitleTextField.rx.text.orEmpty
-            .map { String($0.prefix(100)) }
-            .do { [weak self] limited in
-                self?.editFolderView.folderTitleTextField.text = limited
-            }
-            .map { .folderTitleChanged($0) }
-            .bind(to: viewModel.action)
-            .disposed(by: disposeBag)
-
+    func bindAction(to reactor: Reactor) {
         editFolderView.backButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
@@ -168,20 +54,136 @@ private extension EditFolderViewController {
             }
             .disposed(by: disposeBag)
 
-        editFolderView.saveButton.rx.tap
-            .map { EditFolderAction.saveButtonTapped }
-            .bind(to: viewModel.action)
+        editFolderView.folderTitleTextField.rx.text.orEmpty
+            .distinctUntilChanged()
+            .map { .folderTitleChanged($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        editFolderView.folderTitleTextField.clearButton.rx.tap
+            .map { .clearButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         editFolderView.selectedFolderView.folderViewTapGesture.rx.event
             .map { _ in .folderViewTapped }
-            .bind(to: viewModel.action)
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        editFolderView.folderTitleTextField.clearButton.rx.tap
-            .map { EditFolderAction.clearButtonTapped }
-            .bind(to: viewModel.action)
+        editFolderView.saveButton.rx.tap
+            .map { .saveButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+
+    func bindState(from reactor: Reactor) {
+        reactor.state
+            .map { $0.navigationTitle }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] title in
+                self?.editFolderView.commonNavigationView.setTitle(title)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { $0.folderTitle }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: editFolderView.folderTitleTextField.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { $0.isSavable }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: editFolderView.saveButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { $0.parentFolderDisplay }
+            .distinctUntilChanged { $0?.id == $1?.id }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] display in
+                self?.editFolderView.selectedFolderView.folderRowView.setDisplay(display)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { $0.folder == nil }
+            .take(1)
+            .filter { $0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.editFolderView.folderTitleTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] phase in
+                guard let self = self else { return }
+                switch phase {
+                case .idle:
+                    break
+                case .loading:
+                    break
+                case .success(let folder):
+                    self.onAdditionComplete?(folder)
+                    self.navigationController?.popViewController(animated: true)
+                case .error(let message):
+                    self.presentAlert(message: message)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+
+    func bindRoute(from reactor: Reactor) {
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] route in
+                guard let self else { return }
+                switch route {
+                case .showFolderSelector:
+                    let currentState = reactor.currentState
+                    let vm = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: currentState.parentFolder, folder: currentState.folder)
+                    let vc = FolderSelectorViewController(reactor: vm, diContainer: diContainer)
+                    vc.onSelectionComplete = { selected in
+                        reactor.action.onNext(.selectFolder(selected: selected))
+                    }
+                    vc.onDismissed = {
+                        reactor.action.onNext(.folderSelectorDismissed)
+                    }
+
+                    vc.modalPresentationStyle = .pageSheet
+                    if let sheet = vc.sheetPresentationController {
+                        sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
+                        sheet.prefersGrabberVisible = true
+                    }
+
+                    present(vc, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+}
+
+private extension EditFolderViewController {
+    func presentAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(alert, animated: true)
+    }
+}
+
+extension EditFolderViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        return updatedText.count <= 100
     }
 }
 
