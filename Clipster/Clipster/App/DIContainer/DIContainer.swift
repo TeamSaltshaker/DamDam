@@ -48,6 +48,10 @@ final class DIContainer {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeCanSaveFolderUseCase() -> CanSaveFolderUseCase {
+        DefaultCanSaveFolderUseCase()
+    }
+
     func makeCanSelectFolderUseCase() -> CanSelectFolderUseCase {
         DefaultCanSelectFolderUseCase()
     }
@@ -74,6 +78,10 @@ final class DIContainer {
 
     func makeFetchTopLevelFoldersUseCase() -> FetchTopLevelFoldersUseCase {
         DefaultFetchTopLevelFoldersUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeSanitizeFolderTitleUseCase() -> SanitizeFolderTitleUseCase {
+        DefaultSanitizeFolderTitleUseCase()
     }
 
     func makeUpdateFolderUseCase() -> UpdateFolderUseCase {
@@ -136,11 +144,14 @@ final class DIContainer {
         )
     }
 
-    func makeEditFolderViewModel(mode: EditFolderMode) -> EditFolderViewModel {
-        EditFolderViewModel(
+    func makeEditFolderReactor(parentFolder: Folder?, folder: Folder?) -> EditFolderReactor {
+        EditFolderReactor(
+            canSaveFolderUseCase: makeCanSaveFolderUseCase(),
+            sanitizeFolderTitleUseCase: makeSanitizeFolderTitleUseCase(),
             createFolderUseCase: makeCreateFolderUseCase(),
             updateFolderUseCase: makeUpdateFolderUseCase(),
-            mode: mode
+            parentFolder: parentFolder,
+            folder: folder
         )
     }
 
