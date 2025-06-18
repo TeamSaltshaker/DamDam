@@ -91,8 +91,8 @@ private extension EditFolderViewController {
             .subscribe { [weak self] _, folder, parentFolder in
                 guard let self else { return }
 
-                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .editFolder(folder: folder, parentFolder: parentFolder))
-                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                let reactor = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: parentFolder, folder: folder)
+                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
                 vc.onSelectionComplete = { selected in
                     self.viewModel.action.accept(.selectFolder(selected: selected))
                 }
