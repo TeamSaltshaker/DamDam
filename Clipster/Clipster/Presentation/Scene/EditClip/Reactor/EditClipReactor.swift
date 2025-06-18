@@ -237,7 +237,6 @@ final class EditClipReactor: Reactor {
                 newState.urlTextFieldBorderColor = .black900
             } else {
                 newState.urlTextFieldBorderColor = value ? .blue600 : .red600
-                newState.isHiddenURLValidationStackView = false
             }
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadataDisplay = urlMetaDisplay
