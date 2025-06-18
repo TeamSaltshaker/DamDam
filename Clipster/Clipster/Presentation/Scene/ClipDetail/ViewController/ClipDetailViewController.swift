@@ -1,17 +1,18 @@
+import ReactorKit
 import RxSwift
 import UIKit
 
-final class ClipDetailViewController: UIViewController {
-    private let viewModel: ClipDetailViewModel
+final class ClipDetailViewController: UIViewController, View {
+    typealias Reactor = ClipDetailReactor
     private let diContainer: DIContainer
-    private let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     private let clipDetailView = ClipDetailView()
 
-    init(viewModel: ClipDetailViewModel, diContainer: DIContainer) {
-        self.viewModel = viewModel
+    init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -22,115 +23,21 @@ final class ClipDetailViewController: UIViewController {
         view = clipDetailView
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
-        viewModel.action.accept(.viewWillAppear)
+        reactor?.action.onNext(.viewWillAppear)
+    }
+
+    func bind(reactor: Reactor) {
+        bindAction(to: reactor)
+        bindState(from: reactor)
+        bindRoute(from: reactor)
     }
 }
 
 private extension ClipDetailViewController {
-    func configure() {
-        setBindings()
-    }
-
-    func setBindings() {
-        let state = viewModel.state.share(replay: 1)
-
-        state
-            .map { (clip: $0.clipDisplay, folder: $0.folderDisplay) }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] (clip, folder) in
-                guard let folder else { return }
-
-                self?.clipDetailView.setDisplay(clip, folder: folder)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.isLoading }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] isLoading in
-                self?.clipDetailView.setLoading(isLoading)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.isProcessingDelete }
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] isProcessing in
-                guard let self else { return }
-
-                self.clipDetailView.editButton.isEnabled = !isProcessing
-                self.clipDetailView.deleteButton.isEnabled = !isProcessing
-                self.clipDetailView.alpha = isProcessing ? 0.5 : 1.0
-                self.navigationController?.navigationBar.isUserInteractionEnabled = !isProcessing
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.showDeleteConfirmation }
-            .distinctUntilChanged()
-            .filter { $0 }
-            .withLatestFrom(state.map { $0.clipDisplay.urlMetadata.title })
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] title in
-                guard let self else { return }
-
-                self.presentDeleteAlert(
-                    title: title,
-                    onCancel: {
-                        self.viewModel.action.accept(.deleteCanceled)
-                    },
-                    onConfirm: {
-                        self.viewModel.action.accept(.deleteConfirmed)
-                    }
-                )
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .compactMap { $0.errorMessage }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] message in
-                let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.shouldNavigateToEdit }
-            .distinctUntilChanged()
-            .filter { $0 }
-            .withLatestFrom(state)
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] state in
-                guard let self else { return }
-
-                let vm = self.diContainer.makeEditClipViewModel(clip: state.clip)
-                let vc = EditClipViewController(viewModel: vm, diContainer: self.diContainer)
-                self.navigationController?.pushViewController(vc, animated: true)
-            }
-            .disposed(by: disposeBag)
-
-        state
-            .map { $0.shouldDismiss }
-            .distinctUntilChanged()
-            .filter { $0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.navigationController?.popViewController(animated: true)
-            }
-            .disposed(by: disposeBag)
-
+    func bindAction(to reactor: Reactor) {
         clipDetailView.backButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
@@ -139,14 +46,84 @@ private extension ClipDetailViewController {
             .disposed(by: disposeBag)
 
         clipDetailView.editButton.rx.tap
-            .map { ClipDetailAction.editButtonTapped }
-            .bind(to: viewModel.action)
+            .map { .editButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         clipDetailView.deleteButton.rx.tap
-            .map { ClipDetailAction.deleteButtonTapped }
-            .bind(to: viewModel.action)
+            .map { .deleteButtonTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+
+    func bindState(from reactor: Reactor) {
+        reactor.state
+            .map { (clip: $0.clipDisplay, folder: $0.folderDisplay) }
+            .filter { $0.folder != nil }
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] (clip, folder) in
+                guard let folder else { return }
+                self?.clipDetailView.setDisplay(clip, folder: folder)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .skip(1)
+            .map { (clip: $0.clip, clipDisplay: $0.clipDisplay, folderDisplay: $0.folderDisplay) }
+            .distinctUntilChanged { $0.clip.updatedAt == $1.clip.updatedAt }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] (_, clip, folder) in
+                guard let folder else { return }
+                self?.clipDetailView.setDisplay(clip, folder: folder)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self = self else { return }
+                switch phase {
+                case .idle:
+                    break
+                case .loading:
+                    break
+                case .success:
+                    self.navigationController?.popViewController(animated: true)
+                case .error(let message):
+                    self.presentAlert(message: message)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+
+    func bindRoute(from reactor: Reactor) {
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] route in
+                guard let self else { return }
+                switch route {
+                case .showEditClip(let clip):
+                    let vm = self.diContainer.makeEditClipViewModel(clip: clip)
+                    let vc = EditClipViewController(viewModel: vm, diContainer: self.diContainer)
+                    self.navigationController?.pushViewController(vc, animated: true)
+                case .showDeleteConfirmation(let title):
+                    self.presentDeleteAlert(title: title) {
+                        reactor.action.onNext(.deleteConfirmed)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+}
+
+private extension ClipDetailViewController {
+    func presentAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
     }
 }
 
