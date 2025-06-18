@@ -109,9 +109,12 @@ extension UnvisitedClipListViewController {
                     )
                     self.navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
-                    let vm = diContainer.makeEditClipViewModel(clip: clip)
-                    let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    let reactor = owner.diContainer.makeEditClipReactor(clip: clip)
+                    let vc = EditClipViewController(
+                        reactor: reactor,
+                        diContainer: owner.diContainer
+                    )
+                    owner.navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)

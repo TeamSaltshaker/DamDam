@@ -37,8 +37,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             DispatchQueue.main.async {
                 if let rootVC = self.window?.rootViewController as? UINavigationController {
                     let diContainer = DIContainer()
-                    let editVM = diContainer.makeEditClipViewModel(urlString: urlString)
-                    let editClipVC = EditClipViewController(viewModel: editVM, diContainer: diContainer)
+                    let reactor = diContainer.makeEditClipReactor(urlString: urlString)
+                    let editClipVC = EditClipViewController(reactor: reactor, diContainer: diContainer)
                     rootVC.pushViewController(editClipVC, animated: true)
                 }
             }
