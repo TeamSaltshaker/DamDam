@@ -8,9 +8,11 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
     private var timeoutTimer: Timer?
 
     func execute(url: URL) async -> Result<(ParsedURLMetadata?, Bool), any Error> {
-        await withCheckedContinuation { continuation in
+        let finalURL = await resolveRedirectURL(initialURL: url)
+
+        return await withCheckedContinuation { continuation in
             self.continuation = continuation
-            self.originalURL = url
+            self.originalURL = finalURL
 
             self.cleanupWebView()
 
@@ -19,20 +21,37 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             self.webView = WKWebView(frame: webViewFrame, configuration: config)
             self.webView?.navigationDelegate = self
 
-            let request = URLRequest(url: url)
+            let request = URLRequest(url: finalURL)
             self.webView?.load(request)
 
-            self.timeoutTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: false) { [weak self] _ in
+            self.timeoutTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
                 self?.handleTimeout()
             }
         }
     }
 
-    private func complete(with result: Result<(ParsedURLMetadata?, Bool), Error>) {
-        if let currentContinuation = continuation {
-            currentContinuation.resume(returning: result)
-            cleanupWebView()
+    func resolveRedirectURL(initialURL: URL) async -> URL {
+        var request = URLRequest(url: initialURL)
+        request.httpMethod = "HEAD"
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse,
+               let finalURL = httpResponse.url {
+                print("🎯 리디렉션 최종 URL: \(finalURL)")
+                return finalURL
+            }
+        } catch {
+            print("리디렉션 확인 실패: \(error)")
         }
+
+        return initialURL
+    }
+
+    private func complete(with result: Result<(ParsedURLMetadata?, Bool), Error>) {
+        guard let currentContinuation = continuation else { return }
+        currentContinuation.resume(returning: result)
+        cleanupWebView()
         continuation = nil
     }
 
@@ -69,19 +88,21 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
         Task {
             do {
+                try await Task.sleep(for: .seconds(0.5))
+
                 guard let htmlString = try await webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") as? String, !htmlString.isEmpty else {
                     print("\(Self.self) HTML 불러오기 실패")
                     self.complete(with: .success((nil, false)))
                     return
                 }
 
-                guard let originalURL = self.originalURL else {
-                    print("\(Self.self) Original URL이 없습니다.")
+                guard let url = webView.url?.absoluteURL else {
+                    print("\(Self.self) WKWebView의 현재 URL이 없습니다.")
                     self.complete(with: .success((nil, false)))
                     return
                 }
 
-                let parsedDTO = try self.parseHTML(url: originalURL, html: htmlString)
+                let parsedDTO = try self.parseHTML(url: self.originalURL ?? url, html: htmlString)
 
                 let topPortionRect = CGRect(x: 0, y: 0, width: webView.bounds.width, height: 400)
                 let screenshotImage = await self.captureScreenshot(rect: topPortionRect)
@@ -93,6 +114,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                     thumbnailImageURL: parsedDTO.thumbnailImageURL,
                     screenshotData: screenshotData
                 )
+
                 let metadata = metadataDTOWithScreenshot.toEntity()
                 self.complete(with: .success((metadata, true)))
             } catch {
