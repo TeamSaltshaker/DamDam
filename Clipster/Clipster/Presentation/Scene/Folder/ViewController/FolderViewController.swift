@@ -69,16 +69,21 @@ private extension FolderViewController {
     func bindState(from reactor: FolderReactor) {
         reactor.state
             .observe(on: MainScheduler.instance)
-            .map { $0.currentFolderTitle }
+            .map(\.currentFolderTitle)
+            .distinctUntilChanged()
             .bind { [weak self] title in
                 guard let self else { return }
                 folderView.setDisplay(title: title)
             }
             .disposed(by: disposeBag)
 
+        typealias Display = ([FolderDisplay], [ClipDisplay])
         reactor.state
             .observe(on: MainScheduler.instance)
             .map { ($0.folders, $0.clips) }
+            .distinctUntilChanged { (lhs: Display, rhs: Display) in
+                lhs.0 == rhs.0 && lhs.1 == rhs.1
+            }
             .subscribe { [weak self] folders, clips in
                 guard let self else { return }
                 folderView.setDisplay(folders: folders, clips: clips)
@@ -87,7 +92,8 @@ private extension FolderViewController {
 
         reactor.state
             .observe(on: MainScheduler.instance)
-            .map { $0.isEmptyViewHidden }
+            .map(\.isEmptyViewHidden)
+            .distinctUntilChanged()
             .bind { [weak self] isHidden in
                 guard let self else { return }
                 folderView.setDisplay(isEmptyViewHidden: isHidden)
