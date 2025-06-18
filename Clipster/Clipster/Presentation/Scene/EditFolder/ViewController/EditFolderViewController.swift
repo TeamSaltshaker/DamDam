@@ -59,7 +59,7 @@ private extension EditFolderViewController {
             .distinctUntilChanged { $0?.id == $1?.id }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] parentFolderDisplay in
-                self?.editFolderView.folderRowView.setDisplay(parentFolderDisplay)
+                self?.editFolderView.selectedFolderView.folderRowView.setDisplay(parentFolderDisplay)
             }
             .disposed(by: disposeBag)
 
@@ -134,18 +134,13 @@ private extension EditFolderViewController {
 
         state
             .map { $0.folderTitle }
-            .take(1)
+            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .bind(to: editFolderView.folderTitleTextField.rx.text)
             .disposed(by: disposeBag)
 
-        state
-            .map { $0.folderTitleLimit }
-            .bind(to: editFolderView.folderTitleLimitLabel.rx.text)
-            .disposed(by: disposeBag)
-
         editFolderView.folderTitleTextField.rx.text.orEmpty
-            .map { String($0.prefix(10)) }
+            .map { String($0.prefix(100)) }
             .do { [weak self] limited in
                 self?.editFolderView.folderTitleTextField.text = limited
             }
@@ -165,8 +160,13 @@ private extension EditFolderViewController {
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
 
-        editFolderView.folderViewTapGesture.rx.event
+        editFolderView.selectedFolderView.folderViewTapGesture.rx.event
             .map { _ in .folderViewTapped }
+            .bind(to: viewModel.action)
+            .disposed(by: disposeBag)
+
+        editFolderView.folderTitleTextField.clearButton.rx.tap
+            .map { EditFolderAction.clearButtonTapped }
             .bind(to: viewModel.action)
             .disposed(by: disposeBag)
     }

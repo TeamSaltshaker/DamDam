@@ -10,6 +10,7 @@ enum EditFolderMode {
 enum EditFolderAction {
     case folderTitleChanged(String)
     case saveButtonTapped
+    case clearButtonTapped
     case folderViewTapped
     case saveSucceeded(Folder)
     case saveFailed(Error)
@@ -25,10 +26,6 @@ struct EditFolderState {
     var didFinishAddtion: Folder?
     var parentFolder: Folder?
     var parentFolderDisplay: FolderDisplay?
-
-    var folderTitleLimit: String {
-        "\(folderTitle.count) / 10"
-    }
 
     var folder: Folder? {
         switch mode {
@@ -106,6 +103,9 @@ final class EditFolderViewModel {
                         print("\(Self.self): save button tapped")
                         newState.isProcessing = true
                     }
+                case .clearButtonTapped:
+                    print("\(Self.self): clear button tapped")
+                    newState.folderTitle = ""
                 case .folderViewTapped:
                     print("\(Self.self): folder view tapped")
                     newState.shouldNavigateToFolderSelector = true

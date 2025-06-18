@@ -89,6 +89,7 @@ private extension EditClipViewController {
             .rx
             .text
             .orEmpty
+            .distinctUntilChanged()
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .subscribe { [weak self] in
                 self?.viewModel.action.accept(.editURLInputTextField($0))
@@ -323,6 +324,15 @@ private extension EditClipViewController {
                 } else {
                     self?.editClipView.urlValidationStacKView.activityIndicatorView.stopAnimating()
                 }
+            }
+            .disposed(by: disposeBag)
+
+        editClipView.urlView.urlTextField.clearButton
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                self?.editClipView.urlView.urlTextField.text = ""
+                self?.viewModel.action.accept(.editURLInputTextField(""))
             }
             .disposed(by: disposeBag)
     }
