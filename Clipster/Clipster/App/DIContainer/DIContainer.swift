@@ -92,8 +92,8 @@ final class DIContainer {
         DefaultParseURLUseCase(urlRepository: makeURLRepository())
     }
 
-    func makeClipDetailViewModel(clip: Clip) -> ClipDetailViewModel {
-        ClipDetailViewModel(
+    func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
+        ClipDetailReactor(
             fetchFolderUseCase: makeFetchFolderUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
             fetchClipUseCase: makeFetchClipUseCase(),
