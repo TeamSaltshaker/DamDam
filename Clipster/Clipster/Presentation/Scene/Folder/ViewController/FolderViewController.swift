@@ -118,14 +118,8 @@ private extension FolderViewController {
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .editFolderView(let parentFolder, let folder):
-                    let mode: EditFolderMode
-                    if let folder = folder {
-                        mode = .edit(parentFolder: parentFolder, folder: folder)
-                    } else {
-                        mode = .add(parentFolder: parentFolder)
-                    }
-                    let vm = diContainer.makeEditFolderViewModel(mode: mode)
-                    let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
+                    let vm = diContainer.makeEditFolderReactor(parentFolder: parentFolder, folder: folder)
+                    let vc = EditFolderViewController(reactor: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .folderView(let folder):
                     let reactor = diContainer.makeFolderReactor(folder: folder)
