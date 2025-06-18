@@ -205,9 +205,9 @@ final class EditClipReactor: Reactor {
             .catchAndReturn(.updateCurrentFolder(nil))
         case .fetchTopLevelFolder:
             return .fromAsync { [weak self] in
-                guard let self else { throw DomainError.unknownError  }
-                return try await fetchTopLevelFoldersUseCase.execute().get()
+                try? await self?.fetchTopLevelFoldersUseCase.execute().get()
             }
+            .compactMap { $0 }
             .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
