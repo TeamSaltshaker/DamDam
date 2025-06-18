@@ -56,9 +56,8 @@ private extension FolderSelectorView {
 
     func setConstraints() {
         commonNavigationView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(21)
+            make.top.equalToSuperview().offset(24)
             make.directionalHorizontalEdges.equalToSuperview()
-            make.height.equalTo(84)
         }
 
         backButton.snp.makeConstraints { make in
@@ -70,7 +69,7 @@ private extension FolderSelectorView {
         }
 
         separator.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom)
+            make.top.equalTo(commonNavigationView.snp.bottom).offset(14)
             make.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(1)
         }

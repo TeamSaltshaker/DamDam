@@ -21,7 +21,7 @@ final class EmptyView: UIView {
             case .editClipView:
                 return "현재 생성된 폴더가 없습니다.\n+버튼으로 추가해 보세요!"
             default:
-                return "현재 폴더 및 파일이 없습니다.\n상단 +버튼으로 추가해 보세요!"
+                return "현재 폴더 및 파일이 없습니다."
             }
         }
 

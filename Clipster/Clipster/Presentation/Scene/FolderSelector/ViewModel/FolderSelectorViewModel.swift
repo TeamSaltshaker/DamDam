@@ -35,7 +35,6 @@ enum FolderSelectorAction {
 
 struct FolderSelectorState {
     let mode: FolderSelectorMode
-    var initialParentFolder: Folder?
     var folders: [Folder] = []
     var currentPath: [Folder] = []
     var isLoading = true
@@ -70,10 +69,6 @@ struct FolderSelectorState {
     }
 
     var isSelectable: Bool {
-        guard selectedFolder?.id != initialParentFolder?.id else {
-            return false
-        }
-
         switch mode {
         case .editClip:
             return selectedFolder != nil
@@ -84,7 +79,6 @@ struct FolderSelectorState {
 
     init(mode: FolderSelectorMode) {
         self.mode = mode
-        self.initialParentFolder = mode.parentFolder
     }
 }
 

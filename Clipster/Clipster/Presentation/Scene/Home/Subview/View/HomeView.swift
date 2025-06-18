@@ -90,6 +90,16 @@ final class HomeView: UIView {
         return view
     }()
 
+    private let emptyAddButton: UIButton = {
+        let button = UIButton()
+        button.setImage(.addButtonBlue, for: .normal)
+        button.setImage(.addButtonBlue, for: .highlighted)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.backgroundColor = .clear
+        button.isHidden = true
+        return button
+    }()
+
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
 
     override init(frame: CGRect) {
@@ -192,8 +202,9 @@ final class HomeView: UIView {
             snapshot.appendItems(folderItems, toSection: .folder)
         }
 
-        let isEmptyViewHidden = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
-        emptyView.isHidden = isEmptyViewHidden
+        let isEmpty = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
+        emptyView.isHidden = isEmpty
+        emptyAddButton.isHidden = isEmpty
 
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -404,6 +415,7 @@ private extension HomeView {
             navigationView,
             collectionView,
             emptyView,
+            emptyAddButton,
             loadingIndicator
         ].forEach { addSubview($0) }
 
@@ -438,7 +450,16 @@ private extension HomeView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.top.equalToSuperview().inset(291)
+            make.height.equalTo(146)
+            make.centerX.equalToSuperview()
+        }
+
+        emptyAddButton.snp.makeConstraints { make in
+            make.top.equalTo(emptyView.snp.bottom).offset(32)
+            make.width.equalTo(160)
+            make.height.equalTo(48)
+            make.centerX.equalToSuperview()
         }
 
         loadingIndicator.snp.makeConstraints { make in
@@ -452,6 +473,11 @@ private extension HomeView {
                 self?.logicalIndexPath(indexPath) ?? indexPath
             }
             .map { Action.tapCell($0) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
+
+        emptyAddButton.rx.tap
+            .map { Action.tapAddClip }
             .bind(to: action)
             .disposed(by: disposeBag)
     }
