@@ -1,6 +1,5 @@
 import Foundation
 import ReactorKit
-import RxRelay
 
 final class FolderReactor: Reactor {
     enum Action {
