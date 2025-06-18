@@ -3,6 +3,7 @@ import RxCocoa
 import UIKit
 
 final class EditClipViewController: UIViewController {
+    typealias Reactor = EditClipReactor
     private let diContainer: DIContainer
     var disposeBag = DisposeBag()
 
