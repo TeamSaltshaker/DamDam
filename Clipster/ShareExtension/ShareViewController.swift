@@ -34,28 +34,32 @@ final class ShareViewController: SLComposeViewController {
             return
         }
 
-        provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { [weak self] (item, error) in
-            guard let self else {
-                self?.close()
-                return
-            }
+        let types = [UTType.url.identifier, UTType.plainText.identifier]
 
-            if let error = error {
-                print("\(Self.self) ❌ URL 로딩 에러: \(error)")
-                close()
-                return
-            }
-
-            if let url = item as? URL {
-                print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
-                if saveURLToUserDefaults(url) {
-                    DispatchQueue.main.async {
-                        self.openMainApp()
-                    }
+        for type in types {
+            provider.loadItem(forTypeIdentifier: type, options: nil) { [weak self] (item, error) in
+                guard let self else {
+                    self?.close()
+                    return
                 }
-            } else {
-                print("\(Self.self) ❌ URL 타입 변환 에러")
-                close()
+
+                if let error = error {
+                    print("\(Self.self) ❌ URL 로딩 에러: \(error)")
+                    close()
+                    return
+                }
+
+                if let url = item as? URL {
+                    print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
+                    if saveURLToUserDefaults(url) {
+                        DispatchQueue.main.async {
+                            self.openMainApp()
+                        }
+                    }
+                } else {
+                    print("\(Self.self) ❌ URL 타입 변환 에러")
+                    close()
+                }
             }
         }
     }
