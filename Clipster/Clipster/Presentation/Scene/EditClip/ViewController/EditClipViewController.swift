@@ -246,8 +246,8 @@ private extension EditClipViewController {
             .drive { [weak self] currentFolder in
                 guard let self else { return }
 
-                let vm = self.diContainer.makeFolderSelectorViewModel(mode: .editClip(parentFolder: currentFolder))
-                let vc = FolderSelectorViewController(viewModel: vm, diContainer: self.diContainer)
+                let reactor = self.diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
+                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
                 vc.onSelectionComplete = {
                     self.viewModel.action.accept(.editFolder($0))
                 }
