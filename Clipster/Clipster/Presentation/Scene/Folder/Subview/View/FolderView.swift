@@ -63,6 +63,16 @@ final class FolderView: UIView {
 
     private let emptyView = EmptyView(type: .folderView)
 
+    private let emptyAddButton: UIButton = {
+        let button = UIButton()
+        button.setImage(.addButtonBlue, for: .normal)
+        button.setImage(.addButtonBlue, for: .highlighted)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.backgroundColor = .clear
+        button.isHidden = true
+        return button
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -94,8 +104,9 @@ final class FolderView: UIView {
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
 
-    func setDisplay(isEmptyViewHidden: Bool) {
-        emptyView.isHidden = isEmptyViewHidden
+    func setDisplay(isHidden: Bool) {
+        emptyView.isHidden = isHidden
+        emptyAddButton.isHidden = isHidden
     }
 }
 
@@ -278,7 +289,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, collectionView, emptyView].forEach {
+        [navigationView, collectionView, emptyView, emptyAddButton].forEach {
             addSubview($0)
         }
     }
@@ -304,7 +315,16 @@ private extension FolderView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.top.equalToSuperview().inset(291)
+            make.height.equalTo(146)
+            make.centerX.equalToSuperview()
+        }
+
+        emptyAddButton.snp.makeConstraints { make in
+            make.top.equalTo(emptyView.snp.bottom).offset(32)
+            make.width.equalTo(160)
+            make.height.equalTo(48)
+            make.centerX.equalToSuperview()
         }
     }
 
@@ -373,6 +393,11 @@ private extension FolderView {
                 guard let self else { return }
                 action.accept(.didTapCell(indexPath))
             }
+            .disposed(by: disposeBag)
+
+        emptyAddButton.rx.tap
+            .map { Action.didTapAddClipButton }
+            .bind(to: action)
             .disposed(by: disposeBag)
     }
 }
