@@ -64,6 +64,19 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         state
+            .map { $0.mode }
+            .filter { mode in
+                if case .add = mode { return true }
+                return false
+            }
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.editFolderView.folderTitleTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+
+        state
             .map { $0.isSavable }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
