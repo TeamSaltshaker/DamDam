@@ -256,7 +256,7 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
         section.interGroupSpacing = 16
-        section.contentInsets = .init(top: 16, leading: 24, bottom: 24, trailing: 24)
+        section.contentInsets = .init(top: 8, leading: 24, bottom: 24, trailing: 24)
         section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .clip)]
 
         return section
