@@ -126,8 +126,8 @@ private extension FolderViewController {
                     let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .clipDetailView(let clip):
-                    let vm = diContainer.makeClipDetailViewModel(clip: clip)
-                    let vc = ClipDetailViewController(viewModel: vm, diContainer: diContainer)
+                    let vm = diContainer.makeClipDetailReactor(clip: clip)
+                    let vc = ClipDetailViewController(reactor: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .webView(let url):
                     let vc = SFSafariViewController(url: url)
