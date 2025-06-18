@@ -39,6 +39,7 @@ final class FolderReactor: Reactor {
 
     let initialState: State
     private var folder: Folder
+    private var isFirstAppear = true
 
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
@@ -71,6 +72,10 @@ final class FolderReactor: Reactor {
 
         switch action {
         case .viewWillAppear:
+            if isFirstAppear {
+                isFirstAppear = false
+                return .empty()
+            }
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
                 return try await fetchFolderUseCase.execute(id: folder.id).get()
