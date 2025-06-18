@@ -11,47 +11,54 @@ final class FolderView: UIView {
         case didTapCell(IndexPath)
         case didTapDetailButton(IndexPath)
         case didTapEditButton(IndexPath)
-        case didTapDeleteButton((IndexPath, String))
+        case didTapDeleteButton(IndexPath, String)
     }
 
-    enum Section: Int {
+    enum Section: Int, CaseIterable {
         case folder
         case clip
+
+        func logicalIndexPath(for item: Int) -> IndexPath {
+            switch self {
+            case .folder:
+                IndexPath(item: item, section: 0)
+            case .clip:
+                IndexPath(item: item, section: 1)
+            }
+        }
     }
 
     enum Item: Hashable {
         case folder(FolderDisplay)
         case clip(ClipDisplay)
+
+        var displayTitle: String {
+            switch self {
+            case .folder(let folder):
+                folder.title
+            case .clip(let clip):
+                clip.urlMetadata.title
+            }
+        }
     }
 
     let action = PublishRelay<Action>()
-    private var dataSource: UITableViewDiffableDataSource<Section, Item>?
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
     private let disposeBag = DisposeBag()
 
     private let navigationView = CommonNavigationView()
     private let backButton = BackButton()
     private let addButton = AddButton()
 
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = .white800
-        tableView.rowHeight = 80
-        tableView.separatorStyle = .none
-        tableView.sectionHeaderTopPadding = 0
-        tableView.register(
-            FolderCell.self,
-            forCellReuseIdentifier: FolderCell.identifier,
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: createCollectionViewLayout()
         )
-        tableView.register(
-            ClipCell.self,
-            forCellReuseIdentifier: ClipCell.identifier,
-        )
-        tableView.register(
-            TableHeaderView.self,
-            forHeaderFooterViewReuseIdentifier: TableHeaderView.identifier,
-        )
-        tableView.delegate = self
-        return tableView
+        collectionView.delegate = self
+        collectionView.contentInset.top = 24
+        collectionView.backgroundColor = .white800
+        return collectionView
     }()
 
     private let emptyView = EmptyView(type: .folderView)
@@ -71,10 +78,18 @@ final class FolderView: UIView {
 
     func setDisplay(folders: [FolderDisplay], clips: [ClipDisplay]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-        snapshot.appendSections([.folder, .clip])
-        snapshot.appendItems(folders.map { .folder($0) }, toSection: .folder)
-        snapshot.appendItems(clips.map { .clip($0) }, toSection: .clip)
-        snapshot.reloadSections([.folder, .clip])
+
+        if !folders.isEmpty {
+            let folderItems = folders.map { Item.folder($0) }
+            snapshot.appendSections([.folder])
+            snapshot.appendItems(folderItems, toSection: .folder)
+        }
+
+        if !clips.isEmpty {
+            let clipItems = clips.map { Item.clip($0) }
+            snapshot.appendSections([.clip])
+            snapshot.appendItems(clipItems, toSection: .clip)
+        }
 
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -82,18 +97,156 @@ final class FolderView: UIView {
     func setDisplay(isEmptyViewHidden: Bool) {
         emptyView.isHidden = isEmptyViewHidden
     }
+}
 
-    private func makeAddButtonMenu() -> UIMenu {
+private extension FolderView {
+    func createCollectionViewLayout() -> UICollectionViewCompositionalLayout {
+        let layout = UICollectionViewCompositionalLayout { _, env in
+            var config = UICollectionLayoutListConfiguration(appearance: .plain)
+            config.showsSeparators = false
+            config.backgroundColor = .white800
+            config.headerMode = .supplementary
+            config.headerTopPadding = 0
+            config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
+                let delete = UIContextualAction(
+                    style: .destructive,
+                    title: "삭제"
+                ) { [weak self] _, _, completion in
+                    self?.performAction(for: indexPath) {
+                        .didTapDeleteButton($0, $1.displayTitle)
+                    }
+                    completion(true)
+                }
+
+                delete.image = .trashWhite
+                delete.backgroundColor = .red600
+
+                return UISwipeActionsConfiguration(actions: [delete])
+            }
+
+            let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+            section.boundarySupplementaryItems = [self.makeHeaderItemLayout()]
+            section.contentInsets = .init(top: 0, leading: 0, bottom: 40, trailing: 24)
+            return section
+        }
+        return layout
+    }
+
+    func makeHeaderItemLayout() -> NSCollectionLayoutBoundarySupplementaryItem {
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(48)
+        )
+
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+        header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+        return header
+    }
+}
+
+extension FolderView: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        .init(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { [weak self] _ in
+            guard let self,
+                  let item = self.dataSource?.itemIdentifier(for: indexPath)
+            else {
+                return UIMenu()
+            }
+
+            let edit = self.makeEditAction(for: indexPath)
+            let delete = self.makeDeleteAction(for: indexPath)
+
+            switch item {
+            case .clip:
+                let detail = self.makeDetailAction(for: indexPath)
+                return UIMenu(title: "", children: [detail, edit, delete])
+            case .folder:
+                return UIMenu(title: "", children: [edit, delete])
+            }
+        }
+    }
+}
+
+private extension FolderView {
+    func makeAddButtonMenu() -> UIMenu {
         let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
             guard let self else { return }
             action.accept(.didTapAddFolderButton)
         }
+
         let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
             guard let self else { return }
             action.accept(.didTapAddClipButton)
         }
 
         return UIMenu(title: "", children: [addFolderAction, addClipAction])
+    }
+
+    func makeDetailAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "상세정보",
+            image: UIImage(systemName: "magnifyingglass")
+        ) { [weak self] _ in
+            self?.performAction(for: indexPath) { .didTapDetailButton($0) }
+        }
+    }
+
+    func makeEditAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "편집",
+            image: UIImage(systemName: "pencil")
+        ) { [weak self] _ in
+            self?.performAction(for: indexPath) { .didTapEditButton($0) }
+        }
+    }
+
+    func makeDeleteAction(for indexPath: IndexPath) -> UIAction {
+        .init(
+            title: "삭제",
+            image: UIImage(systemName: "trash"),
+            attributes: .destructive
+        ) { [weak self] _ in
+            self?.performAction(for: indexPath) {
+                .didTapDeleteButton($0, $1.displayTitle)
+            }
+        }
+    }
+}
+
+private extension FolderView {
+    func performAction(
+        for indexPath: IndexPath,
+        transform: (IndexPath, Item) -> Action
+    ) {
+        guard let item = dataSource?.itemIdentifier(for: indexPath) else { return }
+        let logical = logicalIndexPath(indexPath)
+        action.accept(transform(logical, item))
+    }
+
+    func performAction(
+        for indexPath: IndexPath,
+        transform: (IndexPath) -> Action
+    ) {
+        let logical = logicalIndexPath(indexPath)
+        action.accept(transform(logical))
+    }
+
+    func logicalIndexPath(_ indexPath: IndexPath) -> IndexPath {
+        guard let section = self.dataSource?.sectionIdentifier(for: indexPath.section)
+        else { return indexPath }
+
+        return section.logicalIndexPath(for: indexPath.item)
     }
 }
 
@@ -117,7 +270,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, tableView, emptyView].forEach {
+        [navigationView, collectionView, emptyView].forEach {
             addSubview($0)
         }
     }
@@ -136,10 +289,10 @@ private extension FolderView {
             make.size.equalTo(48)
         }
 
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(navigationView.snp.bottom).offset(24)
-            make.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(24)
-            make.bottom.equalTo(safeAreaLayoutGuide)
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(navigationView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
 
         emptyView.snp.makeConstraints { make in
@@ -148,25 +301,52 @@ private extension FolderView {
     }
 
     func setDataSource() {
-        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
+        let clipCellRegistration = UICollectionView.CellRegistration<ClipListCell, ClipDisplay> { cell, _, item in
+            cell.setDisplay(item)
+        }
+
+        let folderCellRegistration = UICollectionView.CellRegistration<FolderListCell, FolderDisplay> { cell, _, item in
+            cell.setDisplay(item)
+        }
+
+        dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
-            case .folder(let folderDisplay):
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: FolderCell.identifier,
+            case .clip(let clipItem):
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: clipCellRegistration,
                     for: indexPath,
-                ) as? FolderCell else { return UITableViewCell() }
-                cell.setDisplay(folderDisplay)
-
-                return cell
-            case .clip(let clipDisplay):
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: ClipCell.identifier,
+                    item: clipItem
+                )
+            case .folder(let folderItem):
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: folderCellRegistration,
                     for: indexPath,
-                ) as? ClipCell else { return UITableViewCell() }
-                cell.setDisplay(clipDisplay)
-
-                return cell
+                    item: folderItem
+                )
             }
+        }
+
+        let headerRegistration = UICollectionView.SupplementaryRegistration<CollectionHeaderView>(
+            elementKind: UICollectionView.elementKindSectionHeader
+        ) { [weak self] header, _, indexPath in
+            guard
+                let self,
+                let section = dataSource?.sectionIdentifier(for: indexPath.section)
+            else { return }
+
+            switch section {
+            case .clip:
+                header.setTitle("클립")
+            case .folder:
+                header.setTitle("폴더")
+            }
+        }
+
+        dataSource?.supplementaryViewProvider = { collectionView, _, indexPath in
+            collectionView.dequeueConfiguredReusableSupplementary(
+                using: headerRegistration,
+                for: indexPath
+            )
         }
     }
 
@@ -179,124 +359,12 @@ private extension FolderView {
             }
             .disposed(by: disposeBag)
 
-        tableView.rx.itemSelected
+        collectionView.rx.itemSelected
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] indexPath in
                 guard let self else { return }
-                tableView.deselectRow(at: indexPath, animated: true)
                 action.accept(.didTapCell(indexPath))
             }
             .disposed(by: disposeBag)
-    }
-}
-
-extension FolderView: UITableViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        viewForHeaderInSection section: Int,
-    ) -> UIView? {
-        guard let section = Section(rawValue: section),
-              let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
-              !items.isEmpty,
-              let header = tableView.dequeueReusableHeaderFooterView(
-                withIdentifier: TableHeaderView.identifier,
-              ) as? TableHeaderView else { return nil }
-
-        header.setTitle(section == .folder ? "폴더" : "클립")
-        return header
-    }
-
-    func tableView(
-        _ tableView: UITableView,
-        heightForHeaderInSection section: Int,
-    ) -> CGFloat {
-        guard let section = Section(rawValue: section),
-              let items = dataSource?.snapshot().itemIdentifiers(inSection: section),
-              !items.isEmpty else { return .leastNonzeroMagnitude }
-
-        return 48
-    }
-
-    func tableView(
-        _ tableView: UITableView,
-        heightForFooterInSection section: Int
-    ) -> CGFloat {
-        guard section == 0,
-              let items = dataSource?.snapshot().itemIdentifiers(inSection: .folder),
-              !items.isEmpty else {
-            return 0
-        }
-
-        return 24
-    }
-
-    func tableView(
-        _ tableView: UITableView,
-        viewForFooterInSection section: Int,
-    ) -> UIView? {
-        guard section == 0 else { return nil }
-
-        let spacer = UIView()
-        spacer.backgroundColor = .clear
-
-        return spacer
-    }
-
-    func tableView(
-        _ tableView: UITableView,
-        contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint,
-    ) -> UIContextMenuConfiguration? {
-        UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            guard let self else { return UIMenu() }
-
-            let detailAction = UIAction(title: "상세정보", image: .info) { _ in
-                self.action.accept(.didTapDetailButton(indexPath))
-            }
-            let editAction = UIAction(title: "편집", image: .pen) { _ in
-                self.action.accept(.didTapEditButton(indexPath))
-            }
-            let deleteAction = UIAction(title: "삭제", image: .trashRed, attributes: .destructive) { _ in
-                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else { return }
-
-                switch item {
-                case .folder(let display):
-                    self.action.accept(.didTapDeleteButton((indexPath, display.title)))
-                case .clip(let display):
-                    self.action.accept(.didTapDeleteButton((indexPath, display.urlMetadata.title)))
-                }
-            }
-            let actions = (indexPath.section == 0 ? [] : [detailAction]) + [editAction, deleteAction]
-
-            return UIMenu(title: "", children: actions)
-        }
-    }
-
-    func tableView(
-        _ tableView: UITableView,
-        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath,
-    ) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(
-            style: .destructive,
-            title: "삭제",
-        ) { [weak self] _, _, completion in
-            guard let self,
-                  let item = dataSource?.itemIdentifier(for: indexPath) else {
-                completion(false)
-                return
-            }
-
-            switch item {
-            case .folder(let display):
-                action.accept(.didTapDeleteButton((indexPath, display.title)))
-            case .clip(let display):
-                action.accept(.didTapDeleteButton((indexPath, display.urlMetadata.title)))
-            }
-
-            completion(true)
-        }
-        deleteAction.image = .trashWhite
-
-        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }

@@ -56,7 +56,7 @@ private extension FolderViewController {
                     reactor.action.onNext(.didTapDetailButton(indexPath))
                 case .didTapEditButton(let indexPath):
                     reactor.action.onNext(.didTapEditButton(indexPath))
-                case .didTapDeleteButton((let indexPath, let title)):
+                case .didTapDeleteButton(let indexPath, let title):
                     presentDeleteAlert(title: title) {
                         reactor.action.onNext(.didTapDeleteButton(indexPath))
                     }
