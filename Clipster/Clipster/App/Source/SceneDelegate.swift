@@ -18,12 +18,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let diContainer = DIContainer()
-        let homeVM = diContainer.makeHomeViewModel()
-        let homeVC = HomeViewController(homeviewModel: homeVM, diContainer: diContainer)
+        let reactor = diContainer.makeHomeReactor()
+        let homeVC = HomeViewController(reactor: reactor, diContainer: diContainer)
+        let naviVC = UINavigationController(rootViewController: homeVC)
+        naviVC.isNavigationBarHidden = true
 
         window = UIWindow(windowScene: windowScene)
         window?.backgroundColor = .white800
-        window?.rootViewController = UINavigationController(rootViewController: homeVC)
+        window?.rootViewController = naviVC
         window?.makeKeyAndVisible()
     }
 

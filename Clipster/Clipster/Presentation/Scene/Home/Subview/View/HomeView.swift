@@ -100,6 +100,8 @@ final class HomeView: UIView {
         return button
     }()
 
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -188,8 +190,8 @@ final class HomeView: UIView {
     func setDisplay(_ display: HomeDisplay) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
 
-        if !display.unvitsedClips.isEmpty {
-            let clipItems = display.unvitsedClips.map { Item.clip($0) }
+        if !display.unvisitedClips.isEmpty {
+            let clipItems = display.unvisitedClips.map { Item.clip($0) }
             snapshot.appendSections([.clip])
             snapshot.appendItems(clipItems, toSection: .clip)
         }
@@ -200,11 +202,21 @@ final class HomeView: UIView {
             snapshot.appendItems(folderItems, toSection: .folder)
         }
 
-        let isEmpty = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
+        let isEmpty = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
         emptyView.isHidden = isEmpty
         emptyAddButton.isHidden = isEmpty
 
         dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        isUserInteractionEnabled = true
     }
 }
 
@@ -403,7 +415,8 @@ private extension HomeView {
             navigationView,
             collectionView,
             emptyView,
-            emptyAddButton
+            emptyAddButton,
+            loadingIndicator
         ].forEach { addSubview($0) }
 
         [
@@ -447,6 +460,10 @@ private extension HomeView {
             make.width.equalTo(160)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
+        }
+
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 
