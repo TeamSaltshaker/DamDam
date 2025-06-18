@@ -290,9 +290,21 @@ private extension HomeView {
         }
 
         func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
+            let heightDimension: NSCollectionLayoutDimension
+            var contentInsets: NSDirectionalEdgeInsets
+
+            switch section {
+            case .clip:
+                heightDimension = .absolute(48)
+                contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+            case .folder:
+                heightDimension = .absolute(56)
+                contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+            }
+
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(48)
+                heightDimension: heightDimension
             )
 
             let header = NSCollectionLayoutBoundarySupplementaryItem(
@@ -300,14 +312,7 @@ private extension HomeView {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-
-            switch section {
-            case .clip:
-                header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-            case .folder:
-                header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
-            }
-
+            header.contentInsets = contentInsets
             return header
         }
     }
