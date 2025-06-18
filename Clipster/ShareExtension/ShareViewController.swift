@@ -98,6 +98,6 @@ final class ShareViewController: SLComposeViewController {
     }
 
     private func close() {
-        self.extensionContext?.completeRequest(returningItems: nil)
+        extensionContext?.completeRequest(returningItems: nil)
     }
 }
