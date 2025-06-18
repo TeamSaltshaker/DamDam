@@ -86,7 +86,7 @@ final class FolderView: UIView {
     private func makeAddButtonMenu() -> UIMenu {
         let addFolderAction = UIAction(title: "폴더 추가", image: .folderPlus) { [weak self] _ in
             guard let self else { return }
-            action.accept(.didTapBackButton)
+            action.accept(.didTapAddFolderButton)
         }
         let addClipAction = UIAction(title: "클립 추가", image: .clip) { [weak self] _ in
             guard let self else { return }
