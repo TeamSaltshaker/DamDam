@@ -101,7 +101,7 @@ final class FolderView: UIView {
 
 private extension FolderView {
     func createCollectionViewLayout() -> UICollectionViewCompositionalLayout {
-        let layout = UICollectionViewCompositionalLayout { _, env in
+        let layout = UICollectionViewCompositionalLayout { index, env in
             var config = UICollectionLayoutListConfiguration(appearance: .plain)
             config.showsSeparators = false
             config.backgroundColor = .white800
@@ -126,7 +126,14 @@ private extension FolderView {
 
             let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
             section.boundarySupplementaryItems = [self.makeHeaderItemLayout()]
-            section.contentInsets = .init(top: 0, leading: 0, bottom: 40, trailing: 24)
+            if let sectionKind = self.dataSource?.sectionIdentifier(for: index) {
+                switch sectionKind {
+                case .folder:
+                    section.contentInsets = .init(top: 8, leading: 0, bottom: 40, trailing: 24)
+                case .clip:
+                    section.contentInsets = .init(top: 8, leading: 0, bottom: 24, trailing: 24)
+                }
+            }
             return section
         }
         return layout
@@ -143,7 +150,7 @@ private extension FolderView {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
-        header.contentInsets = .init(top: 0, leading: 24, bottom: 8, trailing: 24)
+        header.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
         return header
     }
 }
