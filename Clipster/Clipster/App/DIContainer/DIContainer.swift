@@ -48,6 +48,18 @@ final class DIContainer {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeCanSelectFolderUseCase() -> CanSelectFolderUseCase {
+        DefaultCanSelectFolderUseCase()
+    }
+
+    func makeFindFolderPathUseCase() -> FindFolderPathUseCase {
+        DefaultFindFolderPathUseCase()
+    }
+
+    func makeFilterSubfoldersUseCase() -> FilterSubfoldersUseCase {
+        DefaultFilterSubfoldersUseCase()
+    }
+
     func makeCreateFolderUseCase() -> CreateFolderUseCase {
         DefaultCreateFolderUseCase(folderRepository: makeFolderRepository())
     }
@@ -161,10 +173,24 @@ final class DIContainer {
         )
     }
 
-    func makeFolderSelectorViewModel(mode: FolderSelectorMode) -> FolderSelectorViewModel {
-        FolderSelectorViewModel(
+    func makeFolderSelectorReactorForClip(parentFolder: Folder?) -> FolderSelectorReactor {
+        FolderSelectorReactor(
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
-            mode: mode
+            canSelectFolderUseCase: makeCanSelectFolderUseCase(),
+            findFolderPathUseCase: makeFindFolderPathUseCase(),
+            filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
+            parentFolder: parentFolder
+        )
+    }
+
+    func makeFolderSelectorReactorForFolder(parentFolder: Folder?, folder: Folder?) -> FolderSelectorReactor {
+        FolderSelectorReactor(
+            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
+            canSelectFolderUseCase: makeCanSelectFolderUseCase(),
+            findFolderPathUseCase: makeFindFolderPathUseCase(),
+            filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
+            parentFolder: parentFolder,
+            folder: folder
         )
     }
 }
