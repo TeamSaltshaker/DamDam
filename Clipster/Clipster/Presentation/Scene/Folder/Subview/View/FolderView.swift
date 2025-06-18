@@ -126,6 +126,7 @@ private extension FolderView {
 
             let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
             section.boundarySupplementaryItems = [self.makeHeaderItemLayout()]
+            section.interGroupSpacing = 8
             if let sectionKind = self.dataSource?.sectionIdentifier(for: index) {
                 switch sectionKind {
                 case .folder:
