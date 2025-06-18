@@ -1,19 +1,19 @@
-import RxCocoa
-import RxSwift
+import ReactorKit
 import SafariServices
 import UIKit
 
-final class FolderViewController: UIViewController {
-    private let viewModel: FolderViewModel
+final class FolderViewController: UIViewController, View {
+    typealias Reactor = FolderReactor
+
+    var disposeBag = DisposeBag()
     private let diContainer: DIContainer
-    private let disposeBag = DisposeBag()
 
     private let folderView = FolderView()
 
-    init(viewModel: FolderViewModel, diContainer: DIContainer) {
-        self.viewModel = viewModel
+    init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -24,41 +24,91 @@ final class FolderViewController: UIViewController {
         view = folderView
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        viewModel.action.accept(.viewWillAppear)
+        reactor?.action.onNext(.viewWillAppear)
+    }
+
+    func bind(reactor: FolderReactor) {
+        bindAction(to: reactor)
+        bindState(from: reactor)
+        bindRoute(from: reactor)
     }
 }
 
 private extension FolderViewController {
-    func configure() {
-        setBindings()
+    func bindAction(to reactor: FolderReactor) {
+        folderView.action
+            .bind { [weak self] action in
+                guard let self else { return }
+
+                switch action {
+                case .didTapBackButton:
+                    navigationController?.popViewController(animated: true)
+                case .didTapAddFolderButton:
+                    reactor.action.onNext(.didTapAddFolderButton)
+                case .didTapAddClipButton:
+                    reactor.action.onNext(.didTapAddClipButton)
+                case .didTapCell(let indexPath):
+                    reactor.action.onNext(.didTapCell(indexPath))
+                case .didTapDetailButton(let indexPath):
+                    reactor.action.onNext(.didTapDetailButton(indexPath))
+                case .didTapEditButton(let indexPath):
+                    reactor.action.onNext(.didTapEditButton(indexPath))
+                case .didTapDeleteButton((let indexPath, let title)):
+                    presentDeleteAlert(title: title) {
+                        reactor.action.onNext(.didTapDeleteButton(indexPath))
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
     }
 
-    func setBindings() {
-        viewModel.state
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] state in
+    func bindState(from reactor: FolderReactor) {
+        reactor.state
+            .observe(on: MainScheduler.instance)
+            .map(\.currentFolderTitle)
+            .distinctUntilChanged()
+            .bind { [weak self] title in
                 guard let self else { return }
-                folderView.setDisplay(title: state.currentFolderTitle)
-                folderView.setDisplay(folders: state.folders, clips: state.clips)
-                folderView.setDisplay(isEmptyViewHidden: state.isEmptyViewHidden)
+                folderView.setDisplay(title: title)
             }
             .disposed(by: disposeBag)
 
-        viewModel.navigation
-            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] navigation in
+        typealias Display = ([FolderDisplay], [ClipDisplay])
+        reactor.state
+            .observe(on: MainScheduler.instance)
+            .map { ($0.folders, $0.clips) }
+            .distinctUntilChanged { (lhs: Display, rhs: Display) in
+                lhs.0 == rhs.0 && lhs.1 == rhs.1
+            }
+            .subscribe { [weak self] folders, clips in
                 guard let self else { return }
-                switch navigation {
+                folderView.setDisplay(folders: folders, clips: clips)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .observe(on: MainScheduler.instance)
+            .map(\.isEmptyViewHidden)
+            .distinctUntilChanged()
+            .bind { [weak self] isHidden in
+                guard let self else { return }
+                folderView.setDisplay(isEmptyViewHidden: isHidden)
+            }
+            .disposed(by: disposeBag)
+    }
+
+    func bindRoute(from reactor: FolderReactor) {
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .bind { [weak self] route in
+                guard let self else { return }
+
+                switch route {
                 case .editClipViewForAdd(let folder):
                     let vm = diContainer.makeEditClipViewModel(folder: folder)
                     let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
@@ -78,8 +128,8 @@ private extension FolderViewController {
                     let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .folderView(let folder):
-                    let vm = diContainer.makeFolderViewModel(folder: folder)
-                    let vc = FolderViewController(viewModel: vm, diContainer: diContainer)
+                    let reactor = diContainer.makeFolderReactor(folder: folder)
+                    let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .clipDetailView(let clip):
                     let vm = diContainer.makeClipDetailViewModel(clip: clip)
@@ -88,64 +138,6 @@ private extension FolderViewController {
                 case .webView(let url):
                     let vc = SFSafariViewController(url: url)
                     present(vc, animated: true)
-                }
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapBackButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                guard let self else { return }
-                navigationController?.popViewController(animated: true)
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapAddFolderButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                guard let self else { return }
-                viewModel.action.accept(.didTapAddFolderButton)
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapAddClipButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                guard let self else { return }
-                viewModel.action.accept(.didTapAddClipButton)
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapCell
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] indexPath in
-                guard let self else { return }
-                viewModel.action.accept(.didTapCell(indexPath))
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapDetailButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] indexPath in
-                guard let self else { return }
-                viewModel.action.accept(.didTapDetailButton(indexPath))
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapEditButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] indexPath in
-                guard let self else { return }
-                viewModel.action.accept(.didTapEditButton(indexPath))
-            }
-            .disposed(by: disposeBag)
-
-        folderView.didTapDeleteButton
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] (indexPath, title) in
-                guard let self else { return }
-                presentDeleteAlert(title: title) { [weak self] in
-                    self?.viewModel.action.accept(.didTapDeleteButton(indexPath))
                 }
             }
             .disposed(by: disposeBag)

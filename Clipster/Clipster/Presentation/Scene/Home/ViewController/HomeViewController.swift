@@ -111,8 +111,8 @@ private extension HomeViewController {
                     let vc = SFSafariViewController(url: url)
                     present(vc, animated: true)
                 case .showFolder(let folder):
-                    let vm = diContainer.makeFolderViewModel(folder: folder)
-                    let vc = FolderViewController(viewModel: vm, diContainer: diContainer)
+                    let reactor = diContainer.makeFolderReactor(folder: folder)
+                    let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .showDetailClip(let clip):
                     let vm = diContainer.makeClipDetailViewModel(clip: clip)
