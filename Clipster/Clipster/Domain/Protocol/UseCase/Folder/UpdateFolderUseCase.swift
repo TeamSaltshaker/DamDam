@@ -1,3 +1,3 @@
 protocol UpdateFolderUseCase {
-    func execute(_ folder: Folder) async -> Result<Void, DomainError>
+    func execute(_ folder: Folder) async -> Result<Void, Error>
 }
