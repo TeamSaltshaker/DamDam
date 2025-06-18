@@ -1,3 +1,4 @@
+import SnapKit
 import UIKit
 
 final class CommonTextField: UITextField {
@@ -16,7 +17,16 @@ final class CommonTextField: UITextField {
         didSet { setMode() }
     }
 
-    let textPadding = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+    private let textPadding = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 48)
+
+    let clearButton: UIButton = {
+        let button = UIButton()
+        var config = UIButton.Configuration.plain()
+        config.image = .xGray
+        config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 14, bottom: 14, trailing: 14)
+        button.configuration = config
+        return button
+    }()
 
     init(type: TextFieldType) {
         self.type = type
@@ -68,6 +78,8 @@ private extension CommonTextField {
             placeholder = "제목을 입력해 주세요."
         }
 
+        rightView = clearButton
+        rightViewMode = .whileEditing
         autocapitalizationType = .none
         autocorrectionType = .no
         spellCheckingType = .no

@@ -1,4 +1,4 @@
 struct HomeDisplay {
-    let unvitsedClips: [ClipDisplay]
+    let unvisitedClips: [ClipDisplay]
     let folders: [FolderDisplay]
 }

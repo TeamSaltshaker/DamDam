@@ -90,6 +90,18 @@ final class HomeView: UIView {
         return view
     }()
 
+    private let emptyAddButton: UIButton = {
+        let button = UIButton()
+        button.setImage(.addButtonBlue, for: .normal)
+        button.setImage(.addButtonBlue, for: .highlighted)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.backgroundColor = .clear
+        button.isHidden = true
+        return button
+    }()
+
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -178,8 +190,8 @@ final class HomeView: UIView {
     func setDisplay(_ display: HomeDisplay) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
 
-        if !display.unvitsedClips.isEmpty {
-            let clipItems = display.unvitsedClips.map { Item.clip($0) }
+        if !display.unvisitedClips.isEmpty {
+            let clipItems = display.unvisitedClips.map { Item.clip($0) }
             snapshot.appendSections([.clip])
             snapshot.appendItems(clipItems, toSection: .clip)
         }
@@ -190,10 +202,21 @@ final class HomeView: UIView {
             snapshot.appendItems(folderItems, toSection: .folder)
         }
 
-        let isEmptyViewHidden = !(display.unvitsedClips.isEmpty && display.folders.isEmpty)
-        emptyView.isHidden = isEmptyViewHidden
+        let isEmpty = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
+        emptyView.isHidden = isEmpty
+        emptyAddButton.isHidden = isEmpty
 
         dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        isUserInteractionEnabled = true
     }
 }
 
@@ -391,7 +414,9 @@ private extension HomeView {
         [
             navigationView,
             collectionView,
-            emptyView
+            emptyView,
+            emptyAddButton,
+            loadingIndicator
         ].forEach { addSubview($0) }
 
         [
@@ -425,6 +450,19 @@ private extension HomeView {
         }
 
         emptyView.snp.makeConstraints { make in
+            make.top.equalToSuperview().inset(291)
+            make.height.equalTo(146)
+            make.centerX.equalToSuperview()
+        }
+
+        emptyAddButton.snp.makeConstraints { make in
+            make.top.equalTo(emptyView.snp.bottom).offset(32)
+            make.width.equalTo(160)
+            make.height.equalTo(48)
+            make.centerX.equalToSuperview()
+        }
+
+        loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
@@ -435,6 +473,11 @@ private extension HomeView {
                 self?.logicalIndexPath(indexPath) ?? indexPath
             }
             .map { Action.tapCell($0) }
+            .bind(to: action)
+            .disposed(by: disposeBag)
+
+        emptyAddButton.rx.tap
+            .map { Action.tapAddClip }
             .bind(to: action)
             .disposed(by: disposeBag)
     }

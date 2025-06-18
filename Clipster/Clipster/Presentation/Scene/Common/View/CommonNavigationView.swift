@@ -73,9 +73,12 @@ private extension CommonNavigationView {
     }
 
     func setConstraints() {
+        snp.makeConstraints { make in
+            make.height.equalTo(56)
+        }
+
         titleLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(12)
-            make.centerX.equalToSuperview()
+            make.center.equalToSuperview()
         }
 
         leftStackView.snp.makeConstraints { make in
