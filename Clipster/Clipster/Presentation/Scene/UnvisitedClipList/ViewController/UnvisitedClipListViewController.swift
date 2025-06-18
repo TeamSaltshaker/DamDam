@@ -1,19 +1,18 @@
-import RxCocoa
-import RxSwift
+import ReactorKit
 import SafariServices
 import UIKit
 
-final class UnvisitedClipListViewController: UIViewController {
-    private let disposeBag = DisposeBag()
+final class UnvisitedClipListViewController: UIViewController, View {
+    typealias Reactor = UnvisitedClipListReactor
 
-    private let unvisitedClipListViewModel: UnvisitedClipListViewModel
-    private let diContainer: DIContainer
+    var disposeBag = DisposeBag()
     private let unvisitedClipListView = UnvisitedClipListView()
+    private let diContainer: DIContainer
 
-    init(unvisitedClipListViewModel: UnvisitedClipListViewModel, diContainer: DIContainer) {
-        self.unvisitedClipListViewModel = unvisitedClipListViewModel
+    init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -24,82 +23,92 @@ final class UnvisitedClipListViewController: UIViewController {
         view = unvisitedClipListView
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
-        unvisitedClipListViewModel.action.accept(.viewWillAppear)
+        reactor?.action.onNext(.viewWillAppear)
+    }
+
+    func bind(reactor: Reactor) {
+        bindAction(to: reactor)
+        bindState(from: reactor)
+        bindRoute(from: reactor)
     }
 }
 
-private extension UnvisitedClipListViewController {
-    func configure() {
-        setAttributes()
-        setBindings()
-    }
-
-    func setAttributes() {
-        title = "방문하지 않은 클립"
-    }
-
-    func setBindings() {
+extension UnvisitedClipListViewController {
+    func bindAction(to reactor: Reactor) {
         unvisitedClipListView.action
-            .bind(with: self) { owner, action in
+            .bind { [weak self] action in
                 switch action {
                 case .tapBack:
-                    owner.unvisitedClipListViewModel.action.accept(.tapBack)
+                    reactor.action.onNext(.tapBack)
                 case .tapCell(let index):
-                    owner.unvisitedClipListViewModel.action.accept(.tapCell(index))
+                    reactor.action.onNext(.tapCell(index))
                 case .detail(let index):
-                    owner.unvisitedClipListViewModel.action.accept(.tapDetail(index))
+                    reactor.action.onNext(.tapDetail(index))
                 case .edit(let index):
-                    owner.unvisitedClipListViewModel.action.accept(.tapEdit(index))
+                    reactor.action.onNext(.tapEdit(index))
                 case .delete(let index, let title):
-                    owner.presentDeleteAlert(title: title) { [weak self] in
-                        self?.unvisitedClipListViewModel.action.accept(.tapDelete(index))
+                    self?.presentDeleteAlert(title: title) {
+                        reactor.action.onNext(.tapDelete(index))
                     }
                 }
             }
             .disposed(by: disposeBag)
+    }
 
-        unvisitedClipListViewModel.state
-            .asSignal()
-            .emit(with: self) { owner, state in
-                switch state {
-                case .clips(let clips):
-                    owner.unvisitedClipListView.setDisplay(clips)
-                }
+    func bindState(from reactor: Reactor) {
+        reactor.state
+            .compactMap { $0.clips }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] display in
+                self?.unvisitedClipListView.setDisplay(display)
             }
             .disposed(by: disposeBag)
 
-        unvisitedClipListViewModel.route
+        reactor.pulse(\.$phase)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self else { return }
+
+                switch phase {
+                case .loading:
+                    unvisitedClipListView.showLoading()
+                case .success:
+                    unvisitedClipListView.hideLoading()
+                case .error(let message):
+                    let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
+                    present(alert, animated: true)
+                case .idle:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+
+    func bindRoute(from reactor: Reactor) {
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
-            .asSignal(onErrorSignalWith: .empty())
-            .emit(with: self) { owner, route in
+            .bind { [weak self] route in
+                guard let self else { return }
+
                 switch route {
                 case .back:
-                    owner.navigationController?.popViewController(animated: true)
+                    navigationController?.popViewController(animated: true)
                 case .showWebView(let url):
                     let vc = SFSafariViewController(url: url)
-                    owner.present(vc, animated: true)
+                    present(vc, animated: true)
                 case .showDetailClip(let clip):
-                    let vm = owner.diContainer.makeClipDetailViewModel(clip: clip)
-                    let vc = ClipDetailViewController(
-                        viewModel: vm,
-                        diContainer: owner.diContainer
-                    )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    let vm = diContainer.makeClipDetailViewModel(clip: clip)
+                    let vc = ClipDetailViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
-                    let vm = owner.diContainer.makeEditClipViewModel(clip: clip)
-                    let vc = EditClipViewController(
-                        viewModel: vm,
-                        diContainer: owner.diContainer
-                    )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    let vm = diContainer.makeEditClipViewModel(clip: clip)
+                    let vc = EditClipViewController(viewModel: vm, diContainer: diContainer)
+                    navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)

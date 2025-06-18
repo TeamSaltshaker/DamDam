@@ -40,6 +40,8 @@ final class UnvisitedClipListView: UIView {
         return collectionView
     }()
 
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -69,6 +71,16 @@ final class UnvisitedClipListView: UIView {
         snapshot.appendSections([0])
         snapshot.appendItems(display)
         dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        isUserInteractionEnabled = true
     }
 }
 
@@ -160,7 +172,8 @@ private extension UnvisitedClipListView {
     func setHierarchy() {
         [
             navigationView,
-            collectionView
+            collectionView,
+            loadingIndicator
         ].forEach { addSubview($0) }
     }
 
@@ -180,6 +193,10 @@ private extension UnvisitedClipListView {
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+
+        loadingIndicator.snp.makeConstraints { make in
+              make.center.equalToSuperview()
+          }
     }
 
     func setBindings() {

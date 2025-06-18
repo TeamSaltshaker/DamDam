@@ -127,11 +127,8 @@ private extension HomeViewController {
                     let vc = EditFolderViewController(viewModel: vm, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .showUnvisitedClipList(let clips):
-                    let vm = diContainer.makeUnvisitedClipListViewModel(clips: clips)
-                    let vc = UnvisitedClipListViewController(
-                        unvisitedClipListViewModel: vm,
-                        diContainer: diContainer
-                    )
+                    let reactor = diContainer.makeUnvisitedClipListReactor(clips: clips)
+                    let vc = UnvisitedClipListViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 }
             }
