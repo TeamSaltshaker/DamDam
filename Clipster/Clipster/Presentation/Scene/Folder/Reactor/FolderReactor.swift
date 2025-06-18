@@ -137,11 +137,11 @@ final class FolderReactor: Reactor {
                     guard let self else { throw DomainError.unknownError }
                     switch indexPath.section {
                     case 0:
-                        let folder = self.folder.folders[indexPath.item]
-                        _ = await self.deleteFolderUseCase.execute(folder)
+                        let folder = folder.folders[indexPath.item]
+                        _ = await deleteFolderUseCase.execute(folder)
                     case 1:
-                        let clip = self.folder.clips[indexPath.item]
-                        _ = await self.deleteClipUseCase.execute(clip)
+                        let clip = folder.clips[indexPath.item]
+                        _ = await deleteClipUseCase.execute(clip)
                     default:
                         break
                     }
