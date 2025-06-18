@@ -152,15 +152,13 @@ final class EditClipReactor: Reactor {
                         title: urlMetadataDisplay.title,
                         thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
                         createdAt: clip.createdAt,
-                        updatedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? Date() : clip.updatedAt,
+                        updatedAt: Date(),
                         deletedAt: clip.deletedAt
                     ),
                     memo: currentState.memoText,
                     lastVisitedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? nil : clip.lastVisitedAt,
                     createdAt: clip.createdAt,
-                    updatedAt: clip.memo != currentState.memoText ||
-                    clip.urlMetadata.url != urlMetadataDisplay.url ||
-                    clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
+                    updatedAt: Date(),
                     deletedAt: clip.deletedAt
                 )
                 return .fromAsync {
