@@ -158,8 +158,8 @@ final class EditClipReactor: Reactor {
                     memo: currentState.memoText,
                     lastVisitedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? nil : clip.lastVisitedAt,
                     createdAt: clip.createdAt,
-                    updatedAt: clip.memo != currentState.memoText &&
-                    clip.urlMetadata.url != urlMetadataDisplay.url &&
+                    updatedAt: clip.memo != currentState.memoText ||
+                    clip.urlMetadata.url != urlMetadataDisplay.url ||
                     clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
                     deletedAt: clip.deletedAt
                 )
