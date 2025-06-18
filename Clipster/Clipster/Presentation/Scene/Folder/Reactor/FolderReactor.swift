@@ -132,7 +132,7 @@ final class FolderReactor: Reactor {
                 return .empty()
             }
         case .didTapDeleteButton(let indexPath):
-            return Observable.concat(
+            return .concat(
                 .fromAsync { [weak self] in
                     guard let self else { throw DomainError.unknownError }
                     switch indexPath.section {
@@ -159,6 +159,7 @@ final class FolderReactor: Reactor {
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
+
         switch mutation {
         case .reloadFolder(let folder):
             self.folder = folder
@@ -175,6 +176,7 @@ final class FolderReactor: Reactor {
         case .setRoute(let route):
             newState.route = route
         }
+
         return newState
     }
 }
