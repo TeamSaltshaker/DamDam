@@ -102,11 +102,12 @@ private extension FolderViewController {
     }
 
     func bindRoute(from reactor: FolderReactor) {
-        reactor.route
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] route in
-                guard let self = self else { return }
+            .bind { [weak self] route in
+                guard let self else { return }
 
                 switch route {
                 case .editClipViewForAdd(let folder):

@@ -17,7 +17,7 @@ final class FolderReactor: Reactor {
         case reloadFolder(Folder)
         case updateClipLastVisitedDate(Clip)
         case delete
-        case route(Route)
+        case setRoute(Route)
     }
 
     struct State {
@@ -25,6 +25,7 @@ final class FolderReactor: Reactor {
         var folders: [FolderDisplay]
         var clips: [ClipDisplay]
         var isEmptyViewHidden: Bool
+        @Pulse var route: Route?
     }
 
     enum Route {
@@ -37,7 +38,6 @@ final class FolderReactor: Reactor {
     }
 
     let initialState: State
-    let route = PublishRelay<Route>()
     private var folder: Folder
 
     private let fetchFolderUseCase: FetchFolderUseCase
@@ -81,7 +81,7 @@ final class FolderReactor: Reactor {
             switch indexPath.section {
             case 0:
                 let folder = folder.folders[indexPath.item]
-                return .just(.route(.folderView(folder)))
+                return .just(.setRoute(.folderView(folder)))
             case 1:
                 let url = folder.clips[indexPath.item].urlMetadata.url
                 return .concat(
@@ -103,20 +103,20 @@ final class FolderReactor: Reactor {
                     }
                     .map { .updateClipLastVisitedDate($0) }
                     .catch { _ in .empty() },
-                    .just(.route(.webView(url)))
+                    .just(.setRoute(.webView(url)))
                 )
             default:
                 return .empty()
             }
         case .didTapAddFolderButton:
-            return .just(.route(.editFolderView(folder, nil)))
+            return .just(.setRoute(.editFolderView(folder, nil)))
         case .didTapAddClipButton:
-            return .just(.route(.editClipViewForAdd(folder)))
+            return .just(.setRoute(.editClipViewForAdd(folder)))
         case .didTapDetailButton(let indexPath):
             switch indexPath.section {
             case 1:
                 let clip = folder.clips[indexPath.item]
-                return .just(.route(.clipDetailView(clip)))
+                return .just(.setRoute(.clipDetailView(clip)))
             default:
                 return .empty()
             }
@@ -124,10 +124,10 @@ final class FolderReactor: Reactor {
             switch indexPath.section {
             case 0:
                 let selectedFolder = folder.folders[indexPath.item]
-                return .just(.route(.editFolderView(folder, selectedFolder)))
+                return .just(.setRoute(.editFolderView(folder, selectedFolder)))
             case 1:
                 let clip = folder.clips[indexPath.item]
-                return .just(.route(.editClipViewForEdit(clip)))
+                return .just(.setRoute(.editClipViewForEdit(clip)))
             default:
                 return .empty()
             }
@@ -172,8 +172,8 @@ final class FolderReactor: Reactor {
             }
         case .delete:
             break
-        case .route(let route):
-            self.route.accept(route)
+        case .setRoute(let route):
+            newState.route = route
         }
         return newState
     }
