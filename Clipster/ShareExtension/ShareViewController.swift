@@ -43,7 +43,7 @@ final class ShareViewController: SLComposeViewController {
                     return
                 }
 
-                if let error = error {
+                if let error {
                     print("\(Self.self) ❌ URL 로딩 에러: \(error)")
                     close()
                     return
