@@ -4,7 +4,7 @@ final class AppCoordinator: Coordinator {
     private let diContainer: DIContainer
 
     let navigationController: UINavigationController
-    var parent: Coordinator?
+    weak var parent: Coordinator?
     var childs: [Coordinator] = []
 
     init(navigationController: UINavigationController, diContainer: DIContainer) {
