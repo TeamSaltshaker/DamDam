@@ -105,8 +105,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                 let parsedDTO = try self.parseHTML(url: self.originalURL ?? url, html: htmlString)
 
                 let topPortionRect = CGRect(x: 0, y: 0, width: webView.bounds.width, height: 400)
-                let screenshotImage = await self.captureScreenshot(rect: topPortionRect)
-                let screenshotData = screenshotImage?.pngData()
+                let screenshotData = await self.captureScreenshot(rect: topPortionRect)
 
                 let metadataDTOWithScreenshot = ParsedURLMetadataDTO(
                     url: parsedDTO.url,
@@ -148,7 +147,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
         )
     }
 
-    private func captureScreenshot(rect: CGRect? = nil) async -> UIImage? {
+    private func captureScreenshot(rect: CGRect? = nil) async -> Data? {
         guard let webView = self.webView else {
             print("\(Self.self) WKWebView 인스턴스가 없어 스크린샷을 찍을 수 없습니다.")
             return nil
@@ -167,7 +166,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                     continuation.resume(returning: nil)
                 } else if let image = image {
                     print("\(Self.self) 스크린샷 캡처 성공.")
-                    continuation.resume(returning: image)
+                    continuation.resume(returning: image.pngData())
                 } else {
                     print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
                     continuation.resume(returning: nil)
