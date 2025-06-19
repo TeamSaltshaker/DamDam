@@ -11,12 +11,15 @@ final class DefaultDeleteClipUseCase: DeleteClipUseCase {
         let deletedClip = Clip(
             id: clip.id,
             folderID: clip.folderID,
-            urlMetadata: clip.urlMetadata,
+            url: clip.url,
+            title: clip.title,
             memo: clip.memo,
+            thumbnailImageURL: clip.thumbnailImageURL,
+            screenshotData: clip.screenshotData,
             lastVisitedAt: clip.lastVisitedAt,
             createdAt: clip.createdAt,
             updatedAt: clip.updatedAt,
-            deletedAt: Date()
+            deletedAt: Date.now,
         )
 
         return await clipRepository.deleteClip(deletedClip).mapError { $0 as Error }

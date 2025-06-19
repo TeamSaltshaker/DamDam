@@ -3,10 +3,10 @@ import Foundation
 struct ClipDisplayMapper {
     static func map(_ clip: Clip) -> ClipDisplay {
         let urlMetadataDisplay = URLMetadataDisplay(
-            url: clip.urlMetadata.url,
-            title: clip.urlMetadata.title.isEmpty ? " " : clip.urlMetadata.title,
-            thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
-            screenshotImageData: nil
+            url: clip.url,
+            title: clip.title.isEmpty ? " " : clip.title,
+            thumbnailImageURL: clip.thumbnailImageURL,
+            screenshotImageData: clip.screenshotData,
         )
 
         return ClipDisplay(

@@ -155,7 +155,7 @@ private extension HomeReactor {
             switch section {
             case .unvisitedClip(let clip):
                 Task { await updateClipAsVisited(clip) }
-                return .showWebView(clip.urlMetadata.url)
+                return .showWebView(clip.url)
             case .folder(let folder):
                 return .showFolder(folder)
             }
@@ -187,12 +187,15 @@ private extension HomeReactor {
         let visited = Clip(
             id: clip.id,
             folderID: clip.folderID,
-            urlMetadata: clip.urlMetadata,
+            url: clip.url,
+            title: clip.title,
             memo: clip.memo,
+            thumbnailImageURL: clip.thumbnailImageURL,
+            screenshotData: clip.screenshotData,
             lastVisitedAt: Date(),
             createdAt: clip.createdAt,
             updatedAt: Date(),
-            deletedAt: clip.deletedAt
+            deletedAt: clip.deletedAt,
         )
         _ = await updateClipUseCase.execute(clip: visited)
     }

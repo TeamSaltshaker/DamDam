@@ -304,7 +304,7 @@ extension EditClipViewController: View {
             guard !isLoading else { return false }
             guard isURLValid else { return false }
             if let clip = clip {
-                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.urlMetadata.url.absoluteString != urlText
+                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.url.absoluteString != urlText
             } else {
                 return currentFolder != nil
             }
