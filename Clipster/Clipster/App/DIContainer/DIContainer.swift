@@ -101,8 +101,8 @@ final class DIContainer {
         )
     }
 
-    func makeEditClipViewModel() -> EditClipViewModel {
-        EditClipViewModel(
+    func makeEditClipReactor() -> EditClipReactor {
+        EditClipReactor(
             parseURLUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
@@ -111,8 +111,8 @@ final class DIContainer {
         )
     }
 
-    func makeEditClipViewModel(urlString: String) -> EditClipViewModel {
-        EditClipViewModel(
+    func makeEditClipReactor(urlString: String) -> EditClipReactor {
+        EditClipReactor(
             urlText: urlString,
             parseURLUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
@@ -122,8 +122,8 @@ final class DIContainer {
         )
     }
 
-    func makeEditClipViewModel(folder: Folder?) -> EditClipViewModel {
-        EditClipViewModel(
+    func makeEditClipReactor(folder: Folder?) -> EditClipReactor {
+        EditClipReactor(
             currentFolder: folder,
             parseURLUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
@@ -133,8 +133,8 @@ final class DIContainer {
         )
     }
 
-    func makeEditClipViewModel(clip: Clip) -> EditClipViewModel {
-        EditClipViewModel(
+    func makeEditClipReactor(clip: Clip) -> EditClipReactor {
+        EditClipReactor(
             clip: clip,
             parseURLUseCase: makeParseURLMetadataUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),

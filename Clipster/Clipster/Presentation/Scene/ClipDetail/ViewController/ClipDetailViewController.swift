@@ -119,11 +119,57 @@ private extension ClipDetailViewController {
     }
 }
 
-private extension ClipDetailViewController {
-    func presentAlert(message: String) {
-        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        present(alert, animated: true)
+        state
+            .compactMap { $0.errorMessage }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] message in
+                let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                self?.present(alert, animated: true, completion: nil)
+            }
+            .disposed(by: disposeBag)
+
+        state
+            .map { $0.shouldNavigateToEdit }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .withLatestFrom(state)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] state in
+                guard let self else { return }
+
+                let reactor = self.diContainer.makeEditClipReactor(clip: state.clip)
+                let vc = EditClipViewController(reactor: reactor, diContainer: self.diContainer)
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        state
+            .map { $0.shouldDismiss }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        clipDetailView.backButton.rx.tap
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        clipDetailView.editButton.rx.tap
+            .map { ClipDetailAction.editButtonTapped }
+            .bind(to: viewModel.action)
+            .disposed(by: disposeBag)
+
+        clipDetailView.deleteButton.rx.tap
+            .map { ClipDetailAction.deleteButtonTapped }
+            .bind(to: viewModel.action)
+            .disposed(by: disposeBag)
     }
 }
 

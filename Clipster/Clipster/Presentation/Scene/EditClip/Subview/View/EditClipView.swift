@@ -61,6 +61,7 @@ private extension EditClipView {
     }
 
     func setAttributes() {
+        backgroundColor = .white800
         commonNavigationView.setLeftItem(backButton)
         commonNavigationView.setRightItem(saveButton)
     }

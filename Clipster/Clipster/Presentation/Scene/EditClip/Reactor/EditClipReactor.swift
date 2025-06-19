@@ -1,63 +1,59 @@
 import Foundation
-import RxRelay
-import RxSwift
+import ReactorKit
 
-final class EditClipViewModel: ViewModel {
-    enum EditClipType {
+final class EditClipReactor: Reactor {
+    enum EditClipReactorType {
         case edit
         case create
         case shareExtension
     }
 
     enum Action {
-        case editURLInputTextField(String)
+        case editURLTextField(String)
         case editingURLTextField
-        case editMomo(String)
-        case folderViewTapped
+        case editMemo(String)
+        case tapFolderView
         case editFolder(Folder?)
         case saveClip
         case fetchFolder
         case fetchTopLevelFolder
-        case folderSelectorViewDisappeared
+        case disappearFolderSelectorView
     }
 
     enum Mutation {
-        case updateURLInputText(String)
+        case updateURLString(String)
         case updateMemo(String)
-        case updateValidURL(Bool)
+        case updateIsValidURL(Bool)
         case updateURLMetadata(URLMetadataDisplay?)
-        case updateFolderViewTapped(Bool)
+        case updateIsTappedFolderView(Bool)
         case updateCurrentFolder(Folder?)
-        case updateSuccessfullyEdited(Bool)
+        case updateIsSuccessedEditClip(Bool)
         case updateIsLoading(Bool)
     }
 
     struct State {
-        var type: EditClipType
-        var urlInputText: String
+        var type: EditClipReactorType
+        var clip: Clip?
+        var currentFolder: Folder?
+        var navigationTitle: String
+        var urlString: String
+        var memoText: String = ""
+        var memoLimit: String = "0 / 100"
+        var urlValidationImageName: String?
+        var urlValidationLabelText: String = ""
+        var urlMetadataDisplay: URLMetadataDisplay?
+        var urlTextFieldBorderColor: ColorResource = .black900
         var isLoading = false
         var isHiddenURLMetadataStackView = true
         var isHiddenURLValidationStackView = true
-        var memoText: String = ""
-        var memoLimit: String = "0 / 100"
         var isURLValid = false
-        var urlValidationImageName: String?
-        var urlValidationLabelText: String = ""
-        var urlMetadata: URLMetadataDisplay?
-        var isFolderViewTapped: Bool = false
-        var clip: Clip?
-        var currentFolder: Folder?
-        var isSuccessfullyEdited: Bool = false
-        var urlTextFieldBorderColor: ColorResource = .black900
-        var navigationTitle: String
+        var isTappedFolderView: Bool = false
+        var isSuccessedEditClip: Bool = false
     }
 
-    var state: BehaviorRelay<State>
-    var action = PublishRelay<Action>()
-    var disposeBag = DisposeBag()
+    var initialState: State
 
     private let parseURLUseCase: ParseURLUseCase
-
     private let fetchFolderUseCase: FetchFolderUseCase
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
@@ -72,18 +68,17 @@ final class EditClipViewModel: ViewModel {
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
-        state = BehaviorRelay(value: State(
+        self.initialState = State(
             type: urlText.isEmpty ? .create : .shareExtension,
-            urlInputText: urlText,
             currentFolder: currentFolder,
-            navigationTitle: "클립 추가"
-        ))
+            navigationTitle: "클립 추가",
+            urlString: urlText,
+        )
         self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
-        bind()
     }
 
     init(
@@ -94,93 +89,89 @@ final class EditClipViewModel: ViewModel {
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
-        state = BehaviorRelay(value: State(
+        self.initialState = State(
             type: .edit,
-            urlInputText: clip.urlMetadata.url.absoluteString,
-            memoText: clip.memo,
-            memoLimit: "\(clip.memo.count) / 100",
             clip: clip,
-            navigationTitle: "클립 수정"
-        ))
+            navigationTitle: "클립 수정",
+            urlString: clip.urlMetadata.url.absoluteString,
+            memoText: clip.memo,
+            memoLimit: "\(clip.memo.count) / 100"
+        )
         self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
-        bind()
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
+        print("\(Self.self) \(action)")
         switch action {
-        case .editURLInputTextField(let urlText):
-            let trimmed = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
-            print("\(Self.self) \(action)")
-            let updateURLInputText = Observable.just(Mutation.updateURLInputText(trimmed))
-            let urlPrasingResult = Observable<Mutation>.fromAsync { [weak self] in
-                guard let self = self else { throw URLError(.cancelled) }
-                let (metadata, isValid) = try await parseURLUseCase.execute(urlString: trimmed).get()
-                guard let metadata else { throw URLError(.cancelled) }
+        case .editURLTextField(let text):
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let updateURLText = Observable.just(Mutation.updateURLString(trimmed))
+            let parsedURL = Observable<Mutation>.fromAsync { [weak self] in
+                guard let self else { return Observable<Mutation>.empty() }
+                let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                guard let metadata else { return Observable<Mutation>.empty() }
                 return Observable.merge(
-                    .just(Mutation.updateValidURL(isValid)),
+                    .just(Mutation.updateIsValidURL(isValidURL)),
                     .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata)))
                 )
             }
             .flatMap { $0 }
             .catch { _ in
                 Observable.merge(
-                    .just(Mutation.updateValidURL(false)),
+                    .just(Mutation.updateIsValidURL(false)),
                     .just(Mutation.updateURLMetadata(nil))
                 )
             }
-            return Observable.merge(updateURLInputText, urlPrasingResult)
+            return Observable.merge(updateURLText, parsedURL)
         case .editingURLTextField:
             return .just(.updateIsLoading(true))
-        case .editMomo(let memoText):
-            print("\(Self.self) \(action)")
-            return .just(.updateMemo(memoText))
-        case .folderViewTapped:
-            print("\(Self.self) \(action)")
-            return .just(.updateFolderViewTapped(true))
+        case .editMemo(let text):
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            return .just(.updateMemo(trimmed))
+        case .tapFolderView:
+            return .just(.updateIsTappedFolderView(true))
         case .editFolder(let newFolder):
-            print("\(Self.self) \(action)")
             return .just(.updateCurrentFolder(newFolder))
         case .saveClip:
-            print("\(Self.self) \(action)")
-            switch state.value.type {
+            switch currentState.type {
             case .edit:
                 print("\(Self.self) edit clip")
-                guard let clip = state.value.clip else { return .empty() }
-                guard let currentFolder = state.value.currentFolder else { return .empty() }
-                guard let urlMetadata = state.value.urlMetadata else { return .empty() }
+                guard let clip = currentState.clip else { return .empty() }
+                guard let currentFolder = currentState.currentFolder else { return .empty() }
+                guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
 
                 let newClip = Clip(
                     id: clip.id,
                     folderID: currentFolder.id,
                     urlMetadata: URLMetadata(
-                        url: urlMetadata.url,
-                        title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
+                        url: urlMetadataDisplay.url,
+                        title: urlMetadataDisplay.title,
+                        thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
                         createdAt: clip.createdAt,
-                        updatedAt: clip.urlMetadata.url != urlMetadata.url ? Date() : clip.updatedAt,
+                        updatedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? Date() : clip.updatedAt,
                         deletedAt: clip.deletedAt
                     ),
-                    memo: state.value.memoText,
-                    lastVisitedAt: clip.urlMetadata.url != urlMetadata.url ? nil : clip.lastVisitedAt,
+                    memo: currentState.memoText,
+                    lastVisitedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? nil : clip.lastVisitedAt,
                     createdAt: clip.createdAt,
-                    updatedAt: clip.memo != state.value.memoText &&
-                    clip.urlMetadata.url != urlMetadata.url &&
+                    updatedAt: clip.memo != currentState.memoText &&
+                    clip.urlMetadata.url != urlMetadataDisplay.url &&
                     clip.folderID != currentFolder.id ? Date() : clip.updatedAt,
                     deletedAt: clip.deletedAt
                 )
                 return .fromAsync {
                     try await self.updateClipUseCase.execute(clip: newClip).get()
                 }
-                .map { .updateSuccessfullyEdited(true) }
-                .catchAndReturn(.updateSuccessfullyEdited(false))
+                .map { .updateIsSuccessedEditClip(true) }
+                .catchAndReturn(.updateIsSuccessedEditClip(false))
             case .create, .shareExtension:
                 print("\(Self.self) save clip")
-                guard let currentFolder = state.value.currentFolder else { return .empty() }
-                guard let urlMetadata = state.value.urlMetadata else { return .empty() }
+                guard let currentFolder = currentState.currentFolder else { return .empty() }
+                guard let urlMetadata = currentState.urlMetadataDisplay else { return .empty() }
 
                 let newClip = Clip(
                     id: UUID(),
@@ -193,7 +184,7 @@ final class EditClipViewModel: ViewModel {
                         updatedAt: Date(),
                         deletedAt: nil
                     ),
-                    memo: state.value.memoText,
+                    memo: currentState.memoText,
                     lastVisitedAt: nil,
                     createdAt: Date(),
                     updatedAt: Date(),
@@ -202,76 +193,71 @@ final class EditClipViewModel: ViewModel {
                 return .fromAsync {
                     try await self.createClipUseCase.execute(newClip).get()
                 }
-                .map { .updateSuccessfullyEdited(true) }
-                .catchAndReturn(.updateSuccessfullyEdited(false))
+                .map { .updateIsSuccessedEditClip(true) }
+                .catchAndReturn(.updateIsSuccessedEditClip(false))
             }
         case .fetchFolder:
-            print("\(Self.self) \(action)")
-            guard let clip = state.value.clip else { return .empty() }
+            guard let clip = currentState.clip else { return .empty() }
             return .fromAsync {
                 try await self.fetchFolderUseCase.execute(id: clip.folderID).get()
             }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
         case .fetchTopLevelFolder:
-            print("\(Self.self) \(action)")
-            return .fromAsync {
-                try await self.fetchTopLevelFoldersUseCase.execute().get()
+            return .fromAsync { [weak self] in
+                try? await self?.fetchTopLevelFoldersUseCase.execute().get()
             }
+            .compactMap { $0 }
             .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
-        case .folderSelectorViewDisappeared:
-            print("\(Self.self) \(action)")
-            return .just(.updateFolderViewTapped(false))
+        case .disappearFolderSelectorView:
+            return .just(.updateIsTappedFolderView(false))
         }
     }
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .updateURLInputText(let urlText):
-            newState.urlInputText = urlText
-            if urlText.isEmpty {
+        case .updateURLString(let text):
+            newState.urlString = text
+            if text.isEmpty {
                 newState.isHiddenURLValidationStackView = true
             }
-        case .updateMemo(let memoText):
-            newState.memoText = memoText
-            newState.memoLimit = "\(memoText.count) / 100"
-        case .updateValidURL(let result):
-            newState.isURLValid = result
-            newState.urlValidationImageName = result ? "CheckBlue" : "XRed"
-            newState.urlValidationLabelText = result ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
+        case .updateMemo(let text):
+            newState.memoText = text
+            newState.memoLimit = "\(text.count) / 100"
+        case .updateIsValidURL(let value):
+            newState.isURLValid = value
+            newState.urlValidationImageName = value ? "CheckBlue" : "XRed"
+            newState.urlValidationLabelText = value ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
             newState.isLoading = false
 
-            if !state.urlInputText.isEmpty {
-                newState.isHiddenURLValidationStackView = false
-            }
-
-            if state.urlInputText.isEmpty {
+            if currentState.urlString.isEmpty {
                 newState.urlTextFieldBorderColor = .black900
             } else {
-                newState.urlTextFieldBorderColor = result ? .blue600 : .red600
+                newState.urlTextFieldBorderColor = value ? .blue600 : .red600
             }
         case .updateURLMetadata(let urlMetaDisplay):
-            newState.urlMetadata = urlMetaDisplay
+            newState.urlMetadataDisplay = urlMetaDisplay
             newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
-        case .updateFolderViewTapped(let value):
-            newState.isFolderViewTapped = value
+        case .updateIsTappedFolderView(let value):
+            newState.isTappedFolderView = value
         case .updateCurrentFolder(let newFolder):
             newState.currentFolder = newFolder
-        case .updateSuccessfullyEdited(let value):
-            newState.isSuccessfullyEdited = value
+        case .updateIsSuccessedEditClip(let value):
+            newState.isSuccessedEditClip = value
         case .updateIsLoading(let value):
             newState.isLoading = value
             newState.urlValidationLabelText = "URL 분석 중..."
             newState.urlValidationImageName = nil
+            newState.isHiddenURLValidationStackView = false
         }
         return newState
     }
 }
 
-private extension EditClipViewModel {
+private extension EditClipReactor {
     func toURLMetaDisplay(entity: ParsedURLMetadata) -> URLMetadataDisplay {
         URLMetadataDisplay(
             url: entity.url,

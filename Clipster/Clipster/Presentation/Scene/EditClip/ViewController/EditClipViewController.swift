@@ -1,18 +1,18 @@
+import ReactorKit
 import RxCocoa
-import RxSwift
 import UIKit
 
 final class EditClipViewController: UIViewController {
-    private let viewModel: EditClipViewModel
+    typealias Reactor = EditClipReactor
     private let diContainer: DIContainer
-    private let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     private let editClipView = EditClipView()
 
-    init(viewModel: EditClipViewModel, diContainer: DIContainer) {
-        self.viewModel = viewModel
+    init(reactor: EditClipReactor, diContainer: DIContainer) {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -25,7 +25,6 @@ final class EditClipViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
         hideKeyboardWhenTappedBackground()
     }
 
@@ -35,65 +34,20 @@ final class EditClipViewController: UIViewController {
     }
 }
 
-private extension EditClipViewController {
-    func configure() {
-        setAttributes()
-        setBindings()
+extension EditClipViewController: View {
+    func bind(reactor: EditClipReactor) {
+        bindUI(to: reactor)
+        bindState(from: reactor)
     }
 
-    func setAttributes() {
-        view.backgroundColor = .white800
-    }
-
-    func setBindings() {
-        viewModel.state
-            .map(\.urlInputText)
-            .take(1)
-            .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.urlView.urlTextField.rx.text)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.memoText)
-            .take(1)
-            .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.memoView.memoTextView.rx.text)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .compactMap(\.clip)
-            .take(1)
-            .subscribe { [weak self] _ in
-                self?.viewModel.action.accept(.fetchFolder)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map { $0.type == .shareExtension }
-            .filter { $0 }
-            .take(1)
-            .subscribe { [weak self] _ in
-                self?.viewModel.action.accept(.fetchTopLevelFolder)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.navigationTitle)
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
-                self?.editClipView.commonNavigationView.setTitle($0)
-            }
-            .disposed(by: disposeBag)
-
+    private func bindUI(to reactor: EditClipReactor) {
         editClipView.urlView.urlTextField
             .rx
             .text
             .orEmpty
-            .distinctUntilChanged()
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-            .subscribe { [weak self] in
-                self?.viewModel.action.accept(.editURLInputTextField($0))
-            }
+            .map { Reactor.Action.editURLTextField($0) }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         editClipView.urlView.urlTextField
@@ -101,34 +55,9 @@ private extension EditClipViewController {
             .text
             .orEmpty
             .distinctUntilChanged()
-            .subscribe { [weak self] _ in
-                self?.viewModel.action.accept(.editingURLTextField)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.urlTextFieldBorderColor)
-            .map { UIColor(resource: $0).cgColor }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlView.urlTextField.layer.rx.borderColor)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.isHiddenURLMetadataStackView)
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] isHidden in
-                self?.editClipView.urlMetadataStackView.setHiddenAnimated(isHidden)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.isHiddenURLValidationStackView)
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] isHidden in
-                self?.editClipView.urlValidationStacKView.setHiddenAnimated(isHidden)
-            }
+            .skip(1)
+            .map { _ in Reactor.Action.editingURLTextField }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         editClipView.memoView.memoTextView
@@ -136,10 +65,8 @@ private extension EditClipViewController {
             .text
             .orEmpty
             .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
-                self?.viewModel.action.accept(.editMomo($0))
-            }
+            .map { Reactor.Action.editMemo($0) }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         editClipView.memoView.memoTextView
@@ -152,78 +79,19 @@ private extension EditClipViewController {
             .drive(editClipView.memoView.memoTextView.rx.text)
             .disposed(by: disposeBag)
 
-        viewModel.state
-            .map(\.memoLimit)
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: "0 / 100")
-            .drive(editClipView.memoView.memoLimitLabel.rx.text)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map { state in
-                if let imageName = state.urlValidationImageName {
-                    return UIImage(named: imageName)
-                } else {
-                    return .none
-                }
-            }
-            .distinctUntilChanged()
-            .asDriver(onErrorJustReturn: .none)
-            .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.urlValidationLabelText)
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.urlValidationStacKView.statusLabel.rx.text)
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.urlMetadata)
-            .compactMap { $0 }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] urlMetadataDisplay in
-                self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
-            }
-            .disposed(by: disposeBag)
-
-        Observable.combineLatest(
-            viewModel.state.map(\.clip),
-            viewModel.state.map(\.memoText),
-            viewModel.state.map(\.isURLValid),
-            viewModel.state.map(\.currentFolder),
-            viewModel.state.map(\.isLoading),
-            viewModel.state.map(\.urlInputText)
-        )
-        .map { clip, memoText, isURLValid, currentFolder, isLoading, urlText in
-            guard !isLoading else { return false }
-            guard isURLValid else { return false }
-            if let clip = clip {
-                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.urlMetadata.url.absoluteString != urlText
-            } else {
-                return currentFolder != nil
-            }
-        }
-        .distinctUntilChanged()
-        .asDriver(onErrorDriveWith: .empty())
-        .drive(editClipView.saveButton.rx.isEnabled)
-        .disposed(by: disposeBag)
-
         editClipView.selectedFolderView.addButton
             .rx
             .tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
-                let vm = diContainer.makeEditFolderReactor(parentFolder: viewModel.state.value.currentFolder, folder: nil)
+                let vm = diContainer.makeEditFolderViewModel(mode: .add(parentFolder: reactor.currentState.currentFolder))
                 let vc = EditFolderViewController(
-                    reactor: vm,
+                    viewModel: vm,
                     diContainer: diContainer
                 )
 
                 vc.onAdditionComplete = {
-                    self.viewModel.action.accept(.editFolder($0))
+                    reactor.action.onNext(.editFolder($0))
                 }
 
                 navigationController?.pushViewController(vc, animated: true)
@@ -238,83 +106,99 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
-            .map { ($0.isFolderViewTapped, $0.currentFolder) }
-            .filter { $0 && $1 != nil }
-            .map { $1 }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] currentFolder in
-                guard let self else { return }
-
-                let reactor = self.diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
-                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
-                vc.onSelectionComplete = {
-                    self.viewModel.action.accept(.editFolder($0))
-                }
-                vc.modalPresentationStyle = .pageSheet
-
-                if let sheet = vc.sheetPresentationController {
-                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
-                    sheet.prefersGrabberVisible = true
-                }
-
-                present(vc, animated: true)
-                self.viewModel.action.accept(.folderSelectorViewDisappeared)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .compactMap(\.currentFolder)
-            .distinctUntilChanged { $0.id == $1.id }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
-                self?.editClipView.selectedFolderView.folderRowView.setDisplay(
-                    FolderDisplayMapper.map($0)
-                )
-            }
-            .disposed(by: disposeBag)
-
         editClipView.selectedFolderView.folderViewTapGesture
             .rx
             .event
-            .subscribe { [weak self] _ in
-                self?.viewModel.action.accept(.folderViewTapped)
-            }
-            .disposed(by: disposeBag)
-
-        viewModel.state
-            .map(\.isSuccessfullyEdited)
-            .filter { $0 }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                self?.navigationController?.popViewController(animated: true)
-            }
+            .map { _ in Reactor.Action.tapFolderView }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         editClipView.saveButton
             .rx
             .tap
-            .subscribe { [weak self] _ in
-                self?.viewModel.action.accept(.saveClip)
+            .map { _ in Reactor.Action.saveClip }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+
+    private func bindState(from reactor: EditClipReactor) {
+        reactor.state
+            .compactMap(\.clip)
+            .take(1)
+            .map { _ in Reactor.Action.fetchFolder }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { $0.type == .shareExtension }
+            .filter { $0 }
+            .take(1)
+            .map { _ in Reactor.Action.fetchTopLevelFolder }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlString)
+            .take(1)
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.urlView.urlTextField.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.memoText)
+            .take(1)
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.memoView.memoTextView.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.navigationTitle)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.commonNavigationView.setTitle($0)
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
+        reactor.state
+            .map(\.urlTextFieldBorderColor)
+            .map { UIColor(resource: $0).cgColor }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlView.urlTextField.layer.rx.borderColor)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.isHiddenURLMetadataStackView)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlMetadataStackView.setHiddenAnimated(isHidden)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.isHiddenURLValidationStackView)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] isHidden in
+                self?.editClipView.urlValidationStacKView.setHiddenAnimated(isHidden)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
             .map { $0.currentFolder == nil }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.selectedFolderView.folderView.rx.isHidden)
             .disposed(by: disposeBag)
 
-        viewModel.state
+        reactor.state
             .map { $0.currentFolder != nil }
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive(editClipView.selectedFolderView.emptyView.rx.isHidden)
             .disposed(by: disposeBag)
 
-        viewModel.state
+        reactor.state
             .map(\.isLoading)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
@@ -327,24 +211,110 @@ private extension EditClipViewController {
             }
             .disposed(by: disposeBag)
 
-        editClipView.urlView.urlTextField.clearButton
-            .rx
-            .tap
-            .subscribe { [weak self] _ in
-                self?.editClipView.urlView.urlTextField.text = ""
-                self?.viewModel.action.accept(.editURLInputTextField(""))
+        reactor.state
+            .map(\.isSuccessedEditClip)
+            .filter { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
 
-        viewModel.state
-            .map { $0.type }
-            .filter { $0 == .create }
-            .take(1)
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.editClipView.urlView.urlTextField.becomeFirstResponder()
+        reactor.state
+            .map { ($0.isTappedFolderView, $0.currentFolder) }
+            .filter { $0 && $1 != nil }
+            .map { $1 }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] currentFolder in
+                guard let self else { return }
+
+                let reactor = self.diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
+                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
+                vc.onSelectionComplete = {
+                    reactor.action.onNext(.editFolder($0))
+                }
+                vc.modalPresentationStyle = .pageSheet
+
+                if let sheet = vc.sheetPresentationController {
+                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
+                    sheet.prefersGrabberVisible = true
+                }
+
+                present(vc, animated: true)
+                reactor.action.onNext(.disappearFolderSelectorView)
             }
             .disposed(by: disposeBag)
+
+        reactor.state
+            .compactMap(\.currentFolder)
+            .distinctUntilChanged { $0.id == $1.id }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] in
+                self?.editClipView.selectedFolderView.folderRowView.setDisplay(
+                    FolderDisplayMapper.map($0)
+                )
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.memoLimit)
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "0 / 100")
+            .drive(editClipView.memoView.memoLimitLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { state in
+                if let imageName = state.urlValidationImageName {
+                    return UIImage(named: imageName)
+                } else {
+                    return .none
+                }
+            }
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: .none)
+            .drive(editClipView.urlValidationStacKView.statusImageView.rx.image)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlValidationLabelText)
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(editClipView.urlValidationStacKView.statusLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlMetadataDisplay)
+            .compactMap { $0 }
+            .distinctUntilChanged()
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] urlMetadataDisplay in
+                self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
+            }
+            .disposed(by: disposeBag)
+
+        Observable.combineLatest(
+            reactor.state.map(\.clip),
+            reactor.state.map(\.memoText),
+            reactor.state.map(\.isURLValid),
+            reactor.state.map(\.currentFolder),
+            reactor.state.map(\.isLoading),
+            reactor.state.map(\.urlString)
+        )
+        .map { clip, memoText, isURLValid, currentFolder, isLoading, urlText in
+            guard !isLoading else { return false }
+            guard isURLValid else { return false }
+            if let clip = clip {
+                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.urlMetadata.url.absoluteString != urlText
+            } else {
+                return currentFolder != nil
+            }
+        }
+        .distinctUntilChanged()
+        .asDriver(onErrorDriveWith: .empty())
+        .drive(editClipView.saveButton.rx.isEnabled)
+        .disposed(by: disposeBag)
     }
 }
 
