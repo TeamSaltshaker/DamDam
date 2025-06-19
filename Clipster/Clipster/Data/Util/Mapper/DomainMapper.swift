@@ -46,6 +46,7 @@ struct DomainMapper {
             url: url,
             title: entity.title,
             thumbnailImageURL: URL(string: entity.thumbnailImageURLString ?? ""),
+            screenshotData: entity.screenshotData,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
             deletedAt: entity.deletedAt,

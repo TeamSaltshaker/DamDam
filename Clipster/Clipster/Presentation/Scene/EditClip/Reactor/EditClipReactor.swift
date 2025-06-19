@@ -151,6 +151,7 @@ final class EditClipReactor: Reactor {
                         url: urlMetadataDisplay.url,
                         title: urlMetadataDisplay.title,
                         thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
+                        screenshotData: urlMetadataDisplay.screenshotImageData,
                         createdAt: clip.createdAt,
                         updatedAt: Date(),
                         deletedAt: clip.deletedAt
@@ -178,6 +179,7 @@ final class EditClipReactor: Reactor {
                         url: urlMetadata.url,
                         title: urlMetadata.title,
                         thumbnailImageURL: urlMetadata.thumbnailImageURL,
+                        screenshotData: urlMetadata.screenshotImageData,
                         createdAt: Date(),
                         updatedAt: Date(),
                         deletedAt: nil

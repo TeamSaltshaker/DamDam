@@ -90,6 +90,7 @@ final class DefaultClipStorage: ClipStorage {
                 urlMetadataEntity.urlString = clip.urlMetadata.url.absoluteString
                 urlMetadataEntity.title = clip.urlMetadata.title
                 urlMetadataEntity.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
+                urlMetadataEntity.screenshotData = clip.urlMetadata.screenshotData
                 urlMetadataEntity.createdAt = clip.urlMetadata.createdAt
                 urlMetadataEntity.updatedAt = clip.urlMetadata.updatedAt
 
@@ -145,6 +146,7 @@ final class DefaultClipStorage: ClipStorage {
                     entity.urlMetadata?.urlString = clip.urlMetadata.url.absoluteString
                     entity.urlMetadata?.title = clip.urlMetadata.title
                     entity.urlMetadata?.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
+                    entity.urlMetadata?.screenshotData = clip.urlMetadata.screenshotData
                     entity.urlMetadata?.updatedAt = clip.urlMetadata.updatedAt
 
                     try context.save()
