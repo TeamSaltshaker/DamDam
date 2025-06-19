@@ -1,17 +1,16 @@
 import ReactorKit
-import SafariServices
 import UIKit
 
 final class FolderViewController: UIViewController, View {
     typealias Reactor = FolderReactor
 
     var disposeBag = DisposeBag()
-    private let diContainer: DIContainer
 
     private let folderView = FolderView()
+    private weak var coordinator: HomeCoordinator?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -110,28 +109,17 @@ private extension FolderViewController {
 
                 switch route {
                 case .editClipViewForAdd(let folder):
-                    let reactor = diContainer.makeEditClipReactor(folder: folder)
-                    let vc = EditClipViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showAddClip(folder: folder)
                 case .editClipViewForEdit(let clip):
-                    let reactor = diContainer.makeEditClipReactor(clip: clip)
-                    let vc = EditClipViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditClip(clip: clip)
                 case .editFolderView(let parentFolder, let folder):
-                    let reactor = diContainer.makeEditFolderReactor(parentFolder: parentFolder, folder: folder)
-                    let vc = EditFolderViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditFolder(parentFolder: parentFolder, folder: folder)
                 case .folderView(let folder):
-                    let reactor = diContainer.makeFolderReactor(folder: folder)
-                    let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showFolder(folder: folder)
                 case .clipDetailView(let clip):
-                    let reactor = diContainer.makeClipDetailReactor(clip: clip)
-                    let vc = ClipDetailViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showDetailClip(clip: clip)
                 case .webView(let url):
-                    let vc = SFSafariViewController(url: url)
-                    present(vc, animated: true)
+                    coordinator?.showWebView(url: url)
                 }
             }
             .disposed(by: disposeBag)
