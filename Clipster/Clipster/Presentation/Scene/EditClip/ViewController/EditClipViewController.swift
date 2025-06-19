@@ -84,14 +84,14 @@ extension EditClipViewController: View {
             .tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
-                let vm = diContainer.makeEditFolderViewModel(mode: .add(parentFolder: reactor.currentState.currentFolder))
+                let reactor = diContainer.makeEditFolderReactor(parentFolder: reactor.currentState.currentFolder, folder: nil)
                 let vc = EditFolderViewController(
-                    viewModel: vm,
+                    reactor: reactor,
                     diContainer: diContainer
                 )
 
-                vc.onAdditionComplete = {
-                    reactor.action.onNext(.editFolder($0))
+                vc.onAdditionComplete = { [weak self] in
+                    self?.reactor?.action.onNext(.editFolder($0))
                 }
 
                 navigationController?.pushViewController(vc, animated: true)
@@ -231,8 +231,8 @@ extension EditClipViewController: View {
 
                 let reactor = self.diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
                 let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
-                vc.onSelectionComplete = {
-                    reactor.action.onNext(.editFolder($0))
+                vc.onSelectionComplete = { [weak self] in
+                    self?.reactor?.action.onNext(.editFolder($0))
                 }
                 vc.modalPresentationStyle = .pageSheet
 

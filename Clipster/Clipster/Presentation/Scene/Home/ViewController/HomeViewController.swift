@@ -100,12 +100,12 @@ private extension HomeViewController {
 
                 switch route {
                 case .showAddClip(let folder):
-                    let reactor = owner.diContainer.makeEditClipReactor(folder: folder)
+                    let reactor = diContainer.makeEditClipReactor(folder: folder)
                     let vc = EditClipViewController(
                         reactor: reactor,
-                        diContainer: owner.diContainer
+                        diContainer: diContainer
                     )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .showAddFolder:
                     let vm = self.diContainer.makeEditFolderReactor(parentFolder: nil, folder: nil)
                     let vc = EditFolderViewController(
@@ -128,12 +128,12 @@ private extension HomeViewController {
                     )
                     self.navigationController?.pushViewController(vc, animated: true)
                 case .showEditClip(let clip):
-                    let reactor = owner.diContainer.makeEditClipReactor(clip: clip)
+                    let reactor = diContainer.makeEditClipReactor(clip: clip)
                     let vc = EditClipViewController(
                         reactor: reactor,
-                        diContainer: owner.diContainer
+                        diContainer: diContainer
                     )
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                    navigationController?.pushViewController(vc, animated: true)
                 case .showEditFolder(let folder):
                     let vm = self.diContainer.makeEditFolderReactor(
                         parentFolder: nil,
