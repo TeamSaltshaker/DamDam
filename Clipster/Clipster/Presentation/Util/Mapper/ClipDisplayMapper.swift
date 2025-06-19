@@ -6,7 +6,7 @@ struct ClipDisplayMapper {
             url: clip.urlMetadata.url,
             title: clip.urlMetadata.title.isEmpty ? " " : clip.urlMetadata.title,
             thumbnailImageURL: clip.urlMetadata.thumbnailImageURL,
-            screenshotImageData: nil
+            screenshotImageData: clip.urlMetadata.screenshotData
         )
 
         return ClipDisplay(
