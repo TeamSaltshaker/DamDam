@@ -51,9 +51,11 @@ extension HomeCoordinator {
 
     func showAddFolder(
         parentFolder: Folder? = nil,
+        onComplete: ((Folder) -> Void)? = nil
     ) {
         let reactor = diContainer.makeEditFolderReactor(parentFolder: parentFolder, folder: nil)
         let vc = EditFolderViewController(reactor: reactor, coordinator: self)
+        vc.onAdditionComplete = onComplete
         navigationController.pushViewController(vc, animated: true)
     }
 
@@ -72,5 +74,20 @@ extension HomeCoordinator {
     func showWebView(url: URL) {
         let safariVC = SFSafariViewController(url: url)
         navigationController.present(safariVC, animated: true)
+    }
+
+    func showFolderSelectorForClip(
+        parentFolder: Folder?,
+        onSelect: @escaping (Folder?) -> Void,
+    ) {
+        let reactor = diContainer.makeFolderSelectorReactorForClip(parentFolder: parentFolder)
+        let vc = FolderSelectorViewController(reactor: reactor, coordinator: self)
+        vc.onSelectionComplete = onSelect
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
+            sheet.prefersGrabberVisible = true
+        }
+        navigationController.present(vc, animated: true)
     }
 }
