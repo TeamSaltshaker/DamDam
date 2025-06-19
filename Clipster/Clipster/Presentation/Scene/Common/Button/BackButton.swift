@@ -29,7 +29,8 @@ private extension BackButton {
         let pointSize: CGFloat = hasTitle ? 12 : 16
 
         let symbolConfig = UIImage.SymbolConfiguration(pointSize: pointSize, weight: .medium)
-        let image = UIImage(systemName: "chevron.left", withConfiguration: symbolConfig)?
+        let image = UIImage.chevronLeft
+            .withConfiguration(symbolConfig)
             .withTintColor(.black100, renderingMode: .alwaysOriginal)
 
         var config = UIButton.Configuration.plain()
