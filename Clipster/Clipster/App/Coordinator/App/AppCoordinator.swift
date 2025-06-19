@@ -10,7 +10,6 @@ final class AppCoordinator: Coordinator {
     init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
         self.diContainer = diContainer
-        configure()
     }
 
     deinit {
@@ -38,15 +37,5 @@ extension AppCoordinator {
         } else {
             print("HomeCoordinator가 아직 초기화되지 않았습니다.")
         }
-    }
-}
-
-private extension AppCoordinator {
-    func configure() {
-        setAttributes()
-    }
-
-    func setAttributes() {
-        navigationController.isNavigationBarHidden = true
     }
 }
