@@ -16,6 +16,7 @@ final class EditClipReactor: Reactor {
 
     enum Action {
         case editURLTextField(String)
+        case validifyURL(String)
         case editingURLTextField
         case editMemo(String)
         case tapFolderView
@@ -115,7 +116,9 @@ final class EditClipReactor: Reactor {
         switch action {
         case .editURLTextField(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            let updateURLText = Observable.just(Mutation.updateURLString(trimmed))
+            return .just(.updateURLString(trimmed))
+        case .validifyURL(let text):
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             let parsedURL = Observable<Mutation>.fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
                 let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
@@ -156,7 +159,7 @@ final class EditClipReactor: Reactor {
                 }
                 return .empty()
             }
-            return Observable.merge(updateURLText, parsedURL)
+            return parsedURL
         case .editingURLTextField:
             return .just(.updateIsLoading(true))
         case .editMemo(let text):

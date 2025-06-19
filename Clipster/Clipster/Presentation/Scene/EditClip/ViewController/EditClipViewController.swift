@@ -46,8 +46,17 @@ extension EditClipViewController: View {
             .text
             .orEmpty
             .skip(1)
-            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { Reactor.Action.editURLTextField($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        editClipView.urlView.urlTextField
+            .rx
+            .text
+            .orEmpty
+            .skip(1)
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.validifyURL($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -114,6 +123,18 @@ extension EditClipViewController: View {
             .map { _ in Reactor.Action.saveClip }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        editClipView.urlView.urlTextField.clearButton
+            .rx
+            .tap
+            .flatMap { _ in
+                Observable.of(
+                    Reactor.Action.editURLTextField(""),
+                    Reactor.Action.validifyURL("")
+                )
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: EditClipReactor) {
@@ -133,27 +154,17 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map(\.urlString)
-            .take(1)
-            .filter { !$0.isEmpty }
-            .flatMap { urlString in
-                Observable.of(.editingURLTextField, .editURLTextField(urlString))
-            }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        reactor.state
-            .map(\.urlString)
-            .take(1)
-            .asDriver(onErrorJustReturn: "")
-            .drive(editClipView.urlView.urlTextField.rx.text)
-            .disposed(by: disposeBag)
-
-        reactor.state
             .map(\.memoText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
             .drive(editClipView.memoView.memoTextView.rx.text)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlString)
+            .distinctUntilChanged()
+            .asDriver(onErrorJustReturn: "")
+            .drive(editClipView.urlView.urlTextField.rx.text)
             .disposed(by: disposeBag)
 
         reactor.state
