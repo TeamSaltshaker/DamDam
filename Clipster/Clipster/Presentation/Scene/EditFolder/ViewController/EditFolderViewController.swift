@@ -153,9 +153,6 @@ private extension EditFolderViewController {
                     vc.onSelectionComplete = { selected in
                         reactor.action.onNext(.selectFolder(selected: selected))
                     }
-                    vc.onDismissed = {
-                        reactor.action.onNext(.folderSelectorDismissed)
-                    }
 
                     vc.modalPresentationStyle = .pageSheet
                     if let sheet = vc.sheetPresentationController {
@@ -190,5 +187,11 @@ extension EditFolderViewController: UITextFieldDelegate {
 extension EditFolderViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+}
+
+extension EditFolderViewController: UISheetPresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        reactor?.action.onNext(.folderSelectorDismissed)
     }
 }

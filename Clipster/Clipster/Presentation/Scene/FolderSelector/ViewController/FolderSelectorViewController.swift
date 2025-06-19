@@ -10,7 +10,6 @@ final class FolderSelectorViewController: UIViewController, View {
     private let folderSelectorView = FolderSelectorView()
 
     var onSelectionComplete: ((Folder?) -> Void)?
-    var onDismissed: (() -> Void)?
 
     init(reactor: Reactor, diContainer: DIContainer) {
         self.diContainer = diContainer
@@ -29,11 +28,6 @@ final class FolderSelectorViewController: UIViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         reactor?.action.onNext(.viewDidLoad)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        onDismissed?()
     }
 
     func bind(reactor: Reactor) {
