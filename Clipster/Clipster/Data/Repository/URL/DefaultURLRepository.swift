@@ -133,7 +133,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
         var thumbnailImageURL: String?
 
-        if url.host?.contains("youtube") == true {
+        if let host = url.host(percentEncoded: false), host.contains("youtube") {
             if let videoID = extractYouTubeVideoID(from: url) {
                 thumbnailImageURL = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
             }
