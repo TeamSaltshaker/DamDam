@@ -88,7 +88,11 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
         Task {
             do {
-                try await Task.sleep(for: .seconds(0.5))
+                while true {
+                    let readyState = try await webView.evaluateJavaScript("document.readyState") as? String
+                    if readyState == "complete" { break }
+                    try await Task.sleep(for: .milliseconds(100))
+                }
 
                 guard let htmlString = try await webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") as? String, !htmlString.isEmpty else {
                     print("\(Self.self) HTML 불러오기 실패")
