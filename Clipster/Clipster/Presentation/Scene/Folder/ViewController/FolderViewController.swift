@@ -95,7 +95,7 @@ private extension FolderViewController {
             .distinctUntilChanged()
             .bind { [weak self] isHidden in
                 guard let self else { return }
-                folderView.setDisplay(isEmptyViewHidden: isHidden)
+                folderView.setDisplay(isHidden: isHidden)
             }
             .disposed(by: disposeBag)
     }
