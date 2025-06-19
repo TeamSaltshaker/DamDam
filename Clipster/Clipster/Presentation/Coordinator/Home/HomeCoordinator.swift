@@ -49,6 +49,12 @@ extension HomeCoordinator {
         navigationController.pushViewController(vc, animated: true)
     }
 
+    func showEditClipFromSharedURL(urlString: String) {
+        let reactor = diContainer.makeEditClipReactor(urlString: urlString)
+        let vc = EditClipViewController(reactor: reactor, coordinator: self)
+        navigationController.pushViewController(vc, animated: true)
+    }
+
     func showAddFolder(
         parentFolder: Folder? = nil,
         onComplete: ((Folder) -> Void)? = nil

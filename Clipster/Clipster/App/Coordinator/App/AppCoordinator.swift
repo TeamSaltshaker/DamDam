@@ -31,6 +31,14 @@ extension AppCoordinator {
         addChild(homeCoordinator)
         homeCoordinator.start()
     }
+
+    func handleSharedURL(_ urlString: String) {
+        if let homeCoordinator = childs.compactMap({ $0 as? HomeCoordinator }).first {
+            homeCoordinator.showEditClipFromSharedURL(urlString: urlString)
+        } else {
+            print("HomeCoordinator가 아직 초기화되지 않았습니다.")
+        }
+    }
 }
 
 private extension AppCoordinator {

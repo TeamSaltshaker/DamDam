@@ -40,12 +40,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             sharedDefaults.removeObject(forKey: "sharedURL")
 
             DispatchQueue.main.async {
-                if let rootVC = self.window?.rootViewController as? UINavigationController {
-                    let diContainer = DIContainer()
-                    let reactor = diContainer.makeEditClipReactor(urlString: urlString)
-                    let editClipVC = EditClipViewController(reactor: reactor, diContainer: diContainer)
-                    rootVC.pushViewController(editClipVC, animated: true)
-                }
+                self.appCoordinator?.handleSharedURL(urlString)
             }
         }
     }
