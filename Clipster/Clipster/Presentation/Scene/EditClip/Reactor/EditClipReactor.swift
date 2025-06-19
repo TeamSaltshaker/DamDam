@@ -290,7 +290,7 @@ final class EditClipReactor: Reactor {
             }
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadataDisplay = urlMetaDisplay
-            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.title == nil
+            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.thumbnailImageURL == nil && urlMetaDisplay?.screenshotImageData == nil
         case .updateIsTappedFolderView(let value):
             newState.isTappedFolderView = value
         case .updateCurrentFolder(let newFolder):

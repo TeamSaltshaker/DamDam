@@ -145,7 +145,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
         return ParsedURLMetadataDTO(
             url: url,
-            title: title,
+            title: title.isEmpty ? url.absoluteString : title,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),
             screenshotData: nil
         )
