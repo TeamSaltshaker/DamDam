@@ -55,6 +55,7 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         editFolderView.folderTitleTextField.rx.text.orEmpty
+            .skip(1)
             .distinctUntilChanged()
             .map { .folderTitleChanged($0) }
             .bind(to: reactor.action)
