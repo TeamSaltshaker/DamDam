@@ -6,7 +6,7 @@ final class HomeCoordinator: Coordinator {
 
     let navigationController: UINavigationController
     weak var parent: Coordinator?
-    var childs: [Coordinator] = []
+    var children: [Coordinator] = []
 
     init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController

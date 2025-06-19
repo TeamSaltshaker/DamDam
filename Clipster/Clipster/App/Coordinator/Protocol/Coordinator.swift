@@ -3,7 +3,7 @@ import UIKit
 protocol Coordinator: AnyObject {
     var navigationController: UINavigationController { get }
     var parent: Coordinator? { get set }
-    var childs: [Coordinator] { get set }
+    var children: [Coordinator] { get set }
 
     func start()
     func addChild(_ coordinator: Coordinator)
@@ -14,14 +14,14 @@ protocol Coordinator: AnyObject {
 extension Coordinator {
     func addChild(_ coordinator: Coordinator) {
         coordinator.parent = self
-        childs.append(coordinator)
+        children.append(coordinator)
     }
 
     func removeChild(_ coordinator: Coordinator) {
-        childs.removeAll { $0 === coordinator }
+        children.removeAll { $0 === coordinator }
     }
 
     func removeAllChild() {
-        childs.removeAll()
+        children.removeAll()
     }
 }

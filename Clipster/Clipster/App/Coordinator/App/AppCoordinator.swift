@@ -5,7 +5,7 @@ final class AppCoordinator: Coordinator {
 
     let navigationController: UINavigationController
     weak var parent: Coordinator?
-    var childs: [Coordinator] = []
+    var children: [Coordinator] = []
 
     init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
@@ -33,7 +33,7 @@ extension AppCoordinator {
     }
 
     func handleSharedURL(_ urlString: String) {
-        if let homeCoordinator = childs.compactMap({ $0 as? HomeCoordinator }).first {
+        if let homeCoordinator = children.compactMap({ $0 as? HomeCoordinator }).first {
             homeCoordinator.showEditClipFromSharedURL(urlString: urlString)
         } else {
             print("HomeCoordinator가 아직 초기화되지 않았습니다.")
