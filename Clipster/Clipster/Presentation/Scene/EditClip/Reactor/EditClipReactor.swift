@@ -140,7 +140,6 @@ final class EditClipReactor: Reactor {
             }
             .flatMap { $0 }
             .catch { error in
-                print(error)
                 if let urlValidationError = error as? URLValidationError {
                     switch urlValidationError {
                     case .badURL:
@@ -152,7 +151,7 @@ final class EditClipReactor: Reactor {
                         return .empty()
                     default:
                         return Observable.merge(
-                            .just(Mutation.updateURLMetadata(nil)),
+                            .just(Mutation.updateURLMetadata(self.makeURLMetaDisplayOnlyURL(urlString: self.currentState.urlString))),
                             .just(Mutation.updateIsValidURL(.validWithWarning))
                         )
                     }
@@ -291,7 +290,7 @@ final class EditClipReactor: Reactor {
             }
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadataDisplay = urlMetaDisplay
-            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.title == nil
+            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.thumbnailImageURL == nil && urlMetaDisplay?.screenshotImageData == nil
         case .updateIsTappedFolderView(let value):
             newState.isTappedFolderView = value
         case .updateCurrentFolder(let newFolder):
@@ -318,6 +317,16 @@ private extension EditClipReactor {
                 screenshotImageData: $0.screenshotData
             )
         }
+    }
+
+    func makeURLMetaDisplayOnlyURL(urlString: String) -> URLMetadataDisplay? {
+        guard let url = URL(string: urlString) else { return nil }
+        return URLMetadataDisplay(
+            url: url,
+            title: url.absoluteString,
+            thumbnailImageURL: nil,
+            screenshotImageData: nil
+        )
     }
 }
 
