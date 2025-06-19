@@ -2,6 +2,12 @@ import Foundation
 import ReactorKit
 
 final class EditClipReactor: Reactor {
+    enum ClipValidType {
+        case valid
+        case validWithWarning
+        case invalid
+    }
+
     enum EditClipReactorType {
         case edit
         case create
@@ -23,7 +29,7 @@ final class EditClipReactor: Reactor {
     enum Mutation {
         case updateURLString(String)
         case updateMemo(String)
-        case updateIsValidURL(Bool)
+        case updateIsValidURL(ClipValidType)
         case updateURLMetadata(URLMetadataDisplay?)
         case updateIsTappedFolderView(Bool)
         case updateCurrentFolder(Folder?)
@@ -113,18 +119,42 @@ final class EditClipReactor: Reactor {
             let parsedURL = Observable<Mutation>.fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
                 let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
-                guard let metadata else { return Observable<Mutation>.empty() }
+
+                let clipValidType: ClipValidType
+                switch (metadata, isValidURL) {
+                case (.some, true):
+                    clipValidType = .valid
+                case (nil, true):
+                    clipValidType = .validWithWarning
+                case (_, false):
+                    clipValidType = .invalid
+                }
+
                 return Observable.merge(
-                    .just(Mutation.updateIsValidURL(isValidURL)),
-                    .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata)))
+                    .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata))),
+                    .just(Mutation.updateIsValidURL(clipValidType)),
                 )
             }
             .flatMap { $0 }
-            .catch { _ in
-                Observable.merge(
-                    .just(Mutation.updateIsValidURL(false)),
-                    .just(Mutation.updateURLMetadata(nil))
-                )
+            .catch { error in
+                print(error)
+                if let urlValidationError = error as? URLValidationError {
+                    switch urlValidationError {
+                    case .badURL:
+                        return Observable.merge(
+                            .just(Mutation.updateURLMetadata(nil)),
+                            .just(Mutation.updateIsValidURL(.invalid))
+                        )
+                    case .unknown:
+                        return .empty()
+                    default:
+                        return Observable.merge(
+                            .just(Mutation.updateURLMetadata(nil)),
+                            .just(Mutation.updateIsValidURL(.validWithWarning))
+                        )
+                    }
+                }
+                return .empty()
             }
             return Observable.merge(updateURLText, parsedURL)
         case .editingURLTextField:
@@ -225,20 +255,38 @@ final class EditClipReactor: Reactor {
         case .updateMemo(let text):
             newState.memoText = text
             newState.memoLimit = "\(text.count) / 100"
-        case .updateIsValidURL(let value):
-            newState.isURLValid = value
-            newState.urlValidationImageName = value ? "CheckBlue" : "XRed"
-            newState.urlValidationLabelText = value ? "올바른 URL 입니다." : "올바르지 않은 URL 입니다."
+        case .updateIsValidURL(let type):
+            switch type {
+            case .valid:
+                newState.isURLValid = true
+                newState.urlValidationImageName = "CheckBlue"
+                newState.urlValidationLabelText = "올바른 URL 입니다."
+                if !currentState.urlString.isEmpty {
+                    newState.urlTextFieldBorderColor = .blue600
+                }
+            case .validWithWarning:
+                newState.isURLValid = true
+                newState.urlValidationImageName = "AlertCircle"
+                newState.urlValidationLabelText = "올바른 URL이지만, 미리보기를 불러 올 수 없습니다."
+                if !currentState.urlString.isEmpty {
+                    newState.urlTextFieldBorderColor = .yellow600
+                }
+            case .invalid:
+                newState.isURLValid = false
+                newState.urlValidationImageName = "XCircle"
+                newState.urlValidationLabelText = "올바르지 않은 URL 입니다."
+                if !currentState.urlString.isEmpty {
+                    newState.urlTextFieldBorderColor = .red600
+                }
+            }
             newState.isLoading = false
 
             if currentState.urlString.isEmpty {
                 newState.urlTextFieldBorderColor = .black900
-            } else {
-                newState.urlTextFieldBorderColor = value ? .blue600 : .red600
             }
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadataDisplay = urlMetaDisplay
-            newState.isHiddenURLMetadataStackView = urlMetaDisplay == nil
+            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.title == nil
         case .updateIsTappedFolderView(let value):
             newState.isTappedFolderView = value
         case .updateCurrentFolder(let newFolder):
@@ -256,13 +304,15 @@ final class EditClipReactor: Reactor {
 }
 
 private extension EditClipReactor {
-    func toURLMetaDisplay(entity: ParsedURLMetadata) -> URLMetadataDisplay {
-        URLMetadataDisplay(
-            url: entity.url,
-            title: entity.title,
-            thumbnailImageURL: entity.thumbnailImageURL,
-            screenshotImageData: entity.screenshotData
-        )
+    func toURLMetaDisplay(entity: ParsedURLMetadata?) -> URLMetadataDisplay? {
+        entity.map {
+            URLMetadataDisplay(
+                url: $0.url,
+                title: $0.title,
+                thumbnailImageURL: $0.thumbnailImageURL,
+                screenshotImageData: $0.screenshotData
+            )
+        }
     }
 }
 

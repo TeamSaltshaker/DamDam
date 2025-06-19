@@ -7,13 +7,28 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         self.urlRepository = urlMetaRepository
     }
 
-    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), Error> {
-        let correctedURLString = urlString.lowercased().hasPrefix("https://") ?
-        urlString : "https://\(urlString)"
+    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), URLValidationError> {
+        let lowercased = urlString.lowercased()
+        let correctedURLString: String
+
+        if lowercased.hasPrefix("https://") || lowercased.hasPrefix("http://") {
+            correctedURLString = urlString
+        } else {
+            correctedURLString = "https://\(urlString)"
+        }
+
+        guard correctedURLString != "https://" || correctedURLString != "http://" else {
+            return .failure(.badURL)
+        }
 
         guard let url = URL(string: correctedURLString) else {
-            return .failure(URLError(.badURL))
+            return .failure(.badURL)
         }
+
+        guard let host = url.host, host.contains(".") else {
+            return .failure(.badURL)
+        }
+
         return await urlRepository.execute(url: url)
     }
 }
