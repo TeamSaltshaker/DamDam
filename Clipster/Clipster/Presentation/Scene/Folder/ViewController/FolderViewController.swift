@@ -118,16 +118,16 @@ private extension FolderViewController {
                     let vc = EditClipViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .editFolderView(let parentFolder, let folder):
-                    let vm = diContainer.makeEditFolderReactor(parentFolder: parentFolder, folder: folder)
-                    let vc = EditFolderViewController(reactor: vm, diContainer: diContainer)
+                    let reactor = diContainer.makeEditFolderReactor(parentFolder: parentFolder, folder: folder)
+                    let vc = EditFolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .folderView(let folder):
                     let reactor = diContainer.makeFolderReactor(folder: folder)
                     let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .clipDetailView(let clip):
-                    let vm = diContainer.makeClipDetailReactor(clip: clip)
-                    let vc = ClipDetailViewController(reactor: vm, diContainer: diContainer)
+                    let reactor = diContainer.makeClipDetailReactor(clip: clip)
+                    let vc = ClipDetailViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .webView(let url):
                     let vc = SFSafariViewController(url: url)

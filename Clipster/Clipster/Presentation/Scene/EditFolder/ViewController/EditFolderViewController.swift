@@ -148,13 +148,10 @@ private extension EditFolderViewController {
                 switch route {
                 case .showFolderSelector:
                     let currentState = reactor.currentState
-                    let vm = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: currentState.parentFolder, folder: currentState.folder)
-                    let vc = FolderSelectorViewController(reactor: vm, diContainer: diContainer)
-                    vc.onSelectionComplete = { selected in
-                        reactor.action.onNext(.selectFolder(selected: selected))
-                    }
-                    vc.onDismissed = {
-                        reactor.action.onNext(.folderSelectorDismissed)
+                    let folderSelectorReactor = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: currentState.parentFolder, folder: currentState.folder)
+                    let vc = FolderSelectorViewController(reactor: folderSelectorReactor, diContainer: diContainer)
+                    vc.onSelectionComplete = { [weak reactor] selected in
+                        reactor?.action.onNext(.selectFolder(selected: selected))
                     }
 
                     vc.modalPresentationStyle = .pageSheet
@@ -190,5 +187,11 @@ extension EditFolderViewController: UITextFieldDelegate {
 extension EditFolderViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+}
+
+extension EditFolderViewController: UISheetPresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        reactor?.action.onNext(.folderSelectorDismissed)
     }
 }

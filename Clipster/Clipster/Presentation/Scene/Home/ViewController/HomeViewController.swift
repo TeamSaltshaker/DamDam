@@ -107,9 +107,9 @@ private extension HomeViewController {
                     )
                     navigationController?.pushViewController(vc, animated: true)
                 case .showAddFolder:
-                    let vm = self.diContainer.makeEditFolderReactor(parentFolder: nil, folder: nil)
+                    let reactor = self.diContainer.makeEditFolderReactor(parentFolder: nil, folder: nil)
                     let vc = EditFolderViewController(
-                        reactor: vm,
+                        reactor: reactor,
                         diContainer: self.diContainer
                     )
                     self.navigationController?.pushViewController(vc, animated: true)
@@ -121,9 +121,9 @@ private extension HomeViewController {
                     let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
                     navigationController?.pushViewController(vc, animated: true)
                 case .showDetailClip(let clip):
-                    let vm = self.diContainer.makeClipDetailReactor(clip: clip)
+                    let reactor = self.diContainer.makeClipDetailReactor(clip: clip)
                     let vc = ClipDetailViewController(
-                        reactor: vm,
+                        reactor: reactor,
                         diContainer: self.diContainer
                     )
                     self.navigationController?.pushViewController(vc, animated: true)
@@ -135,12 +135,12 @@ private extension HomeViewController {
                     )
                     navigationController?.pushViewController(vc, animated: true)
                 case .showEditFolder(let folder):
-                    let vm = self.diContainer.makeEditFolderReactor(
+                    let reactor = self.diContainer.makeEditFolderReactor(
                         parentFolder: nil,
                         folder: folder
                     )
                     let vc = EditFolderViewController(
-                        reactor: vm,
+                        reactor: reactor,
                         diContainer: self.diContainer
                     )
                     self.navigationController?.pushViewController(vc, animated: true)
