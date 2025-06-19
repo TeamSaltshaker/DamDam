@@ -3,11 +3,11 @@ import Foundation
 final class DefaultParseURLUseCase: ParseURLUseCase {
     let urlRepository: URLRepository
 
-    init(urlRepository: URLRepository) {
-        self.urlRepository = urlRepository
+    init(urlMetaRepository: URLRepository) {
+        self.urlRepository = urlMetaRepository
     }
 
-    func execute(urlString: String) async -> Result<(ParsedURLMetadata, Bool), Error> {
+    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), Error> {
         let correctedURLString = urlString.lowercased().hasPrefix("https://") ?
         urlString : "https://\(urlString)"
 

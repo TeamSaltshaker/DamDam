@@ -42,10 +42,15 @@ final class URLMetadataStackView: UIStackView {
 
     func setDisplay(model: URLMetadataDisplay) {
         titleLabel.text = model.title
-        if let urlString = model.thumbnailImageURL?.absoluteString, urlString.isEmpty {
-            thumbnailImageView.image = .none
-        } else {
+
+        if let urlString = model.thumbnailImageURL?.absoluteString, !urlString.isEmpty {
             thumbnailImageView.kf.setImage(with: model.thumbnailImageURL)
+        } else {
+            guard let screenshotImageData = model.screenshotImageData else {
+                thumbnailImageView.image = .none
+                return
+            }
+            thumbnailImageView.image = UIImage(data: screenshotImageData)
         }
     }
 }
