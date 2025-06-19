@@ -37,7 +37,7 @@ final class ClipDetailView: UIView {
     }
 
     func setDisplay(_ clip: ClipDisplay, folder: FolderDisplay) {
-        urlMetadataStackView.setDisplay(model: clip.urlMetadata)
+        urlMetadataStackView.setDisplay(display: clip.urlMetadata)
         urlView.urlTextField.text = clip.urlMetadata.url.description
         memoView.memoTextView.text = clip.memo
         memoView.memoLimitLabel.text = clip.memoLimit

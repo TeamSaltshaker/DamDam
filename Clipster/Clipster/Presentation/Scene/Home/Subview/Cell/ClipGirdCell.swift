@@ -57,7 +57,14 @@ final class ClipGridCell: UICollectionViewCell {
     }
 
     func setDisplay(_ display: ClipDisplay) {
-        thumbnailImageView.kf.setImage(with: display.urlMetadata.thumbnailImageURL)
+        if let thumbnailURL = display.urlMetadata.thumbnailImageURL {
+            thumbnailImageView.kf.setImage(with: thumbnailURL)
+        } else if let screenshotImageData = display.urlMetadata.screenshotImageData,
+                  let screenshotImage = UIImage(data: screenshotImageData) {
+            thumbnailImageView.image = screenshotImage
+        } else {
+            thumbnailImageView.image = .none
+        }
         titleTextView.text = display.urlMetadata.title
         memoLabel.text = display.memo
         visitIndicatorView.isHidden = display.isVisited

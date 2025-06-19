@@ -295,7 +295,7 @@ extension EditClipViewController: View {
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] urlMetadataDisplay in
-                self?.editClipView.urlMetadataStackView.setDisplay(model: urlMetadataDisplay)
+                self?.editClipView.urlMetadataStackView.setDisplay(display: urlMetadataDisplay)
             }
             .disposed(by: disposeBag)
 
