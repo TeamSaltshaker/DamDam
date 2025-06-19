@@ -123,6 +123,18 @@ extension EditClipViewController: View {
             .map { _ in Reactor.Action.saveClip }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        editClipView.urlView.urlTextField.clearButton
+            .rx
+            .tap
+            .flatMap { _ in
+                Observable.of(
+                    Reactor.Action.editURLTextField(""),
+                    Reactor.Action.validifyURL("")
+                )
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: EditClipReactor) {
