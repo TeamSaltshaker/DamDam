@@ -112,8 +112,8 @@ private extension EditFolderViewController {
 
         reactor.state
             .map { $0.folder == nil }
-            .take(1)
             .filter { $0 }
+            .take(1)
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.editFolderView.folderTitleTextField.becomeFirstResponder()
