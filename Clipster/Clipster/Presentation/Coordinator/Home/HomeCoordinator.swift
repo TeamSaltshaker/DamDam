@@ -90,4 +90,20 @@ extension HomeCoordinator {
         }
         navigationController.present(vc, animated: true)
     }
+
+    func showFolderSelectorForFolder(
+        parentFolder: Folder?,
+        folder: Folder?,
+        onSelect: @escaping (Folder?) -> Void,
+    ) {
+        let reactor = diContainer.makeFolderSelectorReactorForFolder(parentFolder: parentFolder, folder: folder)
+        let vc = FolderSelectorViewController(reactor: reactor, coordinator: self)
+        vc.onSelectionComplete = onSelect
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
+            sheet.prefersGrabberVisible = true
+        }
+        navigationController.present(vc, animated: true)
+    }
 }

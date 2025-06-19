@@ -6,15 +6,15 @@ import UIKit
 
 final class EditFolderViewController: UIViewController, View {
     typealias Reactor = EditFolderReactor
-    private let diContainer: DIContainer
-    var disposeBag = DisposeBag()
 
+    var disposeBag = DisposeBag()
     private let editFolderView = EditFolderView()
+    private weak var coordinator: HomeCoordinator?
 
     var onAdditionComplete: ((Folder) -> Void)?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -148,19 +148,12 @@ private extension EditFolderViewController {
                 switch route {
                 case .showFolderSelector:
                     let currentState = reactor.currentState
-                    let folderSelectorReactor = self.diContainer.makeFolderSelectorReactorForFolder(parentFolder: currentState.parentFolder, folder: currentState.folder)
-                    let vc = FolderSelectorViewController(reactor: folderSelectorReactor, diContainer: diContainer)
-                    vc.onSelectionComplete = { [weak reactor] selected in
+                    coordinator?.showFolderSelectorForFolder(
+                        parentFolder: currentState.parentFolder,
+                        folder: currentState.folder
+                    ) { [weak reactor] selected in
                         reactor?.action.onNext(.selectFolder(selected: selected))
                     }
-
-                    vc.modalPresentationStyle = .pageSheet
-                    if let sheet = vc.sheetPresentationController {
-                        sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
-                        sheet.prefersGrabberVisible = true
-                    }
-
-                    present(vc, animated: true)
                 }
             }
             .disposed(by: disposeBag)
