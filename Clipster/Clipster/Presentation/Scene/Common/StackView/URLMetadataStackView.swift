@@ -40,7 +40,7 @@ final class URLMetadataStackView: UIStackView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(model: URLMetadataDisplay) {
+    func setDisplay(display: URLMetadataDisplay) {
         titleLabel.text = model.title
 
         if let urlString = model.thumbnailImageURL?.absoluteString, !urlString.isEmpty {
