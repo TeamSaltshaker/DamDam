@@ -10,23 +10,29 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }()
 
     var window: UIWindow?
+    var appCoordinator: AppCoordinator?
 
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,
-        options connectionOptions: UIScene.ConnectionOptions,
+        options connectionOptions: UIScene.ConnectionOptions
     ) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        let navigationController = UINavigationController()
+        navigationController.isNavigationBarHidden = true
         let diContainer = DIContainer()
-        let reactor = diContainer.makeHomeReactor()
-        let homeVC = HomeViewController(reactor: reactor, diContainer: diContainer)
-        let naviVC = UINavigationController(rootViewController: homeVC)
-        naviVC.isNavigationBarHidden = true
+
+        appCoordinator = AppCoordinator(
+            navigationController: navigationController,
+            diContainer: diContainer
+        )
 
         window = UIWindow(windowScene: windowScene)
-        window?.backgroundColor = .white800
-        window?.rootViewController = naviVC
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+
+        appCoordinator?.start()
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
@@ -35,12 +41,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             sharedDefaults.removeObject(forKey: "sharedURL")
 
             DispatchQueue.main.async {
-                if let rootVC = self.window?.rootViewController as? UINavigationController {
-                    let diContainer = DIContainer()
-                    let reactor = diContainer.makeEditClipReactor(urlString: urlString)
-                    let editClipVC = EditClipViewController(reactor: reactor, diContainer: diContainer)
-                    rootVC.pushViewController(editClipVC, animated: true)
-                }
+                self.appCoordinator?.handleSharedURL(urlString)
             }
         }
     }

@@ -4,13 +4,13 @@ import UIKit
 
 final class EditClipViewController: UIViewController {
     typealias Reactor = EditClipReactor
-    private let diContainer: DIContainer
+
     var disposeBag = DisposeBag()
-
     private let editClipView = EditClipView()
+    private weak var coordinator: HomeCoordinator?
 
-    init(reactor: EditClipReactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: EditClipReactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -85,17 +85,10 @@ extension EditClipViewController: View {
             .tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
-                let editFolderReactor = diContainer.makeEditFolderReactor(parentFolder: reactor.currentState.currentFolder, folder: nil)
-                let vc = EditFolderViewController(
-                    reactor: editFolderReactor,
-                    diContainer: diContainer
-                )
-
-                vc.onAdditionComplete = { [weak reactor] in
+                let parentFolder = reactor.currentState.currentFolder
+                coordinator?.showAddFolder(parentFolder: parentFolder) { [weak reactor] in
                     reactor?.action.onNext(.editFolder($0))
                 }
-
-                navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
 
@@ -240,18 +233,10 @@ extension EditClipViewController: View {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
-                let reactor = diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
-                let vc = FolderSelectorViewController(reactor: reactor, diContainer: diContainer)
-                vc.onSelectionComplete = { [weak self] in
-                    self?.reactor?.action.onNext(.editFolder($0))
+                coordinator?.showFolderSelectorForClip(parentFolder: currentFolder) { [weak reactor] in
+                    reactor?.action.onNext(.editFolder($0))
                 }
-                vc.modalPresentationStyle = .pageSheet
-                if let sheet = vc.sheetPresentationController {
-                    sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
-                    sheet.prefersGrabberVisible = true
-                }
-                present(vc, animated: true)
-                self.reactor?.action.onNext(.disappearFolderSelectorView)
+                reactor.action.onNext(.disappearFolderSelectorView)
             }
             .disposed(by: disposeBag)
 

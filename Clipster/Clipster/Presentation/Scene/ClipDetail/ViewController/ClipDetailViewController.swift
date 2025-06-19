@@ -4,13 +4,13 @@ import UIKit
 
 final class ClipDetailViewController: UIViewController, View {
     typealias Reactor = ClipDetailReactor
-    private let diContainer: DIContainer
+
     var disposeBag = DisposeBag()
-
     private let clipDetailView = ClipDetailView()
+    private weak var coordinator: HomeCoordinator?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -106,9 +106,7 @@ private extension ClipDetailViewController {
                 guard let self else { return }
                 switch route {
                 case .showEditClip(let clip):
-                    let editClipReactor = self.diContainer.makeEditClipReactor(clip: clip)
-                    let vc = EditClipViewController(reactor: editClipReactor, diContainer: self.diContainer)
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditClip(clip: clip)
                 case .showDeleteConfirmation(let title):
                     self.presentDeleteAlert(title: title) { [weak reactor] in
                         reactor?.action.onNext(.deleteConfirmed)

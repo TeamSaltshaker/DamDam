@@ -4,15 +4,15 @@ import UIKit
 
 final class FolderSelectorViewController: UIViewController, View {
     typealias Reactor = FolderSelectorReactor
-    private let diContainer: DIContainer
-    var disposeBag = DisposeBag()
 
+    var disposeBag = DisposeBag()
     private let folderSelectorView = FolderSelectorView()
+    private weak var coordinator: HomeCoordinator?
 
     var onSelectionComplete: ((Folder?) -> Void)?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
