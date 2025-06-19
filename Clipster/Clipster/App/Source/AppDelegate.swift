@@ -7,6 +7,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
     ) -> Bool {
         CoreDataStack.shared.migrateIfNeeded()
+        CoreDataStack.shared.container
+            .loadPersistentStores { _, error in
+                if let error {
+                    fatalError("\(Self.self): ❌ Failed to load persistent stores: \(error.localizedDescription)")
+                } else {
+                    print("\(Self.self): ✅ Persistent store loaded successfully")
+                }
+            }
+
         return true
     }
 

@@ -24,13 +24,6 @@ final class CoreDataStack {
             fatalError("\(Self.self): ❌ Failed to locate AppGroup container")
         }
 
-        container.loadPersistentStores { _, error in
-            if let error {
-                fatalError("\(Self.self): ❌ Failed to load persistent stores: \(error.localizedDescription)")
-            } else {
-                print("\(Self.self): ✅ Persistent store loaded successfully")
-            }
-        }
         return container
     }()
 
@@ -57,14 +50,20 @@ final class CoreDataStack {
 
         let storeURL = appGroupURL.appendingPathComponent("Clipster.sqlite")
 
-        guard let sourceModelURL = Bundle.main.url(forResource: "Clipster", withExtension: "momd"),
-              let sourceModel = NSManagedObjectModel(contentsOf: sourceModelURL) else {
+        guard let modelDirectoryURL = Bundle.main.url(forResource: "Clipster", withExtension: "momd"),
+              let modelBundle = Bundle(url: modelDirectoryURL) else {
+            print("\(Self.self): ❌ Failed to load models directory")
+            return
+        }
+
+        guard let sourceURL = modelBundle.url(forResource: "Clipster", withExtension: "mom"),
+              let sourceModel = NSManagedObjectModel(contentsOf: sourceURL) else {
             print("\(Self.self): ❌ Failed to load source model")
             return
-         }
+        }
 
-        guard let destinationModelURL = Bundle.main.url(forResource: "Clipster2", withExtension: "momd"),
-              let destinationModel = NSManagedObjectModel(contentsOf: destinationModelURL) else {
+        guard let destinationURL = modelBundle.url(forResource: "Clipster2", withExtension: "mom"),
+              let destinationModel = NSManagedObjectModel(contentsOf: destinationURL) else {
             print("\(Self.self): ❌ Failed to load destination model")
             return
         }
