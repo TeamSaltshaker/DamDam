@@ -101,6 +101,7 @@ extension EditClipViewController: View {
         editClipView.backButton
             .rx
             .tap
+            .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
             }
@@ -228,21 +229,18 @@ extension EditClipViewController: View {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
-
-                let reactor = self.diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
-                let vc = FolderSelectorViewController(reactor: reactor, diContainer: self.diContainer)
+                let reactor = diContainer.makeFolderSelectorReactorForClip(parentFolder: currentFolder)
+                let vc = FolderSelectorViewController(reactor: reactor, diContainer: diContainer)
                 vc.onSelectionComplete = { [weak self] in
                     self?.reactor?.action.onNext(.editFolder($0))
                 }
                 vc.modalPresentationStyle = .pageSheet
-
                 if let sheet = vc.sheetPresentationController {
                     sheet.detents = [.custom { context in context.maximumDetentValue * 0.75 }]
                     sheet.prefersGrabberVisible = true
                 }
-
                 present(vc, animated: true)
-                reactor.action.onNext(.disappearFolderSelectorView)
+                self.reactor?.action.onNext(.disappearFolderSelectorView)
             }
             .disposed(by: disposeBag)
 
