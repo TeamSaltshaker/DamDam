@@ -139,6 +139,16 @@ extension EditClipViewController: View {
 
     private func bindState(from reactor: EditClipReactor) {
         reactor.state
+            .map { $0.type }
+            .filter { $0 == .create }
+            .take(1)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                self?.editClipView.urlView.urlTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+
+        reactor.state
             .compactMap(\.clip)
             .take(1)
             .map { _ in Reactor.Action.fetchFolder }
