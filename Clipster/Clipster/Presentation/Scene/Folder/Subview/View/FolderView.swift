@@ -395,7 +395,7 @@ private extension FolderView {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] indexPath in
                 guard let self else { return }
-                action.accept(.didTapCell(indexPath))
+                action.accept(.didTapCell(logicalIndexPath(indexPath)))
             }
             .disposed(by: disposeBag)
 
