@@ -201,7 +201,6 @@ final class DefaultFolderStorage: FolderStorage {
             .filter { $0.deletedAt == nil }
             .forEach { subEntity in
                 subEntity.deletedAt = deletedAt
-                subEntity.urlMetadata?.deletedAt = deletedAt
             }
     }
 }

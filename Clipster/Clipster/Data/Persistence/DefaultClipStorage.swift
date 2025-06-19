@@ -65,7 +65,11 @@ final class DefaultClipStorage: ClipStorage {
             container.performBackgroundTask { context in
                 let entity = ClipEntity(context: context)
                 entity.id = clip.id
+                entity.urlString = clip.url.absoluteString
+                entity.title = clip.title
                 entity.memo = clip.memo
+                entity.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
+                entity.screenshotData = clip.screenshotData
                 entity.lastVisitedAt = clip.lastVisitedAt
                 entity.createdAt = clip.createdAt
                 entity.updatedAt = clip.updatedAt
@@ -85,16 +89,6 @@ final class DefaultClipStorage: ClipStorage {
                     print("\(Self.self): ❌ Failed to insert: \(error.localizedDescription)")
                     continuation.resume(returning: .failure(.insertFailed(error.localizedDescription)))
                 }
-
-                let urlMetadataEntity = URLMetadataEntity(context: context)
-                urlMetadataEntity.urlString = clip.urlMetadata.url.absoluteString
-                urlMetadataEntity.title = clip.urlMetadata.title
-                urlMetadataEntity.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
-                urlMetadataEntity.createdAt = clip.urlMetadata.createdAt
-                urlMetadataEntity.updatedAt = clip.urlMetadata.updatedAt
-
-                urlMetadataEntity.clip = entity
-                entity.urlMetadata = urlMetadataEntity
 
                 do {
                     try context.save()
@@ -122,7 +116,11 @@ final class DefaultClipStorage: ClipStorage {
                         return
                     }
 
+                    entity.urlString = clip.url.absoluteString
+                    entity.title = clip.title
                     entity.memo = clip.memo
+                    entity.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
+                    entity.screenshotData = clip.screenshotData
                     entity.lastVisitedAt = clip.lastVisitedAt
                     entity.updatedAt = clip.updatedAt
 
@@ -141,11 +139,6 @@ final class DefaultClipStorage: ClipStorage {
                         }
                         entity.folder = folderEntity
                     }
-
-                    entity.urlMetadata?.urlString = clip.urlMetadata.url.absoluteString
-                    entity.urlMetadata?.title = clip.urlMetadata.title
-                    entity.urlMetadata?.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
-                    entity.urlMetadata?.updatedAt = clip.urlMetadata.updatedAt
 
                     try context.save()
                     print("\(Self.self): ✅ Update successfully")
@@ -173,7 +166,6 @@ final class DefaultClipStorage: ClipStorage {
                     }
 
                     entity.deletedAt = clip.deletedAt
-                    entity.urlMetadata?.deletedAt = clip.urlMetadata.deletedAt
 
                     try context.save()
                     print("\(Self.self): ✅ Delete successfully")
