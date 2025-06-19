@@ -107,8 +107,8 @@ private extension EditClipView {
         }
 
         scrollContainerView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.width.equalToSuperview()
+            make.edges.equalTo(scrollView.contentLayoutGuide)
+            make.width.equalTo(scrollView.frameLayoutGuide)
         }
 
         urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
@@ -128,7 +128,7 @@ private extension EditClipView {
         selectedFolderView.snp.makeConstraints { make in
             make.top.equalTo(memoView.snp.bottom).offset(40)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
-            make.bottom.lessThanOrEqualToSuperview().inset(24)
+            make.bottom.equalToSuperview()
         }
     }
 }
