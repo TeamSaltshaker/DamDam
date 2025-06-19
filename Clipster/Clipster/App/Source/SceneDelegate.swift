@@ -19,6 +19,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
+        #if DEBUG
+        _ = UserDefaults(suiteName: "group.com.saltshaker.clipster.debug")
+        #else
+        _ = UserDefaults(suiteName: "group.com.saltshaker.clipster")
+        #endif
+
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
         let diContainer = DIContainer()
