@@ -1,5 +1,4 @@
 import ReactorKit
-import SafariServices
 import UIKit
 
 final class HomeViewController: UIViewController, View {
@@ -100,54 +99,21 @@ private extension HomeViewController {
 
                 switch route {
                 case .showAddClip(let folder):
-                    let reactor = diContainer.makeEditClipReactor(folder: folder)
-                    let vc = EditClipViewController(
-                        reactor: reactor,
-                        diContainer: diContainer
-                    )
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showAddClip(folder: folder)
                 case .showAddFolder:
-                    let reactor = self.diContainer.makeEditFolderReactor(parentFolder: nil, folder: nil)
-                    let vc = EditFolderViewController(
-                        reactor: reactor,
-                        diContainer: self.diContainer
-                    )
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showAddFolder()
                 case .showWebView(let url):
-                    let vc = SFSafariViewController(url: url)
-                    present(vc, animated: true)
+                    coordinator?.showWebView(url: url)
                 case .showFolder(let folder):
-                    let reactor = diContainer.makeFolderReactor(folder: folder)
-                    let vc = FolderViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showFolder(folder: folder)
                 case .showDetailClip(let clip):
-                    let reactor = self.diContainer.makeClipDetailReactor(clip: clip)
-                    let vc = ClipDetailViewController(
-                        reactor: reactor,
-                        diContainer: self.diContainer
-                    )
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showDetailClip(clip: clip)
                 case .showEditClip(let clip):
-                    let reactor = diContainer.makeEditClipReactor(clip: clip)
-                    let vc = EditClipViewController(
-                        reactor: reactor,
-                        diContainer: diContainer
-                    )
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditClip(clip: clip)
                 case .showEditFolder(let folder):
-                    let reactor = self.diContainer.makeEditFolderReactor(
-                        parentFolder: nil,
-                        folder: folder
-                    )
-                    let vc = EditFolderViewController(
-                        reactor: reactor,
-                        diContainer: self.diContainer
-                    )
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditFolder(folder: folder)
                 case .showUnvisitedClipList(let clips):
-                    let reactor = diContainer.makeUnvisitedClipListReactor(clips: clips)
-                    let vc = UnvisitedClipListViewController(reactor: reactor, diContainer: diContainer)
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showUnvisitedClipList(clips: clips)
                 }
             }
             .disposed(by: disposeBag)
