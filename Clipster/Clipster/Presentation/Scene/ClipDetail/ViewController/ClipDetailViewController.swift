@@ -106,12 +106,12 @@ private extension ClipDetailViewController {
                 guard let self else { return }
                 switch route {
                 case .showEditClip(let clip):
-                    let reactor = self.diContainer.makeEditClipReactor(clip: clip)
-                    let vc = EditClipViewController(reactor: reactor, diContainer: self.diContainer)
+                    let editClipReactor = self.diContainer.makeEditClipReactor(clip: clip)
+                    let vc = EditClipViewController(reactor: editClipReactor, diContainer: self.diContainer)
                     self.navigationController?.pushViewController(vc, animated: true)
                 case .showDeleteConfirmation(let title):
-                    self.presentDeleteAlert(title: title) {
-                        reactor.action.onNext(.deleteConfirmed)
+                    self.presentDeleteAlert(title: title) { [weak reactor] in
+                        reactor?.action.onNext(.deleteConfirmed)
                     }
                 }
             }

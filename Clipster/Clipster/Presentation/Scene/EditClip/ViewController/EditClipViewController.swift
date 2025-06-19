@@ -84,14 +84,14 @@ extension EditClipViewController: View {
             .tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
-                let reactor = diContainer.makeEditFolderReactor(parentFolder: reactor.currentState.currentFolder, folder: nil)
+                let editFolderReactor = diContainer.makeEditFolderReactor(parentFolder: reactor.currentState.currentFolder, folder: nil)
                 let vc = EditFolderViewController(
-                    reactor: reactor,
+                    reactor: editFolderReactor,
                     diContainer: diContainer
                 )
 
-                vc.onAdditionComplete = { [weak self] in
-                    self?.reactor?.action.onNext(.editFolder($0))
+                vc.onAdditionComplete = { [weak reactor] in
+                    reactor?.action.onNext(.editFolder($0))
                 }
 
                 navigationController?.pushViewController(vc, animated: true)
