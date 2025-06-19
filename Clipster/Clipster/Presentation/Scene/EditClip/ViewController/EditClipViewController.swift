@@ -45,6 +45,7 @@ extension EditClipViewController: View {
             .rx
             .text
             .orEmpty
+            .skip(1)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { Reactor.Action.editURLTextField($0) }
             .bind(to: reactor.action)
@@ -135,6 +136,16 @@ extension EditClipViewController: View {
             .filter { $0 }
             .take(1)
             .map { _ in Reactor.Action.fetchTopLevelFolder }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlString)
+            .take(1)
+            .filter { !$0.isEmpty }
+            .flatMap { urlString in
+                Observable.of(.editingURLTextField, .editURLTextField(urlString))
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -293,21 +304,12 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         Observable.combineLatest(
-            reactor.state.map(\.clip),
-            reactor.state.map(\.memoText),
             reactor.state.map(\.isURLValid),
             reactor.state.map(\.currentFolder),
-            reactor.state.map(\.isLoading),
-            reactor.state.map(\.urlString)
+            reactor.state.map(\.isLoading)
         )
-        .map { clip, memoText, isURLValid, currentFolder, isLoading, urlText in
-            guard !isLoading else { return false }
-            guard isURLValid else { return false }
-            if let clip = clip {
-                return clip.memo != memoText || currentFolder?.id != clip.folderID || clip.urlMetadata.url.absoluteString != urlText
-            } else {
-                return currentFolder != nil
-            }
+        .map { isURLValid, currentFolder, isLoading in
+            !isLoading && isURLValid && currentFolder != nil
         }
         .distinctUntilChanged()
         .asDriver(onErrorDriveWith: .empty())
