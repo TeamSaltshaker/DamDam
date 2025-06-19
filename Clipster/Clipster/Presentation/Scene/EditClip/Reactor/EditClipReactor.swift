@@ -151,7 +151,7 @@ final class EditClipReactor: Reactor {
                         return .empty()
                     default:
                         return Observable.merge(
-                            .just(Mutation.updateURLMetadata(nil)),
+                            .just(Mutation.updateURLMetadata(self.makeURLMetaDisplayOnlyURL(urlString: self.currentState.urlString))),
                             .just(Mutation.updateIsValidURL(.validWithWarning))
                         )
                     }
@@ -317,6 +317,16 @@ private extension EditClipReactor {
                 screenshotImageData: $0.screenshotData
             )
         }
+    }
+
+    func makeURLMetaDisplayOnlyURL(urlString: String) -> URLMetadataDisplay? {
+        guard let url = URL(string: urlString) else { return nil }
+        return URLMetadataDisplay(
+            url: url,
+            title: url.absoluteString,
+            thumbnailImageURL: nil,
+            screenshotImageData: nil
+        )
     }
 }
 
