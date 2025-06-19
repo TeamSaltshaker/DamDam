@@ -1,5 +1,4 @@
 import ReactorKit
-import SafariServices
 import UIKit
 
 final class UnvisitedClipListViewController: UIViewController, View {
@@ -7,10 +6,10 @@ final class UnvisitedClipListViewController: UIViewController, View {
 
     var disposeBag = DisposeBag()
     private let unvisitedClipListView = UnvisitedClipListView()
-    private let diContainer: DIContainer
+    private weak var coordinator: HomeCoordinator?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -99,22 +98,11 @@ extension UnvisitedClipListViewController {
                 case .back:
                     navigationController?.popViewController(animated: true)
                 case .showWebView(let url):
-                    let vc = SFSafariViewController(url: url)
-                    present(vc, animated: true)
+                    coordinator?.showWebView(url: url)
                 case .showDetailClip(let clip):
-                    let reactor = self.diContainer.makeClipDetailReactor(clip: clip)
-                    let vc = ClipDetailViewController(
-                        reactor: reactor,
-                        diContainer: self.diContainer
-                    )
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showDetailClip(clip: clip)
                 case .showEditClip(let clip):
-                    let reactor = diContainer.makeEditClipReactor(clip: clip)
-                    let vc = EditClipViewController(
-                        reactor: reactor,
-                        diContainer: diContainer
-                    )
-                    navigationController?.pushViewController(vc, animated: true)
+                    coordinator?.showEditClip(clip: clip)
                 }
             }
             .disposed(by: disposeBag)
