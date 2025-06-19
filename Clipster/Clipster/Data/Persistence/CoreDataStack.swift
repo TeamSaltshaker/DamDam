@@ -18,6 +18,8 @@ final class CoreDataStack {
             forSecurityApplicationGroupIdentifier: appGroupID,
         ) {
             let storeURL = appGroupURL.appendingPathComponent("Clipster.sqlite")
+            print("\(Self.self): Store URL: \(storeURL)")
+
             let description = NSPersistentStoreDescription(url: storeURL)
             container.persistentStoreDescriptions = [description]
         } else {
