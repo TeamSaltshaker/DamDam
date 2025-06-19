@@ -7,10 +7,10 @@ final class HomeViewController: UIViewController, View {
 
     var disposeBag = DisposeBag()
     private let homeView = HomeView()
-    private let diContainer: DIContainer
+    private weak var coordinator: HomeCoordinator?
 
-    init(reactor: Reactor, diContainer: DIContainer) {
-        self.diContainer = diContainer
+    init(reactor: Reactor, coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
