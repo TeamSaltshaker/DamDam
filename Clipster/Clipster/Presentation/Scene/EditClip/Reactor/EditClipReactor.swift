@@ -266,14 +266,14 @@ final class EditClipReactor: Reactor {
                 }
             case .validWithWarning:
                 newState.isURLValid = true
-                newState.urlValidationImageName = "AlertCircle"
+                newState.urlValidationImageName = "InfoYellow"
                 newState.urlValidationLabelText = "올바른 URL이지만, 미리보기를 불러 올 수 없습니다."
                 if !currentState.urlString.isEmpty {
                     newState.urlTextFieldBorderColor = .yellow600
                 }
             case .invalid:
                 newState.isURLValid = false
-                newState.urlValidationImageName = "XCircle"
+                newState.urlValidationImageName = "XCircleRed"
                 newState.urlValidationLabelText = "올바르지 않은 URL 입니다."
                 if !currentState.urlString.isEmpty {
                     newState.urlTextFieldBorderColor = .red600
