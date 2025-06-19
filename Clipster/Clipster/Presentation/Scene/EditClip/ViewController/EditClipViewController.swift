@@ -162,6 +162,20 @@ extension EditClipViewController: View {
 
         reactor.state
             .map(\.urlString)
+            .take(1)
+            .filter { !$0.isEmpty }
+            .flatMap { urlString in
+                Observable.of(
+                    .editingURLTextField,
+                    .editURLTextField(urlString),
+                    .validifyURL(urlString)
+                )
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlString)
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: "")
             .drive(editClipView.urlView.urlTextField.rx.text)
