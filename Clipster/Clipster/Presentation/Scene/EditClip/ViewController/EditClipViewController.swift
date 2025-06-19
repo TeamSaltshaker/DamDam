@@ -45,6 +45,7 @@ extension EditClipViewController: View {
             .rx
             .text
             .orEmpty
+            .skip(1)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { Reactor.Action.editURLTextField($0) }
             .bind(to: reactor.action)
@@ -135,6 +136,16 @@ extension EditClipViewController: View {
             .filter { $0 }
             .take(1)
             .map { _ in Reactor.Action.fetchTopLevelFolder }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.urlString)
+            .take(1)
+            .filter { !$0.isEmpty }
+            .flatMap { urlString in
+                Observable.of(.editingURLTextField, .editURLTextField(urlString))
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
