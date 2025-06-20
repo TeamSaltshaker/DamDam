@@ -57,8 +57,12 @@ private extension ClipDetailViewController {
     }
 
     func bindState(from reactor: Reactor) {
+        typealias Display = (clip: ClipDisplay, folder: FolderDisplay?)
+
         reactor.state
-            .map { (clip: $0.clipDisplay, folder: $0.folderDisplay) }
+            .map { state -> Display in
+                (clip: state.clipDisplay, folder: state.folderDisplay)
+            }
             .filter { $0.folder != nil }
             .take(1)
             .observe(on: MainScheduler.instance)
@@ -70,8 +74,12 @@ private extension ClipDetailViewController {
 
         reactor.state
             .skip(1)
-            .map { (clip: $0.clipDisplay, folder: $0.folderDisplay) }
-            .distinctUntilChanged { $0.clip == $1.clip }
+            .map { state -> Display in
+                (clip: state.clipDisplay, folder: state.folderDisplay)
+            }
+            .distinctUntilChanged { (lhs: Display, rhs: Display) in
+                lhs.clip == rhs.clip && lhs.folder == rhs.folder
+            }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] (clip, folder) in
                 guard let folder else { return }
