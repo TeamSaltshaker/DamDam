@@ -161,7 +161,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             let configuration = WKSnapshotConfiguration()
 
             if let rect = rect {
-                configuration.rect = rect // 캡처할 특정 영역 설정
+                configuration.rect = rect
             }
 
             webView.takeSnapshot(with: configuration) { image, error in
