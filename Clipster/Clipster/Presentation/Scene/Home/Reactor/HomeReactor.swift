@@ -57,20 +57,20 @@ final class HomeReactor: Reactor {
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let deleteClipUseCase: DeleteClipUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
-    private let updateClipUseCase: UpdateClipUseCase
+    private let visitClipUseCase: VisitClipUseCase
 
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         deleteClipUseCase: DeleteClipUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
-        updateClipUseCase: UpdateClipUseCase
+        visitClipUseCase: VisitClipUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.deleteClipUseCase = deleteClipUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
-        self.updateClipUseCase = updateClipUseCase
+        self.visitClipUseCase = visitClipUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -128,8 +128,7 @@ final class HomeReactor: Reactor {
 
                 switch section {
                 case .unvisitedClip(let clip):
-                    let updatedClip = updateClipAsVisited(clip)
-                    _ = await updateClipUseCase.execute(clip: updatedClip)
+                    _ = await visitClipUseCase.execute(clip: clip)
                     return .setRoute(.showWebView(clip.urlMetadata.url))
                 case .folder(let folder):
                     return .setRoute(.showFolder(folder))
@@ -190,21 +189,6 @@ final class HomeReactor: Reactor {
             newState.phase = phase
         }
         return newState
-    }
-}
-
-private extension HomeReactor {
-    func updateClipAsVisited(_ clip: Clip) -> Clip {
-        Clip(
-            id: clip.id,
-            folderID: clip.folderID,
-            urlMetadata: clip.urlMetadata,
-            memo: clip.memo,
-            lastVisitedAt: Date(),
-            createdAt: clip.createdAt,
-            updatedAt: Date(),
-            deletedAt: clip.deletedAt
-        )
     }
 }
 
