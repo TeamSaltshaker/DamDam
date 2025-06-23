@@ -46,7 +46,7 @@ final class EditClipReactor: Reactor {
         var urlString: String
         var memoText: String = ""
         var memoLimit: String = "0 / 100"
-        var urlValidationImageName: String?
+        var urlValidationImageResource: ImageResource?
         var urlValidationLabelText: String = ""
         var urlMetadataDisplay: URLMetadataDisplay?
         var urlTextFieldBorderColor: ColorResource = .black900
@@ -260,21 +260,21 @@ final class EditClipReactor: Reactor {
             switch type {
             case .valid:
                 newState.isURLValid = true
-                newState.urlValidationImageName = "CheckBlue"
+                newState.urlValidationImageResource = .checkBlue
                 newState.urlValidationLabelText = "올바른 URL 입니다."
                 if !currentState.urlString.isEmpty {
                     newState.urlTextFieldBorderColor = .blue600
                 }
             case .validWithWarning:
                 newState.isURLValid = true
-                newState.urlValidationImageName = "InfoYellow"
+                newState.urlValidationImageResource = .infoYellow
                 newState.urlValidationLabelText = "올바른 URL이지만, 미리보기를 불러 올 수 없습니다."
                 if !currentState.urlString.isEmpty {
                     newState.urlTextFieldBorderColor = .yellow600
                 }
             case .invalid:
                 newState.isURLValid = false
-                newState.urlValidationImageName = "XCircleRed"
+                newState.urlValidationImageResource = .xCircleRed
                 newState.urlValidationLabelText = "올바르지 않은 URL 입니다."
                 if !currentState.urlString.isEmpty {
                     newState.urlTextFieldBorderColor = .red600
@@ -283,6 +283,7 @@ final class EditClipReactor: Reactor {
             newState.isLoading = false
 
             if currentState.urlString.isEmpty {
+                newState.urlValidationImageResource = .none
                 newState.urlTextFieldBorderColor = .black900
             }
         case .updateURLMetadata(let urlMetaDisplay):
@@ -297,7 +298,7 @@ final class EditClipReactor: Reactor {
         case .updateIsLoading(let value):
             newState.isLoading = value
             newState.urlValidationLabelText = "URL 분석 중..."
-            newState.urlValidationImageName = nil
+            newState.urlValidationImageResource = .none
             newState.isHiddenURLValidationStackView = false
         }
         return newState
