@@ -13,6 +13,12 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
 
         if lowercased.hasPrefix("https://") || lowercased.hasPrefix("http://") {
             correctedURLString = urlString
+        } else if lowercased.hasPrefix("https:/") || lowercased.hasPrefix("http:/") {
+            correctedURLString = lowercased.replacingOccurrences(of: "https:/", with: "https://")
+                .replacingOccurrences(of: "http:/", with: "https://")
+        } else if lowercased.hasPrefix("https:")  || lowercased.hasPrefix("http:") {
+            correctedURLString =  lowercased.replacingOccurrences(of: "https:", with: "https://")
+                .replacingOccurrences(of: "http:", with: "http://")
         } else {
             correctedURLString = "https://\(urlString)"
         }
