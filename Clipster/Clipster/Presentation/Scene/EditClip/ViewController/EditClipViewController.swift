@@ -52,10 +52,11 @@ extension EditClipViewController: View {
 
         editClipView.urlView.urlTextField
             .rx
-            .text
-            .orEmpty
+            .controlEvent(.editingChanged)
+            .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
             .skip(1)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
             .map { Reactor.Action.validifyURL($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
