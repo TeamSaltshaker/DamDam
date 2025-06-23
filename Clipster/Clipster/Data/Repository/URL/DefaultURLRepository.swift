@@ -170,7 +170,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                     continuation.resume(returning: nil)
                 } else if let image = image {
                     print("\(Self.self) 스크린샷 캡처 성공.")
-                    continuation.resume(returning: image.pngData())
+                    continuation.resume(returning: image.jpegData(compressionQuality: 0.5))
                 } else {
                     print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
                     continuation.resume(returning: nil)
