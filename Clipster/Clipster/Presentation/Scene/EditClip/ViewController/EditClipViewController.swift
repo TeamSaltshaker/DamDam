@@ -32,6 +32,11 @@ final class EditClipViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
+
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        reactor?.action.onNext(.viewIsAppearing)
+    }
 }
 
 extension EditClipViewController: View {
@@ -140,8 +145,8 @@ extension EditClipViewController: View {
 
     private func bindState(from reactor: EditClipReactor) {
         reactor.state
-            .map { $0.type }
-            .filter { $0 == .create }
+            .map { ($0.type, $0.isShowKeyboard) }
+            .filter { $0 == .create && $1 }
             .take(1)
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] _ in
