@@ -14,7 +14,7 @@ final class HomeReactor: Reactor {
     }
 
     enum Mutation {
-        case setHomeDisplay(HomeDisplay)
+        case setHomeDisplay([Clip], [Folder])
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
@@ -75,22 +75,115 @@ final class HomeReactor: Reactor {
 
     func mutate(action: Action) -> Observable<Mutation> {
         print("\(Self.self): received action → \(action)")
+
         switch action {
         case .viewWillAppear:
-            return fetchHomeData()
+            return .concat(
+                .just(.setPhase(.loading)),
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+
+                    async let unvisitedClipsResult = fetchUnvisitedClipsUseCase.execute().get()
+                    async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
+                    let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
+
+                    return .setHomeDisplay(unvisitedClips, folders)
+                }
+                .catch { .just(.setPhase(.error($0.localizedDescription))) },
+                .just(.setPhase(.success))
+            )
+
         case .tapDelete(let indexPath):
-            return handleDelete(at: indexPath)
-        default:
-            let route = makeRoute(for: action)
-            return .just(.setRoute(route))
+            return .concat(
+                .just(.setPhase(.loading)),
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+                    guard let section = section(at: indexPath) else {
+                        return .setPhase(.error("항목을 찾을 수 없습니다."))
+                    }
+
+                    switch section {
+                    case .unvisitedClip(let clip):
+                        try await deleteClipUseCase.execute(clip).get()
+                    case .folder(let folder):
+                        try await deleteFolderUseCase.execute(folder).get()
+                    }
+
+                    async let unvisitedClipsResult = fetchUnvisitedClipsUseCase.execute().get()
+                    async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
+                    let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
+
+                    return .setHomeDisplay(unvisitedClips, folders)
+                }
+                .catch { .just(.setPhase(.error($0.localizedDescription))) },
+                .just(.setPhase(.success))
+            )
+
+        case .tapCell(let indexPath):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                guard let section = section(at: indexPath) else {
+                    return .setPhase(.error("항목을 찾을 수 없습니다."))
+                }
+
+                switch section {
+                case .unvisitedClip(let clip):
+                    let updatedClip = updateClipAsVisited(clip)
+                    _ = await updateClipUseCase.execute(clip: updatedClip)
+                    return .setRoute(.showWebView(clip.urlMetadata.url))
+                case .folder(let folder):
+                    return .setRoute(.showFolder(folder))
+                }
+            }
+            .catch { .just(.setPhase(.error($0.localizedDescription))) }
+
+        case .tapDetail(let indexPath):
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("항목을 찾을 수 없습니다.")))
+            }
+
+            switch section {
+            case .unvisitedClip(let clip):
+                return .just(.setRoute(.showDetailClip(clip)))
+            case .folder:
+                return .just(.setPhase(.error("폴더 상세보기는 지원하지 않습니다.")))
+            }
+
+        case .tapEdit(let indexPath):
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("항목을 찾을 수 없습니다.")))
+            }
+
+            switch section {
+            case .unvisitedClip(let clip):
+                return .just(.setRoute(.showEditClip(clip)))
+            case .folder(let folder):
+                return .just(.setRoute(.showEditFolder(folder)))
+            }
+
+        case .tapAddClip:
+            return .just(.setRoute(.showAddClip(folders.max { $0.updatedAt < $1.updatedAt })))
+
+        case .tapAddFolder:
+            return .just(.setRoute(.showAddFolder))
+
+        case .tapShowAllClips:
+            return .just(.setRoute(.showUnvisitedClipList(unvisitedClips)))
         }
     }
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setHomeDisplay(let display):
-            newState.homeDisplay = display
+        case .setHomeDisplay(let unvisitedClips, let folders):
+            self.unvisitedClips = unvisitedClips
+            self.folders = folders
+
+            let homeDisplay = HomeDisplay(
+                unvisitedClips: unvisitedClips.map { ClipDisplayMapper.map($0) },
+                folders: folders.map { FolderDisplayMapper.map($0) }
+            )
+            newState.homeDisplay = homeDisplay
         case .setRoute(let route):
             newState.route = route
         case .setPhase(let phase):
@@ -101,90 +194,8 @@ final class HomeReactor: Reactor {
 }
 
 private extension HomeReactor {
-    func fetchHomeData() -> Observable<Mutation> {
-        Observable.concat([
-            .just(.setPhase(.loading)),
-            asyncMutate { try await self.makeHomeDisplayMutation() }
-        ])
-    }
-
-    func makeHomeDisplayMutation() async throws -> Mutation {
-        async let clips = self.makeClipDisplays()
-        async let folders = self.makeFolderDisplays()
-        let display = try await HomeDisplay(unvisitedClips: clips, folders: folders)
-        return .setHomeDisplay(display)
-    }
-
-    func makeClipDisplays() async throws -> [ClipDisplay] {
-        let clips = try await fetchUnvisitedClipsUseCase.execute().get()
-        self.unvisitedClips = clips
-        return clips.map(ClipDisplayMapper.map)
-    }
-
-    func makeFolderDisplays() async throws -> [FolderDisplay] {
-        let folders = try await fetchTopLevelFoldersUseCase.execute().get()
-        self.folders = folders
-        return folders.map(FolderDisplayMapper.map)
-    }
-
-    func handleDelete(at indexPath: IndexPath) -> Observable<Mutation> {
-        Observable.concat([
-            .just(.setPhase(.loading)),
-            asyncMutate {
-                guard let section = self.section(at: indexPath) else {
-                    return .setPhase(.error("삭제할 항목을 찾을 수 없습니다."))
-                }
-
-                switch section {
-                case .unvisitedClip(let clip):
-                    try await self.deleteClipUseCase.execute(clip).get()
-                case .folder(let folder):
-                    try await self.deleteFolderUseCase.execute(folder).get()
-                }
-
-                return try await self.makeHomeDisplayMutation()
-            }
-        ])
-    }
-
-    func makeRoute(for action: Action) -> State.Route? {
-        switch action {
-        case .tapCell(let indexPath):
-            guard let section = section(at: indexPath) else { return nil }
-
-            switch section {
-            case .unvisitedClip(let clip):
-                Task { await updateClipAsVisited(clip) }
-                return .showWebView(clip.urlMetadata.url)
-            case .folder(let folder):
-                return .showFolder(folder)
-            }
-        case .tapDetail(let indexPath):
-            guard case let .unvisitedClip(clip)? = section(at: indexPath) else { return nil }
-            return .showDetailClip(clip)
-        case .tapEdit(let indexPath):
-            guard let section = section(at: indexPath) else { return nil }
-
-            switch section {
-            case .unvisitedClip(let clip):
-                return .showEditClip(clip)
-            case .folder(let folder):
-                return .showEditFolder(folder)
-            }
-        case .tapAddClip:
-            let latestFolder = folders.max { $0.updatedAt < $1.updatedAt }
-            return .showAddClip(latestFolder)
-        case .tapAddFolder:
-            return .showAddFolder
-        case .tapShowAllClips:
-            return .showUnvisitedClipList(unvisitedClips)
-        default:
-            return nil
-        }
-    }
-
-    func updateClipAsVisited(_ clip: Clip) async {
-        let visited = Clip(
+    func updateClipAsVisited(_ clip: Clip) -> Clip {
+        Clip(
             id: clip.id,
             folderID: clip.folderID,
             urlMetadata: clip.urlMetadata,
@@ -194,27 +205,10 @@ private extension HomeReactor {
             updatedAt: Date(),
             deletedAt: clip.deletedAt
         )
-        _ = await updateClipUseCase.execute(clip: visited)
     }
 }
 
 private extension HomeReactor {
-    func asyncMutate(_ task: @escaping () async throws -> Mutation) -> Observable<Mutation> {
-        Observable.create { observer in
-            Task {
-                do {
-                    let mutation = try await task()
-                    observer.onNext(mutation)
-                    observer.onNext(.setPhase(.success))
-                } catch {
-                    observer.onNext(.setPhase(.error(error.localizedDescription)))
-                }
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        }
-    }
-
     func section(at indexPath: IndexPath) -> SectionType? {
         switch indexPath.section {
         case 0:
