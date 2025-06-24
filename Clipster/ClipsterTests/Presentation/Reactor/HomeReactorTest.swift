@@ -5,6 +5,8 @@ import RxSwift
 final class HomeReactorTests: XCTestCase {
     private var disposeBag: DisposeBag!
 
+    private var fetchUnvisitedClipsUseCase: MockFetchUnvisitedClipsUseCase!
+    private var fetchTopLevelFoldersUseCase: MockFetchTopLevelFoldersUseCase!
     private var deleteClipUseCase: MockDeleteClipUseCase!
     private var deleteFolderUseCase: MockDeleteFolderUseCase!
     private var visitClipUseCase: MockVisitClipUseCase!
@@ -16,12 +18,14 @@ final class HomeReactorTests: XCTestCase {
 
     override func setUpWithError() throws {
         disposeBag = DisposeBag()
+        fetchUnvisitedClipsUseCase = MockFetchUnvisitedClipsUseCase()
+        fetchTopLevelFoldersUseCase = MockFetchTopLevelFoldersUseCase()
         deleteClipUseCase = MockDeleteClipUseCase()
         deleteFolderUseCase = MockDeleteFolderUseCase()
         visitClipUseCase = MockVisitClipUseCase()
         reactor = HomeReactor(
-            fetchUnvisitedClipsUseCase: MockFetchUnvisitedClipsUseCase(),
-            fetchTopLevelFoldersUseCase: MockFetchTopLevelFoldersUseCase(),
+            fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
+            fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
             deleteClipUseCase: deleteClipUseCase,
             deleteFolderUseCase: deleteFolderUseCase,
             visitClipUseCase: visitClipUseCase
@@ -51,7 +55,7 @@ final class HomeReactorTests: XCTestCase {
         waitUntilHomeDataLoaded()
 
         // then
-        assertPhaseStartAndEnd(phaseHistory)
+        assertPhaseForSuccessCase(phaseHistory)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.unvisitedClips.count,
             MockClip.unvisitedClips.count
@@ -60,6 +64,26 @@ final class HomeReactorTests: XCTestCase {
             reactor.currentState.homeDisplay?.folders.count,
             MockFolder.rootFolders.count
         )
+    }
+
+    func test_홈_화면_나타날_때_홈_데이터_로드_실패() {
+        // given
+        var phaseHistory: [HomeReactor.State.Phase] = []
+        fetchUnvisitedClipsUseCase.shouldSucceed = false
+        fetchTopLevelFoldersUseCase.shouldSucceed = false
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe(onNext: { phase in
+                phaseHistory.append(phase)
+            })
+            .disposed(by: disposeBag)
+
+        // when
+        waitUntilHomeDataLoaded()
+
+        // then
+        assertPhaseForFailureCase(phaseHistory)
     }
 
     func test_클립_추가_탭_시_클립_추가_화면으로_이동() {
@@ -117,6 +141,37 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertTrue(visitClipUseCase.didCallExecute, "클립 방문 처리 유스케이스가 호출되어야 합니다.")
     }
 
+    func test_클립_셀_탭_시_방문_처리_실패시_phase_변경됨() {
+        // given
+        waitUntilHomeDataLoaded()
+        visitClipUseCase.shouldSucceed = false
+
+        var phaseHistory: [HomeReactor.State.Phase] = []
+        let expectation = expectation(description: "에러 phase 방출 대기")
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe(onNext: { phase in
+                print(phase)
+                phaseHistory.append(phase)
+                if case .error = phase {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(clipIndexPath))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseHistory.count, 1, "오직 하나의 phase만 방출되어야 합니다.")
+        XCTAssertTrue(
+            phaseHistory.first.map { if case .error = $0 { true } else { false } } ?? false,
+            "방출된 phase는 .error 여야 합니다."
+        )
+    }
+
     func test_클립_상세_탭_시_클립_상세_화면으로_이동() {
         // given
         waitUntilHomeDataLoaded()
@@ -149,7 +204,7 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertEqual(clip.id, MockClip.unvisitedClips[0].id)
     }
 
-    func test_클립_삭제_성공시_phase_변경되고_유스케이스_호출됨() {
+    func test_클립_삭제_성공시_홈_데이터_갱신됨() {
         // given
         waitUntilHomeDataLoaded()
 
@@ -172,12 +227,38 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseStartAndEnd(phaseHistory)
+        assertPhaseForSuccessCase(phaseHistory)
         XCTAssertTrue(deleteClipUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
             MockFolder.rootFolders.count
         )
+    }
+
+    func test_클립_삭제_실패시_에러_상태_표시됨() {
+        // given
+        waitUntilHomeDataLoaded()
+        deleteClipUseCase.shouldSucceed = false
+
+        var phaseHistory: [HomeReactor.State.Phase] = []
+        let expectation = expectation(description: "에러 phase 방출 대기")
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe(onNext: { phase in
+                phaseHistory.append(phase)
+                if case .error = phase {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapDelete(clipIndexPath))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        assertPhaseForFailureCase(phaseHistory)
     }
 
     func test_폴더_셀_탭_시_폴더_화면으로_이동() {
@@ -225,7 +306,7 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertEqual(folder.id, MockFolder.rootFolders[0].id)
     }
 
-    func test_폴더_삭제_성공시_phase_변경되고_유스케이스_호출됨() {
+    func test_폴더_삭제_성공시_홈_데이터_갱신됨() {
         // given
         waitUntilHomeDataLoaded()
 
@@ -248,12 +329,38 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseStartAndEnd(phaseHistory)
+        assertPhaseForSuccessCase(phaseHistory)
         XCTAssertTrue(deleteFolderUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
             MockFolder.rootFolders.count
         )
+    }
+
+    func test_폴더_삭제_실패시_에러_상태_표시됨() {
+        // given
+        waitUntilHomeDataLoaded()
+        deleteFolderUseCase.shouldSucceed = false
+
+        var phaseHistory: [HomeReactor.State.Phase] = []
+        let expectation = expectation(description: "에러 phase 방출 대기")
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe(onNext: { phase in
+                phaseHistory.append(phase)
+                if case .error = phase {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapDelete(folderIndexPath))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        assertPhaseForFailureCase(phaseHistory)
     }
 
     func test_모든_클립_보기를_누르면_클립_리스트로_이동() {
@@ -285,11 +392,28 @@ private extension HomeReactorTests {
         wait(for: [expectation], timeout: 1.0)
     }
 
-    func assertPhaseStartAndEnd(_ history: [HomeReactor.State.Phase]) {
+    func assertPhaseForSuccessCase(_ history: [HomeReactor.State.Phase]) {
         XCTAssertTrue(
             history.first.map { if case .loading = $0 { true } else { false } } ?? false,
             "첫 번째 phase는 .loading이어야 합니다."
         )
+        XCTAssertTrue(
+            history.last.map { if case .success = $0 { true } else { false } } ?? false,
+            "마지막 phase는 .success이어야 합니다."
+        )
+    }
+
+    func assertPhaseForFailureCase(_ history: [HomeReactor.State.Phase]) {
+        XCTAssertTrue(
+            history.first.map { if case .loading = $0 { true } else { false } } ?? false,
+            "첫 번째 phase는 .loading이어야 합니다."
+        )
+
+        XCTAssertTrue(
+            history.dropFirst().first.map { if case .error = $0 { true } else { false } } ?? false,
+            "두 번째 phase는 .error이어야 합니다."
+        )
+
         XCTAssertTrue(
             history.last.map { if case .success = $0 { true } else { false } } ?? false,
             "마지막 phase는 .success이어야 합니다."
