@@ -427,6 +427,8 @@
 		};
 		44DFD9C92DE9D0E200B6CD87 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDebug;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -467,6 +469,8 @@
 		};
 		44DFD9CA2DE9D0E200B6CD87 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -507,6 +511,8 @@
 		};
 		44DFD9CB2DE9D0E200B6CD87 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -571,6 +577,8 @@
 		};
 		44DFD9CC2DE9D0E200B6CD87 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -628,6 +636,8 @@
 		};
 		9F781F1B2DF6CEFC00D7BEC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtensionDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -664,6 +674,8 @@
 		};
 		9F781F1C2DF6CEFC00D7BEC6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtensionRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
