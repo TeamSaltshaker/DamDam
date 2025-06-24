@@ -25,7 +25,7 @@ final class EditClipReactor: Reactor {
         case fetchFolder
         case fetchTopLevelFolder
         case disappearFolderSelectorView
-        case viewIsAppearing
+        case viewDidAppear
     }
 
     enum Mutation {
@@ -245,7 +245,7 @@ final class EditClipReactor: Reactor {
             .catchAndReturn(.updateCurrentFolder(nil))
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
-        case .viewIsAppearing:
+        case .viewDidAppear:
             return .just(.updateIsShowKeyboard(true))
         }
     }

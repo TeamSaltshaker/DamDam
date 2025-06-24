@@ -3,7 +3,7 @@ import ReactorKit
 
 final class EditFolderReactor: Reactor {
     enum Action {
-        case viewIsAppearing
+        case viewDidAppear
         case folderTitleChanged(String)
         case saveButtonTapped
         case clearButtonTapped
@@ -142,7 +142,7 @@ final class EditFolderReactor: Reactor {
             return .just(.setRoute(.showFolderSelector))
         case .folderSelectorDismissed:
             return .just(.setRoute(nil))
-        case .viewIsAppearing:
+        case .viewDidAppear:
             return .just(.updateIsShowKeyboard(true))
         }
     }

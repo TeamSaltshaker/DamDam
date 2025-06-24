@@ -33,9 +33,9 @@ final class EditClipViewController: UIViewController {
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        reactor?.action.onNext(.viewIsAppearing)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        reactor?.action.onNext(.viewDidAppear)
     }
 }
 
