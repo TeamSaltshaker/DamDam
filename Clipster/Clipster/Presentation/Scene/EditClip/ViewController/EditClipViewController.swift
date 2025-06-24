@@ -43,8 +43,9 @@ extension EditClipViewController: View {
     private func bindUI(to reactor: EditClipReactor) {
         editClipView.urlView.urlTextField
             .rx
-            .text
-            .orEmpty
+            .controlEvent(.editingChanged)
+            .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
+            .distinctUntilChanged()
             .skip(1)
             .map { Reactor.Action.editURLTextField($0) }
             .bind(to: reactor.action)
@@ -52,8 +53,8 @@ extension EditClipViewController: View {
 
         editClipView.urlView.urlTextField
             .rx
-            .text
-            .orEmpty
+            .controlEvent(.editingChanged)
+            .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
             .skip(1)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { Reactor.Action.validifyURL($0) }
@@ -62,8 +63,8 @@ extension EditClipViewController: View {
 
         editClipView.urlView.urlTextField
             .rx
-            .text
-            .orEmpty
+            .controlEvent(.editingChanged)
+            .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
             .distinctUntilChanged()
             .skip(1)
             .map { _ in Reactor.Action.editingURLTextField }

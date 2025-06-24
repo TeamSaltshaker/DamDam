@@ -119,10 +119,9 @@ final class EditClipReactor: Reactor {
             return .just(.updateURLString(trimmed))
         case .validifyURL(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            let parsedURL = Observable<Mutation>.fromAsync { [weak self] in
+            return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
                 let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
-
                 let clipValidType: ClipValidType
                 switch (metadata, isValidURL) {
                 case (.some, true):
@@ -132,10 +131,9 @@ final class EditClipReactor: Reactor {
                 case (_, false):
                     clipValidType = .invalid
                 }
-
-                return Observable.merge(
+                return .merge(
                     .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata))),
-                    .just(Mutation.updateIsValidURL(clipValidType)),
+                    .just(Mutation.updateIsValidURL(clipValidType))
                 )
             }
             .flatMap { $0 }
@@ -158,7 +156,6 @@ final class EditClipReactor: Reactor {
                 }
                 return .empty()
             }
-            return parsedURL
         case .editingURLTextField:
             return .just(.updateIsLoading(true))
         case .editMemo(let text):
