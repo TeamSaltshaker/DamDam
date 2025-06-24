@@ -43,11 +43,6 @@ final class EditFolderViewController: UIViewController, View {
         reactor?.action.onNext(.viewIsAppearing)
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        reactor?.action.onNext(.viewWillDisappear)
-    }
-
     func bind(reactor: Reactor) {
         bindAction(to: reactor)
         bindState(from: reactor)
@@ -127,15 +122,6 @@ private extension EditFolderViewController {
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.editFolderView.folderTitleTextField.becomeFirstResponder()
-            }
-            .disposed(by: disposeBag)
-
-        reactor.state
-            .filter { !$0.isShowKeyboard }
-            .skip(1)
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.editFolderView.folderTitleTextField.resignFirstResponder()
             }
             .disposed(by: disposeBag)
 
