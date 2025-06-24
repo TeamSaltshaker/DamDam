@@ -12,7 +12,7 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    private let scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView
@@ -102,8 +102,7 @@ private extension EditClipView {
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()
-//            make.bottom.equalToSuperview()
-            make.bottom.equalTo(keyboardLayoutGuide.snp.top)
+            make.bottom.equalToSuperview()
         }
 
         scrollContainerView.snp.makeConstraints { make in
