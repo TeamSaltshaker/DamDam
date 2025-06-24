@@ -102,7 +102,8 @@ private extension EditClipView {
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
+//            make.bottom.equalToSuperview()
+            make.bottom.equalTo(keyboardLayoutGuide.snp.top)
         }
 
         scrollContainerView.snp.makeConstraints { make in
