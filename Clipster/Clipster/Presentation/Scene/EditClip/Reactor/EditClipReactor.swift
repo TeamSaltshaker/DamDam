@@ -15,6 +15,7 @@ final class EditClipReactor: Reactor {
     }
 
     enum Action {
+        case viewDidAppear
         case editURLTextField(String)
         case validifyURL(String)
         case editingURLTextField
@@ -25,7 +26,6 @@ final class EditClipReactor: Reactor {
         case fetchFolder
         case fetchTopLevelFolder
         case disappearFolderSelectorView
-        case viewDidAppear
     }
 
     enum Mutation {
