@@ -58,6 +58,10 @@ final class DIContainer {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeSearchClipsUseCase() -> SearchClipsUseCase {
+        DefaultSearchClipsUseCase()
+    }
+
     func makeCanSaveFolderUseCase() -> CanSaveFolderUseCase {
         DefaultCanSaveFolderUseCase()
     }
@@ -92,6 +96,10 @@ final class DIContainer {
 
     func makeSanitizeFolderTitleUseCase() -> SanitizeFolderTitleUseCase {
         DefaultSanitizeFolderTitleUseCase()
+    }
+
+    func makeSearchFoldersUseCase() -> SearchFoldersUseCase {
+        DefaultSearchFoldersUseCase()
     }
 
     func makeUpdateFolderUseCase() -> UpdateFolderUseCase {
