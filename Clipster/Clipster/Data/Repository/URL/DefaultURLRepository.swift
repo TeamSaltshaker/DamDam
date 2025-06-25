@@ -9,10 +9,10 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
     func fetchHTML(from url: URL) async -> Result<String, URLValidationError> {
         await withCheckedContinuation { continuation in
+            self.cleanupWebView()
+
             self.continuation = continuation
             self.originalURL = url
-
-            self.cleanupWebView()
 
             let config = WKWebViewConfiguration()
             let webViewFrame = CGRect(x: 0, y: 0, width: 375, height: 812)
