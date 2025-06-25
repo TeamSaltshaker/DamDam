@@ -14,28 +14,6 @@ final class FindFolderPathUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    private func makeFolder(
-        id: String,
-        parentID: String? = nil,
-        title: String,
-        depth: Int,
-        folders: [Folder] = [],
-        clips: [Clip] = []
-    ) -> Folder {
-        let now = Date()
-        return Folder(
-            id: UUID(uuidString: id)!,
-            parentFolderID: parentID.flatMap(UUID.init(uuidString:)),
-            title: title,
-            depth: depth,
-            folders: folders,
-            clips: clips,
-            createdAt: now,
-            updatedAt: now,
-            deletedAt: nil
-        )
-    }
-
     func test_타겟_폴더가_폴더_트리에_존재하면_정확한_경로_반환() {
         let subSub = makeFolder(id: "00000000-0000-0000-0000-000000000003", parentID: "00000000-0000-0000-0000-000000000002", title: "SubSub", depth: 2)
         let sub = makeFolder(id: "00000000-0000-0000-0000-000000000002", parentID: "00000000-0000-0000-0000-000000000001", title: "Sub", depth: 1, folders: [subSub])
@@ -69,5 +47,29 @@ final class FindFolderPathUseCaseTests: XCTestCase {
         let result = useCase.execute(to: target, in: [])
 
         XCTAssertNil(result)
+    }
+}
+
+private extension FindFolderPathUseCaseTests {
+    func makeFolder(
+        id: String,
+        parentID: String? = nil,
+        title: String,
+        depth: Int,
+        folders: [Folder] = [],
+        clips: [Clip] = []
+    ) -> Folder {
+        let now = Date()
+        return Folder(
+            id: UUID(uuidString: id)!,
+            parentFolderID: parentID.flatMap(UUID.init(uuidString:)),
+            title: title,
+            depth: depth,
+            folders: folders,
+            clips: clips,
+            createdAt: now,
+            updatedAt: now,
+            deletedAt: nil
+        )
     }
 }
