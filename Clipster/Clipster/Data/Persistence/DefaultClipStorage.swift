@@ -87,12 +87,12 @@ final class DefaultClipStorage: ClipStorage {
                 }
 
                 let urlMetadataEntity = URLMetadataEntity(context: context)
-                urlMetadataEntity.urlString = clip.urlMetadata.url.absoluteString
-                urlMetadataEntity.title = clip.urlMetadata.title
-                urlMetadataEntity.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
-                urlMetadataEntity.screenshotData = clip.urlMetadata.screenshotData
-                urlMetadataEntity.createdAt = clip.urlMetadata.createdAt
-                urlMetadataEntity.updatedAt = clip.urlMetadata.updatedAt
+                urlMetadataEntity.urlString = clip.url.absoluteString
+                urlMetadataEntity.title = clip.title
+                urlMetadataEntity.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
+                urlMetadataEntity.screenshotData = clip.screenshotData
+                urlMetadataEntity.createdAt = clip.createdAt
+                urlMetadataEntity.updatedAt = clip.updatedAt
 
                 urlMetadataEntity.clip = entity
                 entity.urlMetadata = urlMetadataEntity
@@ -143,11 +143,11 @@ final class DefaultClipStorage: ClipStorage {
                         entity.folder = folderEntity
                     }
 
-                    entity.urlMetadata?.urlString = clip.urlMetadata.url.absoluteString
-                    entity.urlMetadata?.title = clip.urlMetadata.title
-                    entity.urlMetadata?.thumbnailImageURLString = clip.urlMetadata.thumbnailImageURL?.absoluteString
-                    entity.urlMetadata?.screenshotData = clip.urlMetadata.screenshotData
-                    entity.urlMetadata?.updatedAt = clip.urlMetadata.updatedAt
+                    entity.urlMetadata?.urlString = clip.url.absoluteString
+                    entity.urlMetadata?.title = clip.title
+                    entity.urlMetadata?.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
+                    entity.urlMetadata?.screenshotData = clip.screenshotData
+                    entity.urlMetadata?.updatedAt = clip.updatedAt
 
                     try context.save()
                     print("\(Self.self): ✅ Update successfully")
@@ -175,7 +175,7 @@ final class DefaultClipStorage: ClipStorage {
                     }
 
                     entity.deletedAt = clip.deletedAt
-                    entity.urlMetadata?.deletedAt = clip.urlMetadata.deletedAt
+                    entity.urlMetadata?.deletedAt = clip.deletedAt
 
                     try context.save()
                     print("\(Self.self): ✅ Delete successfully")

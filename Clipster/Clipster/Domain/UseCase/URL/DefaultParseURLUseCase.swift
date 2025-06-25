@@ -7,7 +7,7 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         self.urlRepository = urlMetaRepository
     }
 
-    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), URLValidationError> {
+    func execute(urlString: String) async -> Result<(URLMetadata?, Bool), URLValidationError> {
         let lowercased = urlString.lowercased()
         let correctedURLString: String
 

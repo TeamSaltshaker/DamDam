@@ -2,12 +2,12 @@ import Foundation
 import WebKit
 
 final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository {
-    private var continuation: CheckedContinuation<Result<(ParsedURLMetadata?, Bool), URLValidationError>, Never>?
+    private var continuation: CheckedContinuation<Result<(URLMetadata?, Bool), URLValidationError>, Never>?
     private var webView: WKWebView?
     private var originalURL: URL?
     private var timeoutTimer: Timer?
 
-    func execute(url: URL) async -> Result<(ParsedURLMetadata?, Bool), URLValidationError> {
+    func execute(url: URL) async -> Result<(URLMetadata?, Bool), URLValidationError> {
         let finalURL = await resolveRedirectURL(initialURL: url)
 
         return await withCheckedContinuation { continuation in
@@ -48,7 +48,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
         return initialURL
     }
 
-    private func complete(with result: Result<(ParsedURLMetadata?, Bool), URLValidationError>) {
+    private func complete(with result: Result<(URLMetadata?, Bool), URLValidationError>) {
         guard let currentContinuation = continuation else { return }
         currentContinuation.resume(returning: result)
         cleanupWebView()
@@ -111,7 +111,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                 let topPortionRect = CGRect(x: 0, y: 0, width: webView.bounds.width, height: 400)
                 let screenshotData = await self.captureScreenshot(rect: topPortionRect)
 
-                let metadataDTOWithScreenshot = ParsedURLMetadataDTO(
+                let metadataDTOWithScreenshot = URLMetadataDTO(
                     url: parsedDTO.url,
                     title: parsedDTO.title,
                     thumbnailImageURL: parsedDTO.thumbnailImageURL,
@@ -131,7 +131,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
         complete(with: .failure(.unsupportedURL))
     }
 
-    private func parseHTML(url: URL, html: String) -> ParsedURLMetadataDTO {
+    private func parseHTML(url: URL, html: String) -> URLMetadataDTO {
         let ogTitle = extractMetaContent(html: html, property: "og:title")
         let title = ogTitle ?? extractTitleTagContent(html: html) ?? "제목 없음"
 
@@ -143,7 +143,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             }
         }
 
-        return ParsedURLMetadataDTO(
+        return URLMetadataDTO(
             url: url,
             title: title.isEmpty ? url.absoluteString : title,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),

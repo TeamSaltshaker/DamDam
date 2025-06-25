@@ -122,7 +122,7 @@ private extension UnvisitedClipListReactor {
         case .tapCell(let index):
             guard clips.indices.contains(index) else { return nil }
             Task { await updateClipAsVisited(clips[index]) }
-            return .showWebView(clips[index].urlMetadata.url)
+            return .showWebView(clips[index].url)
         case .tapDetail(let index):
             guard clips.indices.contains(index) else { return nil }
             return .showDetailClip(clips[index])
@@ -138,12 +138,15 @@ private extension UnvisitedClipListReactor {
         let visited = Clip(
             id: clip.id,
             folderID: clip.folderID,
-            urlMetadata: clip.urlMetadata,
+            url: clip.url,
+            title: clip.title,
             memo: clip.memo,
-            lastVisitedAt: Date(),
+            thumbnailImageURL: clip.thumbnailImageURL,
+            screenshotData: clip.screenshotData,
             createdAt: clip.createdAt,
-            updatedAt: Date(),
-            deletedAt: clip.deletedAt
+            lastVisitedAt: Date.now,
+            updatedAt: Date.now,
+            deletedAt: clip.deletedAt,
         )
         _ = await updateClipUseCase.execute(clip: visited)
     }

@@ -87,7 +87,7 @@ final class FolderReactor: Reactor {
                 let folder = folder.folders[indexPath.item]
                 return .just(.setRoute(.folderView(folder)))
             case 1:
-                let url = folder.clips[indexPath.item].urlMetadata.url
+                let url = folder.clips[indexPath.item].url
                 return .concat(
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
@@ -95,10 +95,13 @@ final class FolderReactor: Reactor {
                         let updatedClip = Clip(
                             id: clip.id,
                             folderID: clip.folderID,
-                            urlMetadata: clip.urlMetadata,
+                            url: clip.url,
+                            title: clip.title,
                             memo: clip.memo,
-                            lastVisitedAt: Date.now,
+                            thumbnailImageURL: clip.thumbnailImageURL,
+                            screenshotData: clip.screenshotData,
                             createdAt: clip.createdAt,
+                            lastVisitedAt: Date.now,
                             updatedAt: Date.now,
                             deletedAt: clip.deletedAt,
                         )
