@@ -303,7 +303,7 @@ final class EditClipReactor: Reactor {
 }
 
 private extension EditClipReactor {
-    func toURLMetaDisplay(entity: ParsedURLMetadata?) -> URLMetadataDisplay? {
+    func toURLMetaDisplay(entity: URLMetadata?) -> URLMetadataDisplay? {
         entity.map {
             URLMetadataDisplay(
                 url: $0.url,

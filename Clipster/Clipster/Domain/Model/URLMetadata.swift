@@ -1,6 +1,6 @@
 import Foundation
 
-struct ParsedURLMetadata {
+struct URLMetadata {
     var url: URL
     var title: String
     var thumbnailImageURL: URL?
