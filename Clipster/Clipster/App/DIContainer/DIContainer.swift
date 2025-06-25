@@ -3,9 +3,15 @@ import Foundation
 
 final class DIContainer {
     private let container: NSPersistentContainer
+    private let supabaseService: SupabaseService
 
-    init(container: NSPersistentContainer? = nil) {
+    init(
+        container: NSPersistentContainer? = nil,
+        supabaseURL: URL,
+        supabaseKey: String,
+    ) {
         self.container = container ?? CoreDataStack.shared.container
+        supabaseService = SupabaseService(url: supabaseURL, key: supabaseKey)
     }
 
     func makeClipStorage() -> ClipStorage {
