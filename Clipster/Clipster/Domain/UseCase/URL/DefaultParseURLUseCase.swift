@@ -56,9 +56,12 @@ private extension DefaultParseURLUseCase {
         return .success(url)
     }
 
-    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> URLMetadata {
-        let ogTitle = extractMetaContent(html: html, property: "og:title")
-        let title = ogTitle ?? extractTitleTagContent(html: html) ?? "제목 없음"
+    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> ParsedURLMetadata {
+        let ogTitle = extractOGContent(html: html, property: "og:title")
+        let title = ogTitle ?? extractHTMLTagContent(html: html, property: "title") ?? "제목 없음"
+
+        let ogDescription = extractOGContent(html: html, property: "og:description")
+        let description = ogDescription ?? extractHTMLTagContent(html: html, property: "description")
 
         var thumbnailImageURL: String?
 
@@ -76,7 +79,7 @@ private extension DefaultParseURLUseCase {
         )
     }
 
-    func extractMetaContent(html: String, property: String) -> String? {
+    func extractOGContent(html: String, property: String) -> String? {
         let pattern = "<meta[^>]*?(?:property|name)=[\"']\(NSRegularExpression.escapedPattern(for: property))[\"'][^>]*?content=[\"']([^\"']*)[\"'][^>]*?>"
 
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
@@ -95,21 +98,6 @@ private extension DefaultParseURLUseCase {
 
     func extractHTMLTagContent(html: String, property: String) -> String? {
         let pattern = "<\(property)[^>]*>([^<]*)</\(property)>"
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return nil
-        }
-
-        let range = NSRange(html.startIndex..., in: html)
-        guard let match = regex.firstMatch(in: html, options: [], range: range),
-              match.numberOfRanges > 1,
-              let contentRange = Range(match.range(at: 1), in: html) else {
-            return nil
-        }
-        return String(html[contentRange]).trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func extractTitleTagContent(html: String) -> String? {
-        let pattern = "<title[^>]*>([^<]*)</title>"
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
             return nil
         }
