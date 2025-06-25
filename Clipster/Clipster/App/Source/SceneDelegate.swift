@@ -27,18 +27,26 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
-        let diContainer = DIContainer()
 
-        appCoordinator = AppCoordinator(
-            navigationController: navigationController,
-            diContainer: diContainer
-        )
+        let supabaseURLString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String ?? ""
+        let supabaseKey = Bundle.main.infoDictionary?["SUPABASE_KEY"] as? String ?? ""
 
-        window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
+        if let supabaseURL = URL(string: supabaseURLString) {
+            let diContainer = DIContainer(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
 
-        appCoordinator?.start()
+            appCoordinator = AppCoordinator(
+                navigationController: navigationController,
+                diContainer: diContainer
+            )
+
+            window = UIWindow(windowScene: windowScene)
+            window?.rootViewController = navigationController
+            window?.makeKeyAndVisible()
+
+            appCoordinator?.start()
+        } else {
+            print("\(Self.self): ❌ Invalid Supabase URL")
+        }
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {

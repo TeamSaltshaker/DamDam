@@ -119,6 +119,8 @@ iOSInjectionProject/
 
 ### Xcode ###
 
+*.xcconfig
+
 ## Xcode 8 and earlier
 
 ### Xcode Patch ###

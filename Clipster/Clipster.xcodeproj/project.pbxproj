@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		442D5AB02DFFB069002E4E68 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 442D5AAF2DFFB069002E4E68 /* ReactorKit */; };
+		443905122E0A78800092F53C /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 443905112E0A78800092F53C /* Auth */; };
+		443905142E0A78800092F53C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 443905132E0A78800092F53C /* Storage */; };
+		443905162E0A78800092F53C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 443905152E0A78800092F53C /* Supabase */; };
 		4468B8B72DEC961600AD2F57 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 4468B8B62DEC961600AD2F57 /* .swiftlint.yml */; };
 		44DFD9CF2DE9D36400B6CD87 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9CE2DE9D36400B6CD87 /* RxCocoa */; };
 		44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D02DE9D36400B6CD87 /* RxRelay */; };
@@ -111,6 +114,9 @@
 				44DFD9DC2DE9D39300B6CD87 /* Kingfisher in Frameworks */,
 				44DFD9D32DE9D36400B6CD87 /* RxSwift in Frameworks */,
 				44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */,
+				443905122E0A78800092F53C /* Auth in Frameworks */,
+				443905142E0A78800092F53C /* Storage in Frameworks */,
+				443905162E0A78800092F53C /* Supabase in Frameworks */,
 				44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */,
 				442D5AB02DFFB069002E4E68 /* ReactorKit in Frameworks */,
 				44DFD9CF2DE9D36400B6CD87 /* RxCocoa in Frameworks */,
@@ -200,6 +206,9 @@
 				44DFD9D52DE9D37000B6CD87 /* SnapKit */,
 				44DFD9DB2DE9D39300B6CD87 /* Kingfisher */,
 				442D5AAF2DFFB069002E4E68 /* ReactorKit */,
+				443905112E0A78800092F53C /* Auth */,
+				443905132E0A78800092F53C /* Storage */,
+				443905152E0A78800092F53C /* Supabase */,
 			);
 			productName = Clipster;
 			productReference = 44DFD9B52DE9D0E000B6CD87 /* Clipster.app */;
@@ -264,6 +273,7 @@
 				44DFD9D42DE9D37000B6CD87 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */,
+				443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 44DFD9B62DE9D0E000B6CD87 /* Products */;
@@ -417,6 +427,8 @@
 		};
 		44DFD9C92DE9D0E200B6CD87 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDebug;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -457,6 +469,8 @@
 		};
 		44DFD9CA2DE9D0E200B6CD87 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -497,6 +511,8 @@
 		};
 		44DFD9CB2DE9D0E200B6CD87 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -561,6 +577,8 @@
 		};
 		44DFD9CC2DE9D0E200B6CD87 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -618,6 +636,8 @@
 		};
 		9F781F1B2DF6CEFC00D7BEC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtensionDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -654,6 +674,8 @@
 		};
 		9F781F1C2DF6CEFC00D7BEC6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 44DFD9B72DE9D0E000B6CD87 /* Clipster */;
+			baseConfigurationReferenceRelativePath = App/Derived/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtensionRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
@@ -737,6 +759,14 @@
 				minimumVersion = 3.2.0;
 			};
 		};
+		443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 		44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift";
@@ -768,6 +798,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */;
 			productName = ReactorKit;
+		};
+		443905112E0A78800092F53C /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		443905132E0A78800092F53C /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		443905152E0A78800092F53C /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 		44DFD9CE2DE9D36400B6CD87 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
