@@ -14,28 +14,6 @@ final class FilterSubfoldersUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    private func makeFolder(
-        id: String,
-        parentID: String? = nil,
-        title: String,
-        depth: Int,
-        folders: [Folder] = [],
-        clips: [Clip] = []
-    ) -> Folder {
-        let now = Date()
-        return Folder(
-            id: UUID(uuidString: id)!,
-            parentFolderID: parentID.flatMap(UUID.init(uuidString:)),
-            title: title,
-            depth: depth,
-            folders: folders,
-            clips: clips,
-            createdAt: now,
-            updatedAt: now,
-            deletedAt: nil
-        )
-    }
-
     func test_최상위폴더_목록에서_자기자신을_제외하고_반환() {
         let top1 = makeFolder(id: "00000001-0000-0000-0000-000000000000", title: "Top 1", depth: 0)
         let top2 = makeFolder(id: "00000002-0000-0000-0000-000000000000", title: "Top 2", depth: 0)
@@ -97,5 +75,29 @@ final class FilterSubfoldersUseCaseTests: XCTestCase {
 
         XCTAssertEqual(result.count, 2)
         XCTAssertEqual(Set(result.map(\.id)), Set(topLevel.map(\.id)))
+    }
+}
+
+private extension FilterSubfoldersUseCaseTests {
+    func makeFolder(
+        id: String,
+        parentID: String? = nil,
+        title: String,
+        depth: Int,
+        folders: [Folder] = [],
+        clips: [Clip] = []
+    ) -> Folder {
+        let now = Date()
+        return Folder(
+            id: UUID(uuidString: id)!,
+            parentFolderID: parentID.flatMap(UUID.init(uuidString:)),
+            title: title,
+            depth: depth,
+            folders: folders,
+            clips: clips,
+            createdAt: now,
+            updatedAt: now,
+            deletedAt: nil
+        )
     }
 }
