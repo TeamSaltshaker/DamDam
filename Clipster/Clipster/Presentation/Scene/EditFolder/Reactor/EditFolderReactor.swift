@@ -3,6 +3,7 @@ import ReactorKit
 
 final class EditFolderReactor: Reactor {
     enum Action {
+        case viewDidAppear
         case folderTitleChanged(String)
         case saveButtonTapped
         case clearButtonTapped
@@ -16,6 +17,7 @@ final class EditFolderReactor: Reactor {
         case setParentFolder(Folder?)
         case setPhase(State.Phase)
         case setRoute(State.Route?)
+        case updateIsShowKeyboard(Bool)
     }
 
     struct State {
@@ -25,6 +27,7 @@ final class EditFolderReactor: Reactor {
         var parentFolder: Folder?
         var parentFolderDisplay: FolderDisplay?
         var isSavable = false
+        var isShowKeyboard: Bool = false
 
         @Pulse var phase: Phase = .idle
         @Pulse var route: Route?
@@ -139,6 +142,8 @@ final class EditFolderReactor: Reactor {
             return .just(.setRoute(.showFolderSelector))
         case .folderSelectorDismissed:
             return .just(.setRoute(nil))
+        case .viewDidAppear:
+            return .just(.updateIsShowKeyboard(true))
         }
     }
 
@@ -162,6 +167,9 @@ final class EditFolderReactor: Reactor {
         case .setRoute(let route):
             print("\(Self.self): Navigate to: \(route.debugDescription)")
             newState.route = route
+        case .updateIsShowKeyboard(let value):
+            print("\(Self.self): Show keyboard updated to: \(value)")
+            newState.isShowKeyboard = value
         }
 
         return newState

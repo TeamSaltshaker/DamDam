@@ -38,6 +38,11 @@ final class EditFolderViewController: UIViewController, View {
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        reactor?.action.onNext(.viewDidAppear)
+    }
+
     func bind(reactor: Reactor) {
         bindAction(to: reactor)
         bindState(from: reactor)
@@ -111,8 +116,8 @@ private extension EditFolderViewController {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { $0.folder == nil }
-            .filter { $0 }
+            .map { ($0.folder == nil, $0.isShowKeyboard) }
+            .filter { $0 && $1 }
             .take(1)
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in

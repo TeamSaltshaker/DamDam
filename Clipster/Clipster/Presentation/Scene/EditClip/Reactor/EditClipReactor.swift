@@ -15,6 +15,7 @@ final class EditClipReactor: Reactor {
     }
 
     enum Action {
+        case viewDidAppear
         case editURLTextField(String)
         case validifyURL(String)
         case editingURLTextField
@@ -36,6 +37,7 @@ final class EditClipReactor: Reactor {
         case updateCurrentFolder(Folder?)
         case updateIsSuccessedEditClip(Bool)
         case updateIsLoading(Bool)
+        case updateIsShowKeyboard(Bool)
     }
 
     struct State {
@@ -56,6 +58,7 @@ final class EditClipReactor: Reactor {
         var isURLValid = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
+        var isShowKeyboard: Bool = false
     }
 
     var initialState: State
@@ -242,6 +245,8 @@ final class EditClipReactor: Reactor {
             .catchAndReturn(.updateCurrentFolder(nil))
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
+        case .viewDidAppear:
+            return .just(.updateIsShowKeyboard(true))
         }
     }
 
@@ -299,6 +304,8 @@ final class EditClipReactor: Reactor {
             newState.urlValidationLabelText = "URL 분석 중..."
             newState.urlValidationImageName = nil
             newState.isHiddenURLValidationStackView = false
+        case .updateIsShowKeyboard(let value):
+            newState.isShowKeyboard = value
         }
         return newState
     }

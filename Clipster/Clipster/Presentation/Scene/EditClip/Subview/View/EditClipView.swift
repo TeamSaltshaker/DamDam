@@ -12,7 +12,7 @@ final class EditClipView: UIView {
         return stackView
     }()
 
-    private let scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView

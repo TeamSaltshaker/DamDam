@@ -32,6 +32,11 @@ final class EditClipViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        reactor?.action.onNext(.viewDidAppear)
+    }
 }
 
 extension EditClipViewController: View {
@@ -136,12 +141,25 @@ extension EditClipViewController: View {
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillChangeFrameNotification)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] notification in
+                guard let self,
+                      let userInfo = notification.userInfo,
+                      let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+                let bottomInset = max(0, UIScreen.main.bounds.height - keyboardFrame.origin.y)
+                editClipView.scrollView.contentInset.bottom = bottomInset
+                editClipView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+            }
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: EditClipReactor) {
         reactor.state
-            .map { $0.type }
-            .filter { $0 == .create }
+            .map { ($0.type, $0.isShowKeyboard) }
+            .filter { $0 == .create && $1 }
             .take(1)
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] _ in
