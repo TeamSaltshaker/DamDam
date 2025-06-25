@@ -7,7 +7,7 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         self.urlRepository = urlMetaRepository
     }
 
-    func execute(urlString: String) async -> Result<(ParsedURLMetadata?, Bool), URLValidationError> {
+    func execute(urlString: String) async -> Result<(URLMetadata?, Bool), URLValidationError> {
         guard let sanitizeURL = try? sanitizeURL(urlString: urlString).get() else {
             return .failure(.badURL)
         }
@@ -56,7 +56,7 @@ private extension DefaultParseURLUseCase {
         return .success(url)
     }
 
-    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> ParsedURLMetadata {
+    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> URLMetadata {
         let ogTitle = extractMetaContent(html: html, property: "og:title")
         let title = ogTitle ?? extractTitleTagContent(html: html) ?? "제목 없음"
 
@@ -68,7 +68,7 @@ private extension DefaultParseURLUseCase {
             }
         }
 
-        return ParsedURLMetadata(
+        return URLMetadata(
             url: url,
             title: title.isEmpty ? url.absoluteString : title,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),
