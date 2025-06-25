@@ -51,7 +51,6 @@ extension EditClipViewController: View {
             .controlEvent(.editingChanged)
             .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
             .distinctUntilChanged()
-            .skip(1)
             .map { Reactor.Action.editURLTextField($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -60,7 +59,6 @@ extension EditClipViewController: View {
             .rx
             .controlEvent(.editingChanged)
             .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
-            .skip(1)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { Reactor.Action.validifyURL($0) }
             .bind(to: reactor.action)
@@ -71,7 +69,6 @@ extension EditClipViewController: View {
             .controlEvent(.editingChanged)
             .withLatestFrom(editClipView.urlView.urlTextField.rx.text.orEmpty)
             .distinctUntilChanged()
-            .skip(1)
             .map { _ in Reactor.Action.editingURLTextField }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
