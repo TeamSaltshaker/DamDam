@@ -94,6 +94,7 @@ private extension HomeViewController {
         reactor.pulse(\.$route)
             .compactMap { $0 }
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] route in
                 guard let self else { return }
 

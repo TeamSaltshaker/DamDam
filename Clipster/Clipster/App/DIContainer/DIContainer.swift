@@ -42,6 +42,10 @@ final class DIContainer {
         DefaultUpdateClipUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeVisitClipUseCase() -> VisitClipUseCase {
+        DefaultVisitClipUseCase(clipRepository: makeClipRepository())
+    }
+
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
         DefaultDeleteClipUseCase(clipRepository: makeClipRepository())
     }
@@ -177,7 +181,7 @@ final class DIContainer {
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            visitClipUseCase: makeVisitClipUseCase()
         )
     }
 
