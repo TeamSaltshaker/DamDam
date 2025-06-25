@@ -11,12 +11,15 @@ final class DefaultVisitClipUseCase: VisitClipUseCase {
         let visitedClip = Clip(
             id: clip.id,
             folderID: clip.folderID,
-            urlMetadata: clip.urlMetadata,
+            url: clip.url,
+            title: clip.title,
             memo: clip.memo,
-            lastVisitedAt: Date(),
+            thumbnailImageURL: clip.thumbnailImageURL,
+            screenshotData: clip.screenshotData,
             createdAt: clip.createdAt,
-            updatedAt: Date(),
-            deletedAt: clip.deletedAt
+            lastVisitedAt: Date.now,
+            updatedAt: Date.now,
+            deletedAt: clip.deletedAt,
         )
 
         return await clipRepository.updateClip(visitedClip).mapError { $0 as Error }

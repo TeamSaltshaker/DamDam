@@ -23,31 +23,20 @@ struct DomainMapper {
     func clip(from entity: ClipEntity) -> Clip? {
         guard let folderID = entity.folder?.id,
               let urlMetadataEntity = entity.urlMetadata,
-              let urlMetadata = urlMetadata(from: urlMetadataEntity) else {
+              let url = URL(string: urlMetadataEntity.urlString) else {
             return nil
         }
 
         return Clip(
             id: entity.id,
             folderID: folderID,
-            urlMetadata: urlMetadata,
-            memo: entity.memo,
-            lastVisitedAt: entity.lastVisitedAt,
-            createdAt: entity.createdAt,
-            updatedAt: entity.updatedAt,
-            deletedAt: entity.deletedAt,
-        )
-    }
-
-    private func urlMetadata(from entity: URLMetadataEntity) -> URLMetadata? {
-        guard let url = URL(string: entity.urlString) else { return nil }
-
-        return URLMetadata(
             url: url,
-            title: entity.title,
-            thumbnailImageURL: URL(string: entity.thumbnailImageURLString ?? ""),
-            screenshotData: entity.screenshotData,
+            title: urlMetadataEntity.title,
+            memo: entity.memo,
+            thumbnailImageURL: URL(string: urlMetadataEntity.thumbnailImageURLString ?? ""),
+            screenshotData: urlMetadataEntity.screenshotData,
             createdAt: entity.createdAt,
+            lastVisitedAt: entity.lastVisitedAt,
             updatedAt: entity.updatedAt,
             deletedAt: entity.deletedAt,
         )

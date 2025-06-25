@@ -103,7 +103,7 @@ final class EditClipReactor: Reactor {
             type: .edit,
             clip: clip,
             navigationTitle: "클립 수정",
-            urlString: clip.urlMetadata.url.absoluteString,
+            urlString: clip.url.absoluteString,
             memoText: clip.memo,
             memoLimit: "\(clip.memo.count) / 100"
         )
@@ -179,20 +179,15 @@ final class EditClipReactor: Reactor {
                 let newClip = Clip(
                     id: clip.id,
                     folderID: currentFolder.id,
-                    urlMetadata: URLMetadata(
-                        url: urlMetadataDisplay.url,
-                        title: urlMetadataDisplay.title,
-                        thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
-                        screenshotData: urlMetadataDisplay.screenshotImageData,
-                        createdAt: clip.createdAt,
-                        updatedAt: Date(),
-                        deletedAt: clip.deletedAt
-                    ),
+                    url: urlMetadataDisplay.url,
+                    title: urlMetadataDisplay.title,
                     memo: currentState.memoText,
-                    lastVisitedAt: clip.urlMetadata.url != urlMetadataDisplay.url ? nil : clip.lastVisitedAt,
+                    thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
+                    screenshotData: urlMetadataDisplay.screenshotImageData,
                     createdAt: clip.createdAt,
-                    updatedAt: Date(),
-                    deletedAt: clip.deletedAt
+                    lastVisitedAt: clip.url != urlMetadataDisplay.url ? nil : clip.lastVisitedAt,
+                    updatedAt: Date.now,
+                    deletedAt: clip.deletedAt,
                 )
                 return .fromAsync {
                     try await self.updateClipUseCase.execute(clip: newClip).get()
@@ -207,20 +202,15 @@ final class EditClipReactor: Reactor {
                 let newClip = Clip(
                     id: UUID(),
                     folderID: currentFolder.id,
-                    urlMetadata: URLMetadata(
-                        url: urlMetadata.url,
-                        title: urlMetadata.title,
-                        thumbnailImageURL: urlMetadata.thumbnailImageURL,
-                        screenshotData: urlMetadata.screenshotImageData,
-                        createdAt: Date(),
-                        updatedAt: Date(),
-                        deletedAt: nil
-                    ),
+                    url: urlMetadata.url,
+                    title: urlMetadata.title,
                     memo: currentState.memoText,
+                    thumbnailImageURL: urlMetadata.thumbnailImageURL,
+                    screenshotData: urlMetadata.screenshotImageData,
+                    createdAt: Date.now,
                     lastVisitedAt: nil,
-                    createdAt: Date(),
-                    updatedAt: Date(),
-                    deletedAt: nil
+                    updatedAt: Date.now,
+                    deletedAt: nil,
                 )
                 return .fromAsync {
                     try await self.createClipUseCase.execute(newClip).get()
