@@ -313,9 +313,9 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { state in
-                if let imageName = state.urlValidationImageName {
-                    return UIImage(named: imageName)
+            .map {
+                if let imageResource = $0.urlValidationImageResource {
+                    return UIImage(resource: imageResource)
                 } else {
                     return .none
                 }
