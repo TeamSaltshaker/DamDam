@@ -56,12 +56,12 @@ private extension DefaultParseURLUseCase {
         return .success(url)
     }
 
-    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> ParsedURLMetadata {
+    func createParsedURLMetadata(url: URL, html: String, screenshotData: Data?) -> URLMetadata {
         let ogTitle = extractOGContent(html: html, property: "og:title")
         let title = ogTitle ?? extractHTMLTagContent(html: html, property: "title") ?? "제목 없음"
 
         let ogDescription = extractOGContent(html: html, property: "og:description")
-        let description = ogDescription ?? extractHTMLTagContent(html: html, property: "description")
+        let description = ogDescription ?? extractHTMLTagContent(html: html, property: "description") ?? "내용 없음"
 
         var thumbnailImageURL: String?
 
@@ -74,6 +74,7 @@ private extension DefaultParseURLUseCase {
         return URLMetadata(
             url: url,
             title: title.isEmpty ? url.absoluteString : title,
+            description: description,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),
             screenshotData: screenshotData
         )
