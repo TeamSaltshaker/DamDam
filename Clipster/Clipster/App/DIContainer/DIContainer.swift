@@ -62,10 +62,6 @@ final class DIContainer {
         DefaultCanSaveFolderUseCase()
     }
 
-    func makeCanSelectFolderUseCase() -> CanSelectFolderUseCase {
-        DefaultCanSelectFolderUseCase()
-    }
-
     func makeFindFolderPathUseCase() -> FindFolderPathUseCase {
         DefaultFindFolderPathUseCase()
     }
@@ -197,7 +193,6 @@ final class DIContainer {
     func makeFolderSelectorReactorForClip(parentFolder: Folder?) -> FolderSelectorReactor {
         FolderSelectorReactor(
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
-            canSelectFolderUseCase: makeCanSelectFolderUseCase(),
             findFolderPathUseCase: makeFindFolderPathUseCase(),
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
             parentFolder: parentFolder
@@ -207,7 +202,6 @@ final class DIContainer {
     func makeFolderSelectorReactorForFolder(parentFolder: Folder?, folder: Folder?) -> FolderSelectorReactor {
         FolderSelectorReactor(
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
-            canSelectFolderUseCase: makeCanSelectFolderUseCase(),
             findFolderPathUseCase: makeFindFolderPathUseCase(),
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
             parentFolder: parentFolder,
