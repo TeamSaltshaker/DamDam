@@ -42,7 +42,7 @@ final class URLMetadataStackView: UIStackView {
 
     func setDisplay(display: URLMetadataDisplay) {
         titleLabel.text = display.title
-
+        
         if let thumbnailURL = display.thumbnailImageURL {
             thumbnailImageView.kf.setImage(with: thumbnailURL)
         } else if let screenshotImageData = display.screenshotImageData,

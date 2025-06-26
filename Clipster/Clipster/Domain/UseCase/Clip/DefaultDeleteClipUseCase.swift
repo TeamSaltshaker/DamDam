@@ -13,6 +13,7 @@ final class DefaultDeleteClipUseCase: DeleteClipUseCase {
             folderID: clip.folderID,
             url: clip.url,
             title: clip.title,
+            description: clip.description,
             memo: clip.memo,
             thumbnailImageURL: clip.thumbnailImageURL,
             screenshotData: clip.screenshotData,
