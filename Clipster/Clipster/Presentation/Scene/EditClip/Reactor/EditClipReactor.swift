@@ -181,6 +181,7 @@ final class EditClipReactor: Reactor {
                     folderID: currentFolder.id,
                     url: urlMetadataDisplay.url,
                     title: urlMetadataDisplay.title,
+                    description: urlMetadataDisplay.description,
                     memo: currentState.memoText,
                     thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
                     screenshotData: urlMetadataDisplay.screenshotImageData,
@@ -197,16 +198,17 @@ final class EditClipReactor: Reactor {
             case .create, .shareExtension:
                 print("\(Self.self) save clip")
                 guard let currentFolder = currentState.currentFolder else { return .empty() }
-                guard let urlMetadata = currentState.urlMetadataDisplay else { return .empty() }
+                guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
 
                 let newClip = Clip(
                     id: UUID(),
                     folderID: currentFolder.id,
-                    url: urlMetadata.url,
-                    title: urlMetadata.title,
+                    url: urlMetadataDisplay.url,
+                    title: urlMetadataDisplay.title,
+                    description: urlMetadataDisplay.description,
                     memo: currentState.memoText,
-                    thumbnailImageURL: urlMetadata.thumbnailImageURL,
-                    screenshotData: urlMetadata.screenshotImageData,
+                    thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
+                    screenshotData: urlMetadataDisplay.screenshotImageData,
                     createdAt: Date.now,
                     lastVisitedAt: nil,
                     updatedAt: Date.now,
@@ -310,6 +312,7 @@ private extension EditClipReactor {
             URLMetadataDisplay(
                 url: $0.url,
                 title: $0.title,
+                description: $0.description,
                 thumbnailImageURL: $0.thumbnailImageURL,
                 screenshotImageData: $0.screenshotData
             )
@@ -321,6 +324,7 @@ private extension EditClipReactor {
         return URLMetadataDisplay(
             url: url,
             title: url.absoluteString,
+            description: "내용 없음",
             thumbnailImageURL: nil,
             screenshotImageData: nil
         )
