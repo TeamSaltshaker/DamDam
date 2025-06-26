@@ -15,12 +15,16 @@ final class DIContainer {
     }
 
     func makeClipStorage() -> ClipStorage {
-         DefaultClipStorage(container: container, mapper: DomainMapper())
-     }
+        DefaultClipStorage(container: container, mapper: DomainMapper())
+    }
 
     func makeFolderStorage() -> FolderStorage {
-         DefaultFolderStorage(container: container, mapper: DomainMapper())
-     }
+        DefaultFolderStorage(container: container, mapper: DomainMapper())
+    }
+
+    func makeAppleLoginService() -> AppleLoginService {
+        AppleLoginService()
+    }
 
     func makeClipRepository() -> ClipRepository {
         DefaultClipRepository(storage: makeClipStorage())
@@ -32,6 +36,12 @@ final class DIContainer {
 
     func makeURLMetadataRepository() -> DefaultURLRepository {
         DefaultURLRepository()
+    }
+
+    func makeLoginUseCase() -> LoginUseCase {
+        DefaultLoginUseCase(loginServices: [
+            .apple: makeAppleLoginService()
+        ])
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
