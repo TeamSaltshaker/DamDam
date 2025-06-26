@@ -129,7 +129,7 @@ final class HomeReactor: Reactor {
                 switch section {
                 case .unvisitedClip(let clip):
                     _ = try await visitClipUseCase.execute(clip: clip).get()
-                    return .setRoute(.showWebView(clip.urlMetadata.url))
+                    return .setRoute(.showWebView(clip.url))
                 case .folder(let folder):
                     return .setRoute(.showFolder(folder))
                 }

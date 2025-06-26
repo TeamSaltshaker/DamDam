@@ -137,7 +137,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [routeExpectation], timeout: 1.0)
-        XCTAssertEqual(routedURL, MockClip.unvisitedClips[0].urlMetadata.url)
+        XCTAssertEqual(routedURL, MockClip.unvisitedClips[0].url)
         XCTAssertTrue(visitClipUseCase.didCallExecute, "클립 방문 처리 유스케이스가 호출되어야 합니다.")
     }
 
