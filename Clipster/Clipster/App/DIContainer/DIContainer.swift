@@ -62,6 +62,10 @@ final class DIContainer {
         DefaultSearchClipsUseCase()
     }
 
+    func makeSortClipsUseCase() -> SortClipsUseCase {
+        DefaultSortClipsUseCase()
+    }
+
     func makeCanSaveFolderUseCase() -> CanSaveFolderUseCase {
         DefaultCanSaveFolderUseCase()
     }
@@ -100,6 +104,10 @@ final class DIContainer {
 
     func makeSearchFoldersUseCase() -> SearchFoldersUseCase {
         DefaultSearchFoldersUseCase()
+    }
+
+    func makeSortFoldersUseCase() -> SortFoldersUseCase {
+        DefaultSortFoldersUseCase()
     }
 
     func makeUpdateFolderUseCase() -> UpdateFolderUseCase {
