@@ -77,6 +77,7 @@ extension UnvisitedClipListViewController {
                 case .success:
                     unvisitedClipListView.hideLoading()
                 case .error(let message):
+                    unvisitedClipListView.hideLoading()
                     let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default))
                     present(alert, animated: true)
