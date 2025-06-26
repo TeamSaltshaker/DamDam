@@ -1,5 +1,7 @@
 import Foundation
 
 protocol URLRepository {
-    func execute(url: URL) async -> Result<(URLMetadata?, Bool), URLValidationError>
+    func fetchHTML(from url: URL) async -> Result<String, URLValidationError>
+    func resolveRedirectURL(initialURL: URL) async -> URL
+    func captureScreenshot(rect: CGRect?) async -> Data?
 }
