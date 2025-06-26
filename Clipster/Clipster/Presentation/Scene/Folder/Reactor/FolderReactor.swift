@@ -86,17 +86,7 @@ final class FolderReactor: Reactor {
             }
             return .concat(
                 .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    guard let self else {
-                        let message = DomainError.unknownError.localizedDescription
-                        return .setPhase(.error(message))
-                    }
-                    let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
-                    return .reloadFolder(folder)
-                }
-                .catch { error in
-                    .just(.setPhase(.error(error.localizedDescription)))
-                },
+                reloadFolderMutation(),
                 .just(.setPhase(.success)),
             )
         case .didTapCell(let indexPath):
@@ -108,28 +98,8 @@ final class FolderReactor: Reactor {
                 let clip = folder.clips[indexPath.item]
                 return .concat(
                     .just(.setPhase(.loading)),
-                    .fromAsync { [weak self] in
-                        guard let self else {
-                            let message = DomainError.unknownError.localizedDescription
-                            return .setPhase(.error(message))
-                        }
-                        _ = try await visitClipUseCase.execute(clip: clip).get()
-                        return .setPhase(.success)
-                    }
-                    .catch { error in
-                        .just(.setPhase(.error(error.localizedDescription)))
-                    },
-                    .fromAsync { [weak self] in
-                        guard let self else {
-                            let message = DomainError.unknownError.localizedDescription
-                            return .setPhase(.error(message))
-                        }
-                        let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
-                        return .reloadFolder(folder)
-                    }
-                    .catch { error in
-                        .just(.setPhase(.error(error.localizedDescription)))
-                    },
+                    visitClipMutation(clip),
+                    reloadFolderMutation(),
                     .just(.setRoute(.webView(clip.url))),
                     .just(.setPhase(.success)),
                 )
@@ -162,38 +132,8 @@ final class FolderReactor: Reactor {
         case .didTapDeleteButton(let indexPath):
             return .concat(
                 .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    guard let self else {
-                        let message = DomainError.unknownError.localizedDescription
-                        return .setPhase(.error(message))
-                    }
-                    switch indexPath.section {
-                    case 0:
-                        let folder = folder.folders[indexPath.item]
-                        _ = try await deleteFolderUseCase.execute(folder).get()
-                    case 1:
-                        let clip = folder.clips[indexPath.item]
-                        _ = try await deleteClipUseCase.execute(clip).get()
-                    default:
-                        return .setPhase(.error("Invalid section index"))
-                    }
-                    return .setPhase(.success)
-                }
-                .catch { error in
-                    .just(.setPhase(.error(error.localizedDescription)))
-                },
-                .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    guard let self else {
-                        let message = DomainError.unknownError.localizedDescription
-                        return .setPhase(.error(message))
-                    }
-                    let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
-                    return .reloadFolder(folder)
-                }
-                .catch { error in
-                    .just(.setPhase(.error(error.localizedDescription)))
-                },
+                deleteMutation(at: indexPath),
+                reloadFolderMutation(),
                 .just(.setPhase(.success)),
             )
         }
@@ -216,5 +156,58 @@ final class FolderReactor: Reactor {
         }
 
         return newState
+    }
+}
+
+private extension FolderReactor {
+    func reloadFolderMutation() -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
+            return .reloadFolder(folder)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func visitClipMutation(_ clip: Clip) -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            _ = try await visitClipUseCase.execute(clip: clip).get()
+            return .setPhase(.success)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func deleteMutation(at indexPath: IndexPath) -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            switch indexPath.section {
+            case 0:
+                let folder = folder.folders[indexPath.item]
+                _ = try await deleteFolderUseCase.execute(folder).get()
+            case 1:
+                let clip = folder.clips[indexPath.item]
+                _ = try await deleteClipUseCase.execute(clip).get()
+            default:
+                return .setPhase(.error("Invalid section index"))
+            }
+            return .setPhase(.success)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
     }
 }
