@@ -9,8 +9,7 @@ final class AppleLoginService: NSObject, SocialLoginService {
         self.provider = provider
 
         let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.email, .fullName]
-
+        
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
         controller.presentationContextProvider = provider
