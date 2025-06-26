@@ -11,6 +11,20 @@ extension UIViewController {
         view.endEditing(true)
     }
 
+    func presentErrorAlert(
+        message: String = "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+    ) {
+        let alert = UIAlertController(
+            title: "오류",
+            message: message,
+            preferredStyle: .alert
+        )
+        let confirmAction = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(confirmAction)
+
+        present(alert, animated: true)
+    }
+
     func presentDeleteAlert(
         title: String,
         message: String = "삭제하겠습니까?",
