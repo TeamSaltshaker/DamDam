@@ -34,6 +34,8 @@ final class HomeReactorTests: XCTestCase {
 
     override func tearDownWithError() throws {
         disposeBag = nil
+        fetchUnvisitedClipsUseCase = nil
+        fetchTopLevelFoldersUseCase = nil
         deleteClipUseCase = nil
         deleteFolderUseCase = nil
         visitClipUseCase = nil
