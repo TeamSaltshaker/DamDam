@@ -100,7 +100,7 @@ private extension ClipDetailViewController {
                 case .success:
                     self.navigationController?.popViewController(animated: true)
                 case .error(let message):
-                    self.presentAlert(message: message)
+                    self.presentErrorAlert(message: message)
                 }
             }
             .disposed(by: disposeBag)
@@ -122,14 +122,6 @@ private extension ClipDetailViewController {
                 }
             }
             .disposed(by: disposeBag)
-    }
-}
-
-private extension ClipDetailViewController {
-    func presentAlert(message: String) {
-        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        present(alert, animated: true)
     }
 }
 

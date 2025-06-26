@@ -97,6 +97,23 @@ private extension FolderViewController {
                 folderView.setDisplay(isHidden: isHidden)
             }
             .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self else { return }
+
+                switch phase {
+                case .idle, .success:
+                    folderView.setLoading(false)
+                case .loading:
+                    folderView.setLoading(true)
+                case .error(let message):
+                    presentErrorAlert(message: message)
+                }
+            }
+            .disposed(by: disposeBag)
     }
 
     func bindRoute(from reactor: FolderReactor) {
