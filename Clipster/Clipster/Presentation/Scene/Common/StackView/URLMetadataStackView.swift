@@ -31,6 +31,15 @@ final class URLMetadataStackView: UIStackView {
         return label
     }()
 
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(size: 14, weight: .medium)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 2
+        label.text = " "
+        return label
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -42,7 +51,8 @@ final class URLMetadataStackView: UIStackView {
 
     func setDisplay(display: URLMetadataDisplay) {
         titleLabel.text = display.title
-        
+        descriptionLabel.text = display.description
+
         if let thumbnailURL = display.thumbnailImageURL {
             thumbnailImageView.kf.setImage(with: thumbnailURL)
         } else if let screenshotImageData = display.screenshotImageData,
@@ -84,7 +94,7 @@ private extension URLMetadataStackView {
             addArrangedSubview($0)
         }
 
-        [titleLabel].forEach {
+        [titleLabel, descriptionLabel].forEach {
             infoStackView.addArrangedSubview($0)
         }
     }

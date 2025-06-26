@@ -181,7 +181,7 @@ final class EditClipReactor: Reactor {
                     folderID: currentFolder.id,
                     url: urlMetadataDisplay.url,
                     title: urlMetadataDisplay.title,
-                    description:urlMetadataDisplay.description,
+                    description: urlMetadataDisplay.description,
                     memo: currentState.memoText,
                     thumbnailImageURL: urlMetadataDisplay.thumbnailImageURL,
                     screenshotData: urlMetadataDisplay.screenshotImageData,
