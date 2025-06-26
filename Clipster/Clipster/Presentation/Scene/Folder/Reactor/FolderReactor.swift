@@ -14,7 +14,6 @@ final class FolderReactor: Reactor {
 
     enum Mutation {
         case reloadFolder(Folder)
-        case updateClipLastVisitedDate(Clip)
         case setPhase(Phase)
         case setRoute(Route)
     }
@@ -120,9 +119,22 @@ final class FolderReactor: Reactor {
                         }
 
                         let result = await visitClipUseCase.execute(clip: clip)
+                        if case .failure(let error) = result {
+                            return .setPhase(.error(error.localizedDescription))
+                        }
+
+                        return .setPhase(.success)
+                    },
+                    .fromAsync { [weak self] in
+                        guard let self else {
+                            let message = DomainError.unknownError.localizedDescription
+                            return .setPhase(.error(message))
+                        }
+
+                        let result = await fetchFolderUseCase.execute(id: folder.id)
                         switch result {
-                        case .success:
-                            return .updateClipLastVisitedDate(clip)
+                        case .success(let folder):
+                            return .reloadFolder(folder)
                         case .failure(let error):
                             return .setPhase(.error(error.localizedDescription))
                         }
@@ -214,10 +226,6 @@ final class FolderReactor: Reactor {
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
             newState.clips = folder.clips.map(ClipDisplayMapper.map)
             newState.isEmptyViewHidden = !folder.folders.isEmpty || !folder.clips.isEmpty
-        case .updateClipLastVisitedDate(let updatedClip):
-            if let index = newState.clips.firstIndex(where: { $0.id == updatedClip.id }) {
-                newState.clips[index] = ClipDisplayMapper.map(updatedClip)
-            }
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):
