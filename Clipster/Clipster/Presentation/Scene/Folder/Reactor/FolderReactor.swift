@@ -42,20 +42,20 @@ final class FolderReactor: Reactor {
 
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
-    private let updateClipUseCase: UpdateClipUseCase
+    private let visitClipUseCase: VisitClipUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
         folder: Folder,
         fetchFolderUseCase: FetchFolderUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
-        updateClipUseCase: UpdateClipUseCase,
+        visitClipUseCase: VisitClipUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
-        self.updateClipUseCase = updateClipUseCase
+        self.visitClipUseCase = visitClipUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
         initialState = State(
@@ -92,21 +92,8 @@ final class FolderReactor: Reactor {
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
                         let clip = folder.clips[indexPath.item]
-                        let updatedClip = Clip(
-                            id: clip.id,
-                            folderID: clip.folderID,
-                            url: clip.url,
-                            title: clip.title,
-                            memo: clip.memo,
-                            thumbnailImageURL: clip.thumbnailImageURL,
-                            screenshotData: clip.screenshotData,
-                            createdAt: clip.createdAt,
-                            lastVisitedAt: Date.now,
-                            updatedAt: Date.now,
-                            deletedAt: clip.deletedAt,
-                        )
-                        _ = await updateClipUseCase.execute(clip: updatedClip)
-                        return updatedClip
+                        _ = await visitClipUseCase.execute(clip: clip)
+                        return clip
                     }
                     .map { .updateClipLastVisitedDate($0) }
                     .catch { _ in .empty() },
