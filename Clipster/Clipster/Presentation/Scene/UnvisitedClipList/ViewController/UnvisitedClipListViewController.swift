@@ -77,6 +77,7 @@ extension UnvisitedClipListViewController {
                 case .success:
                     unvisitedClipListView.hideLoading()
                 case .error(let message):
+                    unvisitedClipListView.hideLoading()
                     let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default))
                     present(alert, animated: true)
@@ -91,6 +92,7 @@ extension UnvisitedClipListViewController {
         reactor.pulse(\.$route)
             .compactMap { $0 }
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] route in
                 guard let self else { return }
 

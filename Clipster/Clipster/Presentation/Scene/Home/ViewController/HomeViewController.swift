@@ -80,6 +80,7 @@ private extension HomeViewController {
                 case .success:
                     homeView.hideLoading()
                 case .error(let message):
+                    homeView.hideLoading()
                     let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default))
                     present(alert, animated: true)

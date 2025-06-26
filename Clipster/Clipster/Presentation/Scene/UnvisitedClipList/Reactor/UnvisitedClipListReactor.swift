@@ -12,7 +12,7 @@ final class UnvisitedClipListReactor: Reactor {
     }
 
     enum Mutation {
-        case setClips([ClipDisplay])
+        case setClips([Clip])
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
@@ -44,38 +44,97 @@ final class UnvisitedClipListReactor: Reactor {
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let deleteClipUseCase: DeleteClipUseCase
-    private let updateClipUseCase: UpdateClipUseCase
+    private let visitClipUseCase: VisitClipUseCase
 
     init(
         clips: [Clip],
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         deleteClipUseCase: DeleteClipUseCase,
-        updateClipUseCase: UpdateClipUseCase
+        visitClipUseCase: VisitClipUseCase
     ) {
         self.clips = clips
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.deleteClipUseCase = deleteClipUseCase
-        self.updateClipUseCase = updateClipUseCase
+        self.visitClipUseCase = visitClipUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
         print("\(Self.self): received action → \(action)")
         switch action {
         case .viewWillAppear:
-            return fetchClipData()
+            return .concat(
+                .just(.setPhase(.loading)),
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+
+                    let clips: [Clip]
+                    if shouldFetchOnAppear {
+                        clips = try await fetchUnvisitedClipsUseCase.execute().get()
+                    } else {
+                        shouldFetchOnAppear = true
+                        clips = self.clips
+                    }
+                    return .setClips(clips)
+                },
+                .just(.setPhase(.success))
+            )
+            .catch { .just(.setPhase(.error($0.localizedDescription))) }
+
+        case .tapBack:
+            return .just(.setRoute(.back))
+
+        case .tapCell(let index):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                guard clips.indices.contains(index) else {
+                    return .setPhase(.error("항목을 찾을 수 없습니다."))
+                }
+
+                _ = try await visitClipUseCase.execute(clip: clips[index]).get()
+                return .setRoute(.showWebView(clips[index].url))
+            }
+
+        case .tapDetail(let index):
+            guard clips.indices.contains(index) else {
+                return .just(.setPhase(.error("항목을 찾을 수 없습니다.")))
+            }
+
+            return .just(.setRoute(.showDetailClip(clips[index])))
+
+        case .tapEdit(let index):
+            guard clips.indices.contains(index) else {
+                return .just(.setPhase(.error("항목을 찾을 수 없습니다.")))
+            }
+
+            return .just(.setRoute(.showDetailClip(clips[index])))
+
         case .tapDelete(let index):
-            guard clips.indices.contains(index) else { return .empty() }
-            return deleteClip(clips[index])
-        default:
-            let route = makeRoute(for: action)
-            return .just(.setRoute(route))
+            return .concat(
+                .just(.setPhase(.loading)),
+                .fromAsync { [weak self] in
+                    guard let self else { throw DomainError.unknownError }
+                    guard clips.indices.contains(index) else {
+                        return .setPhase(.error("항목을 찾을 수 없습니다."))
+                    }
+
+                    try await deleteClipUseCase.execute(clips[index]).get()
+
+                    let clips = try await fetchUnvisitedClipsUseCase.execute().get()
+                    return .setClips(clips)
+                },
+                .just(.setPhase(.success))
+            )
+            .catch { .just(.setPhase(.error($0.localizedDescription))) }
         }
     }
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setClips(let display):
+        case .setClips(let clips):
+            self.clips = clips
+
+            let display = clips.map(ClipDisplayMapper.map)
             newState.clips = display
         case .setRoute(let route):
             newState.route = route
@@ -83,89 +142,5 @@ final class UnvisitedClipListReactor: Reactor {
             newState.phase = phase
         }
         return newState
-    }
-}
-
-private extension UnvisitedClipListReactor {
-    func fetchClipData() -> Observable<Mutation> {
-        Observable.concat([
-            .just(.setPhase(.loading)),
-            asyncMutate { try await self.makeClipsMutation() }
-        ])
-    }
-
-    func makeClipsMutation() async throws -> Mutation {
-        if self.shouldFetchOnAppear {
-            let result = try await self.fetchUnvisitedClipsUseCase.execute().get()
-            self.clips = result
-        } else {
-            self.shouldFetchOnAppear = true
-        }
-        let display = self.clips.map(ClipDisplayMapper.map)
-        return .setClips(display)
-    }
-
-    func deleteClip(_ clip: Clip) -> Observable<Mutation> {
-        Observable.concat([
-            .just(.setPhase(.loading)),
-            asyncMutate {
-                try await self.deleteClipUseCase.execute(clip).get()
-                return try await self.makeClipsMutation()
-            }
-        ])
-    }
-
-    func makeRoute(for action: Action) -> State.Route? {
-        switch action {
-        case .tapBack:
-            return .back
-        case .tapCell(let index):
-            guard clips.indices.contains(index) else { return nil }
-            Task { await updateClipAsVisited(clips[index]) }
-            return .showWebView(clips[index].url)
-        case .tapDetail(let index):
-            guard clips.indices.contains(index) else { return nil }
-            return .showDetailClip(clips[index])
-        case .tapEdit(let index):
-            guard clips.indices.contains(index) else { return nil }
-            return .showEditClip(clips[index])
-        default:
-            return nil
-        }
-    }
-
-    func updateClipAsVisited(_ clip: Clip) async {
-        let visited = Clip(
-            id: clip.id,
-            folderID: clip.folderID,
-            url: clip.url,
-            title: clip.title,
-            memo: clip.memo,
-            thumbnailImageURL: clip.thumbnailImageURL,
-            screenshotData: clip.screenshotData,
-            createdAt: clip.createdAt,
-            lastVisitedAt: Date.now,
-            updatedAt: Date.now,
-            deletedAt: clip.deletedAt,
-        )
-        _ = await updateClipUseCase.execute(clip: visited)
-    }
-}
-
-private extension UnvisitedClipListReactor {
-    func asyncMutate(_ task: @escaping () async throws -> Mutation) -> Observable<Mutation> {
-        Observable.create { observer in
-            Task {
-                do {
-                    let mutation = try await task()
-                    observer.onNext(mutation)
-                    observer.onNext(.setPhase(.success))
-                } catch {
-                    observer.onNext(.setPhase(.error(error.localizedDescription)))
-                }
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        }
     }
 }
