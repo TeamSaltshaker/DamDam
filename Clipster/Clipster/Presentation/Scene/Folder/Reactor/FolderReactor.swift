@@ -15,7 +15,6 @@ final class FolderReactor: Reactor {
     enum Mutation {
         case reloadFolder(Folder)
         case updateClipLastVisitedDate(Clip)
-        case delete
         case setPhase(Phase)
         case setRoute(Route)
     }
@@ -219,8 +218,6 @@ final class FolderReactor: Reactor {
             if let index = newState.clips.firstIndex(where: { $0.id == updatedClip.id }) {
                 newState.clips[index] = ClipDisplayMapper.map(updatedClip)
             }
-        case .delete:
-            break
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):
