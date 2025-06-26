@@ -10,8 +10,8 @@ final class FolderSelectorReactor: Reactor {
     }
 
     enum Mutation {
-        case setInitialData(topLevelFolders: [Folder], path: [Folder], filteredSubfolders: [Folder], isSelectable: Bool)
-        case updateNavigation(path: [Folder], filteredSubfolders: [Folder], isSelectable: Bool)
+        case setInitialData(topLevelFolders: [Folder], path: [Folder], filteredSubfolders: [Folder])
+        case updateNavigation(path: [Folder], filteredSubfolders: [Folder])
         case setPhase(State.Phase)
     }
 
@@ -22,7 +22,6 @@ final class FolderSelectorReactor: Reactor {
         var topLevelFolders: [Folder] = []
         var currentPath: [Folder] = []
         var filteredSubfolders: [Folder] = []
-        var isSelectable = false
 
         @Pulse var phase: Phase = .idle
 
@@ -48,13 +47,11 @@ final class FolderSelectorReactor: Reactor {
 
     let initialState: State
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
-    private let canSelectFolderUseCase: CanSelectFolderUseCase
     private let findFolderPathUseCase: FindFolderPathUseCase
     private let filterSubfoldersUseCase: FilterSubfoldersUseCase
 
     private init(
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
-        canSelectFolderUseCase: CanSelectFolderUseCase,
         findFolderPathUseCase: FindFolderPathUseCase,
         filterSubfoldersUseCase: FilterSubfoldersUseCase,
         isClip: Bool,
@@ -62,7 +59,6 @@ final class FolderSelectorReactor: Reactor {
         folder: Folder?
     ) {
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
-        self.canSelectFolderUseCase = canSelectFolderUseCase
         self.findFolderPathUseCase = findFolderPathUseCase
         self.filterSubfoldersUseCase = filterSubfoldersUseCase
         self.initialState = State(isClip: isClip, parentFolder: parentFolder, folder: folder)
@@ -70,14 +66,12 @@ final class FolderSelectorReactor: Reactor {
 
     convenience init(
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
-        canSelectFolderUseCase: CanSelectFolderUseCase,
         findFolderPathUseCase: FindFolderPathUseCase,
         filterSubfoldersUseCase: FilterSubfoldersUseCase,
         parentFolder: Folder?
     ) {
         self.init(
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
-            canSelectFolderUseCase: canSelectFolderUseCase,
             findFolderPathUseCase: findFolderPathUseCase,
             filterSubfoldersUseCase: filterSubfoldersUseCase,
             isClip: true,
@@ -88,7 +82,6 @@ final class FolderSelectorReactor: Reactor {
 
     convenience init(
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
-        canSelectFolderUseCase: CanSelectFolderUseCase,
         findFolderPathUseCase: FindFolderPathUseCase,
         filterSubfoldersUseCase: FilterSubfoldersUseCase,
         parentFolder: Folder?,
@@ -96,7 +89,6 @@ final class FolderSelectorReactor: Reactor {
     ) {
         self.init(
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
-            canSelectFolderUseCase: canSelectFolderUseCase,
             findFolderPathUseCase: findFolderPathUseCase,
             filterSubfoldersUseCase: filterSubfoldersUseCase,
             isClip: false,
@@ -121,13 +113,12 @@ final class FolderSelectorReactor: Reactor {
                     let path = currentState.parentFolder.flatMap {
                         self.findFolderPathUseCase.execute(to: $0, in: folders)
                     } ?? []
-                    let navigationData = calculateNavigationState(for: path, from: folders)
+                    let filteredSubfolders = calculateNavigationState(for: path, from: folders)
 
                     return .setInitialData(
                         topLevelFolders: folders,
                         path: path,
-                        filteredSubfolders: navigationData.filteredSubfolders,
-                        isSelectable: navigationData.isSelectable
+                        filteredSubfolders: filteredSubfolders
                     )
                 }
                 .catch { error in
@@ -147,7 +138,6 @@ final class FolderSelectorReactor: Reactor {
             return .just(makeNavigationMutation(for: path, from: currentState.topLevelFolders))
         case .selectButtonTapped:
             print("\(Self.self): Folder selected: \(currentState.selectedFolder?.title ?? "Home")")
-            guard currentState.isSelectable else { return .empty() }
             return .just(.setPhase(.success(selected: currentState.selectedFolder)))
         }
     }
@@ -156,17 +146,15 @@ final class FolderSelectorReactor: Reactor {
         print("\(Self.self): Applying mutation: \(mutation)")
         var newState = state
         switch mutation {
-        case .setInitialData(let topLevelFolders, let path, let filteredSubfolders, let isSelectable):
+        case .setInitialData(let topLevelFolders, let path, let filteredSubfolders):
             print("\(Self.self): Initial Data set")
             newState.topLevelFolders = topLevelFolders
             newState.currentPath = path
             newState.filteredSubfolders = filteredSubfolders
-            newState.isSelectable = isSelectable
-        case .updateNavigation(let path, let filteredSubfolders, let isSelectable):
+        case .updateNavigation(let path, let filteredSubfolders):
             print("\(Self.self): Navigation update")
             newState.currentPath = path
             newState.filteredSubfolders = filteredSubfolders
-            newState.isSelectable = isSelectable
         case .setPhase(let phase):
             print("\(Self.self): Phase changed to: \(phase)")
             newState.phase = phase
@@ -176,21 +164,17 @@ final class FolderSelectorReactor: Reactor {
 }
 
 private extension FolderSelectorReactor {
-    private func calculateNavigationState(for path: [Folder], from topLevelFolders: [Folder]) -> (filteredSubfolders: [Folder], isSelectable: Bool) {
+    private func calculateNavigationState(for path: [Folder], from topLevelFolders: [Folder]) -> [Folder] {
         let filteredSubfolders = filterSubfoldersUseCase.execute(
             topLevelFolders: topLevelFolders,
             currentPath: path,
             folder: initialState.folder
         )
-        let isSelectable = canSelectFolderUseCase.execute(
-            selectedFolder: path.last,
-            isClip: initialState.isClip
-        )
-        return (filteredSubfolders, isSelectable)
+        return filteredSubfolders
     }
 
     private func makeNavigationMutation(for path: [Folder], from topLevelFolders: [Folder]) -> Mutation {
-        let (filteredSubfolders, isSelectable) = calculateNavigationState(for: path, from: topLevelFolders)
-        return .updateNavigation(path: path, filteredSubfolders: filteredSubfolders, isSelectable: isSelectable)
+        let filteredSubfolders = calculateNavigationState(for: path, from: topLevelFolders)
+        return .updateNavigation(path: path, filteredSubfolders: filteredSubfolders)
     }
 }

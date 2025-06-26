@@ -84,13 +84,6 @@ private extension FolderSelectorViewController {
             .bind(to: folderSelectorView.backButton.rx.isHidden)
             .disposed(by: disposeBag)
 
-        reactor.state
-            .map(\.isSelectable)
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: folderSelectorView.selectButton.rx.isEnabled)
-            .disposed(by: disposeBag)
-
         reactor.pulse(\.$phase)
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
