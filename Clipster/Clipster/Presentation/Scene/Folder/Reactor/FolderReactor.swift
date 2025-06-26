@@ -44,6 +44,11 @@ final class FolderReactor: Reactor {
         case webView(URL)
     }
 
+    enum SectionType {
+        case folder(Folder)
+        case clip(Clip)
+    }
+
     let initialState: State
     private var folder: Folder
     private var isFirstAppear = true
@@ -90,12 +95,13 @@ final class FolderReactor: Reactor {
                 .just(.setPhase(.success)),
             )
         case .didTapCell(let indexPath):
-            switch indexPath.section {
-            case 0:
-                let folder = folder.folders[indexPath.item]
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder(let folder):
                 return .just(.setRoute(.folderView(folder)))
-            case 1:
-                let clip = folder.clips[indexPath.item]
+            case .clip(let clip):
                 return .concat(
                     .just(.setPhase(.loading)),
                     visitClipMutation(clip),
@@ -103,31 +109,30 @@ final class FolderReactor: Reactor {
                     .just(.setRoute(.webView(clip.url))),
                     .just(.setPhase(.success)),
                 )
-            default:
-                return .empty()
             }
         case .didTapAddFolderButton:
             return .just(.setRoute(.editFolderView(folder, nil)))
         case .didTapAddClipButton:
             return .just(.setRoute(.editClipViewForAdd(folder)))
         case .didTapDetailButton(let indexPath):
-            switch indexPath.section {
-            case 1:
-                let clip = folder.clips[indexPath.item]
-                return .just(.setRoute(.clipDetailView(clip)))
-            default:
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder:
                 return .empty()
+            case .clip(let clip):
+                return .just(.setRoute(.clipDetailView(clip)))
             }
         case .didTapEditButton(let indexPath):
-            switch indexPath.section {
-            case 0:
-                let selectedFolder = folder.folders[indexPath.item]
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder(let selectedFolder):
                 return .just(.setRoute(.editFolderView(folder, selectedFolder)))
-            case 1:
-                let clip = folder.clips[indexPath.item]
+            case .clip(let clip):
                 return .just(.setRoute(.editClipViewForEdit(clip)))
-            default:
-                return .empty()
             }
         case .didTapDeleteButton(let indexPath):
             return .concat(
@@ -194,20 +199,36 @@ private extension FolderReactor {
                 let message = DomainError.unknownError.localizedDescription
                 return .setPhase(.error(message))
             }
-            switch indexPath.section {
-            case 0:
-                let folder = folder.folders[indexPath.item]
+            guard let section = section(at: indexPath) else {
+                return .setPhase(.error("Invalid section"))
+            }
+            switch section {
+            case .folder(let folder):
                 _ = try await deleteFolderUseCase.execute(folder).get()
-            case 1:
-                let clip = folder.clips[indexPath.item]
+            case .clip(let clip):
                 _ = try await deleteClipUseCase.execute(clip).get()
-            default:
-                return .setPhase(.error("Invalid section index"))
             }
             return .setPhase(.success)
         }
         .catch { error in
             .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func section(at indexPath: IndexPath) -> SectionType? {
+        switch indexPath.section {
+        case 0:
+            guard folder.folders.indices.contains(indexPath.item) else {
+                return nil
+            }
+            return .folder(folder.folders[indexPath.item])
+        case 1:
+            guard folder.clips.indices.contains(indexPath.item) else {
+                return nil
+            }
+            return .clip(folder.clips[indexPath.item])
+        default:
+            return nil
         }
     }
 }
