@@ -198,7 +198,7 @@ final class DIContainer {
             clips: clips,
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            visitClipUseCase: makeVisitClipUseCase()
         )
     }
 
