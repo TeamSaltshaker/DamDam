@@ -16,6 +16,7 @@ final class FolderReactor: Reactor {
         case reloadFolder(Folder)
         case updateClipLastVisitedDate(Clip)
         case delete
+        case setPhase(Phase)
         case setRoute(Route)
     }
 
@@ -24,7 +25,16 @@ final class FolderReactor: Reactor {
         var folders: [FolderDisplay]
         var clips: [ClipDisplay]
         var isEmptyViewHidden: Bool
+
+        @Pulse var phase: Phase
         @Pulse var route: Route?
+    }
+
+    enum Phase {
+        case idle
+        case loading
+        case success
+        case error(String)
     }
 
     enum Route {
@@ -63,6 +73,7 @@ final class FolderReactor: Reactor {
             folders: folder.folders.map { FolderDisplayMapper.map($0) },
             clips: folder.clips.map { ClipDisplayMapper.map($0) },
             isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
+            phase: .idle,
         )
     }
 
@@ -75,29 +86,50 @@ final class FolderReactor: Reactor {
                 isFirstAppear = false
                 return .empty()
             }
-            return .fromAsync { [weak self] in
-                guard let self else { throw DomainError.unknownError }
-                return try await fetchFolderUseCase.execute(id: folder.id).get()
-            }
-            .map { .reloadFolder($0) }
-            .catch { _ in .empty() }
+
+            return .concat(
+                .just(.setPhase(.loading)),
+                .fromAsync { [weak self] in
+                    guard let self else {
+                        let message = DomainError.unknownError.localizedDescription
+                        return .setPhase(.error(message))
+                    }
+
+                    let result = await fetchFolderUseCase.execute(id: folder.id)
+                    switch result {
+                    case .success(let folder):
+                        return .reloadFolder(folder)
+                    case .failure(let error):
+                        return .setPhase(.error(error.localizedDescription))
+                    }
+                },
+                .just(.setPhase(.idle)),
+            )
         case .didTapCell(let indexPath):
             switch indexPath.section {
             case 0:
                 let folder = folder.folders[indexPath.item]
                 return .just(.setRoute(.folderView(folder)))
             case 1:
-                let url = folder.clips[indexPath.item].url
+                let clip = folder.clips[indexPath.item]
                 return .concat(
+                    .just(.setPhase(.loading)),
                     .fromAsync { [weak self] in
-                        guard let self else { throw DomainError.unknownError }
-                        let clip = folder.clips[indexPath.item]
-                        _ = await visitClipUseCase.execute(clip: clip)
-                        return clip
-                    }
-                    .map { .updateClipLastVisitedDate($0) }
-                    .catch { _ in .empty() },
-                    .just(.setRoute(.webView(url)))
+                        guard let self else {
+                            let message = DomainError.unknownError.localizedDescription
+                            return .setPhase(.error(message))
+                        }
+
+                        let result = await visitClipUseCase.execute(clip: clip)
+                        switch result {
+                        case .success:
+                            return .updateClipLastVisitedDate(clip)
+                        case .failure(let error):
+                            return .setPhase(.error(error.localizedDescription))
+                        }
+                    },
+                    .just(.setRoute(.webView(clip.url))),
+                    .just(.setPhase(.idle)),
                 )
             default:
                 return .empty()
@@ -127,26 +159,48 @@ final class FolderReactor: Reactor {
             }
         case .didTapDeleteButton(let indexPath):
             return .concat(
+                .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
+                    guard let self else {
+                        let message = DomainError.unknownError.localizedDescription
+                        return .setPhase(.error(message))
+                    }
+
                     switch indexPath.section {
                     case 0:
                         let folder = folder.folders[indexPath.item]
-                        _ = await deleteFolderUseCase.execute(folder)
+                        let result = await deleteFolderUseCase.execute(folder)
+                        if case .failure(let error) = result {
+                            return .setPhase(.error(error.localizedDescription))
+                        }
                     case 1:
                         let clip = folder.clips[indexPath.item]
-                        _ = await deleteClipUseCase.execute(clip)
+                        let result = await deleteClipUseCase.execute(clip)
+                        if case .failure(let error) = result {
+                            return .setPhase(.error(error.localizedDescription))
+                        }
                     default:
-                        break
+                        return .setPhase(.error("Invalid section index"))
                     }
-                    return .delete
+
+                    return .setPhase(.success)
                 },
+                .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    return try await fetchFolderUseCase.execute(id: folder.id).get()
-                }
-                .map { .reloadFolder($0) }
-                .catch { _ in .empty() },
+                    guard let self else {
+                        let message = DomainError.unknownError.localizedDescription
+                        return .setPhase(.error(message))
+                    }
+
+                    let result = await fetchFolderUseCase.execute(id: folder.id)
+                    switch result {
+                    case .success(let folder):
+                        return .reloadFolder(folder)
+                    case .failure(let error):
+                        return .setPhase(.error(error.localizedDescription))
+                    }
+                },
+                .just(.setPhase(.idle)),
             )
         }
     }
@@ -167,6 +221,8 @@ final class FolderReactor: Reactor {
             }
         case .delete:
             break
+        case .setPhase(let phase):
+            newState.phase = phase
         case .setRoute(let route):
             newState.route = route
         }
