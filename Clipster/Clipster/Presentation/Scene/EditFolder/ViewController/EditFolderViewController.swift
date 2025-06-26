@@ -139,7 +139,7 @@ private extension EditFolderViewController {
                     self.onAdditionComplete?(folder)
                     self.navigationController?.popViewController(animated: true)
                 case .error(let message):
-                    self.presentAlert(message: message)
+                    self.presentErrorAlert(message: message)
                 }
             }
             .disposed(by: disposeBag)
@@ -163,14 +163,6 @@ private extension EditFolderViewController {
                 }
             }
             .disposed(by: disposeBag)
-    }
-}
-
-private extension EditFolderViewController {
-    func presentAlert(message: String) {
-        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        self.present(alert, animated: true)
     }
 }
 
