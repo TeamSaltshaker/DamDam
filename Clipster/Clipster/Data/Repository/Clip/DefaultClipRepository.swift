@@ -2,9 +2,11 @@ import Foundation
 
 final class DefaultClipRepository: ClipRepository {
     private let storage: ClipStorage
+    private let cache: FolderClipCache
 
-    init(storage: ClipStorage) {
+    init(storage: ClipStorage, cache: FolderClipCache) {
         self.storage = storage
+        self.cache = cache
     }
 
     func fetchClip(by id: UUID) async -> Result<Clip, DomainError> {

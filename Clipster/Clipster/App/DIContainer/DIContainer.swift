@@ -4,14 +4,17 @@ import Foundation
 final class DIContainer {
     private let container: NSPersistentContainer
     private let supabaseService: SupabaseService
+    private let cache: FolderClipCache
 
     init(
         container: NSPersistentContainer? = nil,
         supabaseURL: URL,
         supabaseKey: String,
+        cache: FolderClipCache,
     ) {
         self.container = container ?? CoreDataStack.shared.container
         supabaseService = SupabaseService(url: supabaseURL, key: supabaseKey)
+        self.cache = cache
     }
 
     func makeClipStorage() -> ClipStorage {
@@ -31,11 +34,11 @@ final class DIContainer {
     }
 
     func makeClipRepository() -> ClipRepository {
-        DefaultClipRepository(storage: makeClipStorage())
+        DefaultClipRepository(storage: makeClipStorage(), cache: cache)
     }
 
     func makeFolderRepository() -> FolderRepository {
-        DefaultFolderRepository(storage: makeFolderStorage())
+        DefaultFolderRepository(storage: makeFolderStorage(), cache: cache)
     }
 
     func makeURLMetadataRepository() -> DefaultURLRepository {

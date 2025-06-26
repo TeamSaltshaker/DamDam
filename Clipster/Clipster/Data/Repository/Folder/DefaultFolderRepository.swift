@@ -2,9 +2,11 @@ import Foundation
 
 final class DefaultFolderRepository: FolderRepository {
     private let storage: FolderStorage
+    private let cache: FolderClipCache
 
-    init(storage: FolderStorage) {
+    init(storage: FolderStorage, cache: FolderClipCache) {
         self.storage = storage
+        self.cache = cache
     }
 
     func fetchFolder(by id: UUID) async -> Result<Folder, DomainError> {
