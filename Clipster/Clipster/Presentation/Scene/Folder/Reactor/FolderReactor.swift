@@ -102,7 +102,7 @@ final class FolderReactor: Reactor {
                         return .setPhase(.error(error.localizedDescription))
                     }
                 },
-                .just(.setPhase(.idle)),
+                .just(.setPhase(.success)),
             )
         case .didTapCell(let indexPath):
             switch indexPath.section {
@@ -128,7 +128,7 @@ final class FolderReactor: Reactor {
                         }
                     },
                     .just(.setRoute(.webView(clip.url))),
-                    .just(.setPhase(.idle)),
+                    .just(.setPhase(.success)),
                 )
             default:
                 return .empty()
@@ -199,7 +199,7 @@ final class FolderReactor: Reactor {
                         return .setPhase(.error(error.localizedDescription))
                     }
                 },
-                .just(.setPhase(.idle)),
+                .just(.setPhase(.success)),
             )
         }
     }
