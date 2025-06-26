@@ -1,18 +1,14 @@
 import AuthenticationServices
+import UIKit
 
 final class AppleLoginService: NSObject, SocialLoginService {
     private var continuation: CheckedContinuation<Result<String, Error>, Never>?
-    private var provider: ASAuthorizationControllerPresentationContextProviding?
 
-    func login(presentationAnchor: ASPresentationAnchor) async -> Result<String, Error> {
-        let provider = await StaticPresentationProvider(anchor: presentationAnchor)
-        self.provider = provider
-
+    func login() async -> Result<String, Error> {
         let request = ASAuthorizationAppleIDProvider().createRequest()
-        
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
-        controller.presentationContextProvider = provider
+        controller.presentationContextProvider = self
         controller.performRequests()
 
         return await withCheckedContinuation { continuation in
@@ -45,14 +41,11 @@ extension AppleLoginService: ASAuthorizationControllerDelegate {
     }
 }
 
-private final class StaticPresentationProvider: NSObject, ASAuthorizationControllerPresentationContextProviding {
-    let anchor: ASPresentationAnchor
-
-    init(anchor: ASPresentationAnchor) {
-        self.anchor = anchor
-    }
-
+extension AppleLoginService: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        anchor
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow } ?? UIWindow()
     }
 }

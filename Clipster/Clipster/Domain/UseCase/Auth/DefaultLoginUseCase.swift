@@ -1,5 +1,3 @@
-import AuthenticationServices
-
 final class DefaultLoginUseCase: LoginUseCase {
     private let loginServices: [LoginType: SocialLoginService]
 
@@ -7,10 +5,10 @@ final class DefaultLoginUseCase: LoginUseCase {
         self.loginServices = loginServices
     }
 
-    func execute(type: LoginType, anchor: ASPresentationAnchor) async -> Result<String, Error> {
+    func execute(type: LoginType) async -> Result<String, Error> {
         guard let service = loginServices[type] else {
             return .failure(LoginError.unsupportedType)
         }
-        return await service.login(presentationAnchor: anchor)
+        return await service.login()
     }
 }
