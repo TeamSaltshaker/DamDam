@@ -110,7 +110,7 @@ private extension FolderViewController {
                 case .loading:
                     folderView.setLoading(true)
                 case .error(let message):
-                    print(message) // TODO: 구현 필요
+                    presentErrorAlert(message: message)
                 }
             }
             .disposed(by: disposeBag)
