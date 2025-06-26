@@ -73,6 +73,12 @@ final class FolderView: UIView {
         return button
     }()
 
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -107,6 +113,14 @@ final class FolderView: UIView {
     func setDisplay(isHidden: Bool) {
         emptyView.isHidden = isHidden
         emptyAddButton.isHidden = isHidden
+    }
+
+    func setLoading(_ isLoading: Bool) {
+        if isLoading {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
     }
 }
 
@@ -293,7 +307,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, collectionView, emptyView, emptyAddButton].forEach {
+        [navigationView, collectionView, emptyView, emptyAddButton, activityIndicator].forEach {
             addSubview($0)
         }
     }
@@ -329,6 +343,10 @@ private extension FolderView {
             make.width.equalTo(160)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
+        }
+
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 
