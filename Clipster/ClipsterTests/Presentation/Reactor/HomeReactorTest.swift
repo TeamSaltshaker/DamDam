@@ -72,17 +72,22 @@ final class HomeReactorTests: XCTestCase {
         fetchUnvisitedClipsUseCase.shouldSucceed = false
         fetchTopLevelFoldersUseCase.shouldSucceed = false
 
+        let expectation = expectation(description: "에러 phase 방출 대기")
         reactor.pulse(\.$phase)
             .skip(1)
             .subscribe(onNext: { phase in
                 phaseHistory.append(phase)
+                if case .error = phase {
+                    expectation.fulfill()
+                }
             })
             .disposed(by: disposeBag)
 
         // when
-        waitUntilHomeDataLoaded()
+        reactor.action.onNext(.viewWillAppear)
 
         // then
+        wait(for: [expectation], timeout: 1.0)
         assertPhaseForFailureCase(phaseHistory)
     }
 
@@ -410,13 +415,8 @@ private extension HomeReactorTests {
         )
 
         XCTAssertTrue(
-            history.dropFirst().first.map { if case .error = $0 { true } else { false } } ?? false,
-            "두 번째 phase는 .error이어야 합니다."
-        )
-
-        XCTAssertTrue(
-            history.last.map { if case .success = $0 { true } else { false } } ?? false,
-            "마지막 phase는 .success이어야 합니다."
+            history.last.map { if case .error = $0 { true } else { false } } ?? false,
+            "마지막 phase는 .error이어야 합니다."
         )
     }
 }
