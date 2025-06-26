@@ -444,6 +444,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				GOOGLE_CLIENT_ID = "${GOOGLE_CLIENT_ID}";
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "담담";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -486,6 +487,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				GOOGLE_CLIENT_ID = "${GOOGLE_CLIENT_ID}";
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "담담";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
