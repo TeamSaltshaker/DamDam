@@ -105,7 +105,6 @@ final class FolderReactor: Reactor {
                 return .concat(
                     .just(.setPhase(.loading)),
                     visitClipMutation(clip),
-                    reloadFolderMutation(),
                     .just(.setRoute(.webView(clip.url))),
                     .just(.setPhase(.success)),
                 )
