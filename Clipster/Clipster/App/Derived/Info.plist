@@ -6,6 +6,8 @@
 	<string>$(SUPABASE_KEY)</string>
 	<key>SUPABASE_URL</key>
 	<string>$(SUPABASE_URL)</string>
+    <key>GIDClientID</key>
+    <string>$(GOOGLE_CLIENT_ID)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -30,6 +32,14 @@
 				<string>damdamdebug</string>
 			</array>
 		</dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>$(GOOGLE_CLIENT_ID_REVERSED)</string>
+            </array>
+        </dict>
 	</array>
 	<key>UIAppFonts</key>
 	<array>

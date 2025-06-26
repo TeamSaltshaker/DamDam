@@ -22,8 +22,12 @@ final class DIContainer {
         DefaultFolderStorage(container: container, mapper: DomainMapper())
     }
 
-    func makeAppleLoginService() -> AppleLoginService {
+    func makeAppleLoginService() -> SocialLoginService {
         AppleLoginService()
+    }
+
+    func makeGoogleLoginService() -> SocialLoginService {
+        GoogleLoginService()
     }
 
     func makeClipRepository() -> ClipRepository {
@@ -40,7 +44,8 @@ final class DIContainer {
 
     func makeLoginUseCase() -> LoginUseCase {
         DefaultLoginUseCase(loginServices: [
-            .apple: makeAppleLoginService()
+            .apple: makeAppleLoginService(),
+            .google: makeGoogleLoginService()
         ])
     }
 

@@ -18,6 +18,7 @@
 		44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D52DE9D37000B6CD87 /* SnapKit */; };
 		44DFD9DC2DE9D39300B6CD87 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9DB2DE9D39300B6CD87 /* Kingfisher */; };
 		9F781F192DF6CEFC00D7BEC6 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E5C2F0E72E0D0045006BAC60 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +117,7 @@
 				44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */,
 				443905122E0A78800092F53C /* Auth in Frameworks */,
 				443905142E0A78800092F53C /* Storage in Frameworks */,
+				E5C2F0E72E0D0045006BAC60 /* GoogleSignIn in Frameworks */,
 				443905162E0A78800092F53C /* Supabase in Frameworks */,
 				44DFD9D12DE9D36400B6CD87 /* RxRelay in Frameworks */,
 				442D5AB02DFFB069002E4E68 /* ReactorKit in Frameworks */,
@@ -209,6 +211,7 @@
 				443905112E0A78800092F53C /* Auth */,
 				443905132E0A78800092F53C /* Storage */,
 				443905152E0A78800092F53C /* Supabase */,
+				E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */,
 			);
 			productName = Clipster;
 			productReference = 44DFD9B52DE9D0E000B6CD87 /* Clipster.app */;
@@ -274,6 +277,7 @@
 				44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 				443905102E0A78800092F53C /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				E5C2F0E52E0D0045006BAC60 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 44DFD9B62DE9D0E000B6CD87 /* Products */;
@@ -440,6 +444,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				GOOGLE_CLIENT_ID = "${GOOGLE_CLIENT_ID}";
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "담담";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -482,6 +487,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 37CRZBHS68;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				GOOGLE_CLIENT_ID = "${GOOGLE_CLIENT_ID}";
 				INFOPLIST_FILE = Clipster/App/Derived/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "담담";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -791,6 +797,14 @@
 				minimumVersion = 8.3.2;
 			};
 		};
+		E5C2F0E52E0D0045006BAC60 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -838,6 +852,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5C2F0E52E0D0045006BAC60 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
