@@ -88,10 +88,10 @@ final class HomeReactor: Reactor {
                     let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
 
                     return .setHomeDisplay(unvisitedClips, folders)
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
+                },
                 .just(.setPhase(.success))
             )
+            .catch { .just(.setPhase(.error($0.localizedDescription))) }
 
         case .tapDelete(let indexPath):
             return .concat(
@@ -114,10 +114,10 @@ final class HomeReactor: Reactor {
                     let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
 
                     return .setHomeDisplay(unvisitedClips, folders)
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
+                },
                 .just(.setPhase(.success))
             )
+            .catch { .just(.setPhase(.error($0.localizedDescription))) }
 
         case .tapCell(let indexPath):
             return .fromAsync { [weak self] in
