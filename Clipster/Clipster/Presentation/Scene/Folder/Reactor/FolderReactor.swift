@@ -14,8 +14,7 @@ final class FolderReactor: Reactor {
 
     enum Mutation {
         case reloadFolder(Folder)
-        case updateClipLastVisitedDate(Clip)
-        case delete
+        case setPhase(Phase)
         case setRoute(Route)
     }
 
@@ -24,7 +23,16 @@ final class FolderReactor: Reactor {
         var folders: [FolderDisplay]
         var clips: [ClipDisplay]
         var isEmptyViewHidden: Bool
+
+        @Pulse var phase: Phase
         @Pulse var route: Route?
+    }
+
+    enum Phase {
+        case idle
+        case loading
+        case success
+        case error(String)
     }
 
     enum Route {
@@ -36,26 +44,31 @@ final class FolderReactor: Reactor {
         case webView(URL)
     }
 
+    enum SectionType {
+        case folder(Folder)
+        case clip(Clip)
+    }
+
     let initialState: State
     private var folder: Folder
     private var isFirstAppear = true
 
     private let fetchFolderUseCase: FetchFolderUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
-    private let updateClipUseCase: UpdateClipUseCase
+    private let visitClipUseCase: VisitClipUseCase
     private let deleteClipUseCase: DeleteClipUseCase
 
     init(
         folder: Folder,
         fetchFolderUseCase: FetchFolderUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
-        updateClipUseCase: UpdateClipUseCase,
+        visitClipUseCase: VisitClipUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
         self.fetchFolderUseCase = fetchFolderUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
-        self.updateClipUseCase = updateClipUseCase
+        self.visitClipUseCase = visitClipUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
         initialState = State(
@@ -63,6 +76,7 @@ final class FolderReactor: Reactor {
             folders: folder.folders.map { FolderDisplayMapper.map($0) },
             clips: folder.clips.map { ClipDisplayMapper.map($0) },
             isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
+            phase: .idle,
         )
     }
 
@@ -75,91 +89,56 @@ final class FolderReactor: Reactor {
                 isFirstAppear = false
                 return .empty()
             }
-            return .fromAsync { [weak self] in
-                guard let self else { throw DomainError.unknownError }
-                return try await fetchFolderUseCase.execute(id: folder.id).get()
-            }
-            .map { .reloadFolder($0) }
-            .catch { _ in .empty() }
+            return .concat(
+                .just(.setPhase(.loading)),
+                reloadFolderMutation(),
+                .just(.setPhase(.success)),
+            )
         case .didTapCell(let indexPath):
-            switch indexPath.section {
-            case 0:
-                let folder = folder.folders[indexPath.item]
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder(let folder):
                 return .just(.setRoute(.folderView(folder)))
-            case 1:
-                let url = folder.clips[indexPath.item].url
+            case .clip(let clip):
                 return .concat(
-                    .fromAsync { [weak self] in
-                        guard let self else { throw DomainError.unknownError }
-                        let clip = folder.clips[indexPath.item]
-                        let updatedClip = Clip(
-                            id: clip.id,
-                            folderID: clip.folderID,
-                            url: clip.url,
-                            title: clip.title,
-                            memo: clip.memo,
-                            thumbnailImageURL: clip.thumbnailImageURL,
-                            screenshotData: clip.screenshotData,
-                            createdAt: clip.createdAt,
-                            lastVisitedAt: Date.now,
-                            updatedAt: Date.now,
-                            deletedAt: clip.deletedAt,
-                        )
-                        _ = await updateClipUseCase.execute(clip: updatedClip)
-                        return updatedClip
-                    }
-                    .map { .updateClipLastVisitedDate($0) }
-                    .catch { _ in .empty() },
-                    .just(.setRoute(.webView(url)))
+                    .just(.setPhase(.loading)),
+                    visitClipMutation(clip),
+                    .just(.setRoute(.webView(clip.url))),
+                    .just(.setPhase(.success)),
                 )
-            default:
-                return .empty()
             }
         case .didTapAddFolderButton:
             return .just(.setRoute(.editFolderView(folder, nil)))
         case .didTapAddClipButton:
             return .just(.setRoute(.editClipViewForAdd(folder)))
         case .didTapDetailButton(let indexPath):
-            switch indexPath.section {
-            case 1:
-                let clip = folder.clips[indexPath.item]
-                return .just(.setRoute(.clipDetailView(clip)))
-            default:
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder:
                 return .empty()
+            case .clip(let clip):
+                return .just(.setRoute(.clipDetailView(clip)))
             }
         case .didTapEditButton(let indexPath):
-            switch indexPath.section {
-            case 0:
-                let selectedFolder = folder.folders[indexPath.item]
+            guard let section = section(at: indexPath) else {
+                return .just(.setPhase(.error("Invalid section")))
+            }
+            switch section {
+            case .folder(let selectedFolder):
                 return .just(.setRoute(.editFolderView(folder, selectedFolder)))
-            case 1:
-                let clip = folder.clips[indexPath.item]
+            case .clip(let clip):
                 return .just(.setRoute(.editClipViewForEdit(clip)))
-            default:
-                return .empty()
             }
         case .didTapDeleteButton(let indexPath):
             return .concat(
-                .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    switch indexPath.section {
-                    case 0:
-                        let folder = folder.folders[indexPath.item]
-                        _ = await deleteFolderUseCase.execute(folder)
-                    case 1:
-                        let clip = folder.clips[indexPath.item]
-                        _ = await deleteClipUseCase.execute(clip)
-                    default:
-                        break
-                    }
-                    return .delete
-                },
-                .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    return try await fetchFolderUseCase.execute(id: folder.id).get()
-                }
-                .map { .reloadFolder($0) }
-                .catch { _ in .empty() },
+                .just(.setPhase(.loading)),
+                deleteMutation(at: indexPath),
+                reloadFolderMutation(),
+                .just(.setPhase(.success)),
             )
         }
     }
@@ -174,16 +153,81 @@ final class FolderReactor: Reactor {
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
             newState.clips = folder.clips.map(ClipDisplayMapper.map)
             newState.isEmptyViewHidden = !folder.folders.isEmpty || !folder.clips.isEmpty
-        case .updateClipLastVisitedDate(let updatedClip):
-            if let index = newState.clips.firstIndex(where: { $0.id == updatedClip.id }) {
-                newState.clips[index] = ClipDisplayMapper.map(updatedClip)
-            }
-        case .delete:
-            break
+        case .setPhase(let phase):
+            newState.phase = phase
         case .setRoute(let route):
             newState.route = route
         }
 
         return newState
+    }
+}
+
+private extension FolderReactor {
+    func reloadFolderMutation() -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
+            return .reloadFolder(folder)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func visitClipMutation(_ clip: Clip) -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            _ = try await visitClipUseCase.execute(clip: clip).get()
+            return .setPhase(.success)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func deleteMutation(at indexPath: IndexPath) -> Observable<Mutation> {
+        .fromAsync { [weak self] in
+            guard let self else {
+                let message = DomainError.unknownError.localizedDescription
+                return .setPhase(.error(message))
+            }
+            guard let section = section(at: indexPath) else {
+                return .setPhase(.error("Invalid section"))
+            }
+            switch section {
+            case .folder(let folder):
+                _ = try await deleteFolderUseCase.execute(folder).get()
+            case .clip(let clip):
+                _ = try await deleteClipUseCase.execute(clip).get()
+            }
+            return .setPhase(.success)
+        }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
+    }
+
+    func section(at indexPath: IndexPath) -> SectionType? {
+        switch indexPath.section {
+        case 0:
+            guard folder.folders.indices.contains(indexPath.item) else {
+                return nil
+            }
+            return .folder(folder.folders[indexPath.item])
+        case 1:
+            guard folder.clips.indices.contains(indexPath.item) else {
+                return nil
+            }
+            return .clip(folder.clips[indexPath.item])
+        default:
+            return nil
+        }
     }
 }

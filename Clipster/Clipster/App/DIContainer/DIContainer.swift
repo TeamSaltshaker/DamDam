@@ -192,7 +192,7 @@ final class DIContainer {
             folder: folder,
             fetchFolderUseCase: makeFetchFolderUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase(),
+            visitClipUseCase: makeVisitClipUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
         )
     }
