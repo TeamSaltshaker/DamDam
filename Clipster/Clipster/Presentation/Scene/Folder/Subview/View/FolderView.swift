@@ -229,7 +229,7 @@ private extension FolderView {
             self?.action.accept(.didTapAddClipButton)
         }
 
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+        return UIMenu(title: "", children: [addClipAction, addFolderAction])
     }
 
     func makeDetailAction(for indexPath: IndexPath) -> UIAction {

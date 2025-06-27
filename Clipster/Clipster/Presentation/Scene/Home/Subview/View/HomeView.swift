@@ -196,7 +196,7 @@ final class HomeView: UIView {
             self?.action.accept(.tapAddClip)
         }
 
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
+        return UIMenu(title: "", children: [addClipAction, addFolderAction])
     }
 
     func setDisplay(_ display: HomeDisplay) {
