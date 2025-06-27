@@ -39,6 +39,27 @@ final class DefaultClipStorage: ClipStorage {
         }
     }
 
+    func fetchTopLevelClips() async -> Result<[Clip], CoreDataError> {
+        await withCheckedContinuation { [weak self] continuation in
+            guard let self else { return }
+
+            container.performBackgroundTask { context in
+                let request = ClipEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
+
+                do {
+                    let entities = try context.fetch(request)
+                    let topLevelClips = entities.compactMap(self.mapper.clip)
+                    print("\(Self.self): ✅ Fetch successfully")
+                    continuation.resume(returning: .success(topLevelClips))
+                } catch {
+                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
+                }
+            }
+        }
+    }
+
     func fetchUnvisitedClips() async -> Result<[Clip], CoreDataError> {
         await withCheckedContinuation { [weak self] continuation in
             guard let self else { return }
