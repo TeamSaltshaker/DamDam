@@ -21,6 +21,16 @@ final class AddFAButton: UIButton {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        let path = UIBezierPath(
+            roundedRect: innerButton.bounds,
+            cornerRadius: innerButton.layer.cornerRadius
+        )
+        innerButton.layer.shadowPath = path.cgPath
+    }
 }
 
 extension AddFAButton {
