@@ -6,6 +6,6 @@ final class MockVisitClipUseCase: VisitClipUseCase {
 
     func execute(clip: Clip) async -> Result<Void, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(()) : .failure(MockError.makrVisitClipFailed)
+        return shouldSucceed ? .success(()) : .failure(MockError.markVisitClipFailed)
     }
 }
