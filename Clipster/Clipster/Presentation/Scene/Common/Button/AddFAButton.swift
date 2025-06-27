@@ -40,7 +40,7 @@ extension AddFAButton {
         animator: UIContextMenuInteractionAnimating?
     ) {
         animator?.addAnimations {
-            self.innerButton.transform = CGAffineTransform(rotationAngle: .pi / 4) // 45도 회전
+            self.innerButton.transform = CGAffineTransform(rotationAngle: .pi / 4)
         }
     }
 

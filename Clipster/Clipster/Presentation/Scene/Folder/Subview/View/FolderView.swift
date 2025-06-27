@@ -53,6 +53,7 @@ final class FolderView: UIView {
         let button = AddFAButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
+        button.preferredMenuElementOrder = .fixed
         return button
     }()
 
