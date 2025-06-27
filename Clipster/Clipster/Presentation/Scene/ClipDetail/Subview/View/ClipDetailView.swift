@@ -36,7 +36,7 @@ final class ClipDetailView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ clip: ClipDisplay, folder: FolderDisplay) {
+    func setDisplay(_ clip: ClipDisplay, folder: FolderDisplay?) {
         urlMetadataStackView.setDisplay(display: clip.urlMetadata)
         urlView.urlTextField.text = clip.urlMetadata.url.description
         memoView.memoTextView.text = clip.memo

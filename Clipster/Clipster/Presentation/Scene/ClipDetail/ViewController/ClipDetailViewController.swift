@@ -63,26 +63,11 @@ private extension ClipDetailViewController {
             .map { state -> Display in
                 (clip: state.clipDisplay, folder: state.folderDisplay)
             }
-            .filter { $0.folder != nil }
-            .take(1)
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] (clip, folder) in
-                guard let folder else { return }
-                self?.clipDetailView.setDisplay(clip, folder: folder)
-            }
-            .disposed(by: disposeBag)
-
-        reactor.state
-            .skip(1)
-            .map { state -> Display in
-                (clip: state.clipDisplay, folder: state.folderDisplay)
-            }
             .distinctUntilChanged { (lhs: Display, rhs: Display) in
                 lhs.clip == rhs.clip && lhs.folder == rhs.folder
             }
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] (clip, folder) in
-                guard let folder else { return }
                 self?.clipDetailView.setDisplay(clip, folder: folder)
             }
             .disposed(by: disposeBag)
