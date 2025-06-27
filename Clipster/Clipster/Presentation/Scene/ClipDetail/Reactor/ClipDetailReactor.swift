@@ -98,9 +98,9 @@ final class ClipDetailReactor: Reactor {
                         let clip = try await fetchClipUseCase.execute(id: currentState.clip.id).get()
                         if let folderID = clip.folderID {
                             let folder = try await fetchFolderUseCase.execute(id: folderID).get()
-                            return .setInitialData(clip: currentState.clip, folder: folder)
+                            return .setInitialData(clip: clip, folder: folder)
                         } else {
-                            return .setInitialData(clip: currentState.clip, folder: nil)
+                            return .setInitialData(clip: clip, folder: nil)
                         }
                     }
                     .catch { error in
