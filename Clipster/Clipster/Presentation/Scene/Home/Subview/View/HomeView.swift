@@ -15,27 +15,27 @@ final class HomeView: UIView {
     }
 
     enum Section: Int, CaseIterable {
-        case clip
+        case unvisitedClip
         case folder
+        case clip
 
         func logicalIndexPath(for item: Int) -> IndexPath {
-            switch self {
-            case .clip:
-                return IndexPath(item: item, section: 0)
-            case .folder:
-                return IndexPath(item: item, section: 1)
-            }
+            IndexPath(item: item, section: rawValue)
         }
     }
 
     enum Item: Hashable {
-        case clip(ClipDisplay)
+        case unvisitedClip(ClipDisplay)
         case folder(FolderDisplay)
+        case clip(ClipDisplay)
 
         var displayTitle: String {
             switch self {
-            case .clip(let clip): clip.urlMetadata.title
-            case .folder(let folder): folder.title
+            case .unvisitedClip(let clip),
+                    .clip(let clip):
+                clip.urlMetadata.title
+            case .folder(let folder):
+                folder.title
             }
         }
     }
@@ -113,27 +113,37 @@ final class HomeView: UIView {
     }
 
     private func configureDataSource() {
-        let clipCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
+        let clipGridCellRegistration = UICollectionView.CellRegistration<ClipGridCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
-        let folderCellRegistration = UICollectionView.CellRegistration<FolderListCell, FolderDisplay> { cell, _, item in
+        let folderListCellRegistration = UICollectionView.CellRegistration<FolderListCell, FolderDisplay> { cell, _, item in
+            cell.setDisplay(item)
+        }
+
+        let clipListCellRegistration = UICollectionView.CellRegistration<ClipListCell, ClipDisplay> { cell, _, item in
             cell.setDisplay(item)
         }
 
         dataSource = .init(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
-            case .clip(let clipItem):
+            case .unvisitedClip(let clipItem):
                 return collectionView.dequeueConfiguredReusableCell(
-                    using: clipCellRegistration,
+                    using: clipGridCellRegistration,
                     for: indexPath,
                     item: clipItem
                 )
             case .folder(let folderItem):
                 return collectionView.dequeueConfiguredReusableCell(
-                    using: folderCellRegistration,
+                    using: folderListCellRegistration,
                     for: indexPath,
                     item: folderItem
+                )
+            case .clip(let clipItem):
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: clipListCellRegistration,
+                    for: indexPath,
+                    item: clipItem
                 )
             }
         }
@@ -147,7 +157,7 @@ final class HomeView: UIView {
             else { return }
 
             switch sectionIdentifier {
-            case .clip:
+            case .unvisitedClip:
                 header.setTitle("방문하지 않은 클립")
                 header.setShowAllButtonVisible(true)
                 header.setBindings()
@@ -158,6 +168,8 @@ final class HomeView: UIView {
                     .disposed(by: header.disposeBag)
             case .folder:
                 header.setTitle("폴더")
+            case .clip:
+                header.setTitle("클립")
             }
         }
 
@@ -191,15 +203,21 @@ final class HomeView: UIView {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
 
         if !display.unvisitedClips.isEmpty {
-            let clipItems = display.unvisitedClips.map { Item.clip($0) }
-            snapshot.appendSections([.clip])
-            snapshot.appendItems(clipItems, toSection: .clip)
+            let clipItems = display.unvisitedClips.map { Item.unvisitedClip($0) }
+            snapshot.appendSections([.unvisitedClip])
+            snapshot.appendItems(clipItems, toSection: .unvisitedClip)
         }
 
         if !display.folders.isEmpty {
             let folderItems = display.folders.map { Item.folder($0) }
             snapshot.appendSections([.folder])
             snapshot.appendItems(folderItems, toSection: .folder)
+        }
+
+        if !display.clips.isEmpty {
+            let clipItem = display.clips.map { Item.clip($0) }
+            snapshot.appendSections([.clip])
+            snapshot.appendItems(clipItem, toSection: .clip)
         }
 
         let isEmpty = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
@@ -228,16 +246,16 @@ private extension HomeView {
             else { return nil }
 
             switch sectionKind {
-            case .clip:
-                return makeClipSectionLayout()
-            case .folder:
-                return makeFolderListSectionLayout(using: env)
+            case .unvisitedClip:
+                return makeClipSectionLayout(for: sectionKind)
+            case .folder, .clip:
+                return makeListSectionLayout(for: sectionKind, using: env)
             }
         }
         return layout
     }
 
-    func makeClipSectionLayout() -> NSCollectionLayoutSection {
+    func makeClipSectionLayout(for sectionKind: Section) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -257,12 +275,15 @@ private extension HomeView {
         section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
         section.interGroupSpacing = 16
         section.contentInsets = .init(top: 8, leading: 24, bottom: 40, trailing: 24)
-        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .clip)]
+        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: sectionKind)]
 
         return section
     }
 
-    func makeFolderListSectionLayout(using env: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+    func makeListSectionLayout(
+        for sectionKind: Section,
+        using env: NSCollectionLayoutEnvironment
+    ) -> NSCollectionLayoutSection {
         var config = UICollectionLayoutListConfiguration(appearance: .plain)
         config.showsSeparators = false
         config.backgroundColor = .white800
@@ -282,35 +303,35 @@ private extension HomeView {
 
             return UISwipeActionsConfiguration(actions: [delete])
         }
-            let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
-            section.boundarySupplementaryItems = [makeHeaderItemLayout(for: .folder)]
-            section.contentInsets = .init(top: 8, leading: 0, bottom: 24, trailing: 24)
-            section.interGroupSpacing = 8
-            return section
-        }
-
-        func makeHeaderItemLayout(for section: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
-            let headerSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(48)
-            )
-
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
-            )
-
-            switch section {
-            case .clip:
-                header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-            case .folder:
-                header.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
-            }
-
-            return header
-        }
+        let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+        section.boundarySupplementaryItems = [makeHeaderItemLayout(for: sectionKind)]
+        section.contentInsets = .init(top: 8, leading: 0, bottom: 40, trailing: 24)
+        section.interGroupSpacing = 8
+        return section
     }
+
+    func makeHeaderItemLayout(for sectionKind: Section) -> NSCollectionLayoutBoundarySupplementaryItem {
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(48)
+        )
+
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+
+        switch sectionKind {
+        case .unvisitedClip:
+            header.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+        case .folder, .clip:
+            header.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
+        }
+
+        return header
+    }
+}
 
 extension HomeView: UICollectionViewDelegate {
     func collectionView(
@@ -332,7 +353,7 @@ extension HomeView: UICollectionViewDelegate {
             let delete = self.makeDeleteAction(for: indexPath)
 
             switch item {
-            case .clip:
+            case .unvisitedClip, .clip:
                 let detail = self.makeDetailAction(for: indexPath)
                 return UIMenu(title: "", children: [detail, edit, delete])
             case .folder:

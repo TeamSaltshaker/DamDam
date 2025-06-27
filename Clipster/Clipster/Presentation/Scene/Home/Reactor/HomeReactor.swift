@@ -14,7 +14,7 @@ final class HomeReactor: Reactor {
     }
 
     enum Mutation {
-        case setHomeDisplay([Clip], [Folder])
+        case setHomeDisplay([Clip], [Folder], [Clip])
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
@@ -46,15 +46,18 @@ final class HomeReactor: Reactor {
     enum SectionType {
         case unvisitedClip(Clip)
         case folder(Folder)
+        case clip(Clip)
     }
 
     let initialState = State()
 
     private var unvisitedClips: [Clip] = []
     private var folders: [Folder] = []
+    private var clips: [Clip] = []
 
     private let fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase
     private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
+    private let fetchTopLevelClipsUseCase: FetchTopLevelClipsUseCase
     private let deleteClipUseCase: DeleteClipUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let visitClipUseCase: VisitClipUseCase
@@ -62,12 +65,14 @@ final class HomeReactor: Reactor {
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
+        fetchTopLevelClipsUseCase: FetchTopLevelClipsUseCase,
         deleteClipUseCase: DeleteClipUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
         visitClipUseCase: VisitClipUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
+        self.fetchTopLevelClipsUseCase = fetchTopLevelClipsUseCase
         self.deleteClipUseCase = deleteClipUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         self.visitClipUseCase = visitClipUseCase
@@ -85,9 +90,14 @@ final class HomeReactor: Reactor {
 
                     async let unvisitedClipsResult = fetchUnvisitedClipsUseCase.execute().get()
                     async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
-                    let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
+                    async let clipsResult = fetchTopLevelClipsUseCase.execute().get()
+                    let (unvisitedClips, folders, clips) = try await (
+                        unvisitedClipsResult,
+                        foldersResult,
+                        clipsResult
+                    )
 
-                    return .setHomeDisplay(unvisitedClips, folders)
+                    return .setHomeDisplay(unvisitedClips, folders, clips)
                 },
                 .just(.setPhase(.success))
             )
@@ -103,7 +113,7 @@ final class HomeReactor: Reactor {
                     }
 
                     switch section {
-                    case .unvisitedClip(let clip):
+                    case .unvisitedClip(let clip), .clip(let clip):
                         try await deleteClipUseCase.execute(clip).get()
                     case .folder(let folder):
                         try await deleteFolderUseCase.execute(folder).get()
@@ -113,7 +123,7 @@ final class HomeReactor: Reactor {
                     async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
                     let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
 
-                    return .setHomeDisplay(unvisitedClips, folders)
+                    return .setHomeDisplay(unvisitedClips, folders, clips)
                 },
                 .just(.setPhase(.success))
             )
@@ -127,7 +137,7 @@ final class HomeReactor: Reactor {
                 }
 
                 switch section {
-                case .unvisitedClip(let clip):
+                case .unvisitedClip(let clip), .clip(let clip):
                     _ = try await visitClipUseCase.execute(clip: clip).get()
                     return .setRoute(.showWebView(clip.url))
                 case .folder(let folder):
@@ -142,7 +152,7 @@ final class HomeReactor: Reactor {
             }
 
             switch section {
-            case .unvisitedClip(let clip):
+            case .unvisitedClip(let clip), .clip(let clip):
                 return .just(.setRoute(.showDetailClip(clip)))
             case .folder:
                 return .just(.setPhase(.error("폴더 상세보기는 지원하지 않습니다.")))
@@ -154,7 +164,7 @@ final class HomeReactor: Reactor {
             }
 
             switch section {
-            case .unvisitedClip(let clip):
+            case .unvisitedClip(let clip), .clip(let clip):
                 return .just(.setRoute(.showEditClip(clip)))
             case .folder(let folder):
                 return .just(.setRoute(.showEditFolder(folder)))
@@ -174,13 +184,15 @@ final class HomeReactor: Reactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setHomeDisplay(let unvisitedClips, let folders):
+        case .setHomeDisplay(let unvisitedClips, let folders, let clips):
             self.unvisitedClips = unvisitedClips
             self.folders = folders
+            self.clips = clips
 
             let homeDisplay = HomeDisplay(
                 unvisitedClips: unvisitedClips.map { ClipDisplayMapper.map($0) },
-                folders: folders.map { FolderDisplayMapper.map($0) }
+                folders: folders.map { FolderDisplayMapper.map($0) },
+                clips: clips.map { ClipDisplayMapper.map($0) }
             )
             newState.homeDisplay = homeDisplay
         case .setRoute(let route):
@@ -201,6 +213,9 @@ private extension HomeReactor {
         case 1:
             guard folders.indices.contains(indexPath.item) else { return nil }
             return .folder(folders[indexPath.item])
+        case 2:
+            guard clips.indices.contains(indexPath.item) else { return nil }
+            return .clip(clips[indexPath.item])
         default:
             return nil
         }

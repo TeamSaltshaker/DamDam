@@ -210,6 +210,7 @@ final class DIContainer {
         HomeReactor(
             fetchUnvisitedClipsUseCase: makeFetchUnvisitedClipsUseCase(),
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
+            fetchTopLevelClipsUseCase: makeFetchTopLevelClipsUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
             visitClipUseCase: makeVisitClipUseCase()
