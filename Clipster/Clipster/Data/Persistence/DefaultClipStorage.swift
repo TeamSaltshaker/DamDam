@@ -89,6 +89,7 @@ final class DefaultClipStorage: ClipStorage {
                 let urlMetadataEntity = URLMetadataEntity(context: context)
                 urlMetadataEntity.urlString = clip.url.absoluteString
                 urlMetadataEntity.title = clip.title
+                urlMetadataEntity.subtitle = clip.subtitle
                 urlMetadataEntity.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
                 urlMetadataEntity.screenshotData = clip.screenshotData
                 urlMetadataEntity.createdAt = clip.createdAt
@@ -145,6 +146,7 @@ final class DefaultClipStorage: ClipStorage {
 
                     entity.urlMetadata?.urlString = clip.url.absoluteString
                     entity.urlMetadata?.title = clip.title
+                    entity.urlMetadata?.subtitle = clip.subtitle
                     entity.urlMetadata?.thumbnailImageURLString = clip.thumbnailImageURL?.absoluteString
                     entity.urlMetadata?.screenshotData = clip.screenshotData
                     entity.urlMetadata?.updatedAt = clip.updatedAt

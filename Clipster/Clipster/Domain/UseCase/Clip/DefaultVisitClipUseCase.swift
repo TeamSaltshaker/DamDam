@@ -13,7 +13,7 @@ final class DefaultVisitClipUseCase: VisitClipUseCase {
             folderID: clip.folderID,
             url: clip.url,
             title: clip.title,
-            description: clip.description,
+            subtitle: clip.subtitle,
             memo: clip.memo,
             thumbnailImageURL: clip.thumbnailImageURL,
             screenshotData: clip.screenshotData,
