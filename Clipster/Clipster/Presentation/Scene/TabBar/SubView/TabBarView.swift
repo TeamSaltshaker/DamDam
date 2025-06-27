@@ -134,21 +134,21 @@ private extension TabBarView {
         }
 
         homeButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
-            make.size.equalTo(24)
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(64)
         }
 
-        addButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
-            make.size.equalTo(28)
+        searchButton.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(64)
         }
 
         userButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
-            make.size.equalTo(24)
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(64)
         }
     }
 
