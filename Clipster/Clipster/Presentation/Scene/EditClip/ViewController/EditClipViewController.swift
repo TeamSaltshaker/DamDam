@@ -278,13 +278,12 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .compactMap(\.currentFolder)
-            .distinctUntilChanged { $0.id == $1.id }
+            .map(\.currentFolder)
+            .distinctUntilChanged { $0?.id == $1?.id }
             .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
-                self?.editClipView.selectedFolderView.folderRowView.setDisplay(
-                    FolderDisplayMapper.map($0)
-                )
+            .drive(with: self) { owner, folder in
+                let display = folder.map(FolderDisplayMapper.map)
+                owner.editClipView.selectedFolderView.folderRowView.setDisplay(display)
             }
             .disposed(by: disposeBag)
 
