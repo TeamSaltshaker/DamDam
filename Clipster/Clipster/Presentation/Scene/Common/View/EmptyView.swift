@@ -5,12 +5,9 @@ final class EmptyView: UIView {
     enum EmptyViewType {
         case homeView
         case folderView
-        case editClipView
 
         var imageSize: CGSize {
             switch self {
-            case .editClipView:
-                return CGSize(width: 54, height: 50)
             default:
                 return CGSize(width: 110, height: 100)
             }
@@ -18,8 +15,6 @@ final class EmptyView: UIView {
 
         var description: String {
             switch self {
-            case .editClipView:
-                return "현재 생성된 폴더가 없습니다.\n+버튼으로 추가해 보세요!"
             default:
                 return "현재 폴더 및 파일이 없습니다."
             }
@@ -27,8 +22,6 @@ final class EmptyView: UIView {
 
         var spacing: CGFloat {
             switch self {
-            case .editClipView:
-                return 17
             default:
                 return 30
             }
