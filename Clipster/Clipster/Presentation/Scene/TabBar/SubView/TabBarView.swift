@@ -22,27 +22,45 @@ final class TabBarView: UIView {
     }()
 
     private let homeContainer = UIView()
-    private let addContainer = UIView()
+    private let searchContainer = UIView()
     private let userContainer = UIView()
 
     private let homeButton: UIButton = {
         let button = UIButton()
-        button.setImage(.home, for: .normal)
-        button.setImage(.homeBlue, for: .selected)
+        let normalImage = UIImage.home
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.black100)
+        let selectedImage = UIImage.home
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.blue600)
+        button.setImage(normalImage, for: .normal)
+        button.setImage(selectedImage, for: .selected)
         return button
     }()
 
-    private lazy var addButton: AddButton = {
-        let button = AddButton()
-        button.showsMenuAsPrimaryAction = true
-        button.menu = makeAddButtonMenu()
+    private lazy var searchButton: UIButton = {
+        let button = UIButton()
+        let normalImage = UIImage.search
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.black100)
+        let selectedImage = UIImage.search
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.blue600)
+        button.setImage(normalImage, for: .normal)
+        button.setImage(selectedImage, for: .selected)
         return button
     }()
 
     private let userButton: UIButton = {
         let button = UIButton()
-        button.setImage(.user, for: .normal)
-        button.setImage(.userBlue, for: .selected)
+        let normalImage = UIImage.user
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.black100)
+        let selectedImage = UIImage.user
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(.blue600)
+        button.setImage(normalImage, for: .normal)
+        button.setImage(selectedImage, for: .selected)
         return button
     }()
 
@@ -97,17 +115,17 @@ private extension TabBarView {
     }
 
     func setHierarchy() {
-        homeContainer.addSubview(homeButton)
-        addContainer.addSubview(addButton)
-        userContainer.addSubview(userButton)
+        addSubview(stackView)
 
         [
             homeContainer,
-            addContainer,
+            searchContainer,
             userContainer
         ].forEach { stackView.addArrangedSubview($0) }
 
-        addSubview(stackView)
+        homeContainer.addSubview(homeButton)
+        searchContainer.addSubview(searchButton)
+        userContainer.addSubview(userButton)
     }
 
     func setConstraints() {
