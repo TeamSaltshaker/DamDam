@@ -41,8 +41,6 @@ final class SelectedFolderView: UIView {
         return imageView
     }()
 
-    let emptyView = EmptyView(type: .editClipView)
-
     let folderViewTapGesture = UITapGestureRecognizer()
 
     init(type: SelectedFolderType, mode: SelectedFolderMode) {
@@ -70,22 +68,17 @@ private extension SelectedFolderView {
         case (.clip, .edit):
             addButton.isHidden = false
             chevronImageView.isHidden = false
-            emptyView.isHidden = false
-
         case (.clip, .detail):
             addButton.isHidden = true
             chevronImageView.isHidden = true
-            emptyView.isHidden = true
-
         case (.folder, _):
             addButton.isHidden = true
             chevronImageView.isHidden = false
-            emptyView.isHidden = true
         }
     }
 
     func setHierarchy() {
-        [titleLabel, addButton, folderView, emptyView]
+        [titleLabel, addButton, folderView]
             .forEach { addSubview($0) }
 
         [folderRowView, chevronImageView]
@@ -108,6 +101,7 @@ private extension SelectedFolderView {
             make.top.equalTo(titleLabel.snp.bottom).offset(24)
             make.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(72)
+            make.bottom.equalToSuperview()
         }
 
         folderRowView.snp.makeConstraints { make in
@@ -120,12 +114,6 @@ private extension SelectedFolderView {
             make.leading.equalTo(folderRowView.snp.trailing)
             make.trailing.equalToSuperview().inset(20)
             make.size.equalTo(48)
-        }
-
-        emptyView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(38)
-            make.directionalHorizontalEdges.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(22)
         }
     }
 
