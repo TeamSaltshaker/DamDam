@@ -4,6 +4,7 @@ import CoreData
 public class URLMetadataEntity: NSManagedObject {
     @NSManaged public var urlString: String
     @NSManaged public var title: String
+    @NSManaged public var subtitle: String
     @NSManaged public var thumbnailImageURLString: String?
     @NSManaged public var screenshotData: Data?
     @NSManaged public var createdAt: Date
