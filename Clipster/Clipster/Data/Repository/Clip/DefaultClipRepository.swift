@@ -12,6 +12,11 @@ final class DefaultClipRepository: ClipRepository {
             .mapError { _ in .unknownError }
     }
 
+    func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
+        await storage.fetchTopLevelClips()
+            .mapError { _ in .unknownError }
+    }
+
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError> {
         await storage.fetchUnvisitedClips()
             .mapError { _ in .unknownError }

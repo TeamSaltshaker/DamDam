@@ -221,9 +221,10 @@ final class EditClipReactor: Reactor {
                 .catchAndReturn(.updateIsSuccessedEditClip(false))
             }
         case .fetchFolder:
-            guard let clip = currentState.clip else { return .empty() }
+            guard let clip = currentState.clip,
+                  let folderID = clip.folderID else { return .empty() }
             return .fromAsync {
-                try await self.fetchFolderUseCase.execute(id: clip.folderID).get()
+                try await self.fetchFolderUseCase.execute(id: folderID).get()
             }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))

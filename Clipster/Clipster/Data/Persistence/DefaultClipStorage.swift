@@ -39,6 +39,27 @@ final class DefaultClipStorage: ClipStorage {
         }
     }
 
+    func fetchTopLevelClips() async -> Result<[Clip], CoreDataError> {
+        await withCheckedContinuation { [weak self] continuation in
+            guard let self else { return }
+
+            container.performBackgroundTask { context in
+                let request = ClipEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
+
+                do {
+                    let entities = try context.fetch(request)
+                    let topLevelClips = entities.compactMap(self.mapper.clip)
+                    print("\(Self.self): ✅ Fetch successfully")
+                    continuation.resume(returning: .success(topLevelClips))
+                } catch {
+                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
+                }
+            }
+        }
+    }
+
     func fetchUnvisitedClips() async -> Result<[Clip], CoreDataError> {
         await withCheckedContinuation { [weak self] continuation in
             guard let self else { return }
@@ -70,20 +91,25 @@ final class DefaultClipStorage: ClipStorage {
                 entity.createdAt = clip.createdAt
                 entity.updatedAt = clip.updatedAt
 
-                let request = FolderEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", clip.folderID as CVarArg)
-                request.fetchLimit = 1
+                if let folderID = clip.folderID {
+                    let request = FolderEntity.fetchRequest()
+                    request.predicate = NSPredicate(
+                        format: "id == %@ AND deletedAt == nil",
+                        folderID as CVarArg,
+                    )
+                    request.fetchLimit = 1
 
-                do {
-                    guard let parentEntity = try context.fetch(request).first else {
-                        print("\(Self.self): ❌ Failed to insert: Parent entity not found")
-                        continuation.resume(returning: .failure(.entityNotFound))
-                        return
+                    do {
+                        guard let parentEntity = try context.fetch(request).first else {
+                            print("\(Self.self): ❌ Failed to insert: Parent entity not found")
+                            continuation.resume(returning: .failure(.entityNotFound))
+                            return
+                        }
+                        entity.folder = parentEntity
+                    } catch {
+                        print("\(Self.self): ❌ Failed to insert: \(error.localizedDescription)")
+                        continuation.resume(returning: .failure(.insertFailed(error.localizedDescription)))
                     }
-                    entity.folder = parentEntity
-                } catch {
-                    print("\(Self.self): ❌ Failed to insert: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.insertFailed(error.localizedDescription)))
                 }
 
                 let urlMetadataEntity = URLMetadataEntity(context: context)
@@ -129,19 +155,23 @@ final class DefaultClipStorage: ClipStorage {
                     entity.updatedAt = clip.updatedAt
 
                     if entity.folder?.id != clip.folderID {
-                        let request = FolderEntity.fetchRequest()
-                        request.predicate = NSPredicate(
-                            format: "id == %@ AND deletedAt == nil",
-                            clip.folderID as CVarArg,
-                        )
-                        request.fetchLimit = 1
+                        if let folderID = clip.folderID {
+                            let request = FolderEntity.fetchRequest()
+                            request.predicate = NSPredicate(
+                                format: "id == %@ AND deletedAt == nil",
+                                folderID as CVarArg,
+                            )
+                            request.fetchLimit = 1
 
-                        guard let folderEntity = try context.fetch(request).first else {
-                            print("\(Self.self): ❌ Failed to update: Parent entity not found")
-                            continuation.resume(returning: .failure(.entityNotFound))
-                            return
+                            guard let folderEntity = try context.fetch(request).first else {
+                                print("\(Self.self): ❌ Failed to update: Parent entity not found")
+                                continuation.resume(returning: .failure(.entityNotFound))
+                                return
+                            }
+                            entity.folder = folderEntity
+                        } else {
+                            entity.folder = nil
                         }
-                        entity.folder = folderEntity
                     }
 
                     entity.urlMetadata?.urlString = clip.url.absoluteString

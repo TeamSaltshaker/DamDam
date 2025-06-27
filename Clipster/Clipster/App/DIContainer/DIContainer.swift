@@ -69,6 +69,10 @@ final class DIContainer {
         DefaultFetchClipUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeFetchTopLevelClipsUseCase() -> FetchTopLevelClipsUseCase {
+        DefaultFetchTopLevelClipsUseCase(clipRepository: makeClipRepository())
+    }
+
     func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
     }
