@@ -265,8 +265,8 @@ extension EditClipViewController: View {
 
         reactor.state
             .map { ($0.isTappedFolderView, $0.currentFolder) }
-            .filter { $0 && $1 != nil }
-            .map { $1 }
+            .filter { $0.0 }
+            .map { $0.1 }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
