@@ -17,18 +17,18 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        showHome()
+        showTab()
     }
 }
 
 extension AppCoordinator {
-    func showHome() {
-        let homeCoordinator = HomeCoordinator(
+    func showTab() {
+        let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
             diContainer: diContainer
         )
-        addChild(homeCoordinator)
-        homeCoordinator.start()
+        addChild(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 
     func handleSharedURL(_ urlString: String) {
