@@ -68,7 +68,7 @@ private extension DefaultParseURLUseCase {
 
         var thumbnailImageURL: String?
 
-        if let host = url.host(percentEncoded: false), host.contains("youtube") {
+        if let host = url.host(percentEncoded: false), host.contains("youtu") {
             if let videoID = extractYouTubeVideoID(from: url) {
                 thumbnailImageURL = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
             }
