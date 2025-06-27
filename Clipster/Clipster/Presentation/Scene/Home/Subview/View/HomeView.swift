@@ -70,6 +70,7 @@ final class HomeView: UIView {
         let button = AddFAButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
+        button.preferredMenuElementOrder = .fixed
         return button
     }()
 
@@ -196,7 +197,7 @@ final class HomeView: UIView {
             self?.action.accept(.tapAddClip)
         }
 
-        return UIMenu(title: "", children: [addClipAction, addFolderAction])
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
     }
 
     func setDisplay(_ display: HomeDisplay) {

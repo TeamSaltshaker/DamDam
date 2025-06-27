@@ -53,6 +53,7 @@ final class FolderView: UIView {
         let button = AddFAButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
+        button.preferredMenuElementOrder = .fixed
         return button
     }()
 
@@ -229,7 +230,7 @@ private extension FolderView {
             self?.action.accept(.didTapAddClipButton)
         }
 
-        return UIMenu(title: "", children: [addClipAction, addFolderAction])
+        return UIMenu(title: "", children: [addFolderAction, addClipAction])
     }
 
     func makeDetailAction(for indexPath: IndexPath) -> UIAction {
