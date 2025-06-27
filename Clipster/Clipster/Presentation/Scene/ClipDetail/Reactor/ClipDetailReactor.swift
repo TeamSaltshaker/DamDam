@@ -10,7 +10,7 @@ final class ClipDetailReactor: Reactor {
     }
 
     enum Mutation {
-        case setInitialData(clip: Clip, folder: Folder)
+        case setInitialData(clip: Clip, folder: Folder?)
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
@@ -75,8 +75,12 @@ final class ClipDetailReactor: Reactor {
                     .fromAsync { [weak self] in
                         guard let self = self else { throw DomainError.unknownError }
 
-                        let folder = try await fetchFolderUseCase.execute(id: currentState.clip.folderID).get()
-                        return .setInitialData(clip: currentState.clip, folder: folder)
+                        if let folderID = currentState.clip.folderID {
+                            let folder = try await fetchFolderUseCase.execute(id: folderID).get()
+                            return .setInitialData(clip: currentState.clip, folder: folder)
+                        } else {
+                            return .setInitialData(clip: currentState.clip, folder: nil)
+                        }
                     }
                     .catch { error in
                         .just(.setPhase(.error(error.localizedDescription)))
@@ -92,8 +96,12 @@ final class ClipDetailReactor: Reactor {
                         guard let self = self else { throw DomainError.unknownError }
 
                         let clip = try await fetchClipUseCase.execute(id: currentState.clip.id).get()
-                        let folder = try await fetchFolderUseCase.execute(id: clip.folderID).get()
-                        return .setInitialData(clip: clip, folder: folder)
+                        if let folderID = clip.folderID {
+                            let folder = try await fetchFolderUseCase.execute(id: folderID).get()
+                            return .setInitialData(clip: currentState.clip, folder: folder)
+                        } else {
+                            return .setInitialData(clip: currentState.clip, folder: nil)
+                        }
                     }
                     .catch { error in
                         .just(.setPhase(.error(error.localizedDescription)))
@@ -102,7 +110,6 @@ final class ClipDetailReactor: Reactor {
                     .just(.setPhase(.idle))
                 )
             }
-
         case .editButtonTapped:
             print("\(Self.self): Edit button tapped")
             return .just(.setRoute(.showEditClip(currentState.clip)))
@@ -137,7 +144,7 @@ final class ClipDetailReactor: Reactor {
             newState.clip = clip
             newState.folder = folder
             newState.clipDisplay = ClipDisplayMapper.map(clip)
-            newState.folderDisplay = FolderDisplayMapper.map(folder)
+            newState.folderDisplay = folder.map { FolderDisplayMapper.map($0) }
         case .setPhase(let phase):
             print("\(Self.self): Phase changed to: \(phase)")
             newState.phase = phase
