@@ -61,8 +61,20 @@ final class DIContainer {
         DefaultVisitClipUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeDeleteAllRecentVisitedClipsUseCase() -> DeleteAllRecentVisitedClipsUseCase {
+        DefaultDeleteAllRecentVisitedClipsUseCase()
+    }
+
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
         DefaultDeleteClipUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeDeleteRecentVisitedClipUseCase() -> DeleteRecentVisitedClipUseCase {
+        DefaultDeleteRecentVisitedClipUseCase()
+    }
+
+    func makeFetchAllClipsUseCase() -> FetchAllClipsUseCase {
+        DefaultFetchAllClipsUseCase(clipRepository: makeClipRepository())
     }
 
     func makeFetchClipUseCase() -> FetchClipUseCase {
@@ -73,8 +85,16 @@ final class DIContainer {
         DefaultFetchTopLevelClipsUseCase(clipRepository: makeClipRepository())
     }
 
+    func makeFetchRecentVisitedClipsUseCase() -> FetchRecentVisitedClipsUseCase {
+        DefaultFetchRecentVisitedClipsUseCase(clipRepository: makeClipRepository())
+    }
+
     func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
+    }
+
+    func makeSaveRecentVisitedClipUseCase() -> SaveRecentVisitedClipUseCase {
+        DefaultSaveRecentVisitedClipUseCase()
     }
 
     func makeSearchClipsUseCase() -> SearchClipsUseCase {
@@ -105,6 +125,10 @@ final class DIContainer {
         DefaultDeleteFolderUseCase(folderRepository: makeFolderRepository())
     }
 
+    func makeFetchAllFoldersUseCase() -> FetchAllFoldersUseCase {
+        DefaultFetchAllFoldersUseCase(folderRepository: makeFolderRepository())
+    }
+
     func makeFetchFolderUseCase() -> FetchFolderUseCase {
         DefaultFetchFolderUseCase(folderRepository: makeFolderRepository())
     }
@@ -127,6 +151,22 @@ final class DIContainer {
 
     func makeUpdateFolderUseCase() -> UpdateFolderUseCase {
         DefaultUpdateFolderUseCase(folderRepository: makeFolderRepository())
+    }
+
+    func makeDeleteAllRecentQueriesUseCase() -> DeleteAllRecentQueriesUseCase {
+        DefaultDeleteAllRecentQueriesUseCase()
+    }
+
+    func makeDeleteRecentQueryUseCase() -> DeleteRecentQueryUseCase {
+        DefaultDeleteRecentQueryUseCase()
+    }
+
+    func makeFetchRecentQueriesUseCase() -> FetchRecentQueriesUseCase {
+        DefaultFetchRecentQueriesUseCase()
+    }
+
+    func makeSaveRecentQueryUseCase() -> SaveRecentQueryUseCase {
+        DefaultSaveRecentQueryUseCase()
     }
 
     func makeParseURLMetadataUseCase() -> ParseURLUseCase {
@@ -242,6 +282,26 @@ final class DIContainer {
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
             parentFolder: parentFolder,
             folder: folder
+        )
+    }
+
+    func makeSearchReactor() -> SearchReactor {
+        SearchReactor(
+            fetchAllFoldersUseCase: makeFetchAllFoldersUseCase(),
+            fetchAllClipsUseCase: makeFetchAllClipsUseCase(),
+            fetchRecentQueriesUseCase: makeFetchRecentQueriesUseCase(),
+            fetchRecentVisitedClipsUseCase: makeFetchRecentVisitedClipsUseCase(),
+            saveRecentQueryUseCase: makeSaveRecentQueryUseCase(),
+            saveRecentVisitedClipUseCase: makeSaveRecentVisitedClipUseCase(),
+            deleteRecentQueryUseCase: makeDeleteRecentQueryUseCase(),
+            deleteAllRecentQueriesUseCase: makeDeleteAllRecentQueriesUseCase(),
+            deleteRecentVisitedClipUseCase: makeDeleteRecentVisitedClipUseCase(),
+            deleteAllRecentVisitedClipsUseCase: makeDeleteAllRecentVisitedClipsUseCase(),
+            deleteFolderUseCase: makeDeleteFolderUseCase(),
+            deleteClipUseCase: makeDeleteClipUseCase(),
+            searchFoldersUseCase: makeSearchFoldersUseCase(),
+            searchClipsUseCase: makeSearchClipsUseCase(),
+            visitClipUseCase: makeVisitClipUseCase()
         )
     }
 }
