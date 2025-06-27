@@ -5,7 +5,7 @@ struct ClipDisplayMapper {
         let urlMetadataDisplay = URLMetadataDisplay(
             url: clip.url,
             title: clip.title.isEmpty ? " " : clip.title,
-            description: clip.description.isEmpty ? " " : clip.description,
+            description: clip.subtitle.isEmpty ? " " : clip.subtitle,
             thumbnailImageURL: clip.thumbnailImageURL,
             screenshotImageData: clip.screenshotData
         )

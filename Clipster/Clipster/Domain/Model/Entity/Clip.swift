@@ -5,7 +5,7 @@ struct Clip {
     let folderID: UUID
     let url: URL
     let title: String
-    let description: String
+    let subtitle: String
     let memo: String
     let thumbnailImageURL: URL?
     let screenshotData: Data?
