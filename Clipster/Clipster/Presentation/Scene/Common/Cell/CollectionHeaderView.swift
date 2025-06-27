@@ -29,6 +29,11 @@ final class CollectionHeaderView: UICollectionReusableView {
         configure()
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        showAllButton.isHidden = true
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
