@@ -1,0 +1,73 @@
+import UIKit
+
+final class AddFAButton: UIButton {
+    private let innerButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .blue600
+        button.setImage(.plus.withTintColor(.white900), for: .normal)
+        button.layer.cornerRadius = 24
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.15
+        button.layer.shadowRadius = 8
+        button.layer.masksToBounds = false
+        return button
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configure()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}
+
+extension AddFAButton {
+    override func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        willDisplayMenuFor configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionAnimating?
+    ) {
+        animator?.addAnimations {
+            self.innerButton.transform = CGAffineTransform(rotationAngle: .pi / 4) // 45도 회전
+        }
+    }
+
+    override func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        willEndFor configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionAnimating?
+    ) {
+        animator?.addAnimations {
+            self.innerButton.transform = .identity
+        }
+    }
+}
+
+private extension AddFAButton {
+    func configure() {
+        setAttributes()
+        setHierarchy()
+        setConstraints()
+    }
+
+    func setAttributes() {
+        backgroundColor = .clear
+    }
+
+    func setHierarchy() {
+        addSubview(innerButton)
+    }
+
+    func setConstraints() {
+        self.snp.makeConstraints { make in
+            make.size.equalTo(60)
+        }
+
+        innerButton.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(48)
+        }
+    }
+}
