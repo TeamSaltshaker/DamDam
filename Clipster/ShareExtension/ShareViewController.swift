@@ -25,42 +25,60 @@ final class ShareViewController: SLComposeViewController {
     }
 
     private func extractURL() {
-        guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
-              let attachments = extensionItem.attachments,
-              let provider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) })
-        else {
-            print("\(Self.self) ❌ Share Extension inputItem parsing 에러")
+        guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
+            print("\(Self.self) ❌ No input items")
             close()
             return
         }
 
-        let types = [UTType.url.identifier, UTType.plainText.identifier]
+        for item in extensionItems {
+            guard let attachments = item.attachments else { continue }
 
-        for type in types {
-            provider.loadItem(forTypeIdentifier: type, options: nil) { [weak self] (item, error) in
-                guard let self else {
-                    return
-                }
+            for provider in attachments {
+                for typeIdentifier in provider.registeredTypeIdentifiers {
+                    print("\(Self.self) 📄 Trying type: \(typeIdentifier)")
 
-                if let error {
-                    print("\(Self.self) ❌ URL 로딩 에러: \(error)")
-                    close()
-                    return
-                }
+                    provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { [weak self] (item, error) in
+                        guard let self else { return }
 
-                if let url = item as? URL {
-                    print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
-                    if saveURLToUserDefaults(url) {
-                        DispatchQueue.main.async {
-                            self.openMainApp()
+                        if let error = error {
+                            print("\(Self.self) ❌ loadItem 에러: \(error.localizedDescription)")
+                            return
+                        }
+
+                        if let url = extractURL(from: item) {
+                            print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
+                            if saveURLToUserDefaults(url) {
+                                DispatchQueue.main.async {
+                                    self.openMainApp()
+                                }
+                            }
+                        } else {
+                            print("\(Self.self) ⚠️ URL 변환 실패 - type: \(typeIdentifier)")
                         }
                     }
-                } else {
-                    print("\(Self.self) ❌ URL 타입 변환 에러")
-                    close()
                 }
             }
         }
+    }
+
+    private func extractURL(from item: NSSecureCoding?) -> URL? {
+        if let url = item as? URL {
+            return url
+        } else if let string = item as? String {
+            return extractFirstURL(from: string)
+        } else if let data = item as? Data,
+                  let string = String(data: data, encoding: .utf8) {
+            return extractFirstURL(from: string)
+        }
+        return nil
+    }
+
+    private func extractFirstURL(from string: String) -> URL? {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: string, options: [], range: NSRange(location: 0, length: string.utf16.count))
+
+        return matches?.first?.url
     }
 
     private func openMainApp() {

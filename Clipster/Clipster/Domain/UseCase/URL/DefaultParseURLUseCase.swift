@@ -14,14 +14,17 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
 
         let resolveFinalURL = await urlRepository.resolveRedirectURL(initialURL: sanitizeURL)
 
-        guard let html = try? await urlRepository.fetchHTML(from: resolveFinalURL).get() else {
-            return .failure(.unknown)
+        let htmlResult = await urlRepository.fetchHTML(from: resolveFinalURL)
+
+        switch htmlResult {
+        case .success(let html):
+            let screenshotData = await urlRepository.captureScreenshot(rect: nil)
+            let parsedMetadata = createParsedURLMetadata(url: sanitizeURL, html: html, screenshotData: screenshotData)
+            return .success((parsedMetadata, true))
+
+        case .failure(let error):
+            return .failure(error)
         }
-
-        let screenshotData = await urlRepository.captureScreenshot(rect: nil)
-        let parsedMetadata = createParsedURLMetadata(url: sanitizeURL, html: html, screenshotData: screenshotData)
-
-        return .success((parsedMetadata, true))
     }
 }
 
@@ -65,7 +68,7 @@ private extension DefaultParseURLUseCase {
 
         var thumbnailImageURL: String?
 
-        if let host = url.host(percentEncoded: false), host.contains("youtube") {
+        if let host = url.host(percentEncoded: false), host.contains("youtu") {
             if let videoID = extractYouTubeVideoID(from: url) {
                 thumbnailImageURL = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
             }
