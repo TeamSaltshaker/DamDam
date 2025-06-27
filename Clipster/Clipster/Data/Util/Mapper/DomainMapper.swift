@@ -32,7 +32,7 @@ struct DomainMapper {
             folderID: folderID,
             url: url,
             title: urlMetadataEntity.title,
-            subtitle: " ",
+            subtitle: urlMetadataEntity.subtitle,
             memo: entity.memo,
             thumbnailImageURL: URL(string: urlMetadataEntity.thumbnailImageURLString ?? ""),
             screenshotData: urlMetadataEntity.screenshotData,
