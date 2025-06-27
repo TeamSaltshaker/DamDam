@@ -241,20 +241,6 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { $0.currentFolder == nil }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.selectedFolderView.folderView.rx.isHidden)
-            .disposed(by: disposeBag)
-
-        reactor.state
-            .map { $0.currentFolder != nil }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.selectedFolderView.emptyView.rx.isHidden)
-            .disposed(by: disposeBag)
-
-        reactor.state
             .map(\.isLoading)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
