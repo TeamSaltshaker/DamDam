@@ -41,7 +41,13 @@ final class TabBarViewController: UIViewController {
 
         addChild(vc)
         view.insertSubview(vc.view, belowSubview: tabBarView)
-        vc.view.frame = view.bounds
+
+        vc.view.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(tabBarView.snp.top)
+        }
+
         vc.didMove(toParent: self)
         currentVC = vc
     }
@@ -55,6 +61,7 @@ private extension TabBarViewController {
     }
 
     func setHierarchy() {
+        view.backgroundColor = .white800
         view.addSubview(tabBarView)
     }
 
