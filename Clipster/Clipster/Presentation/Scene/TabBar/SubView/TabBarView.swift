@@ -6,9 +6,8 @@ import UIKit
 final class TabBarView: UIView {
     enum Action {
         case tapHome
+        case tapSearch
         case tapUser
-        case tapAddFolder
-        case tapAddClip
     }
 
     private let disposeBag = DisposeBag()
@@ -74,29 +73,13 @@ final class TabBarView: UIView {
     }
 
     func updateSelectedTab(_ mode: TabBarMode) {
-        [homeButton, userButton].enumerated().forEach { index, button in
+        [
+            homeButton,
+            searchButton,
+            userButton
+        ].enumerated().forEach { index, button in
             button.isSelected = (index == mode.rawValue)
         }
-    }
-}
-
-private extension TabBarView {
-    func makeAddButtonMenu() -> UIMenu {
-        let addFolderAction = UIAction(
-            title: "폴더 추가",
-            image: .folderPlus
-        ) { [weak self] _ in
-            self?.action.accept(.tapAddFolder)
-        }
-
-        let addClipAction = UIAction(
-            title: "클립 추가",
-            image: .clip
-        ) { [weak self] _ in
-            self?.action.accept(.tapAddClip)
-        }
-
-        return UIMenu(title: "", children: [addFolderAction, addClipAction])
     }
 }
 
@@ -153,14 +136,12 @@ private extension TabBarView {
     }
 
     func setBindings() {
-        homeButton.rx.tap
-            .map { Action.tapHome }
-            .bind(to: action)
-            .disposed(by: disposeBag)
-
-        userButton.rx.tap
-            .map { Action.tapUser }
-            .bind(to: action)
-            .disposed(by: disposeBag)
+        Observable.merge(
+            homeButton.rx.tap.map { Action.tapHome },
+            searchButton.rx.tap.map { Action.tapSearch },
+            userButton.rx.tap.map { Action.tapUser }
+        )
+        .bind(to: action)
+        .disposed(by: disposeBag)
     }
 }

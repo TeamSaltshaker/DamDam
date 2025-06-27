@@ -76,12 +76,10 @@ private extension TabBarViewController {
                 switch action {
                 case .tapHome:
                     selectedTab.accept(.home)
+                case .tapSearch:
+                    selectedTab.accept(.search)
                 case .tapUser:
                     selectedTab.accept(.myPage)
-                case .tapAddFolder:
-                    coordinator?.didTapAddFolder()
-                case .tapAddClip:
-                    coordinator?.didTapAddClip()
                 }
             }
             .disposed(by: disposeBag)

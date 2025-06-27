@@ -1,4 +1,5 @@
 enum TabBarMode: Int {
     case home = 0
-    case myPage = 1
+    case search = 1
+    case myPage = 2
 }

@@ -36,16 +36,10 @@ extension TabBarCoordinator {
         switch tab {
         case .home:
             tabBarController.switchTo(children[tab.rawValue].navigationController)
+        case .search:
+            tabBarController.switchTo(UIViewController())
         case .myPage:
             tabBarController.switchTo(UIViewController())
         }
-    }
-
-    func didTapAddClip() {
-        print("Tap Add Clip")
-    }
-
-    func didTapAddFolder() {
-        print("Tap Add Folder")
     }
 }
