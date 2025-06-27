@@ -173,12 +173,11 @@ final class EditClipReactor: Reactor {
             case .edit:
                 print("\(Self.self) edit clip")
                 guard let clip = currentState.clip else { return .empty() }
-                guard let currentFolder = currentState.currentFolder else { return .empty() }
                 guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
 
                 let newClip = Clip(
                     id: clip.id,
-                    folderID: currentFolder.id,
+                    folderID: currentState.currentFolder?.id,
                     url: urlMetadataDisplay.url,
                     title: urlMetadataDisplay.title,
                     subtitle: urlMetadataDisplay.description,
@@ -197,12 +196,11 @@ final class EditClipReactor: Reactor {
                 .catchAndReturn(.updateIsSuccessedEditClip(false))
             case .create, .shareExtension:
                 print("\(Self.self) save clip")
-                guard let currentFolder = currentState.currentFolder else { return .empty() }
                 guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
 
                 let newClip = Clip(
                     id: UUID(),
-                    folderID: currentFolder.id,
+                    folderID: currentState.currentFolder?.id,
                     url: urlMetadataDisplay.url,
                     title: urlMetadataDisplay.title,
                     subtitle: urlMetadataDisplay.description,
