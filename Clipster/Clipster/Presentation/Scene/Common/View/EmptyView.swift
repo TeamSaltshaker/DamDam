@@ -5,6 +5,7 @@ final class EmptyView: UIView {
     enum EmptyViewType {
         case homeView
         case folderView
+        case searchView
 
         var imageSize: CGSize {
             switch self {
@@ -15,6 +16,8 @@ final class EmptyView: UIView {
 
         var description: String {
             switch self {
+            case .searchView:
+                return "검색된 폴더 및 파일이 없습니다."
             default:
                 return "현재 폴더 및 파일이 없습니다."
             }
