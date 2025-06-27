@@ -30,7 +30,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
     func resolveRedirectURL(initialURL: URL) async -> URL {
         var request = URLRequest(url: initialURL)
-        request.httpMethod = "HEAD"
+        request.httpMethod = "get"
 
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
