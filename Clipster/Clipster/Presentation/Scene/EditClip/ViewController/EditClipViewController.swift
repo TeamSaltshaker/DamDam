@@ -341,11 +341,10 @@ extension EditClipViewController: View {
 
         Observable.combineLatest(
             reactor.state.map(\.isURLValid),
-            reactor.state.map(\.currentFolder),
             reactor.state.map(\.isLoading)
         )
-        .map { isURLValid, currentFolder, isLoading in
-            !isLoading && isURLValid && currentFolder != nil
+        .map { isURLValid, isLoading in
+            !isLoading && isURLValid
         }
         .distinctUntilChanged()
         .asDriver(onErrorDriveWith: .empty())
