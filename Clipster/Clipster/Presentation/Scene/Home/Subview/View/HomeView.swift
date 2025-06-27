@@ -66,8 +66,8 @@ final class HomeView: UIView {
         return label
     }()
 
-    private lazy var addButton: AddButton = {
-        let button = AddButton()
+    private lazy var addButton: AddFAButton = {
+        let button = AddFAButton()
         button.showsMenuAsPrimaryAction = true
         button.menu = makeAddButtonMenu()
         return button
@@ -437,12 +437,12 @@ private extension HomeView {
             collectionView,
             emptyView,
             emptyAddButton,
-            loadingIndicator
+            loadingIndicator,
+            addButton
         ].forEach { addSubview($0) }
 
         [
-            titleLabel,
-            addButton
+            titleLabel
         ].forEach { navigationView.addSubview($0) }
     }
 
@@ -459,9 +459,8 @@ private extension HomeView {
         }
 
         addButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(24)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(48)
+            make.trailing.equalToSuperview().inset(18)
+            make.bottom.equalToSuperview().inset(28)
         }
 
         collectionView.snp.makeConstraints { make in

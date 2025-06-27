@@ -48,7 +48,13 @@ final class FolderView: UIView {
 
     private let navigationView = CommonNavigationView()
     private let backButton = BackButton()
-    private let addButton = AddButton()
+
+    private lazy var addButton: AddFAButton = {
+        let button = AddFAButton()
+        button.showsMenuAsPrimaryAction = true
+        button.menu = makeAddButtonMenu()
+        return button
+    }()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -294,7 +300,6 @@ private extension FolderView {
 
     func setAttributes() {
         navigationView.setLeftItem(backButton)
-        navigationView.setRightItem(addButton)
 
         addButton.menu = makeAddButtonMenu()
         addButton.showsMenuAsPrimaryAction = true
@@ -303,7 +308,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, collectionView, emptyView, emptyAddButton, activityIndicator].forEach {
+        [navigationView, collectionView, emptyView, emptyAddButton, activityIndicator, addButton].forEach {
             addSubview($0)
         }
     }
@@ -319,7 +324,8 @@ private extension FolderView {
         }
 
         addButton.snp.makeConstraints { make in
-            make.size.equalTo(48)
+            make.trailing.equalToSuperview().inset(18)
+            make.bottom.equalToSuperview().inset(28)
         }
 
         collectionView.snp.makeConstraints { make in
