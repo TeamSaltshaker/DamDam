@@ -9,7 +9,7 @@ final class TabBarViewController: UIViewController {
     private weak var coordinator: TabBarCoordinator?
 
     private var currentVC: UIViewController?
-    private let selectedTab = PublishRelay<TabBarMode>()
+    private let selectedTab = BehaviorRelay<TabBarMode>(value: .home)
 
     init(coordinator: TabBarCoordinator) {
         self.coordinator = coordinator
