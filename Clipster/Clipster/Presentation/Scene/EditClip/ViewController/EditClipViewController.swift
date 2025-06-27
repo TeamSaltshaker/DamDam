@@ -241,20 +241,6 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { $0.currentFolder == nil }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.selectedFolderView.folderView.rx.isHidden)
-            .disposed(by: disposeBag)
-
-        reactor.state
-            .map { $0.currentFolder != nil }
-            .distinctUntilChanged()
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(editClipView.selectedFolderView.emptyView.rx.isHidden)
-            .disposed(by: disposeBag)
-
-        reactor.state
             .map(\.isLoading)
             .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
@@ -279,8 +265,8 @@ extension EditClipViewController: View {
 
         reactor.state
             .map { ($0.isTappedFolderView, $0.currentFolder) }
-            .filter { $0 && $1 != nil }
-            .map { $1 }
+            .filter { $0.0 }
+            .map { $0.1 }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] currentFolder in
                 guard let self else { return }
@@ -292,13 +278,12 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .compactMap(\.currentFolder)
-            .distinctUntilChanged { $0.id == $1.id }
+            .map(\.currentFolder)
+            .distinctUntilChanged { $0?.id == $1?.id }
             .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] in
-                self?.editClipView.selectedFolderView.folderRowView.setDisplay(
-                    FolderDisplayMapper.map($0)
-                )
+            .drive(with: self) { owner, folder in
+                let display = folder.map(FolderDisplayMapper.map)
+                owner.editClipView.selectedFolderView.folderRowView.setDisplay(display)
             }
             .disposed(by: disposeBag)
 
