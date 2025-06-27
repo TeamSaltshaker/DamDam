@@ -121,7 +121,12 @@ final class HomeReactor: Reactor {
 
                     async let unvisitedClipsResult = fetchUnvisitedClipsUseCase.execute().get()
                     async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
-                    let (unvisitedClips, folders) = try await (unvisitedClipsResult, foldersResult)
+                    async let clipsResult = fetchTopLevelClipsUseCase.execute().get()
+                    let (unvisitedClips, folders, clips) = try await (
+                        unvisitedClipsResult,
+                        foldersResult,
+                        clipsResult
+                    )
 
                     return .setHomeDisplay(unvisitedClips, folders, clips)
                 },
