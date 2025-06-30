@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class SearchFolderCell: UICollectionViewCell {
+final class SearchFolderCell: UICollectionViewListCell {
     private let folderView: UIView = {
         let view = UIView()
         view.backgroundColor = .white900

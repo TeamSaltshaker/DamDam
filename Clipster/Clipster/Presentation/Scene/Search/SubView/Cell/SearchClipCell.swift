@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class SearchClipCell: UICollectionViewCell {
+final class SearchClipCell: UICollectionViewListCell {
     private let searchClipRowView = SearchClipRowView()
 
     override init(frame: CGRect) {
