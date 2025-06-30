@@ -6,7 +6,7 @@ final class DefaultFetchRecentVisitedClipsUseCase: FetchRecentVisitedClipsUseCas
         self.clipRepository = clipRepository
     }
 
-    func execute() async -> Result<[Clip], any Error> {
+    func execute() async -> Result<[Clip], Error> {
         .success([])
     }
 }
