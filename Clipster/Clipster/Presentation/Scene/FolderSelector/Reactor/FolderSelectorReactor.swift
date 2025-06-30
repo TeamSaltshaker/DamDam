@@ -16,7 +16,6 @@ final class FolderSelectorReactor: Reactor {
     }
 
     struct State {
-        let isClip: Bool
         var parentFolder: Folder?
         var folder: Folder?
         var topLevelFolders: [Folder] = []
@@ -50,18 +49,17 @@ final class FolderSelectorReactor: Reactor {
     private let findFolderPathUseCase: FindFolderPathUseCase
     private let filterSubfoldersUseCase: FilterSubfoldersUseCase
 
-    private init(
+    init(
         fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         findFolderPathUseCase: FindFolderPathUseCase,
         filterSubfoldersUseCase: FilterSubfoldersUseCase,
-        isClip: Bool,
         parentFolder: Folder?,
         folder: Folder?
     ) {
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.findFolderPathUseCase = findFolderPathUseCase
         self.filterSubfoldersUseCase = filterSubfoldersUseCase
-        self.initialState = State(isClip: isClip, parentFolder: parentFolder, folder: folder)
+        self.initialState = State(parentFolder: parentFolder, folder: folder)
     }
 
     convenience init(
@@ -74,26 +72,8 @@ final class FolderSelectorReactor: Reactor {
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
             findFolderPathUseCase: findFolderPathUseCase,
             filterSubfoldersUseCase: filterSubfoldersUseCase,
-            isClip: true,
             parentFolder: parentFolder,
             folder: nil
-        )
-    }
-
-    convenience init(
-        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
-        findFolderPathUseCase: FindFolderPathUseCase,
-        filterSubfoldersUseCase: FilterSubfoldersUseCase,
-        parentFolder: Folder?,
-        folder: Folder?
-    ) {
-        self.init(
-            fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
-            findFolderPathUseCase: findFolderPathUseCase,
-            filterSubfoldersUseCase: filterSubfoldersUseCase,
-            isClip: false,
-            parentFolder: parentFolder,
-            folder: folder
         )
     }
 
