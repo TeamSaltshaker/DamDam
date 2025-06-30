@@ -181,15 +181,51 @@ final class FolderReactorTests: XCTestCase {
     }
 
     func test_폴더_상세정보_탭() {
-        
+        let indexPath = IndexPath(item: 0, section: 0)
+        reactor.action.onNext(.didTapDetailButton(indexPath))
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1.0))
+
+        XCTAssertEqual(reactor.currentState.phase, .idle)
+        XCTAssertNil(reactor.currentState.route)
     }
 
     func test_클립_상세정보_탭() {
+        let expectation = expectation(description: #function)
+        var routeResult: FolderReactor.Route?
 
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let indexPath = IndexPath(item: 0, section: 1)
+        reactor.action.onNext(.didTapDetailButton(indexPath))
+
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(routeResult, .clipDetailView(folder.clips[0]))
     }
 
     func test_유효하지_않은_상세정보_탭() {
+        let expectation = expectation(description: #function)
+        var phaseResult: FolderReactor.Phase?
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResult = phase
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let invalidIndexPath = IndexPath(item: 99, section: 99)
+        reactor.action.onNext(.didTapDetailButton(invalidIndexPath))
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResult, .error("Invalid section"))
     }
 
     func test_폴더_편집_탭() {
