@@ -287,15 +287,74 @@ final class FolderReactorTests: XCTestCase {
     }
 
     func test_폴더_삭제_탭() {
+        let expectation = expectation(description: #function)
+        var phaseResults = [FolderReactor.Phase]()
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phaseResults.count == 2 {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        let indexPath = IndexPath(item: 0, section: 0)
+        reactor.action.onNext(.didTapDeleteButton(indexPath))
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
+        XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
     }
 
     func test_클립_삭제_탭() {
+        let expectation = expectation(description: #function)
+        var phaseResults = [FolderReactor.Phase]()
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phaseResults.count == 2 {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        let indexPath = IndexPath(item: 0, section: 1)
+        reactor.action.onNext(.didTapDeleteButton(indexPath))
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
+        XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
     }
 
     func test_유효하지_않은_삭제_탭() {
+        let expectation = expectation(description: #function)
+        var phaseResult: FolderReactor.Phase?
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResult = phase
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let invalidIndexPath = IndexPath(item: 99, section: 99)
+        reactor.action.onNext(.didTapDeleteButton(invalidIndexPath))
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResult, .error("Invalid section"))
+        XCTAssertFalse((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
+        XCTAssertFalse((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
+        XCTAssertFalse((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
     }
 }
 
