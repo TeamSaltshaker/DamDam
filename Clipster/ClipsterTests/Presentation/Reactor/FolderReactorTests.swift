@@ -86,10 +86,7 @@ final class FolderReactorTests: XCTestCase {
         reactor.action.onNext(.didTapCell(indexPath))
 
         waitForExpectations(timeout: 1.0)
-        XCTAssertTrue({
-            if case .folderView = routeResult { return true }
-            else { return false }
-        }())
+        XCTAssertEqual(routeResult, .folderView(folder.folders[0]))
     }
 
     func test_클립_셀_탭() {
@@ -122,10 +119,7 @@ final class FolderReactorTests: XCTestCase {
         wait(for: [phaseExpectation, routeExpectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.idle, .loading, .success])
         XCTAssertTrue((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
-        XCTAssertTrue({
-            if case .webView = routeResult { return true }
-            else { return false }
-        }())
+        XCTAssertEqual(routeResult, .webView(folder.clips[0].url))
     }
 
     func test_유효하지_않은_셀_탭() {
@@ -201,6 +195,27 @@ extension FolderReactor.Phase: @retroactive Equatable {
             return true
         case (.error(let a), .error(let b)):
             return a == b
+        default:
+            return false
+        }
+    }
+}
+
+extension FolderReactor.Route: @retroactive Equatable {
+    public static func == (lhs: FolderReactor.Route, rhs: FolderReactor.Route) -> Bool {
+        switch (lhs, rhs) {
+        case (.editClipViewForAdd(let a), .editClipViewForAdd(let b)):
+            return a.id == b.id
+        case (.editClipViewForEdit(let a), .editClipViewForEdit(let b)):
+            return a.id == b.id
+        case (.editFolderView(let a, let b), .editFolderView(let c, let d)):
+            return a.id == c.id && b?.id == d?.id
+        case (.folderView(let a), .folderView(let b)):
+            return a.id == b.id
+        case (.clipDetailView(let a), .clipDetailView(let b)):
+            return a.id == b.id
+        case (.webView(let a), .webView(let b)):
+            return a.absoluteString == b.absoluteString
         default:
             return false
         }
