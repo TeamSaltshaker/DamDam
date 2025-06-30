@@ -221,7 +221,9 @@ final class HomeView: UIView {
             snapshot.appendItems(clipItem, toSection: .clip)
         }
 
-        let isEmpty = !(display.unvisitedClips.isEmpty && display.folders.isEmpty)
+        let isEmpty = !(display.unvisitedClips.isEmpty
+                        && display.folders.isEmpty
+                        && display.clips.isEmpty)
         emptyView.isHidden = isEmpty
         emptyAddButton.isHidden = isEmpty
 
