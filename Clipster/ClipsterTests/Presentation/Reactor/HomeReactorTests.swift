@@ -7,6 +7,7 @@ final class HomeReactorTests: XCTestCase {
 
     private var fetchUnvisitedClipsUseCase: MockFetchUnvisitedClipsUseCase!
     private var fetchTopLevelFoldersUseCase: MockFetchTopLevelFoldersUseCase!
+    private var fetchTopLevelClipsUseCase: MockFetchTopLevelClipsUseCase!
     private var deleteClipUseCase: MockDeleteClipUseCase!
     private var deleteFolderUseCase: MockDeleteFolderUseCase!
     private var visitClipUseCase: MockVisitClipUseCase!
@@ -20,12 +21,14 @@ final class HomeReactorTests: XCTestCase {
         disposeBag = DisposeBag()
         fetchUnvisitedClipsUseCase = MockFetchUnvisitedClipsUseCase()
         fetchTopLevelFoldersUseCase = MockFetchTopLevelFoldersUseCase()
+        fetchTopLevelClipsUseCase = MockFetchTopLevelClipsUseCase()
         deleteClipUseCase = MockDeleteClipUseCase()
         deleteFolderUseCase = MockDeleteFolderUseCase()
         visitClipUseCase = MockVisitClipUseCase()
         reactor = HomeReactor(
             fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
+            fetchTopLevelClipsUseCase: fetchTopLevelClipsUseCase,
             deleteClipUseCase: deleteClipUseCase,
             deleteFolderUseCase: deleteFolderUseCase,
             visitClipUseCase: visitClipUseCase
@@ -36,6 +39,7 @@ final class HomeReactorTests: XCTestCase {
         disposeBag = nil
         fetchUnvisitedClipsUseCase = nil
         fetchTopLevelFoldersUseCase = nil
+        fetchTopLevelClipsUseCase = nil
         deleteClipUseCase = nil
         deleteFolderUseCase = nil
         visitClipUseCase = nil
@@ -65,6 +69,10 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
             MockFolder.rootFolders.count
+        )
+        XCTAssertEqual(
+            reactor.currentState.homeDisplay?.clips.count,
+            MockClip.unvisitedClips.count
         )
     }
 
