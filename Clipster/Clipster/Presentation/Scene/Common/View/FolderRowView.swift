@@ -47,8 +47,13 @@ final class FolderRowView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(_ folder: FolderDisplay?) {
-        titleLabel.text = folder?.title ?? "홈"
+    func setDisplay(_ folder: FolderDisplay?, query: String = "") {
+        let title = folder?.title ?? "홈"
+        if !query.isEmpty {
+            titleLabel.attributedText = title.highlight(query: query, foregroundColor: .black100, font: .pretendard(size: 16, weight: .semiBold))
+        } else {
+            titleLabel.text = title
+        }
         countLabel.text = folder?.itemCount
         countLabel.isHidden = folder == nil
     }
@@ -72,7 +77,8 @@ private extension FolderRowView {
 
     func setConstraints() {
         folderImageBackgroundView.snp.makeConstraints { make in
-            make.leading.centerY.equalToSuperview()
+            make.leading.top.equalToSuperview()
+            make.bottom.equalToSuperview().priority(.high)
             make.size.equalTo(48)
         }
 

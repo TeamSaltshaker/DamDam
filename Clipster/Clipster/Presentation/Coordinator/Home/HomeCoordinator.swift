@@ -112,4 +112,10 @@ extension HomeCoordinator {
         }
         navigationController.present(vc, animated: true)
     }
+
+    func showSearch() {
+        let reactor = diContainer.makeSearchReactor()
+        let vc = SearchViewController(reactor: reactor, coordinator: self)
+        navigationController.pushViewController(vc, animated: true)
+    }
 }

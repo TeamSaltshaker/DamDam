@@ -105,7 +105,7 @@ private extension SelectedFolderView {
         }
 
         folderRowView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview()
+            make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
         }
 
