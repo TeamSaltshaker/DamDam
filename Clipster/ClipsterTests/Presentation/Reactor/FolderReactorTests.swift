@@ -144,11 +144,39 @@ final class FolderReactorTests: XCTestCase {
     }
 
     func test_폴더_추가_탭() {
+        let expectation = expectation(description: #function)
+        var routeResult: FolderReactor.Route?
 
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.didTapAddFolderButton)
+
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(routeResult, .editFolderView(folder, nil))
     }
 
     func test_클립_추가_탭() {
+        let expectation = expectation(description: #function)
+        var routeResult: FolderReactor.Route?
 
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.didTapAddClipButton)
+
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(routeResult, .editClipViewForAdd(folder))
     }
 
     func test_폴더_상세정보_탭() {
