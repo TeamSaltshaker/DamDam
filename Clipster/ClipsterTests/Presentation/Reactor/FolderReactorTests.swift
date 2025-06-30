@@ -41,6 +41,7 @@ final class FolderReactorTests: XCTestCase {
 
     func test_viewWillAppear_최초진입() {
         reactor.action.onNext(.viewWillAppear)
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1.0))
 
         XCTAssertEqual(reactor.currentState.phase, .idle)
         XCTAssertNil(reactor.currentState.route)
