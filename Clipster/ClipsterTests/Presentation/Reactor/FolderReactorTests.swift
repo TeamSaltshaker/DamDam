@@ -65,21 +65,88 @@ final class FolderReactorTests: XCTestCase {
         reactor.action.onNext(.viewWillAppear)
         reactor.action.onNext(.viewWillAppear)
 
-        waitForExpectations(timeout: 1.0)
+        wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
     }
 
     func test_폴더_셀_탭() {
+        let expectation = expectation(description: #function)
+        var routeResult: FolderReactor.Route?
 
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let indexPath = IndexPath(item: 0, section: 0)
+        reactor.action.onNext(.didTapCell(indexPath))
+
+        waitForExpectations(timeout: 1.0)
+        XCTAssertTrue({
+            if case .folderView = routeResult { return true }
+            else { return false }
+        }())
     }
 
     func test_클립_셀_탭() {
+        let phaseExpectation = expectation(description: #function + " - phase")
+        var phaseResults = [FolderReactor.Phase]()
+        let routeExpectation = expectation(description: #function + " - route")
+        var routeResult: FolderReactor.Route?
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phaseResults.count == 3 {
+                    phaseExpectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                routeExpectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let indexPath = IndexPath(item: 0, section: 1)
+        reactor.action.onNext(.didTapCell(indexPath))
+
+        wait(for: [phaseExpectation, routeExpectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.idle, .loading, .success])
+        XCTAssertTrue((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
+        XCTAssertTrue({
+            if case .webView = routeResult { return true }
+            else { return false }
+        }())
     }
 
     func test_유효하지_않은_셀_탭() {
+        let expectation = expectation(description: #function)
+        var phaseResult: FolderReactor.Phase?
 
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResult = phase
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let invalidIndexPath = IndexPath(item: 99, section: 99)
+        reactor.action.onNext(.didTapCell(invalidIndexPath))
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResult, .error("Invalid section"))
+        XCTAssertFalse((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
     }
 
     func test_폴더_추가_탭() {
