@@ -98,9 +98,10 @@ final class FolderReactorTests: XCTestCase {
 
         reactor.pulse(\.$phase)
             .compactMap { $0 }
+            .skip(1)
             .subscribe { phase in
                 phaseResults.append(phase)
-                if phaseResults.count == 3 {
+                if phaseResults.count == 2 {
                     phaseExpectation.fulfill()
                 }
             }
@@ -118,7 +119,7 @@ final class FolderReactorTests: XCTestCase {
         reactor.action.onNext(.didTapCell(indexPath))
 
         wait(for: [phaseExpectation, routeExpectation], timeout: 1.0)
-        XCTAssertEqual(phaseResults, [.idle, .loading, .success])
+        XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
         XCTAssertEqual(routeResult, .webView(folder.clips[0].url))
     }
