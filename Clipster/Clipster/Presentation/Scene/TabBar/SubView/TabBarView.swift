@@ -72,6 +72,15 @@ final class TabBarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let path = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: layer.cornerRadius
+        )
+        layer.shadowPath = path.cgPath
+    }
+
     func updateSelectedTab(_ mode: TabBarMode) {
         [
             homeButton,
@@ -95,6 +104,11 @@ private extension TabBarView {
         backgroundColor = .white900
         layer.cornerRadius = 32
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.08
+        layer.shadowOffset = CGSize(width: 0, height: -1)
+        layer.shadowRadius = 7
+        layer.masksToBounds = false
     }
 
     func setHierarchy() {
