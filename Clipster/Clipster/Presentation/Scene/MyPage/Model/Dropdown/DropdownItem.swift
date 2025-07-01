@@ -1,28 +1,33 @@
 import UIKit
 
 enum DropdownItem: Hashable {
-    case sort(SortOption)
+    case folderSort(FolderSortOption)
+    case clipSort(ClipSortOption)
 }
 
 extension DropdownItem {
     var title: String {
         switch self {
-        case .sort: "정렬 순서"
+        case .folderSort: "폴더 정렬 순서"
+        case .clipSort: "클립 정렬 순서"
         }
     }
 
     var value: String {
         switch self {
-        case .sort(let option): option.displayText
+        case .folderSort(let option):
+            option.displayText
+        case .clipSort(let option):
+            option.displayText
         }
     }
 
     var image: UIImage {
         switch self {
-        case .sort(let option):
-            return option.isAscending
-            ? .chevronLightUp .withTintColor(.black500)
-            : .chevronLightDown.withTintColor(.black500)
+        case .folderSort(let option):
+            option.direction.icon
+        case .clipSort(let option):
+            option.direction.icon
         }
     }
 }
