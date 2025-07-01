@@ -8,6 +8,6 @@ final class DefaultCreateClipUseCase: CreateClipUseCase {
     }
 
     func execute(_ clip: Clip) async -> Result<Void, Error> {
-        await clipRepository.createClip(clip).mapError { $0 as Error }
+        await clipRepository.insertClip(clip).mapError { $0 as Error }
     }
 }
