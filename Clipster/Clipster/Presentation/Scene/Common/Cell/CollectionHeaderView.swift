@@ -9,7 +9,7 @@ final class CollectionHeaderView: UICollectionReusableView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .init(name: "Pretendard-SemiBold", size: 18)
+        label.font = .pretendard(size: 18, weight: .semiBold)
         label.textColor = .black100
         return label
     }()
@@ -18,7 +18,7 @@ final class CollectionHeaderView: UICollectionReusableView {
         let button = UIButton()
         button.setTitle("전체보기", for: .normal)
         button.setTitleColor(.black500, for: .normal)
-        button.titleLabel?.font = .init(name: "Pretendard-Medium", size: 14)
+        button.titleLabel?.font = .pretendard(size: 14, weight: .medium)
         button.titleLabel?.textAlignment = .center
         button.isHidden = true
         return button
@@ -44,6 +44,10 @@ final class CollectionHeaderView: UICollectionReusableView {
 
     func setShowAllButtonVisible(_ isVisible: Bool) {
         showAllButton.isHidden = !isVisible
+    }
+
+    func setTitleFont(size: CGFloat, weight: FontWeight) {
+        titleLabel.font = .pretendard(size: size, weight: weight)
     }
 
     func setBindings() {
