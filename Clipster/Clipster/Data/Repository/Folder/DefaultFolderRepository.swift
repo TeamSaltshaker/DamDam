@@ -22,12 +22,22 @@ final class DefaultFolderRepository: FolderRepository {
     }
 
     func fetchTopLevelFolders() async -> Result<[Folder], DomainError> {
+        let query: (Folder) -> Bool = { folder in
+            folder.parentFolderID == nil && folder.deletedAt == nil
+        }
+
         if await cache.isFoldersInitialized {
             let folders = await cache.folders()
-            return .success(folders.filter { $0.parentFolderID == nil && $0.deletedAt == nil })
+            return .success(folders.filter(query))
         } else {
-            return await storage.fetchTopLevelFolders()
-                .mapError { _ in .fetchFailed }
+            let result = await storage.fetchAllFolders()
+
+            switch result {
+            case .success(let folders):
+                return .success(folders.filter(query))
+            case .failure:
+                return .failure(.fetchFailed)
+            }
         }
     }
 
