@@ -1,9 +1,3 @@
-enum ThemeOption: Int, CaseIterable, Hashable {
-    case system
-    case light
-    case dark
-}
-
 extension ThemeOption {
     var displayText: String {
         switch self {

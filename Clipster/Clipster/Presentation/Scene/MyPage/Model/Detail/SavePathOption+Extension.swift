@@ -1,8 +1,3 @@
-enum SavePathOption: Int, CaseIterable, Hashable {
-    case expand
-    case skip
-}
-
 extension SavePathOption {
     var displayText: String {
         switch self {
