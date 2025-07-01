@@ -106,7 +106,6 @@ final class FolderReactor: Reactor {
                     .just(.setPhase(.loading)),
                     visitClipMutation(clip),
                     .just(.setRoute(.webView(clip.url))),
-                    .just(.setPhase(.success)),
                 )
             }
         case .didTapAddFolderButton:
@@ -138,7 +137,6 @@ final class FolderReactor: Reactor {
                 .just(.setPhase(.loading)),
                 deleteMutation(at: indexPath),
                 reloadFolderMutation(),
-                .just(.setPhase(.success)),
             )
         }
     }
