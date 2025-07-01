@@ -3,4 +3,3 @@ enum ThemeOption: Int, CaseIterable, Hashable {
     case light
     case dark
 }
-

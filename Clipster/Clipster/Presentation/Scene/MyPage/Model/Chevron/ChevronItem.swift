@@ -11,7 +11,7 @@ extension ChevronItem {
         case .nicknameEdit: "닉네임 변경"
         case .notificationSetting: "알림 설정"
         case .trash: "휴지통"
-        case .support: "고객지원"
+        case .support: "문의하기"
         }
     }
 }
