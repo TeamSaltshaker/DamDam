@@ -22,26 +22,42 @@ final class DefaultClipRepository: ClipRepository {
     }
 
     func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
+        let query: (Clip) -> Bool = { clip in
+            clip.folderID == nil && clip.deletedAt == nil
+        }
+
         if await cache.isClipsInitialized {
             let clips = await cache.clips()
-            return .success(clips.filter {
-                $0.folderID == nil && $0.deletedAt == nil
-            })
+            return .success(clips.filter(query))
         } else {
-            return await storage.fetchTopLevelClips()
-                .mapError { _ in .fetchFailed }
+            let result = await storage.fetchAllClips()
+
+            switch result {
+            case .success(let clips):
+                return .success(clips.filter(query))
+            case .failure:
+                return .failure(.fetchFailed)
+            }
         }
     }
 
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError> {
+        let query: (Clip) -> Bool = { clip in
+            clip.lastVisitedAt == nil && clip.deletedAt == nil
+        }
+
         if await cache.isClipsInitialized {
             let clips = await cache.clips()
-            return .success(clips.filter {
-                $0.lastVisitedAt == nil && $0.deletedAt == nil
-            })
+            return .success(clips.filter(query))
         } else {
-            return await storage.fetchUnvisitedClips()
-                .mapError { _ in .fetchFailed }
+            let result = await storage.fetchAllClips()
+
+            switch result {
+            case .success(let clips):
+                return .success(clips.filter(query))
+            case .failure:
+                return .failure(.fetchFailed)
+            }
         }
     }
 
