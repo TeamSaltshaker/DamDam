@@ -300,6 +300,7 @@
 				44DFD9B22DE9D0E000B6CD87 /* Frameworks */,
 				44DFD9B32DE9D0E000B6CD87 /* Resources */,
 				9F781F1A2DF6CEFC00D7BEC6 /* Embed Foundation Extensions */,
+				9F3CB1012E1372ED00FB8755 /* Run GoogleService script */,
 			);
 			buildRules = (
 			);
@@ -454,6 +455,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
+		};
+		9F3CB1012E1372ED00FB8755 /* Run GoogleService script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run GoogleService script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "INFO_PLIST_PATH=\"${PROJECT_DIR}/Clipster/App/Derived\"\n\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  SRC=\"${INFO_PLIST_PATH}/GoogleService-Info-debug.plist\"\nelse\n  SRC=\"${INFO_PLIST_PATH}/GoogleService-Info.plist\"\nfi\n\nDEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nif [ -f \"${SRC}\" ]; then\n  cp \"${SRC}\" \"${DEST}\"\n  echo \"✅ Copied ${SRC} to app bundle\"\nelse\n  echo \"❌ ERROR: Missing GoogleService-Info.plist at path: ${SRC}\"\n  exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
