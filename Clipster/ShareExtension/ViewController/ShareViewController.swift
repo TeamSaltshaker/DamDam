@@ -1,8 +1,9 @@
+import SnapKit
 import Social
 import UIKit
 import UniformTypeIdentifiers
 
-final class ShareViewController: SLComposeViewController {
+final class ShareViewController: UIViewController {
     private let appGroupID: String = {
         #if DEBUG
         return "group.com.saltshaker.clipster.debug"
@@ -19,9 +20,15 @@ final class ShareViewController: SLComposeViewController {
         #endif
     }()
 
+    private let shareView = ShareView()
+
+    override func loadView() {
+        view = shareView
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        extractURL()
+//        extractURL()
     }
 
     private func extractURL() {
