@@ -79,6 +79,8 @@
 	</array>
     <key>NSUserNotificationUsageDescription</key>
     <string>앱에서 알림을 보내기 위해 권한이 필요합니다.</string>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
