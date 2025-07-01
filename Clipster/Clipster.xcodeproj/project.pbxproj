@@ -17,6 +17,11 @@
 		44DFD9D32DE9D36400B6CD87 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D22DE9D36400B6CD87 /* RxSwift */; };
 		44DFD9D62DE9D37000B6CD87 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9D52DE9D37000B6CD87 /* SnapKit */; };
 		44DFD9DC2DE9D39300B6CD87 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 44DFD9DB2DE9D39300B6CD87 /* Kingfisher */; };
+		9F3CC6F62E140D3300FB8755 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6F52E140D3300FB8755 /* RxCocoa */; };
+		9F3CC6F82E140D3300FB8755 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6F72E140D3300FB8755 /* RxRelay */; };
+		9F3CC6FA2E140D3300FB8755 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6F92E140D3300FB8755 /* RxSwift */; };
+		9F3CC6FC2E140D3300FB8755 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6FB2E140D3300FB8755 /* SnapKit */; };
+		9F3CC6FE2E140D3300FB8755 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6FD2E140D3300FB8755 /* Kingfisher */; };
 		9F781F192DF6CEFC00D7BEC6 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E5C2F0E72E0D0045006BAC60 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
@@ -67,6 +72,27 @@
 			);
 			target = 44DFD9B42DE9D0E000B6CD87 /* Clipster */;
 		};
+		9F3CB6A92E13FE0300FB8755 /* Exceptions for "Clipster" folder in "ShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Presentation/Model/FolderDisplay.swift,
+				Presentation/Model/URLMetadataDisplay.swift,
+				Presentation/Resource/Color.xcassets,
+				Presentation/Resource/Icon.xcassets,
+				Presentation/Scene/Common/Button/AddButton.swift,
+				Presentation/Scene/Common/Button/CancelButton.swift,
+				Presentation/Scene/Common/Button/SaveButton.swift,
+				Presentation/Scene/Common/StackView/URLMetadataStackView.swift,
+				Presentation/Scene/Common/TextField/CommonTextField.swift,
+				Presentation/Scene/Common/View/CommonNavigationView.swift,
+				Presentation/Scene/Common/View/FolderRowView.swift,
+				Presentation/Scene/Common/View/MemoView.swift,
+				Presentation/Scene/Common/View/SelectedFolderView.swift,
+				Presentation/Scene/EditClip/Subview/StackView/URLValidationStackView.swift,
+				"Presentation/Util/Extension/UIFont+Extension.swift",
+			);
+			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
+		};
 		9F781F1E2DF6CEFC00D7BEC6 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -86,6 +112,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				44DFD9C72DE9D0E200B6CD87 /* Exceptions for "Clipster" folder in "Clipster" target */,
+				9F3CB6A92E13FE0300FB8755 /* Exceptions for "Clipster" folder in "ShareExtension" target */,
 			);
 			path = Clipster;
 			sourceTree = "<group>";
@@ -129,6 +156,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F3CC6FA2E140D3300FB8755 /* RxSwift in Frameworks */,
+				9F3CC6FC2E140D3300FB8755 /* SnapKit in Frameworks */,
+				9F3CC6F82E140D3300FB8755 /* RxRelay in Frameworks */,
+				9F3CC6F62E140D3300FB8755 /* RxCocoa in Frameworks */,
+				9F3CC6FE2E140D3300FB8755 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +174,7 @@
 				44DFD9B72DE9D0E000B6CD87 /* Clipster */,
 				9F781F102DF6CEFC00D7BEC6 /* ShareExtension */,
 				4439FF962E0913270092F53C /* ClipsterTests */,
+				9F3CC6F42E140D3300FB8755 /* Frameworks */,
 				44DFD9B62DE9D0E000B6CD87 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -154,6 +187,13 @@
 				4439FF952E0913270092F53C /* ClipsterTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9F3CC6F42E140D3300FB8755 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,6 +274,11 @@
 			);
 			name = ShareExtension;
 			packageProductDependencies = (
+				9F3CC6F52E140D3300FB8755 /* RxCocoa */,
+				9F3CC6F72E140D3300FB8755 /* RxRelay */,
+				9F3CC6F92E140D3300FB8755 /* RxSwift */,
+				9F3CC6FB2E140D3300FB8755 /* SnapKit */,
+				9F3CC6FD2E140D3300FB8755 /* Kingfisher */,
 			);
 			productName = ShareExtension;
 			productReference = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */;
@@ -849,6 +894,31 @@
 			productName = SnapKit;
 		};
 		44DFD9DB2DE9D39300B6CD87 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		9F3CC6F52E140D3300FB8755 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		9F3CC6F72E140D3300FB8755 /* RxRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxRelay;
+		};
+		9F3CC6F92E140D3300FB8755 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44DFD9CD2DE9D36400B6CD87 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		9F3CC6FB2E140D3300FB8755 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44DFD9D42DE9D37000B6CD87 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		9F3CC6FD2E140D3300FB8755 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
