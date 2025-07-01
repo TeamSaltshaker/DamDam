@@ -4,6 +4,13 @@ actor FolderClipCache {
     private var folderCache = [UUID: Folder]()
     private var clipCache = [UUID: Clip]()
 
+    var isFoldersInitialized = false
+    var isClipsInitialized = false
+
+    var isInitialized: Bool {
+        isFoldersInitialized && isClipsInitialized
+    }
+
     func folders() -> [Folder] {
         Array(folderCache.values)
     }
@@ -18,6 +25,7 @@ actor FolderClipCache {
 
     func resetAndSetFolders(_ folders: [Folder]) {
         folderCache = Dictionary(uniqueKeysWithValues: folders.map { ($0.id, $0) })
+        isFoldersInitialized = true
     }
 
     func clips() -> [Clip] {
@@ -34,5 +42,13 @@ actor FolderClipCache {
 
     func resetAndSetClips(_ clips: [Clip]) {
         clipCache = Dictionary(uniqueKeysWithValues: clips.map { ($0.id, $0) })
+        isClipsInitialized = true
+    }
+
+    func reset() {
+        folderCache.removeAll()
+        clipCache.removeAll()
+        isFoldersInitialized = false
+        isClipsInitialized = false
     }
 }
