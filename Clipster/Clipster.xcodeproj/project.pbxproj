@@ -92,6 +92,7 @@
 				Presentation/Scene/Common/View/SelectedFolderView.swift,
 				Presentation/Scene/EditClip/Subview/StackView/URLValidationStackView.swift,
 				"Presentation/Util/Extension/UIFont+Extension.swift",
+				Presentation/Util/Mapper/URLMetadataDisplayMapper.swift,
 			);
 			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
 		};

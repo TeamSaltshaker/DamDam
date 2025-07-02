@@ -129,7 +129,7 @@ final class EditClipReactor: Reactor {
                     clipValidType = .invalid
                 }
                 return .merge(
-                    .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata))),
+                    .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: metadata))),
                     .just(Mutation.updateIsValidURL(clipValidType))
                 )
             }
@@ -300,18 +300,6 @@ final class EditClipReactor: Reactor {
 }
 
 private extension EditClipReactor {
-    func toURLMetaDisplay(entity: URLMetadata?) -> URLMetadataDisplay? {
-        entity.map {
-            URLMetadataDisplay(
-                url: $0.url,
-                title: $0.title,
-                description: $0.description,
-                thumbnailImageURL: $0.thumbnailImageURL,
-                screenshotImageData: $0.screenshotData
-            )
-        }
-    }
-
     func makeURLMetaDisplayOnlyURL(urlString: String) -> URLMetadataDisplay? {
         guard let url = URL(string: urlString) else { return nil }
         return URLMetadataDisplay(
