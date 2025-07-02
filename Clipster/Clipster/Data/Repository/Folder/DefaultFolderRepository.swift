@@ -21,6 +21,17 @@ final class DefaultFolderRepository: FolderRepository {
         }
     }
 
+    func fetchAllFolders() async -> Result<[Folder], DomainError> {
+        if let cache,
+           await cache.isFoldersInitialized {
+            let folders = await cache.folders()
+            return .success(folders.filter { $0.deletedAt == nil })
+        } else {
+            return await storage.fetchAllFolders()
+                .mapError { _ in .fetchFailed }
+        }
+    }
+
     func fetchTopLevelFolders() async -> Result<[Folder], DomainError> {
         if await cache.isFoldersInitialized {
             let folders = await cache.folders()
