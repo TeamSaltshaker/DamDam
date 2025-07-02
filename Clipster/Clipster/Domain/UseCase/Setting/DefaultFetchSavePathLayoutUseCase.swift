@@ -2,7 +2,7 @@ import Foundation
 
 final class DefaultFetchSavePathLayoutUseCase: FetchSavePathLayoutUseCase {
     private let userDefaults: UserDefaults
-    private let key = "save_path_option"
+    private let key = "savePathOption"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults

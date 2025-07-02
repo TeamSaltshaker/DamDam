@@ -2,7 +2,7 @@ import Foundation
 
 final class DefaultSaveClipSortUseCase: SaveClipSortUseCase {
     private let userDefaults: UserDefaults
-    private let key = "clip_sort_option"
+    private let key = "clipSortOption"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults

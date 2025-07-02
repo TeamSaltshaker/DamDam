@@ -2,7 +2,7 @@ import Foundation
 
 final class DefaultFetchThemeUseCase: FetchThemeUseCase {
     private let userDefaults: UserDefaults
-    private let key = "app_theme_option"
+    private let key = "appThemeOption"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults

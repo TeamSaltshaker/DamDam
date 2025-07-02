@@ -2,7 +2,7 @@ import Foundation
 
 final class DefaultSaveFolderSortUseCase: SaveFolderSortUseCase {
     private let userDefaults: UserDefaults
-    private let key = "folder_sort_option"
+    private let key = "folderSortOption"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
