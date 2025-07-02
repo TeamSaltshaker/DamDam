@@ -76,6 +76,7 @@
 		9F3CB6A92E13FE0300FB8755 /* Exceptions for "Clipster" folder in "ShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Presentation/Model/ClipValidType.swift,
 				Presentation/Model/FolderDisplay.swift,
 				Presentation/Model/URLMetadataDisplay.swift,
 				Presentation/Resource/Color.xcassets,

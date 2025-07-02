@@ -2,12 +2,6 @@ import Foundation
 import ReactorKit
 
 final class EditClipReactor: Reactor {
-    enum ClipValidType {
-        case valid
-        case validWithWarning
-        case invalid
-    }
-
     enum EditClipReactorType {
         case edit
         case create
