@@ -76,12 +76,46 @@
 		9F3CB6A92E13FE0300FB8755 /* Exceptions for "Clipster" folder in "ShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Data/Error/CoreDataError.swift,
+				Data/Model/Cache/FolderClipCache.swift,
+				Data/Model/Persistence/ClipEntity.swift,
+				Data/Model/Persistence/Clipster.xcdatamodeld,
+				Data/Model/Persistence/FolderEntity.swift,
+				Data/Model/Persistence/URLMetadataEntity.swift,
+				Data/Persistence/CoreDataStack.swift,
+				Data/Persistence/DefaultClipStorage.swift,
+				Data/Persistence/DefaultFolderStorage.swift,
+				Data/Protocol/Persistence/ClipStorage.swift,
+				Data/Protocol/Persistence/FolderStorage.swift,
+				Data/Repository/Clip/DefaultClipRepository.swift,
+				Data/Repository/Folder/DefaultFolderRepository.swift,
+				Data/Repository/URL/DefaultURLRepository.swift,
+				Data/Util/Mapper/DomainMapper.swift,
+				Domain/Error/DomainError.swift,
+				Domain/Error/URLValidationError.swift,
+				Domain/Model/Entity/Clip.swift,
+				Domain/Model/Entity/Folder.swift,
+				Domain/Model/Entity/URLMetadata.swift,
+				Domain/Protocol/Repository/Clip/ClipRepository.swift,
+				Domain/Protocol/Repository/Folder/FolderRepository.swift,
+				Domain/Protocol/Repository/URL/URLRepository.swift,
+				Domain/Protocol/UseCase/Clip/CreateClipUseCase.swift,
+				Domain/Protocol/UseCase/Folder/FetchTopLevelFoldersUseCase.swift,
+				Domain/Protocol/UseCase/Folder/FilterSubfoldersUseCase.swift,
+				Domain/Protocol/UseCase/Folder/FindFolderPathUseCase.swift,
+				Domain/Protocol/UseCase/URL/ParseURLUseCase.swift,
+				Domain/UseCase/Clip/DefaultCreateClipUseCase.swift,
+				Domain/UseCase/Folder/DefaultFetchTopLevelFoldersUseCase.swift,
+				Domain/UseCase/Folder/DefaultFilterSubfoldersUseCase.swift,
+				Domain/UseCase/Folder/DefaultFindFolderPathUseCase.swift,
+				Domain/UseCase/URL/DefaultParseURLUseCase.swift,
 				Presentation/Model/ClipValidType.swift,
 				Presentation/Model/FolderDisplay.swift,
 				Presentation/Model/URLMetadataDisplay.swift,
 				Presentation/Resource/Color.xcassets,
 				Presentation/Resource/Icon.xcassets,
 				Presentation/Scene/Common/Button/AddButton.swift,
+				Presentation/Scene/Common/Button/BackButton.swift,
 				Presentation/Scene/Common/Button/CancelButton.swift,
 				Presentation/Scene/Common/Button/SaveButton.swift,
 				Presentation/Scene/Common/StackView/URLMetadataStackView.swift,
@@ -91,8 +125,12 @@
 				Presentation/Scene/Common/View/MemoView.swift,
 				Presentation/Scene/Common/View/SelectedFolderView.swift,
 				Presentation/Scene/EditClip/Subview/StackView/URLValidationStackView.swift,
+				Presentation/Scene/FolderSelector/Reactor/FolderSelectorReactor.swift,
+				Presentation/Scene/FolderSelector/ViewController/FolderSelectorViewController.swift,
 				"Presentation/Util/Extension/Observable+Extension.swift",
 				"Presentation/Util/Extension/UIFont+Extension.swift",
+				"Presentation/Util/Extension/UIViewController+Extension.swift",
+				Presentation/Util/Mapper/FolderDisplayMapper.swift,
 				Presentation/Util/Mapper/URLMetadataDisplayMapper.swift,
 			);
 			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
@@ -103,6 +141,13 @@
 				Info.plist,
 			);
 			target = 9F781F0E2DF6CEFC00D7BEC6 /* ShareExtension */;
+		};
+		9FDF69602E14ECDB00EDBAA7 /* Exceptions for "ShareExtension" folder in "Clipster" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Reactor/ShareReactor.swift,
+			);
+			target = 44DFD9B42DE9D0E000B6CD87 /* Clipster */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -124,6 +169,7 @@
 		9F781F102DF6CEFC00D7BEC6 /* ShareExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				9FDF69602E14ECDB00EDBAA7 /* Exceptions for "ShareExtension" folder in "Clipster" target */,
 				9F781F1E2DF6CEFC00D7BEC6 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */,
 			);
 			path = ShareExtension;
