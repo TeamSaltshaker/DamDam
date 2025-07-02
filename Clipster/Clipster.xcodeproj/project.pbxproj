@@ -22,6 +22,7 @@
 		9F3CC6FA2E140D3300FB8755 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6F92E140D3300FB8755 /* RxSwift */; };
 		9F3CC6FC2E140D3300FB8755 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6FB2E140D3300FB8755 /* SnapKit */; };
 		9F3CC6FE2E140D3300FB8755 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CC6FD2E140D3300FB8755 /* Kingfisher */; };
+		9F3CCB3C2E1414C900FB8755 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9F3CCB3B2E1414C900FB8755 /* ReactorKit */; };
 		9F781F192DF6CEFC00D7BEC6 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E5C2F0E72E0D0045006BAC60 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
@@ -160,6 +161,7 @@
 				9F3CC6FC2E140D3300FB8755 /* SnapKit in Frameworks */,
 				9F3CC6F82E140D3300FB8755 /* RxRelay in Frameworks */,
 				9F3CC6F62E140D3300FB8755 /* RxCocoa in Frameworks */,
+				9F3CCB3C2E1414C900FB8755 /* ReactorKit in Frameworks */,
 				9F3CC6FE2E140D3300FB8755 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,6 +281,7 @@
 				9F3CC6F92E140D3300FB8755 /* RxSwift */,
 				9F3CC6FB2E140D3300FB8755 /* SnapKit */,
 				9F3CC6FD2E140D3300FB8755 /* Kingfisher */,
+				9F3CCB3B2E1414C900FB8755 /* ReactorKit */,
 			);
 			productName = ShareExtension;
 			productReference = 9F781F0F2DF6CEFC00D7BEC6 /* ShareExtension.appex */;
@@ -922,6 +925,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 44DFD9DA2DE9D39300B6CD87 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		9F3CCB3B2E1414C900FB8755 /* ReactorKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 442D5AAE2DFFB069002E4E68 /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			productName = ReactorKit;
 		};
 		E5C2F0E62E0D0045006BAC60 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,9 +1,14 @@
+import ReactorKit
 import SnapKit
 import Social
 import UIKit
 import UniformTypeIdentifiers
 
 final class ShareViewController: UIViewController {
+    typealias Reactor = ShareReactor
+
+    var disposeBag = DisposeBag()
+
     private let appGroupID: String = {
         #if DEBUG
         return "group.com.saltshaker.clipster.debug"
@@ -26,9 +31,18 @@ final class ShareViewController: UIViewController {
         view = shareView
     }
 
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.reactor = ShareReactor()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        extractURL()
+        reactor?.action.onNext(.viewWillAppear)
     }
 
     private func extractURL() {
@@ -55,11 +69,7 @@ final class ShareViewController: UIViewController {
 
                         if let url = extractURL(from: item) {
                             print("\(Self.self) ✅ 공유된 URL: \(url.absoluteString)")
-                            if saveURLToUserDefaults(url) {
-                                DispatchQueue.main.async {
-                                    self.openMainApp()
-                                }
-                            }
+                            reactor?.action.onNext(.extractedURL(url))
                         } else {
                             print("\(Self.self) ⚠️ URL 변환 실패 - type: \(typeIdentifier)")
                         }
@@ -88,41 +98,30 @@ final class ShareViewController: UIViewController {
         return matches?.first?.url
     }
 
-    private func openMainApp() {
-        if let url = URL(string: urlScheme) {
-            if openURLScheme(url) {
-                print("\(Self.self) ✅ URL Scheme open 성공")
-            } else {
-                print("\(Self.self) ❌ URL Scheme open 실패")
-            }
-        }
-        close()
-    }
-
-    private func openURLScheme(_ url: URL) -> Bool {
-        var responder: UIResponder? = self
-        while responder != nil {
-            if let application = responder as? UIApplication {
-                application.open(url, options: [:], completionHandler: nil)
-                return true
-            }
-            responder = responder?.next
-        }
-        return false
-    }
-
-    private func saveURLToUserDefaults(_ url: URL) -> Bool {
-        if let sharedDefaults = UserDefaults(suiteName: appGroupID) {
-            sharedDefaults.set(url.absoluteString, forKey: "sharedURL")
-            print("\(Self.self) ✅ UserDefaults에 URL 저장 완료: \(url.absoluteString)")
-            return true
-        } else {
-            print("\(Self.self) ❌ UserDefaults App Group 접근 실패")
-            return false
-        }
-    }
-
     private func close() {
         extensionContext?.completeRequest(returningItems: nil)
+    }
+}
+
+extension ShareViewController: View {
+    func bind(reactor: ShareReactor) {
+        bindUI(to: reactor)
+        bindState(from: reactor)
+    }
+
+    private func bindUI(to reactor: ShareReactor) {}
+
+    private func bindState(from reactor: ShareReactor) {
+        reactor.state
+            .filter(\.isReadyToExtractURL)
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] event in
+                guard let self else { return }
+                if case .next = event {
+                    extractURL()
+                }
+            }
+            .disposed(by: disposeBag)
     }
 }
