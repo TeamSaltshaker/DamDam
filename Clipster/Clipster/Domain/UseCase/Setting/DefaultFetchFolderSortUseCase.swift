@@ -11,7 +11,7 @@ final class DefaultFetchFolderSortUseCase: FetchFolderSortUseCase {
     func execute() async -> Result<FolderSortOption, Error> {
         guard let raw = userDefaults.string(forKey: key),
               let option = convertFromRawString(raw) else {
-            return .success(.updatedAt(.descending)) // 기본값
+            return .success(.title(.descending))
         }
         return .success(option)
     }
