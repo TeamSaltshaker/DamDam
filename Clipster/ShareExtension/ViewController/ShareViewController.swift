@@ -195,6 +195,19 @@ extension ShareViewController: View {
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillChangeFrameNotification)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] notification in
+                guard let self,
+                      let userInfo = notification.userInfo,
+                      let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+                let bottomInset = max(0, UIScreen.main.bounds.height - keyboardFrame.origin.y)
+                shareView.scrollView.contentInset.bottom = bottomInset
+                shareView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+            }
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: ShareReactor) {
