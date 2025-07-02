@@ -47,7 +47,11 @@ final class ShareView: UIView {
 
     let memoView = MemoView()
 
-    let selectedFolderView = SelectedFolderView(type: .clip, mode: .edit)
+    let selectedFolderView: SelectedFolderView = {
+        let view = SelectedFolderView(type: .clip, mode: .edit)
+        view.addButton.isHidden = true
+        return view
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
