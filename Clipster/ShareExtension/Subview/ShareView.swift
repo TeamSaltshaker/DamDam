@@ -4,7 +4,6 @@ import UIKit
 final class ShareView: UIView {
     let commonNavigationView: CommonNavigationView = {
         let commonNavigationView = CommonNavigationView()
-        commonNavigationView.backgroundColor = .white900
         commonNavigationView.setTitle("클립 추가")
         return commonNavigationView
     }()
@@ -15,6 +14,7 @@ final class ShareView: UIView {
     let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
+        scrollView.backgroundColor = .white900
         return scrollView
     }()
 
@@ -49,6 +49,7 @@ final class ShareView: UIView {
 
     let selectedFolderView: SelectedFolderView = {
         let view = SelectedFolderView(type: .clip, mode: .edit)
+        view.folderView.backgroundColor = .blue900
         view.addButton.isHidden = true
         return view
     }()
@@ -72,6 +73,10 @@ private extension ShareView {
 
     func setAttributes() {
         backgroundColor = .white900
+
+        layer.masksToBounds = false
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        layer.cornerRadius = 16
 
         commonNavigationView.setLeftItem(cancelButton)
         commonNavigationView.setRightItem(saveButton)
@@ -110,7 +115,7 @@ private extension ShareView {
 
     func setConstraints() {
         commonNavigationView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
+            make.top.equalToSuperview()
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
@@ -129,14 +134,14 @@ private extension ShareView {
         }
 
         scrollContainerView.snp.makeConstraints { make in
-            make.edges.equalTo(scrollView.contentLayoutGuide)
+            make.top.directionalHorizontalEdges.equalTo(scrollView.contentLayoutGuide)
             make.width.equalTo(scrollView.frameLayoutGuide)
         }
 
-        urlStackView.setCustomSpacing(32, after: urlStackView.arrangedSubviews[0])
+        urlStackView.setCustomSpacing(16, after: urlStackView.arrangedSubviews[0])
 
         urlStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
+            make.top.equalToSuperview().offset(8)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.width.equalToSuperview().inset(24)
             make.height.equalTo(0).priority(.low)
@@ -147,12 +152,12 @@ private extension ShareView {
         }
 
         memoView.snp.makeConstraints { make in
-            make.top.equalTo(urlStackView.snp.bottom).offset(32)
+            make.top.equalTo(urlStackView.snp.bottom).offset(16)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
         selectedFolderView.snp.makeConstraints { make in
-            make.top.equalTo(memoView.snp.bottom).offset(40)
+            make.top.equalTo(memoView.snp.bottom).offset(7)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.bottom.equalToSuperview()
         }
