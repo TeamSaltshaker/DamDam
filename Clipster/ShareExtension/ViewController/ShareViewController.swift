@@ -281,6 +281,7 @@ extension ShareViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
+            .observe(on: MainScheduler.asyncInstance)
             .map { ($0.isTappedFolderView, $0.currentFolder) }
             .filter { $0.0 }
             .map { $0.1 }
@@ -290,15 +291,17 @@ extension ShareViewController: View {
 
                 let reactor = ShareDIContainer().makeFolderSelectorReactorForClip(parentFolder: currentFolder)
                 let vc = FolderSelectorViewController(reactor: reactor)
-                vc.onSelectionComplete = { [weak self] in
-                    self?.reactor?.action.onNext(.editFolder($0))
-                }
+
                 vc.modalPresentationStyle = .pageSheet
                 if let sheet = vc.sheetPresentationController {
                     sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
                     sheet.prefersGrabberVisible = true
                 }
                 self.present(vc, animated: true)
+
+                vc.onSelectionComplete = { [weak self] in
+                    self?.reactor?.action.onNext(.editFolder($0))
+                }
                 self.reactor?.action.onNext(.disappearFolderSelectorView)
             }
             .disposed(by: disposeBag)
