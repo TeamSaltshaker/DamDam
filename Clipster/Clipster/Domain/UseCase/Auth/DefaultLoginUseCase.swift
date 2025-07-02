@@ -10,7 +10,7 @@ final class DefaultLoginUseCase: LoginUseCase {
         self.authService = authService
     }
 
-    func execute(type: LoginType) async -> Result<String, Error> {
+    func execute(type: LoginType) async -> Result<Void, Error> {
         guard let service = loginServices[type] else {
             return .failure(LoginError.unsupportedType)
         }
@@ -19,8 +19,7 @@ final class DefaultLoginUseCase: LoginUseCase {
 
         switch result {
         case .success(let token):
-            await authService.loginWithApple(token: token)
-            return .success("")
+            return await authService.loginWithApple(token: token)
         case .failure(let error):
             return .failure(error)
         }

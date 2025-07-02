@@ -8,16 +8,16 @@ final class DefaultAuthService: AuthService {
         self.client = client
     }
 
-    func loginWithApple(token: String) async {
+    func loginWithApple(token: String) async -> Result<Void, Error> {
         let credentials = OpenIDConnectCredentials(provider: .apple, idToken: token)
 
         do {
             let response = try await client.auth.signInWithIdToken(credentials: credentials)
-
-            print("id: \(response.user.id)")
-            print("createdAt: \(response.user.createdAt)")
+            print("\(Self.self): ✅ Login Success. UID: \(response.user.id)")
+            return .success(())
         } catch {
-            print("error: \(error.localizedDescription)")
+            print("\(Self.self): ❌ \(error.localizedDescription)")
+            return .failure(error)
         }
     }
 }
