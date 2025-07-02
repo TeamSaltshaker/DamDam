@@ -54,10 +54,13 @@ final class DIContainer {
     }
 
     func makeLoginUseCase() -> LoginUseCase {
-        DefaultLoginUseCase(loginServices: [
-            .apple: makeAppleLoginService(),
-            .google: makeGoogleLoginService()
-        ])
+        DefaultLoginUseCase(
+            loginServices: [
+                .apple: makeAppleLoginService(),
+                .google: makeGoogleLoginService()
+            ],
+            authService: makeAuthService(),
+        )
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
