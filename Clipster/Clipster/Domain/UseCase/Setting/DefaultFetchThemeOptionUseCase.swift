@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultFetchThemeUseCase: FetchThemeUseCase {
+final class DefaultFetchThemeOptionUseCase: FetchThemeOptionUseCase {
     private let userDefaults: UserDefaults
     private let key = "appThemeOption"
 

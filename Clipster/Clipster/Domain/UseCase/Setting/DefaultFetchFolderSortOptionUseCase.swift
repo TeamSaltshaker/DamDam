@@ -1,25 +1,24 @@
 import Foundation
 
-final class DefaultFetchClipSortUseCase: FetchClipSortUseCase {
+final class DefaultFetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase {
     private let userDefaults: UserDefaults
-    private let key = "clipSortOption"
+    private let key = "folderSortOption"
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
-    func execute() async -> Result<ClipSortOption, Error> {
+    func execute() async -> Result<FolderSortOption, Error> {
         guard let raw = userDefaults.string(forKey: key),
               let option = convertFromRawString(raw) else {
             return .success(.title(.descending))
         }
-
         return .success(option)
     }
 }
 
-private extension DefaultFetchClipSortUseCase {
-    func convertFromRawString(_ raw: String) -> ClipSortOption? {
+private extension DefaultFetchFolderSortOptionUseCase {
+    func convertFromRawString(_ raw: String) -> FolderSortOption? {
         let components = raw.split(separator: "|").map(String.init)
         guard components.count == 2 else { return nil }
 
@@ -30,7 +29,6 @@ private extension DefaultFetchClipSortUseCase {
 
         switch type {
         case "title": return .title(direction)
-        case "lastVisitedAt": return .lastVisitedAt(direction)
         case "createdAt": return .createdAt(direction)
         case "updatedAt": return .updatedAt(direction)
         default: return nil

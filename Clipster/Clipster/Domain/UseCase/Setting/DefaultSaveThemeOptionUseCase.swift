@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultSaveThemeUseCase: SaveThemeUseCase {
+final class DefaultSaveThemeOptionUseCase: SaveThemeOptionUseCase {
     private let userDefaults: UserDefaults
     private let key = "appThemeOption"
 

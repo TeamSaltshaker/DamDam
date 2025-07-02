@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultSaveSavePathLayoutUseCase: SaveSavePathLayoutUseCase {
+final class DefaultSaveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase {
     private let userDefaults: UserDefaults
     private let key = "savePathOption"
 
