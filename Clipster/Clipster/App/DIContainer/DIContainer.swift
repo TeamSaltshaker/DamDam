@@ -41,6 +41,10 @@ final class DIContainer {
         GoogleLoginService()
     }
 
+    func makeDatabaseService() -> DatabaseService {
+        DefaultDatabaseService(client: supabaseClient)
+    }
+
     func makeClipRepository() -> ClipRepository {
         DefaultClipRepository(storage: makeClipStorage(), cache: cache)
     }

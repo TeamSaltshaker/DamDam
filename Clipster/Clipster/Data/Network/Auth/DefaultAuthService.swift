@@ -20,21 +20,4 @@ final class DefaultAuthService: AuthService {
             print("error: \(error.localizedDescription)")
         }
     }
-
-    #if DEBUG
-    func dummyFetchFolders() async -> [FolderDTO]? {
-        try? await client
-            .from("Folders")
-            .select()
-            .execute()
-            .value
-    }
-
-    func dummyDownloadScreenshot() async -> Data? {
-        try? await client
-            .storage
-            .from("screenshots")
-            .download(path: "testuser/testimage.png")
-    }
-    #endif
 }
