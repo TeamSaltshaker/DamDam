@@ -81,6 +81,27 @@ final class DefaultClipStorage: ClipStorage {
         }
     }
 
+    func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], CoreDataError> {
+        await withCheckedContinuation { [weak self] continuation in
+            guard let self else { return }
+
+            container.performBackgroundTask { context in
+                let request = ClipEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id IN %@ AND deletedAt == nil", ids)
+
+                do {
+                    let entities = try context.fetch(request)
+                    let recentVisitedClips = entities.compactMap(self.mapper.clip)
+                    print("\(Self.self): ✅ Fetch successfully")
+                    continuation.resume(returning: .success(recentVisitedClips))
+                } catch {
+                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
+                }
+            }
+        }
+    }
+
     func insertClip(_ clip: Clip) async -> Result<Void, CoreDataError> {
         await withCheckedContinuation { continuation in
             container.performBackgroundTask { context in
