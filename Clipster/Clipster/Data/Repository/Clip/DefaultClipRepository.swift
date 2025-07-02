@@ -2,15 +2,16 @@ import Foundation
 
 final class DefaultClipRepository: ClipRepository {
     private let storage: ClipStorage
-    private let cache: FolderClipCache
+    private let cache: FolderClipCache?
 
-    init(storage: ClipStorage, cache: FolderClipCache) {
+    init(storage: ClipStorage, cache: FolderClipCache?) {
         self.storage = storage
         self.cache = cache
     }
 
     func fetchClip(by id: UUID) async -> Result<Clip, DomainError> {
-        if await cache.isClipsInitialized {
+        if let cache,
+           await cache.isClipsInitialized {
             guard let clip = await cache.clip(by: id) else {
                 return .failure(.entityNotFound)
             }
@@ -22,7 +23,8 @@ final class DefaultClipRepository: ClipRepository {
     }
 
     func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
-        if await cache.isClipsInitialized {
+        if let cache,
+           await cache.isClipsInitialized {
             let clips = await cache.clips()
             return .success(clips.filter {
                 $0.folderID == nil && $0.deletedAt == nil
@@ -34,7 +36,8 @@ final class DefaultClipRepository: ClipRepository {
     }
 
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError> {
-        if await cache.isClipsInitialized {
+        if let cache,
+           await cache.isClipsInitialized {
             let clips = await cache.clips()
             return .success(clips.filter {
                 $0.lastVisitedAt == nil && $0.deletedAt == nil
@@ -50,7 +53,8 @@ final class DefaultClipRepository: ClipRepository {
 
         switch result {
         case .success:
-            if await cache.isClipsInitialized {
+            if let cache,
+               await cache.isClipsInitialized {
                 await cache.setClip(clip)
             }
             return .success(())
@@ -64,7 +68,8 @@ final class DefaultClipRepository: ClipRepository {
 
         switch result {
         case .success:
-            if await cache.isClipsInitialized {
+            if let cache,
+               await cache.isClipsInitialized {
                 await cache.setClip(clip)
             }
             return .success(())
@@ -78,7 +83,8 @@ final class DefaultClipRepository: ClipRepository {
 
         switch result {
         case .success:
-            if await cache.isClipsInitialized {
+            if let cache,
+               await cache.isClipsInitialized {
                 await cache.setClip(clip)
             }
             return .success(())
