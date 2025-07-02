@@ -91,6 +91,7 @@
 				Presentation/Scene/Common/View/MemoView.swift,
 				Presentation/Scene/Common/View/SelectedFolderView.swift,
 				Presentation/Scene/EditClip/Subview/StackView/URLValidationStackView.swift,
+				"Presentation/Util/Extension/Observable+Extension.swift",
 				"Presentation/Util/Extension/UIFont+Extension.swift",
 				Presentation/Util/Mapper/URLMetadataDisplayMapper.swift,
 			);
