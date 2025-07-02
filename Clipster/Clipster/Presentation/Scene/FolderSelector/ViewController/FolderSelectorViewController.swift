@@ -7,12 +7,10 @@ final class FolderSelectorViewController: UIViewController, View, UITableViewDel
 
     var disposeBag = DisposeBag()
     private let folderSelectorView = FolderSelectorView()
-    private weak var coordinator: HomeCoordinator?
 
     var onSelectionComplete: ((Folder?) -> Void)?
 
-    init(reactor: Reactor, coordinator: HomeCoordinator) {
-        self.coordinator = coordinator
+    init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
