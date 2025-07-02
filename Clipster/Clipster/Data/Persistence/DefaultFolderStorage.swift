@@ -42,6 +42,32 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 
+    func fetchAllFolders() async -> Result<[Folder], CoreDataError> {
+        await withCheckedContinuation { [weak self] continuation in
+            guard let self else { return }
+
+            container.performBackgroundTask { context in
+                let request = FolderEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "deletedAt == nil")
+
+                do {
+                    let entities = try context.fetch(request)
+                    for entity in entities {
+                        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+                        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+                    }
+
+                    let allFolders = entities.compactMap(self.mapper.folder)
+                    print("\(Self.self): ✅ Fetch successfully")
+                    continuation.resume(returning: .success(allFolders))
+                } catch {
+                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
+                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
+                }
+            }
+        }
+    }
+
     func fetchTopLevelFolders() async -> Result<[Folder], CoreDataError> {
         await withCheckedContinuation { [weak self] continuation in
             guard let self else { return }
