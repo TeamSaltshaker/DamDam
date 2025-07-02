@@ -1,9 +1,10 @@
 import CoreData
 import Foundation
+import Supabase
 
 final class DIContainer {
     private let container: NSPersistentContainer
-    private let supabaseService: SupabaseService
+    private let supabaseClient: SupabaseClient
     private let cache: FolderClipCache
     private let userDefaults: UserDefaults
 
@@ -15,7 +16,7 @@ final class DIContainer {
         userDefaults: UserDefaults
     ) {
         self.container = container ?? CoreDataStack.shared.container
-        supabaseService = SupabaseService(url: supabaseURL, key: supabaseKey)
+        supabaseClient = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
         self.cache = cache
         self.userDefaults = userDefaults
     }
@@ -26,6 +27,10 @@ final class DIContainer {
 
     func makeFolderStorage() -> FolderStorage {
         DefaultFolderStorage(container: container, mapper: DomainMapper())
+    }
+
+    func makeAuthService() -> AuthService {
+        DefaultAuthService(client: supabaseClient)
     }
 
     func makeAppleLoginService() -> SocialLoginService {
