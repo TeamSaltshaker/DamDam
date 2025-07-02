@@ -21,6 +21,17 @@ final class DefaultClipRepository: ClipRepository {
         }
     }
 
+    func fetchAllClips() async -> Result<[Clip], DomainError> {
+        if let cache,
+           await cache.isClipsInitialized {
+            let clips = await cache.clips()
+            return .success(clips.filter { $0.deletedAt == nil })
+        } else {
+            return await storage.fetchAllClips()
+                .mapError { _ in .fetchFailed }
+        }
+    }
+
     func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
         if await cache.isClipsInitialized {
             let clips = await cache.clips()

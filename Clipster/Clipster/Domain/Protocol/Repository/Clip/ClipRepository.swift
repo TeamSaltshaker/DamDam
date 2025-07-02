@@ -2,6 +2,7 @@ import Foundation
 
 protocol ClipRepository {
     func fetchClip(by id: UUID) async -> Result<Clip, DomainError>
+    func fetchAllClips() async -> Result<[Clip], DomainError>
     func fetchTopLevelClips() async -> Result<[Clip], DomainError>
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError>
     func insertClip(_ clip: Clip) async -> Result<Void, DomainError>
