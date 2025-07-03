@@ -48,11 +48,23 @@ final class DIContainer {
         DefaultURLRepository()
     }
 
+    func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {
+        DefaultCheckLoginStatusUseCase()
+    }
+
     func makeLoginUseCase() -> LoginUseCase {
         DefaultLoginUseCase(loginServices: [
             .apple: makeAppleLoginService(),
             .google: makeGoogleLoginService()
         ])
+    }
+
+    func makeLogoutUseCase() -> LogoutUseCase {
+        DefaultLogoutUseCase()
+    }
+
+    func makeWithdrawUseCase() -> WithdrawUseCase {
+        DefaultWithdrawUseCase()
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
@@ -173,6 +185,34 @@ final class DIContainer {
 
     func makeSaveRecentQueryUseCase() -> SaveRecentQueryUseCase {
         DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchClipSortUseCase() -> FetchClipSortOptionUseCase {
+        DefaultFetchClipSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchFolderSortUseCase() -> FetchFolderSortOptionUseCase {
+        DefaultFetchFolderSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchSavePathLayoutUseCase() -> FetchSavePathLayoutOptionUseCase {
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchThemeUseCase() -> FetchThemeOptionUseCase {
+        DefaultFetchThemeOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveClipSortUseCase() -> SaveClipSortOptionUseCase {
+        DefaultSaveClipSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveFolderSortUseCase() -> SaveFolderSortOptionUseCase {
+        DefaultSaveFolderSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
+        DefaultSaveThemeOptionUseCase(userDefaults: userDefaults)
     }
 
     func makeParseURLMetadataUseCase() -> ParseURLUseCase {
@@ -308,6 +348,18 @@ final class DIContainer {
             searchFoldersUseCase: makeSearchFoldersUseCase(),
             searchClipsUseCase: makeSearchClipsUseCase(),
             visitClipUseCase: makeVisitClipUseCase()
+        )
+    }
+
+    func makeMyPageReactor() -> MyPageReactor {
+        MyPageReactor(
+            loginUseCase: makeLoginUseCase(),
+            fetchThemeUseCase: makeFetchThemeUseCase(),
+            fetchFolderSortUseCase: makeFetchFolderSortUseCase(),
+            fetchClipSortUseCase: makeFetchClipSortUseCase(),
+            fetchSavePathLayoutUseCase: makeFetchSavePathLayoutUseCase(),
+            logoutUseCase: makeLogoutUseCase(),
+            withdrawUseCase: makeWithdrawUseCase()
         )
     }
 }
