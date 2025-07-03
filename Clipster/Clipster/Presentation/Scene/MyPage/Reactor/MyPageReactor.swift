@@ -10,12 +10,14 @@ final class MyPageReactor: Reactor {
 
     enum Mutation {
         case setSectionModel([MyPageSectionModel])
+        case setIsScrollToTop(Bool)
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
 
     struct State {
         var sectionModel: [MyPageSectionModel] = []
+        @Pulse var isScrollToTop: Bool = false
         @Pulse var phase: Phase = .idle
         @Pulse var route: Route?
 
@@ -116,6 +118,7 @@ final class MyPageReactor: Reactor {
                         guard let self else { throw DomainError.unknownError }
                         return try await makeAccountItemMutation(item: accountItem)
                     },
+                    .just(.setIsScrollToTop(true)),
                     .just(.setPhase(.success))
                 )
                 .catch {
@@ -140,6 +143,8 @@ final class MyPageReactor: Reactor {
         switch mutation {
         case .setSectionModel(let model):
             newState.sectionModel = model
+        case .setIsScrollToTop(let isScrollToTop):
+            newState.isScrollToTop = isScrollToTop
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):

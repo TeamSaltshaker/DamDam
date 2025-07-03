@@ -72,6 +72,15 @@ extension MyPageViewController {
                 guard let self else { return }
 
                 myPageView.setDisplay(sections)
+            }
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$isScrollToTop)
+            .filter { $0 }
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] _ in
+                guard let self else { return }
+
                 myPageView.scrollToTop(animated: false)
             }
             .disposed(by: disposeBag)
