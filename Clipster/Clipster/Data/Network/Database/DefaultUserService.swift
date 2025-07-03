@@ -13,15 +13,17 @@ final class DefaultUserService: UserService {
         self.mapper = mapper
     }
 
-    func fetchUser(by id: UUID) async -> Result<User, Error> {
+    func fetchUser(by id: UUID) async -> Result<User?, Error> {
         do {
-            let dto: UserDTO = try await client
+            let dtoList: [UserDTO] = try await client
                 .from("Users")
                 .select()
                 .eq("id", value: id)
-                .single()
                 .execute()
                 .value
+            guard let dto = dtoList.first else {
+                return .success(nil)
+            }
             let user = mapper.user(from: dto)
             print("\(Self.self): ✅ Fetch Success. id: \(user.id), nickname: \(user.nickname)")
             return .success(user)
@@ -31,7 +33,7 @@ final class DefaultUserService: UserService {
         }
     }
 
-    func insertUser(with id: UUID) async -> Result<Void, Error> {
+    func insertUser(with id: UUID) async -> Result<User, Error> {
         do {
             let dto = UserDTO(
                 id: id,
@@ -40,12 +42,16 @@ final class DefaultUserService: UserService {
                 updatedAt: Date.now,
                 deletedAt: nil,
             )
-            try await client
+            let insertedDTO: UserDTO = try await client
                 .from("Users")
                 .insert(dto)
+                .select()
+                .single()
                 .execute()
-            print("\(Self.self): ✅ Insert Success. id: \(id)")
-            return .success(())
+                .value
+            let insertedUser = mapper.user(from: insertedDTO)
+            print("\(Self.self): ✅ Insert Success. id: \(insertedUser.id)")
+            return .success((insertedUser))
         } catch {
             print("\(Self.self): ❌ Insert Failed. \(error.localizedDescription)")
             return .failure(error)

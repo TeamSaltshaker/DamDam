@@ -1,26 +1,37 @@
 final class DefaultLoginUseCase: LoginUseCase {
-    private let loginServices: [LoginType: SocialLoginService]
+    private let socialLoginServices: [LoginType: SocialLoginService]
     private let authService: AuthService
+    private let userService: UserService
 
     init(
-        loginServices: [LoginType: SocialLoginService],
-        authService: AuthService
+        socialLoginServices: [LoginType: SocialLoginService],
+        authService: AuthService,
+        userService: UserService,
     ) {
-        self.loginServices = loginServices
+        self.socialLoginServices = socialLoginServices
         self.authService = authService
+        self.userService = userService
     }
 
-    func execute(type: LoginType) async -> Result<Void, Error> {
-        guard let service = loginServices[type] else {
+    func execute(type: LoginType) async -> Result<User, Error> {
+        guard let socialLoginService = socialLoginServices[type] else {
             return .failure(LoginError.unsupportedType)
         }
 
-        let result = await service.login()
+        do {
+            let jwt = try await socialLoginService.login().get()
+            let userID = try await authService.login(loginType: type, token: jwt).get()
 
-        switch result {
-        case .success(let token):
-            return await authService.login(loginType: type, token: token)
-        case .failure(let error):
+            if let user = try await userService.fetchUser(by: userID).get() {
+                print("\(Self.self): ✅ Login Success. id: \(user.id), nickname: \(user.nickname)")
+                return .success(user)
+            } else {
+                let newUser = try await userService.insertUser(with: userID).get()
+                print("\(Self.self): ✅ SignUp and Login Success. id: \(newUser.id), nickname: \(newUser.nickname)")
+                return .success(newUser)
+            }
+        } catch {
+            print("\(Self.self): ❌ Login Failed. \(error.localizedDescription)")
             return .failure(error)
         }
     }
