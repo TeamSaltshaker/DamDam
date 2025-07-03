@@ -27,7 +27,7 @@ final class DefaultAuthService: AuthService {
             print("\(Self.self): ✅ Login success. Provider: \(loginType.title), UID: \(response.user.id)")
             return .success(response.user.id)
         } catch {
-            print("\(Self.self): ❌ Login With Apple Failed: \(error.localizedDescription)")
+            print("\(Self.self): ❌ Login failed: \(error.localizedDescription)")
             return .failure(error)
         }
     }
