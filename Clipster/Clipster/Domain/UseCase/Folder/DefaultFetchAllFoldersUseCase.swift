@@ -8,6 +8,6 @@ final class DefaultFetchAllFoldersUseCase: FetchAllFoldersUseCase {
     }
 
     func execute() async -> Result<[Folder], Error> {
-        .success([])
+        await folderRepository.fetchAllFolders().mapError { $0 as Error }
     }
 }

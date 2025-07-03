@@ -8,6 +8,6 @@ final class DefaultFetchAllClipsUseCase: FetchAllClipsUseCase {
     }
 
     func execute() async -> Result<[Clip], Error> {
-        .success([])
+        await clipRepository.fetchAllClips().mapError { $0 as Error }
     }
 }
