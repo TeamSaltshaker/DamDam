@@ -175,6 +175,10 @@ final class DIContainer {
         DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
     }
 
+    func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
+        DefaultFetchSavePathLayoutOptionUseCase()
+    }
+
     func makeParseURLMetadataUseCase() -> ParseURLUseCase {
         DefaultParseURLUseCase(urlMetaRepository: makeURLMetadataRepository())
     }
@@ -277,6 +281,7 @@ final class DIContainer {
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             findFolderPathUseCase: makeFindFolderPathUseCase(),
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
+            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutOptionUseCase(),
             parentFolder: parentFolder
         )
     }
@@ -286,6 +291,7 @@ final class DIContainer {
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             findFolderPathUseCase: makeFindFolderPathUseCase(),
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
+            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutOptionUseCase(),
             parentFolder: parentFolder,
             folder: folder
         )

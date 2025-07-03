@@ -2,6 +2,9 @@ import SnapKit
 import UIKit
 
 final class FolderSelectorView: UIView {
+    private var tableViewBottomConstraint: Constraint?
+    private var tableViewHorizontalConstraint: Constraint?
+
     let commonNavigationView: CommonNavigationView = {
         let commonNavigationView = CommonNavigationView()
         commonNavigationView.backgroundColor = .white900
@@ -10,6 +13,7 @@ final class FolderSelectorView: UIView {
 
     let backButton = BackButton("이전폴더")
     let selectButton = SelectButton()
+    let confirmButton = ConfirmButton()
 
     private let separator: UIView = {
         let view = UIView()
@@ -19,9 +23,10 @@ final class FolderSelectorView: UIView {
 
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.register(AccordionCell.self, forCellReuseIdentifier: AccordionCell.identifier)
         tableView.register(FolderSelectorCell.self, forCellReuseIdentifier: FolderSelectorCell.identifier)
-        tableView.rowHeight = 72
         tableView.separatorStyle = .none
+        tableView.layer.cornerRadius = 12
         return tableView
     }()
 
@@ -33,20 +38,31 @@ final class FolderSelectorView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    func setDisplay(_ isAccordion: Bool) {
+        if isAccordion {
+            backgroundColor = .white800
+            commonNavigationView.backgroundColor = .white800
+            separator.isHidden = true
+            commonNavigationView.setRightItem(confirmButton)
+            tableViewBottomConstraint?.update(inset: 34)
+            tableViewHorizontalConstraint?.update(inset: 24)
+        } else {
+            backgroundColor = .white900
+            commonNavigationView.backgroundColor = .white900
+            separator.isHidden = false
+            commonNavigationView.setLeftItem(backButton)
+            commonNavigationView.setRightItem(selectButton)
+            tableViewBottomConstraint?.update(inset: 0)
+            tableViewHorizontalConstraint?.update(inset: 0)
+        }
+    }
 }
 
 private extension FolderSelectorView {
     func configure() {
-        setAttributes()
         setHierarchy()
         setConstraints()
-    }
-
-    func setAttributes() {
-        backgroundColor = .white900
-
-        commonNavigationView.setLeftItem(backButton)
-        commonNavigationView.setRightItem(selectButton)
     }
 
     func setHierarchy() {
@@ -56,7 +72,7 @@ private extension FolderSelectorView {
 
     func setConstraints() {
         commonNavigationView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
+            make.top.equalTo(safeAreaLayoutGuide).offset(24)
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
@@ -68,15 +84,20 @@ private extension FolderSelectorView {
             make.size.equalTo(48)
         }
 
+        confirmButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+
         separator.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(14)
+            make.top.equalTo(commonNavigationView.snp.bottom)
             make.directionalHorizontalEdges.equalToSuperview()
             make.height.equalTo(1)
         }
 
         tableView.snp.makeConstraints { make in
             make.top.equalTo(separator.snp.bottom)
-            make.bottom.directionalHorizontalEdges.equalToSuperview()
+            tableViewBottomConstraint = make.bottom.equalToSuperview().constraint
+            tableViewHorizontalConstraint = make.directionalHorizontalEdges.equalToSuperview().constraint
         }
     }
 }
