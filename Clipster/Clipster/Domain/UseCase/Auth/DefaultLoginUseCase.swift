@@ -19,7 +19,7 @@ final class DefaultLoginUseCase: LoginUseCase {
 
         switch result {
         case .success(let token):
-            return await authService.loginWithApple(token: token)
+            return await authService.login(loginType: type, token: token)
         case .failure(let error):
             return .failure(error)
         }

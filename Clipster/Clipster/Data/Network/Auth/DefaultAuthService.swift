@@ -12,12 +12,19 @@ final class DefaultAuthService: AuthService {
         client.auth.currentUser?.id
     }
 
-    func loginWithApple(token: String) async -> Result<Void, Error> {
-        let credentials = OpenIDConnectCredentials(provider: .apple, idToken: token)
+    func login(loginType: LoginType, token: String) async -> Result<Void, Error> {
+        let provider: OpenIDConnectCredentials.Provider
+        switch loginType {
+        case .apple:
+            provider = .apple
+        case .google:
+            provider = .google
+        }
+        let credentials = OpenIDConnectCredentials(provider: provider, idToken: token)
 
         do {
             let response = try await client.auth.signInWithIdToken(credentials: credentials)
-            print("\(Self.self): ✅ Login success. UID: \(response.user.id)")
+            print("\(Self.self): ✅ Login success. Provider: \(loginType.title), UID: \(response.user.id)")
             return .success(())
         } catch {
             print("\(Self.self): ❌ Login With Apple Failed: \(error.localizedDescription)")
