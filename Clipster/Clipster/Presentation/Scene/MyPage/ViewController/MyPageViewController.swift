@@ -56,6 +56,17 @@ extension MyPageViewController {
     func bindState(from reactor: Reactor) {
         reactor.state
             .map { $0.sectionModel }
+            .distinctUntilChanged { lhs, rhs in
+                guard lhs.count == rhs.count else { return false }
+
+                for (lhsModel, rhsModel) in zip(lhs, rhs) {
+                    if lhsModel.section != rhsModel.section || lhsModel.items != rhsModel.items {
+                        return false
+                    }
+                }
+
+                return true
+            }
             .observe(on: MainScheduler.instance)
             .bind { [weak self] sections in
                 guard let self else { return }
