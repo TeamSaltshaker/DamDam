@@ -58,15 +58,23 @@ final class DefaultUserService: UserService {
         }
     }
 
-    func updateUser(_ dto: UserDTO) async -> Result<Void, Error> {
+    func updateNickname(_ nickname: String) async -> Result<User, Error> {
         do {
-            try await client
+            guard let id = client.auth.currentUser?.id else {
+                print("\(Self.self): ❌ Failed to update nickname. Not logged in.")
+                return .failure(AuthError.notLoggedIn)
+            }
+            let updatedUserDTO: UserDTO = try await client
                 .from("Users")
-                .update(["nickname": dto.nickname])
-                .eq("id", value: dto.id)
+                .update(["nickname": nickname])
+                .eq("id", value: id)
+                .select()
+                .single()
                 .execute()
-            print("\(Self.self): ✅ Update Success. id: \(dto.id)")
-            return .success(())
+                .value
+            let updatedUser = mapper.user(from: updatedUserDTO)
+            print("\(Self.self): ✅ Update Success. id: \(updatedUser.id), nickname: \(updatedUser.nickname)")
+            return .success(updatedUser)
         } catch {
             print("\(Self.self): ❌ Update Failed. \(error.localizedDescription)")
             return .failure(error)
