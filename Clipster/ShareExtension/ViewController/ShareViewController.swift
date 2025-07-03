@@ -44,7 +44,6 @@ final class ShareViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
         reactor?.action.onNext(.viewWillAppear)
     }
 
@@ -401,11 +400,5 @@ private extension ShareViewController {
             make.bottom.equalToSuperview()
             make.height.greaterThanOrEqualTo(shareView.scrollContainerView.snp.height).offset(56)
         }
-    }
-}
-
-extension ShareViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        true
     }
 }
