@@ -50,6 +50,10 @@ private extension RadioLabelView {
     }
 
     func setConstraints() {
+        snp.makeConstraints { make in
+            make.height.equalTo(48)
+        }
+
         imageView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.size.equalTo(48)
@@ -58,6 +62,7 @@ private extension RadioLabelView {
 
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(imageView.snp.trailing).offset(4)
+            make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
     }
