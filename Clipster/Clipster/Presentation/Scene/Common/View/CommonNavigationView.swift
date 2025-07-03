@@ -40,6 +40,10 @@ final class CommonNavigationView: UIView {
         titleLabel.text = title
     }
 
+    func setTitleLabelFont(_ font: UIFont) {
+        titleLabel.font = font
+    }
+
     func setLeftItem(_ item: UIButton) {
         leftStackView.addArrangedSubview(item)
     }

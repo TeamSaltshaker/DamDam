@@ -5,6 +5,7 @@ final class ShareView: UIView {
     let commonNavigationView: CommonNavigationView = {
         let commonNavigationView = CommonNavigationView()
         commonNavigationView.setTitle("클립 추가")
+        commonNavigationView.setTitleLabelFont(.pretendard(size: 16, weight: .semiBold))
         return commonNavigationView
     }()
 
