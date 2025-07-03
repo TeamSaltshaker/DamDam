@@ -64,11 +64,11 @@ final class DIContainer {
     }
 
     func makeVisitClipUseCase() -> VisitClipUseCase {
-        DefaultVisitClipUseCase(clipRepository: makeClipRepository())
+        DefaultVisitClipUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
     }
 
     func makeDeleteAllRecentVisitedClipsUseCase() -> DeleteAllRecentVisitedClipsUseCase {
-        DefaultDeleteAllRecentVisitedClipsUseCase()
+        DefaultDeleteAllRecentVisitedClipsUseCase(userDefaults: userDefaults)
     }
 
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
@@ -76,7 +76,7 @@ final class DIContainer {
     }
 
     func makeDeleteRecentVisitedClipUseCase() -> DeleteRecentVisitedClipUseCase {
-        DefaultDeleteRecentVisitedClipUseCase()
+        DefaultDeleteRecentVisitedClipUseCase(userDefaults: userDefaults)
     }
 
     func makeFetchAllClipsUseCase() -> FetchAllClipsUseCase {
@@ -92,7 +92,7 @@ final class DIContainer {
     }
 
     func makeFetchRecentVisitedClipsUseCase() -> FetchRecentVisitedClipsUseCase {
-        DefaultFetchRecentVisitedClipsUseCase(clipRepository: makeClipRepository())
+        DefaultFetchRecentVisitedClipsUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
     }
 
     func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {

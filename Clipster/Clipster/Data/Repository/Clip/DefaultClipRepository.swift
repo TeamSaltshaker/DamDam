@@ -48,6 +48,19 @@ final class DefaultClipRepository: ClipRepository {
         }
     }
 
+    func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], DomainError> {
+        if let cache,
+           await cache.isClipsInitialized {
+            let clips = await cache.clips()
+            return .success(clips.filter {
+                ids.contains($0.id)
+            })
+        } else {
+            return await storage.fetchRecentVisitedClips(for: ids)
+                .mapError { _ in .fetchFailed }
+        }
+    }
+
     func insertClip(_ clip: Clip) async -> Result<Void, DomainError> {
         let result = await storage.insertClip(clip)
 

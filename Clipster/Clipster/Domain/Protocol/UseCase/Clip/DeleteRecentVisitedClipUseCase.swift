@@ -1,5 +1,3 @@
-import Foundation
-
 protocol DeleteRecentVisitedClipUseCase {
-    func execute(_ id: UUID) async -> Result<Void, Error>
+    func execute(_ id: String)
 }
