@@ -5,6 +5,7 @@ final class MyPageReactor: Reactor {
     enum Action {
         case viewWillAppear
         case tapCell(MyPageItem)
+        case changeTheme(ThemeOption)
     }
 
     enum Mutation {
@@ -58,6 +59,7 @@ final class MyPageReactor: Reactor {
     private let fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase
     private let logoutUseCase: LogoutUseCase
     private let withdrawUseCase: WithdrawUseCase
+    private let saveThemeOptionUseCase: SaveThemeOptionUseCase
 
     init(
         loginUseCase: LoginUseCase,
@@ -66,7 +68,8 @@ final class MyPageReactor: Reactor {
         fetchClipSortUseCase: FetchClipSortOptionUseCase,
         fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase,
         logoutUseCase: LogoutUseCase,
-        withdrawUseCase: WithdrawUseCase
+        withdrawUseCase: WithdrawUseCase,
+        saveThemeOptionUseCase: SaveThemeOptionUseCase
     ) {
         self.loginUseCase = loginUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
@@ -75,6 +78,7 @@ final class MyPageReactor: Reactor {
         self.fetchSavePathLayoutUseCase = fetchSavePathLayoutUseCase
         self.logoutUseCase = logoutUseCase
         self.withdrawUseCase = withdrawUseCase
+        self.saveThemeOptionUseCase = saveThemeOptionUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -120,6 +124,11 @@ final class MyPageReactor: Reactor {
             default:
                 return .empty()
             }
+        case .changeTheme(let option):
+            Task {
+                _ = try await saveThemeOptionUseCase.execute(option).get()
+            }
+            return .empty()
         }
     }
 

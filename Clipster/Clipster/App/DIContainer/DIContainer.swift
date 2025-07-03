@@ -395,7 +395,8 @@ final class DIContainer {
             fetchClipSortUseCase: makeFetchClipSortUseCase(),
             fetchSavePathLayoutUseCase: makeFetchSavePathLayoutUseCase(),
             logoutUseCase: makeLogoutUseCase(),
-            withdrawUseCase: makeWithdrawUseCase()
+            withdrawUseCase: makeWithdrawUseCase(),
+            saveThemeOptionUseCase: makeSaveThemeUseCase()
         )
     }
 }

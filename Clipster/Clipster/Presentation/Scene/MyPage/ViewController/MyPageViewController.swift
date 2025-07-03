@@ -107,8 +107,13 @@ extension MyPageViewController {
                 switch route {
                 case .showEditNickName:
                     break
-                case .showSelectTheme:
-                    break
+                case .showSelectTheme(let currentOption, let availableOptions):
+                    coordinator?.showSelectTheme(
+                        current: currentOption,
+                        options: availableOptions
+                    ) { [weak self] selected in
+                        self?.reactor?.action.onNext(.changeTheme(selected))
+                    }
                 case .showSelectFolderSort:
                     break
                 case .showSelectClipSort:
