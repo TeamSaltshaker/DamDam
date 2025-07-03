@@ -125,10 +125,13 @@ final class MyPageReactor: Reactor {
                 return .empty()
             }
         case .changeTheme(let option):
-            Task {
-                _ = try await saveThemeOptionUseCase.execute(option).get()
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+
+                let sectionModels = replacingThemeItem(with: option, in: currentState.sectionModel)
+                print(sectionModels)
+                return .setSectionModel(sectionModels)
             }
-            return .empty()
         }
     }
 
@@ -276,6 +279,28 @@ private extension MyPageReactor {
             _ = try await withdrawUseCase.execute().get()
             let sectionModetls = try await makeSectionModels(isLogin: false)
             return .setSectionModel(sectionModetls)
+        }
+    }
+}
+
+private extension MyPageReactor {
+    func replacingThemeItem(
+        with newOption: ThemeOption,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if let index = section.items.firstIndex(where: {
+                if case .detail(.theme) = $0 {
+                    return true
+                }
+                return false
+            }) {
+                var newItems = section.items
+                newItems[index] = .detail(.theme(newOption))
+                return MyPageSectionModel(section: section.section, items: newItems)
+            } else {
+                return section
+            }
         }
     }
 }
