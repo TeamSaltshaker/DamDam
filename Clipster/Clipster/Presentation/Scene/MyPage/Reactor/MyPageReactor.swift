@@ -130,10 +130,13 @@ final class MyPageReactor: Reactor {
         case .changeTheme(let option):
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
-
+                _ = try await saveThemeOptionUseCase.execute(option).get()
                 let sectionModels = replacingThemeItem(with: option, in: currentState.sectionModel)
                 print(sectionModels)
                 return .setSectionModel(sectionModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
             }
         }
     }
