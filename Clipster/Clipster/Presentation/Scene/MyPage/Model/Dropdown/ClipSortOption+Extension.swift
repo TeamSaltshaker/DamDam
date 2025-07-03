@@ -1,4 +1,11 @@
 extension ClipSortOption {
+    static var allCases: [ClipSortOption] = [
+        .createdAt(.descending),
+        .lastVisitedAt(.descending),
+        .title(.descending),
+        .updatedAt(.descending)
+    ]
+
     var displayText: String {
         switch self {
         case .title: "제목"
