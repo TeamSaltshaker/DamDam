@@ -136,6 +136,9 @@ final class FolderSelectorReactor: Reactor {
                         expandedFolderIDs: expandedFolderIDs,
                         highlightedFolderID: highlightedFolderID
                     )
+                }
+                .catch { error in
+                    .just(.setPhase(.error(error.localizedDescription)))
                 },
 
                 .just(.setPhase(.idle))
