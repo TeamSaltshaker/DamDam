@@ -81,6 +81,10 @@ final class DIContainer {
         )
     }
 
+    func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {
+        DefaultCheckLoginStatusUseCase(authRepository: makeAuthRepository())
+    }
+
     func makeLoginUseCase() -> LoginUseCase {
         DefaultLoginUseCase(authRepository: makeAuthRepository())
     }
@@ -211,6 +215,14 @@ final class DIContainer {
 
     func makeParseURLMetadataUseCase() -> ParseURLUseCase {
         DefaultParseURLUseCase(urlMetaRepository: makeURLMetadataRepository())
+    }
+
+    func makeFetchCurrentUserUseCase() -> FetchCurrentUserUseCase {
+        DefaultFetchCurrentUserUseCase(userRepository: makeUserRepository())
+    }
+
+    func makeUpdateNicknameUseCase() -> UpdateNicknameUseCase {
+        DefaultUpdateNicknameUseCase(userRepository: makeUserRepository())
     }
 
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
