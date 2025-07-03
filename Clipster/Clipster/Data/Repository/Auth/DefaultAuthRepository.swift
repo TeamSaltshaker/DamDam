@@ -50,4 +50,8 @@ final class DefaultAuthRepository: AuthRepository {
     func logout() async -> Result<Void, Error> {
         await authService.logout()
     }
+
+    func withdraw() async -> Result<Void, Error> {
+        await authService.withdraw()
+    }
 }

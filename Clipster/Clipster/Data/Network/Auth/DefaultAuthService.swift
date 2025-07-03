@@ -44,15 +44,19 @@ final class DefaultAuthService: AuthService {
     }
 
     func withdraw() async -> Result<Void, Error> {
-        guard let user = client.auth.currentUser else {
-            print("\(Self.self): ❌ Withdraw Failed. Not Logged In.")
-            return .failure(AuthError.notLoggedIn)
-        }
-
         do {
-            try await client.auth.admin.deleteUser(id: user.id)
-            print("\(Self.self): ✅ Withdraw success")
-            return .success(())
+            let result = try await client.functions
+                .invoke(
+                    "delete-user",
+                    options: FunctionInvokeOptions()
+                ) { _, response in
+                    response.statusCode
+                }
+            guard result == 200 else {
+                print("\(Self.self): ❌ Withdraw Failed")
+                return .failure(AuthError.withdrawFailed)
+            }
+            return await logout()
         } catch {
             print("\(Self.self): ❌ Withdraw Failed. \(error.localizedDescription)")
             return .failure(error)
