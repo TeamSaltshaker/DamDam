@@ -32,6 +32,8 @@ class MyPageView: UIView {
         return collectionView
     }()
 
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -49,6 +51,16 @@ class MyPageView: UIView {
             snapshot.appendItems($0.items, toSection: $0.section)
         }
         dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        isUserInteractionEnabled = true
     }
 }
 
@@ -322,7 +334,8 @@ private extension MyPageView {
     func setHierarchy() {
         [
             navigationView,
-            collectionView
+            collectionView,
+            loadingIndicator
         ].forEach { addSubview($0) }
     }
 
@@ -336,6 +349,10 @@ private extension MyPageView {
             make.top.equalTo(navigationView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
 

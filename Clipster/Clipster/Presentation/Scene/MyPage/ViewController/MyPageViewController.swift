@@ -46,7 +46,7 @@ extension MyPageViewController {
             }
             .disposed(by: disposeBag)
     }
-    
+
     func bindState(from reactor: Reactor) {
         reactor.state
             .map { $0.sectionModel }
@@ -55,8 +55,27 @@ extension MyPageViewController {
                 self?.myPageView.setDisplay(sections)
             }
             .disposed(by: disposeBag)
+
+        reactor.pulse(\.$phase)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] phase in
+                guard let self else { return }
+
+                switch phase {
+                case .loading:
+                    myPageView.showLoading()
+                case .success:
+                    myPageView.hideLoading()
+                case .error(let message):
+                    myPageView.hideLoading()
+                    presentErrorAlert(message: message)
+                case .idle:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
     }
-    
+
     func bindRoute(from reactor: Reactor) {
         reactor.pulse(\.$route)
             .compactMap { $0 }
@@ -64,7 +83,7 @@ extension MyPageViewController {
             .observe(on: MainScheduler.instance)
             .bind { [weak self] route in
                 guard let self else { return }
-                
+
                 switch route {
                 case .showEditNickName:
                     break
