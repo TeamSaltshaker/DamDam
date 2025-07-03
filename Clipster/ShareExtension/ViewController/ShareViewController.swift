@@ -1,5 +1,6 @@
 import ReactorKit
 import RxCocoa
+import SnapKit
 import UIKit
 import UniformTypeIdentifiers
 
@@ -35,12 +36,9 @@ final class ShareViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func loadView() {
-        view = shareView
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+        configure()
         hideKeyboardWhenTappedBackground()
     }
 
@@ -377,6 +375,32 @@ extension ShareViewController: View {
         .asDriver(onErrorDriveWith: .empty())
         .drive(shareView.saveButton.rx.isEnabled)
         .disposed(by: disposeBag)
+    }
+}
+
+private extension ShareViewController {
+    func configure() {
+        setAttributes()
+        setHierarchy()
+        setConstraints()
+    }
+
+    func setAttributes() {
+        view.backgroundColor = .clear
+        modalPresentationStyle = .overCurrentContext
+    }
+
+    func setHierarchy() {
+        view.addSubview(shareView)
+    }
+
+    func setConstraints() {
+        shareView.snp.makeConstraints { make in
+            make.top.greaterThanOrEqualToSuperview()
+            make.directionalHorizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.greaterThanOrEqualTo(shareView.scrollContainerView.snp.height).offset(56)
+        }
     }
 }
 

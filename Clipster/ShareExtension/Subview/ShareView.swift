@@ -15,10 +15,11 @@ final class ShareView: UIView {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.backgroundColor = .white900
+        scrollView.isScrollEnabled = true
         return scrollView
     }()
 
-    private let scrollContainerView = UIView()
+    let scrollContainerView = UIView()
 
     private let urlStackView: UIStackView = {
         let stackView = UIStackView()
@@ -29,7 +30,6 @@ final class ShareView: UIView {
 
     let urlMetadataStackView: URLMetadataStackView = {
         let stackView = URLMetadataStackView()
-        stackView.isHidden = true
         return stackView
     }()
 
@@ -134,7 +134,7 @@ private extension ShareView {
         }
 
         scrollContainerView.snp.makeConstraints { make in
-            make.top.directionalHorizontalEdges.equalTo(scrollView.contentLayoutGuide)
+            make.edges.equalTo(scrollView.contentLayoutGuide)
             make.width.equalTo(scrollView.frameLayoutGuide)
         }
 
@@ -159,7 +159,7 @@ private extension ShareView {
         selectedFolderView.snp.makeConstraints { make in
             make.top.equalTo(memoView.snp.bottom).offset(7)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview()
+            make.bottom.equalToSuperview().inset(24)
         }
     }
 }
