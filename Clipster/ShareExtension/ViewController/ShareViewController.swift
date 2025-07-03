@@ -45,6 +45,8 @@ final class ShareViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         reactor?.action.onNext(.viewWillAppear)
+        shareView.memoView.memoTextView.resignFirstResponder()
+        shareView.urlTextField.resignFirstResponder()
     }
 
     private func close() {
@@ -145,25 +147,18 @@ extension ShareViewController: View {
             .subscribe { [weak self] notification in
                 guard let self,
                       let userInfo = notification.userInfo,
-                      let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+                      let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                      let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+                else { return }
 
                 let bottomInset = max(0, UIScreen.main.bounds.height - keyboardFrame.origin.y)
-                shareView.scrollView.contentInset.bottom = bottomInset
-                shareView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
-            }
-            .disposed(by: disposeBag)
 
-        shareView.memoView.memoTextView.rx.didBeginEditing
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                guard let self else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                    guard let self else { return }
-                    let rect = self.shareView.memoView.convert(
-                        self.shareView.memoView.bounds,
-                        to: self.shareView.scrollView
-                    )
-                    self.shareView.scrollView.scrollRectToVisible(rect.insetBy(dx: 0, dy: -8), animated: true)
+                shareView.snp.updateConstraints { make in
+                    make.bottom.equalToSuperview().inset(bottomInset)
+                }
+
+                UIView.animate(withDuration: duration) {
+                    self.view.layoutIfNeeded()
                 }
             }
             .disposed(by: disposeBag)
@@ -361,10 +356,10 @@ private extension ShareViewController {
 
     func setConstraints() {
         shareView.snp.makeConstraints { make in
-            make.top.greaterThanOrEqualToSuperview()
+            make.top.equalToSuperview().priority(.low)
             make.directionalHorizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.greaterThanOrEqualTo(shareView.scrollContainerView.snp.height).offset(56)
+            make.height.equalTo(shareView.scrollContainerView.snp.height).offset(56)
         }
     }
 }

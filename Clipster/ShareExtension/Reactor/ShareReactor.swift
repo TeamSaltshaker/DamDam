@@ -148,7 +148,7 @@ final class ShareReactor: Reactor {
             )
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
-                try await self.createClipUseCase.execute(newClip).get()
+                try await createClipUseCase.execute(newClip).get()
                 return .just(.updateIsSuccessedEditClip(true))
             }
             .flatMap { $0 }

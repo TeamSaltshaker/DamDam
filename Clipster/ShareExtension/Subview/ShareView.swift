@@ -16,7 +16,6 @@ final class ShareView: UIView {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.backgroundColor = .white900
-        scrollView.isScrollEnabled = true
         return scrollView
     }()
 
