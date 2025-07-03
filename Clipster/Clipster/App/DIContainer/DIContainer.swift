@@ -196,7 +196,6 @@ final class DIContainer {
         EditClipReactor(
             parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
-            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )
@@ -207,7 +206,6 @@ final class DIContainer {
             urlText: urlString,
             parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
-            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )
@@ -218,7 +216,6 @@ final class DIContainer {
             currentFolder: folder,
             parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
-            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )
@@ -229,7 +226,6 @@ final class DIContainer {
             clip: clip,
             parseURLUseCase: makeParseURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
-            fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
         )

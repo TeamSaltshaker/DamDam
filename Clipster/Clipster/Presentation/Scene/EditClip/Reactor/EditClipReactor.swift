@@ -5,7 +5,6 @@ final class EditClipReactor: Reactor {
     enum EditClipReactorType {
         case edit
         case create
-        case shareExtension
     }
 
     enum Action {
@@ -18,7 +17,6 @@ final class EditClipReactor: Reactor {
         case editFolder(Folder?)
         case saveClip
         case fetchFolder
-        case fetchTopLevelFolder
         case disappearFolderSelectorView
     }
 
@@ -59,7 +57,6 @@ final class EditClipReactor: Reactor {
 
     private let parseURLUseCase: ParseURLUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
-    private let fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
 
@@ -68,19 +65,17 @@ final class EditClipReactor: Reactor {
         currentFolder: Folder? = nil,
         parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
-        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
         self.initialState = State(
-            type: urlText.isEmpty ? .create : .shareExtension,
+            type: .create,
             currentFolder: currentFolder,
             navigationTitle: "클립 추가",
             urlString: urlText,
         )
         self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
-        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
     }
@@ -89,7 +84,6 @@ final class EditClipReactor: Reactor {
         clip: Clip,
         parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
-        fetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
     ) {
@@ -103,7 +97,6 @@ final class EditClipReactor: Reactor {
         )
         self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
-        self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
     }
@@ -188,7 +181,7 @@ final class EditClipReactor: Reactor {
                 }
                 .map { .updateIsSuccessedEditClip(true) }
                 .catchAndReturn(.updateIsSuccessedEditClip(false))
-            case .create, .shareExtension:
+            case .create:
                 print("\(Self.self) save clip")
                 guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
 
@@ -218,14 +211,6 @@ final class EditClipReactor: Reactor {
             return .fromAsync {
                 try await self.fetchFolderUseCase.execute(id: folderID).get()
             }
-            .map { .updateCurrentFolder($0) }
-            .catchAndReturn(.updateCurrentFolder(nil))
-        case .fetchTopLevelFolder:
-            return .fromAsync { [weak self] in
-                try? await self?.fetchTopLevelFoldersUseCase.execute().get()
-            }
-            .compactMap { $0 }
-            .map { $0.max { $0.updatedAt < $1.updatedAt } }
             .map { .updateCurrentFolder($0) }
             .catchAndReturn(.updateCurrentFolder(nil))
         case .disappearFolderSelectorView:

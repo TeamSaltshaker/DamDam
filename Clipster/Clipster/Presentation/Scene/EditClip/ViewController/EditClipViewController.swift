@@ -172,14 +172,6 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { $0.type == .shareExtension }
-            .filter { $0 }
-            .take(1)
-            .map { _ in Reactor.Action.fetchTopLevelFolder }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        reactor.state
             .map(\.memoText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
