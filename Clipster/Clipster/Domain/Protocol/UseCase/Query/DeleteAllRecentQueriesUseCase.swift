@@ -1,3 +1,3 @@
 protocol DeleteAllRecentQueriesUseCase {
-    func execute() async -> Result<Void, Error>
+    func execute()
 }

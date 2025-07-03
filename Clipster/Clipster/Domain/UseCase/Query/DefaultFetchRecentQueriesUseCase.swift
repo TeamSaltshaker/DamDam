@@ -1,5 +1,14 @@
+import Foundation
+
 final class DefaultFetchRecentQueriesUseCase: FetchRecentQueriesUseCase {
-    func execute() async -> Result<[String], Error> {
-        .success([])
+    private let userDefaults: UserDefaults
+    private let key = "recentQueries"
+
+    init(userDefaults: UserDefaults) {
+        self.userDefaults = userDefaults
+    }
+
+    func execute() -> [String] {
+        userDefaults.stringArray(forKey: key) ?? []
     }
 }

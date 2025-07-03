@@ -160,19 +160,19 @@ final class DIContainer {
     }
 
     func makeDeleteAllRecentQueriesUseCase() -> DeleteAllRecentQueriesUseCase {
-        DefaultDeleteAllRecentQueriesUseCase()
+        DefaultDeleteAllRecentQueriesUseCase(userDefaults: userDefaults)
     }
 
     func makeDeleteRecentQueryUseCase() -> DeleteRecentQueryUseCase {
-        DefaultDeleteRecentQueryUseCase()
+        DefaultDeleteRecentQueryUseCase(userDefaults: userDefaults)
     }
 
     func makeFetchRecentQueriesUseCase() -> FetchRecentQueriesUseCase {
-        DefaultFetchRecentQueriesUseCase()
+        DefaultFetchRecentQueriesUseCase(userDefaults: userDefaults)
     }
 
     func makeSaveRecentQueryUseCase() -> SaveRecentQueryUseCase {
-        DefaultSaveRecentQueryUseCase()
+        DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
     }
 
     func makeParseURLMetadataUseCase() -> ParseURLUseCase {

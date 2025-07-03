@@ -1,3 +1,3 @@
 protocol FetchRecentQueriesUseCase {
-    func execute() async -> Result<[String], Error>
+    func execute() -> [String]
 }
