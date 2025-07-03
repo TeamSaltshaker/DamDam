@@ -30,7 +30,7 @@ final class DIContainer {
     }
 
     func makeUserService() -> UserService {
-        DefaultUserService(client: supabaseClient, mapper: DomainMapper())
+        DefaultUserService(client: supabaseClient)
     }
 
     func makeAuthService() -> AuthService {
@@ -57,6 +57,7 @@ final class DIContainer {
             ],
             authService: makeAuthService(),
             userService: makeUserService(),
+            mapper: DomainMapper(),
         )
     }
 
@@ -70,6 +71,14 @@ final class DIContainer {
 
     func makeURLMetadataRepository() -> DefaultURLRepository {
         DefaultURLRepository()
+    }
+
+    func makeUserRepository() -> UserRepository {
+        DefaultUserRepository(
+            authService: makeAuthService(),
+            userService: makeUserService(),
+            mapper: DomainMapper(),
+        )
     }
 
     func makeLoginUseCase() -> LoginUseCase {

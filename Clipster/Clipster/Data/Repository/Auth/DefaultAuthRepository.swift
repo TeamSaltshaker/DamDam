@@ -2,15 +2,18 @@ final class DefaultAuthRepository: AuthRepository {
     private let socialLoginServices: [LoginType: SocialLoginService]
     private let authService: AuthService
     private let userService: UserService
+    private let mapper: DomainMapper
 
     init(
         socialLoginServices: [LoginType: SocialLoginService],
         authService: AuthService,
         userService: UserService,
+        mapper: DomainMapper,
     ) {
         self.socialLoginServices = socialLoginServices
         self.authService = authService
         self.userService = userService
+        self.mapper = mapper
     }
 
     func login(type: LoginType) async -> Result<User, Error> {
@@ -22,11 +25,13 @@ final class DefaultAuthRepository: AuthRepository {
             let jwt = try await socialLoginService.login().get()
             let userID = try await authService.login(loginType: type, token: jwt).get()
 
-            if let user = try await userService.fetchUser(by: userID).get() {
+            if let userDTO = try await userService.fetchUser(by: userID).get() {
+                let user = mapper.user(from: userDTO)
                 print("\(Self.self): ✅ Login Success. id: \(user.id), nickname: \(user.nickname)")
                 return .success(user)
             } else {
-                let newUser = try await userService.insertUser(with: userID).get()
+                let newUserDTO = try await userService.insertUser(with: userID).get()
+                let newUser = mapper.user(from: newUserDTO)
                 print("\(Self.self): ✅ SignUp and Login Success. id: \(newUser.id), nickname: \(newUser.nickname)")
                 return .success(newUser)
             }
