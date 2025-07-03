@@ -130,8 +130,8 @@ extension MyPageViewController {
                 case .showSelectSavePathLayout(let currentOption, _):
                     coordinator?.showSelectSavePathLayout(
                         current: currentOption
-                    ) { selected in
-                        print(selected)
+                    ) { [weak self] selected in
+                        self?.reactor?.action.onNext(.changeSavePathLayout(selected))
                     }
                 case .showNotificationSetting:
                     coordinator?.showAppSettings()

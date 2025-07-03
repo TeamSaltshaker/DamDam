@@ -6,6 +6,7 @@ final class MyPageReactor: Reactor {
         case viewWillAppear
         case tapCell(MyPageItem)
         case changeTheme(ThemeOption)
+        case changeSavePathLayout(SavePathOption)
     }
 
     enum Mutation {
@@ -62,6 +63,7 @@ final class MyPageReactor: Reactor {
     private let logoutUseCase: LogoutUseCase
     private let withdrawUseCase: WithdrawUseCase
     private let saveThemeOptionUseCase: SaveThemeOptionUseCase
+    private let saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
 
     init(
         loginUseCase: LoginUseCase,
@@ -71,7 +73,8 @@ final class MyPageReactor: Reactor {
         fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase,
         logoutUseCase: LogoutUseCase,
         withdrawUseCase: WithdrawUseCase,
-        saveThemeOptionUseCase: SaveThemeOptionUseCase
+        saveThemeOptionUseCase: SaveThemeOptionUseCase,
+        saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
     ) {
         self.loginUseCase = loginUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
@@ -81,6 +84,7 @@ final class MyPageReactor: Reactor {
         self.logoutUseCase = logoutUseCase
         self.withdrawUseCase = withdrawUseCase
         self.saveThemeOptionUseCase = saveThemeOptionUseCase
+        self.saveSavePathLayoutOptionUseCase = saveSavePathLayoutOptionUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -132,7 +136,19 @@ final class MyPageReactor: Reactor {
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveThemeOptionUseCase.execute(option).get()
                 let sectionModels = replacingThemeItem(with: option, in: currentState.sectionModel)
-                print(sectionModels)
+                return .setSectionModel(sectionModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
+            }
+        case .changeSavePathLayout(let option):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                _ = try await saveSavePathLayoutOptionUseCase.execute(option).get()
+                let sectionModels = replacingSavePathItem(
+                    with: option,
+                    in: currentState.sectionModel
+                )
                 return .setSectionModel(sectionModels)
             }
             .catch {
@@ -160,8 +176,8 @@ final class MyPageReactor: Reactor {
 private extension MyPageReactor {
     func makeSectionModels(isLogin: Bool) async throws -> [MyPageSectionModel] {
         async let specificSections = isLogin
-            ? makeUserSpecificSections()
-            : makeGuestSpecificSections()
+        ? makeUserSpecificSections()
+        : makeGuestSpecificSections()
 
         async let sharedSections = makeSharedSections()
         let etcSection = makeEtcSection(isLogin: isLogin)
@@ -222,8 +238,8 @@ private extension MyPageReactor {
     func makeEtcSection(isLogin: Bool) -> [MyPageSectionModel] {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let items: [MyPageItem] = isLogin
-            ? [.account(.logout), .account(.withdraw), .version(appVersion)]
-            : [.version(appVersion)]
+        ? [.account(.logout), .account(.withdraw), .version(appVersion)]
+        : [.version(appVersion)]
 
         return [.init(section: .etc, items: items)]
     }
@@ -248,15 +264,15 @@ private extension MyPageReactor {
         case .theme(let option):
             return .setRoute(
                 .showSelectTheme(
-                currentOption: option,
-                availableOptions: ThemeOption.allCases
+                    currentOption: option,
+                    availableOptions: ThemeOption.allCases
                 )
             )
         case .savePath(let option):
             return .setRoute(
                 .showSelectSavePathLayout(
-                currentOption: option,
-                availableOptions: SavePathOption.allCases
+                    currentOption: option,
+                    availableOptions: SavePathOption.allCases
                 )
             )
         }
@@ -305,6 +321,26 @@ private extension MyPageReactor {
             }) {
                 var newItems = section.items
                 newItems[index] = .detail(.theme(newOption))
+                return MyPageSectionModel(section: section.section, items: newItems)
+            } else {
+                return section
+            }
+        }
+    }
+
+    func replacingSavePathItem(
+        with newOption: SavePathOption,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if let index = section.items.firstIndex(where: {
+                if case .detail(.savePath) = $0 {
+                    return true
+                }
+                return false
+            }) {
+                var newItems = section.items
+                newItems[index] = .detail(.savePath(newOption))
                 return MyPageSectionModel(section: section.section, items: newItems)
             } else {
                 return section
