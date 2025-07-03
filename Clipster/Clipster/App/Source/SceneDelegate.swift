@@ -11,6 +11,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     var appCoordinator: AppCoordinator?
+    var userDefaults: UserDefaults = .standard
 
     func scene(
         _ scene: UIScene,
@@ -19,11 +20,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
-        #if DEBUG
-        _ = UserDefaults(suiteName: "group.com.saltshaker.clipster.debug")
-        #else
-        _ = UserDefaults(suiteName: "group.com.saltshaker.clipster")
-        #endif
+        if let userDefaults = UserDefaults(suiteName: appGroupID) {
+            self.userDefaults = userDefaults
+        } else {
+            print("❌ Failed to initialize App Group UserDefaults, using .standard instead.")
+        }
 
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
@@ -37,6 +38,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 supabaseURL: supabaseURL,
                 supabaseKey: supabaseKey,
                 cache: cache,
+                userDefaults: userDefaults
             )
 
             appCoordinator = AppCoordinator(
@@ -55,9 +57,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        if let sharedDefaults = UserDefaults(suiteName: appGroupID),
-           let urlString = sharedDefaults.string(forKey: "sharedURL") {
-            sharedDefaults.removeObject(forKey: "sharedURL")
+        if let urlString = userDefaults.string(forKey: "sharedURL") {
+            userDefaults.removeObject(forKey: "sharedURL")
 
             DispatchQueue.main.async {
                 self.appCoordinator?.handleSharedURL(urlString)
