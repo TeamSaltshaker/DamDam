@@ -131,6 +131,7 @@
 				Presentation/Scene/FolderSelector/Subview/View/FolderSelectorView.swift,
 				Presentation/Scene/FolderSelector/ViewController/FolderSelectorViewController.swift,
 				"Presentation/Util/Extension/Observable+Extension.swift",
+				"Presentation/Util/Extension/String+Extension.swift",
 				"Presentation/Util/Extension/UIFont+Extension.swift",
 				"Presentation/Util/Extension/UITableViewCell+Extension.swift",
 				"Presentation/Util/Extension/UIViewController+Extension.swift",
