@@ -178,7 +178,7 @@ final class SearchReactor: Reactor {
                 return .empty()
             }
             return .fromAsync { [weak self] in
-                _ = try await self?.saveRecentQueryUseCase.execute(query).get()
+                self?.saveRecentQueryUseCase.execute(query)
             }
             .flatMap { _ in Observable.empty() }
             .catch { _ in .empty() }
@@ -191,8 +191,7 @@ final class SearchReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    _ = try await deleteRecentQueryUseCase.execute(query).get()
+                    self?.deleteRecentQueryUseCase.execute(query)
                     return .deleteRecentQuery(query)
                 }
                 .catch { .just(.setPhase(.error($0.localizedDescription))) },
@@ -202,8 +201,7 @@ final class SearchReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    _ = try await deleteAllRecentQueriesUseCase.execute().get()
+                    self?.deleteAllRecentQueriesUseCase.execute()
                     return .deleteAllRecentQueries
                 }
                 .catch { .just(.setPhase(.error($0.localizedDescription))) },
@@ -213,8 +211,7 @@ final class SearchReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    _ = try await deleteRecentVisitedClipUseCase.execute(clip.id).get()
+                    self?.deleteRecentVisitedClipUseCase.execute(clip.id.uuidString)
                     return .deleteRecentVisitedClip(clip)
                 }
                 .catch { .just(.setPhase(.error($0.localizedDescription))) },
@@ -224,8 +221,7 @@ final class SearchReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
-                    guard let self else { throw DomainError.unknownError }
-                    _ = try await deleteAllRecentVisitedClipsUseCase.execute().get()
+                    self?.deleteAllRecentVisitedClipsUseCase.execute()
                     return .deleteAllRecentVisitedClips
                 }
                 .catch { .just(.setPhase(.error($0.localizedDescription))) },
@@ -405,7 +401,7 @@ private extension SearchReactor {
 
             let folders = try await self.fetchAllFoldersUseCase.execute().get()
             let clips = try await self.fetchAllClipsUseCase.execute().get()
-            let recentQueries = try await self.fetchRecentQueriesUseCase.execute().get()
+            let recentQueries = self.fetchRecentQueriesUseCase.execute()
             let recentVisitedClips = try await self.fetchRecentVisitedClipsUseCase.execute().get()
 
             self.allFolders = folders
