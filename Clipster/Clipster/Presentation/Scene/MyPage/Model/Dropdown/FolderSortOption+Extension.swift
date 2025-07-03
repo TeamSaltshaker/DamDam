@@ -31,3 +31,27 @@ extension FolderSortOption {
         }
     }
 }
+
+extension FolderSortOption: SortableOption {
+    func toggled() -> FolderSortOption {
+        switch self {
+        case .title(let dir):
+            return .title(dir == .ascending ? .descending : .ascending)
+        case .createdAt(let dir):
+            return .createdAt(dir == .ascending ? .descending : .ascending)
+        case .updatedAt(let dir):
+            return .updatedAt(dir == .ascending ? .descending : .ascending)
+        }
+    }
+
+    func isSameSortBasis(as other: FolderSortOption) -> Bool {
+        switch (self, other) {
+        case (.title, .title),
+             (.createdAt, .createdAt),
+             (.updatedAt, .updatedAt):
+            return true
+        default:
+            return false
+        }
+    }
+}
