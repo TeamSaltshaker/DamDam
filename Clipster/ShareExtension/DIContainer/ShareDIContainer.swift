@@ -12,7 +12,7 @@ final class ShareDIContainer {
         DefaultClipStorage(container: container, mapper: DomainMapper())
     }
 
-    func makeURLRepository() -> DefaultURLRepository {
+    func makeURLRepository() -> URLRepository {
         DefaultURLRepository()
     }
 

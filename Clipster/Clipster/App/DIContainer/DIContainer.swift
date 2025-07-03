@@ -41,7 +41,7 @@ final class DIContainer {
         DefaultFolderRepository(storage: makeFolderStorage(), cache: cache)
     }
 
-    func makeURLRepository() -> DefaultURLRepository {
+    func makeURLRepository() -> URLRepository {
         DefaultURLRepository()
     }
 
