@@ -53,6 +53,10 @@ class MyPageView: UIView {
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
 
+    func scrollToTop(animated: Bool) {
+        collectionView.setContentOffset(.zero, animated: animated)
+    }
+
     func showLoading() {
         loadingIndicator.startAnimating()
         isUserInteractionEnabled = false

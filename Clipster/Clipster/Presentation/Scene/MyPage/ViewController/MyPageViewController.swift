@@ -58,7 +58,10 @@ extension MyPageViewController {
             .map { $0.sectionModel }
             .observe(on: MainScheduler.instance)
             .bind { [weak self] sections in
-                self?.myPageView.setDisplay(sections)
+                guard let self else { return }
+
+                myPageView.setDisplay(sections)
+                myPageView.scrollToTop(animated: false)
             }
             .disposed(by: disposeBag)
 
