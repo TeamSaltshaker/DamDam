@@ -4,7 +4,7 @@ import ReactorKit
 final class ShareReactor: Reactor {
     enum Action {
         case viewWillAppear
-        case extractedURL(URL)
+        case extractedExtensionItems([NSExtensionItem])
         case editURLTextField(String)
         case validifyURL(String)
         case editingURLTextField
@@ -49,15 +49,18 @@ final class ShareReactor: Reactor {
 
     private let parseURLUseCase: ParseURLUseCase
     private let createClipUseCase: CreateClipUseCase
+    private let extractExtensionContextUseCase: ExtractExtensionContextUseCase
 
     init(
         parseURLUseCase: ParseURLUseCase,
-        createClipUseCase: CreateClipUseCase
+        createClipUseCase: CreateClipUseCase,
+        extractExtensionContextUseCase: ExtractExtensionContextUseCase
     ) {
         initialState = State()
 
         self.parseURLUseCase = parseURLUseCase
         self.createClipUseCase = createClipUseCase
+        self.extractExtensionContextUseCase = extractExtensionContextUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -65,8 +68,16 @@ final class ShareReactor: Reactor {
         switch action {
         case .viewWillAppear:
             return .just(.updateIsReadyExtractURL(true))
-        case .extractedURL(let url):
-            return .just(.updateURLString(url.absoluteString))
+        case .extractedExtensionItems(let extensionItems):
+            return .fromAsync { [weak self] in
+                guard let self else { return Observable<Mutation>.empty() }
+                let url = try await extractExtensionContextUseCase.execute(extensionItems: extensionItems).get()
+                return .just(.updateURLString(url.absoluteString))
+            }
+            .flatMap { $0 }
+            .catch { _ in
+                .empty()
+            }
         case .editURLTextField(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .just(.updateURLString(trimmed))
@@ -135,12 +146,15 @@ final class ShareReactor: Reactor {
                 updatedAt: Date.now,
                 deletedAt: nil,
             )
-            return .fromAsync {
+            return .fromAsync { [weak self] in
+                guard let self else { return Observable<Mutation>.empty() }
                 try await self.createClipUseCase.execute(newClip).get()
+                return .just(.updateIsSuccessedEditClip(true))
             }
-            .map { .updateIsSuccessedEditClip(true) }
-            .catchAndReturn(.updateIsSuccessedEditClip(false))
-
+            .flatMap { $0 }
+            .catch { _ in
+                .just(.updateIsSuccessedEditClip(false))
+            }
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         }
