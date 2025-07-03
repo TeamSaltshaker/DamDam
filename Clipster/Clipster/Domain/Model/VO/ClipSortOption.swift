@@ -1,4 +1,4 @@
-enum ClipSortOption {
+enum ClipSortOption: Hashable {
     case title(SortDirection)
     case lastVisitedAt(SortDirection)
     case createdAt(SortDirection)
