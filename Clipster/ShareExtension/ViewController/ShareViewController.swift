@@ -205,6 +205,21 @@ extension ShareViewController: View {
                 shareView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
             }
             .disposed(by: disposeBag)
+
+        shareView.memoView.memoTextView.rx.didBeginEditing
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] _ in
+                guard let self else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    guard let self else { return }
+                    let rect = self.shareView.memoView.convert(
+                        self.shareView.memoView.bounds,
+                        to: self.shareView.scrollView
+                    )
+                    self.shareView.scrollView.scrollRectToVisible(rect.insetBy(dx: 0, dy: -8), animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: ShareReactor) {
