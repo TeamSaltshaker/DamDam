@@ -7,3 +7,5 @@ extension ThemeOption {
         }
     }
 }
+
+extension ThemeOption: SelectableOption { }
