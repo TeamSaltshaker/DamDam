@@ -3,7 +3,7 @@ import Foundation
 
 final class ShareDIContainer {
     private let container: NSPersistentContainer
-    let cache = FolderClipCache()
+
     init() {
         self.container = CoreDataStack.shared.container
     }
@@ -17,7 +17,7 @@ final class ShareDIContainer {
     }
 
     func makeClipRepository() -> ClipRepository {
-        DefaultClipRepository(storage: makeClipStorage(), cache: cache)
+        DefaultClipRepository(storage: makeClipStorage(), cache: nil)
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
@@ -40,7 +40,7 @@ final class ShareDIContainer {
     }
 
     func makeFolderRepository() -> FolderRepository {
-        DefaultFolderRepository(storage: makeFolderStorage(), cache: cache)
+        DefaultFolderRepository(storage: makeFolderStorage(), cache: nil)
     }
 
     func makeFetchTopLevelFoldersUseCase() -> FetchTopLevelFoldersUseCase {
