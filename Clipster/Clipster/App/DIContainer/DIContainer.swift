@@ -5,16 +5,19 @@ final class DIContainer {
     private let container: NSPersistentContainer
     private let supabaseService: SupabaseService
     private let cache: FolderClipCache
+    private let userDefaults: UserDefaults
 
     init(
         container: NSPersistentContainer? = nil,
         supabaseURL: URL,
         supabaseKey: String,
         cache: FolderClipCache,
+        userDefaults: UserDefaults
     ) {
         self.container = container ?? CoreDataStack.shared.container
         supabaseService = SupabaseService(url: supabaseURL, key: supabaseKey)
         self.cache = cache
+        self.userDefaults = userDefaults
     }
 
     func makeClipStorage() -> ClipStorage {
