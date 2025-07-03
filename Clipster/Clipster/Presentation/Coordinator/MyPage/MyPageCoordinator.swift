@@ -66,6 +66,27 @@ extension MyPageCoordinator {
         navigationController.present(vc, animated: true)
     }
 
+    func showSelectClipSort(
+        title: String,
+        current: ClipSortOption,
+        options: [ClipSortOption],
+        onSelect: @escaping (ClipSortOption) -> Void
+    ) {
+        let vc = SortOptionSelectorViewController<ClipSortOption>(
+            title: title,
+            options: options,
+            selected: current,
+            onSelect: onSelect
+        )
+
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.5 }]
+        }
+
+        navigationController.present(vc, animated: true)
+    }
+
     func showSelectSavePathLayout(
         current: SavePathOption,
         onSelect: @escaping (SavePathOption) -> Void

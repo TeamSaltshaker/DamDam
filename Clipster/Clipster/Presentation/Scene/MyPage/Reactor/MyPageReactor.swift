@@ -8,6 +8,7 @@ final class MyPageReactor: Reactor {
         case changeTheme(ThemeOption)
         case changeSavePathLayout(SavePathOption)
         case changeFolderSort(FolderSortOption)
+        case changeClipSort(ClipSortOption)
     }
 
     enum Mutation {
@@ -66,6 +67,7 @@ final class MyPageReactor: Reactor {
     private let saveThemeOptionUseCase: SaveThemeOptionUseCase
     private let saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
     private let saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase
+    private let saveClipSortOptionUseCase: SaveClipSortOptionUseCase
 
     init(
         loginUseCase: LoginUseCase,
@@ -77,7 +79,8 @@ final class MyPageReactor: Reactor {
         withdrawUseCase: WithdrawUseCase,
         saveThemeOptionUseCase: SaveThemeOptionUseCase,
         saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase,
-        saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase
+        saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase,
+        saveClipSortOptionUseCase: SaveClipSortOptionUseCase
     ) {
         self.loginUseCase = loginUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
@@ -89,6 +92,7 @@ final class MyPageReactor: Reactor {
         self.saveThemeOptionUseCase = saveThemeOptionUseCase
         self.saveSavePathLayoutOptionUseCase = saveSavePathLayoutOptionUseCase
         self.saveFolderSortOptionUseCase = saveFolderSortOptionUseCase
+        self.saveClipSortOptionUseCase = saveClipSortOptionUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -163,6 +167,19 @@ final class MyPageReactor: Reactor {
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveFolderSortOptionUseCase.execute(option).get()
                 let updatedModels = replacingFolderSortItem(
+                    with: option,
+                    in: currentState.sectionModel
+                )
+                return .setSectionModel(updatedModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
+            }
+        case .changeClipSort(let option):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                _ = try await saveClipSortOptionUseCase.execute(option).get()
+                let updatedModels = replacingClipSortItem(
                     with: option,
                     in: currentState.sectionModel
                 )
@@ -378,6 +395,26 @@ private extension MyPageReactor {
             }) {
                 var newItems = section.items
                 newItems[index] = .dropdown(.folderSort(newOption))
+                return MyPageSectionModel(section: section.section, items: newItems)
+            } else {
+                return section
+            }
+        }
+    }
+
+    func replacingClipSortItem(
+        with newOption: ClipSortOption,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if let index = section.items.firstIndex(where: {
+                if case .dropdown(.clipSort) = $0 {
+                    return true
+                }
+                return false
+            }) {
+                var newItems = section.items
+                newItems[index] = .dropdown(.clipSort(newOption))
                 return MyPageSectionModel(section: section.section, items: newItems)
             } else {
                 return section

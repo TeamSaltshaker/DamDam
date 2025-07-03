@@ -131,8 +131,14 @@ extension MyPageViewController {
                     ) { [weak self] selected in
                         self?.reactor?.action.onNext(.changeFolderSort(selected))
                     }
-                case .showSelectClipSort:
-                    break
+                case .showSelectClipSort(let currentOption, let availableOptions):
+                    coordinator?.showSelectClipSort(
+                        title: "클립 정렬 순서",
+                        current: currentOption,
+                        options: availableOptions
+                    ) { [weak self] selected in
+                        self?.reactor?.action.onNext(.changeClipSort(selected))
+                    }
                 case .showSelectSavePathLayout(let currentOption, _):
                     coordinator?.showSelectSavePathLayout(
                         current: currentOption
