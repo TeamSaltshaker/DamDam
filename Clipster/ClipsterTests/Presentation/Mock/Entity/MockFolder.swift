@@ -100,4 +100,28 @@ enum MockFolder {
             deletedAt: nil,
         )
     }()
+
+    static let folderToEdit = Folder(
+        id: UUID(),
+        parentFolderID: nil,
+        title: "기존 폴더 제목",
+        depth: 0,
+        folders: [],
+        clips: [],
+        createdAt: .now,
+        updatedAt: .now,
+        deletedAt: nil
+    )
+
+    static let parentFolderCandidate = Folder(
+        id: UUID(),
+        parentFolderID: nil,
+        title: "상위 폴더가 될 폴더",
+        depth: 0,
+        folders: [],
+        clips: [],
+        createdAt: .now,
+        updatedAt: .now,
+        deletedAt: nil
+    )
 }
