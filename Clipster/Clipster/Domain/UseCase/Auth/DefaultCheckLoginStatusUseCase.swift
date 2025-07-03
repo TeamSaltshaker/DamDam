@@ -1,5 +1,11 @@
 final class DefaultCheckLoginStatusUseCase: CheckLoginStatusUseCase {
-    func execute() async -> Result<Bool, Error> {
-        .success(true)
+    private let authRepository: AuthRepository
+
+    init(authRepository: AuthRepository) {
+        self.authRepository = authRepository
+    }
+
+    func execute() async -> Bool {
+        await authRepository.currentUserID() != nil
     }
 }

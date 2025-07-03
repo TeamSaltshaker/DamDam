@@ -1,3 +1,5 @@
+import Foundation
+
 final class DefaultAuthRepository: AuthRepository {
     private let socialLoginServices: [LoginType: SocialLoginService]
     private let authService: AuthService
@@ -14,6 +16,10 @@ final class DefaultAuthRepository: AuthRepository {
         self.authService = authService
         self.userService = userService
         self.mapper = mapper
+    }
+
+    func currentUserID() async -> UUID? {
+        authService.currentUserID()
     }
 
     func login(type: LoginType) async -> Result<User, Error> {
