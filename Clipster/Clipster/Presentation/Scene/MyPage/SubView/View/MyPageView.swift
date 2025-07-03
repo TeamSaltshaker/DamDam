@@ -7,8 +7,12 @@ class MyPageView: UIView {
     typealias Section = MyPageSection
     typealias Item = MyPageItem
 
+    enum Action {
+        case tapCell(MyPageItem)
+    }
+
     private var disposeBag = DisposeBag()
-    let selectedItem = PublishRelay<MyPageItem>()
+    let action = PublishRelay<Action>()
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
@@ -337,11 +341,14 @@ private extension MyPageView {
 
     func setBindings() {
         collectionView.rx.itemSelected
-            .compactMap { [weak self] indexPath -> MyPageItem? in
-                guard let self = self else { return nil }
-                return self.dataSource?.itemIdentifier(for: indexPath)
+            .compactMap { [weak self] indexPath -> Action? in
+                guard let self = self,
+                      let item = dataSource?.itemIdentifier(for: indexPath)
+                else { return nil }
+
+                return Action.tapCell(item)
             }
-            .bind(to: selectedItem)
+            .bind(to: action)
             .disposed(by: disposeBag)
     }
 }
