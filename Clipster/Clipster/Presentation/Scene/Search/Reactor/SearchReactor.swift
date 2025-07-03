@@ -426,7 +426,9 @@ private extension SearchReactor {
             }
             return .setSections(sections)
         }
-        .catch { _ in .just(.setSections([])) }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
     }
 
     private func executeSearch(with query: String) -> Mutation {
