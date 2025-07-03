@@ -45,6 +45,27 @@ extension MyPageCoordinator {
         navigationController.present(vc, animated: true)
     }
 
+    func showSelectFolderSort(
+        title: String,
+        current: FolderSortOption,
+        options: [FolderSortOption],
+        onSelect: @escaping (FolderSortOption) -> Void
+    ) {
+        let vc = SortOptionSelectorViewController<FolderSortOption>(
+            title: title,
+            options: options,
+            selected: current,
+            onSelect: onSelect
+        )
+
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.5 }]
+        }
+
+        navigationController.present(vc, animated: true)
+    }
+
     func showSelectSavePathLayout(
         current: SavePathOption,
         onSelect: @escaping (SavePathOption) -> Void
