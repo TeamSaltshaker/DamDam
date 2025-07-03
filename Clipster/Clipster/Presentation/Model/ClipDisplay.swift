@@ -6,4 +6,7 @@ struct ClipDisplay: Hashable {
     let memo: String
     let memoLimit: String
     let isVisited: Bool
+    let recentVisitedDate: String
+    let recentEditedDate: String
+    let createdDate: String
 }

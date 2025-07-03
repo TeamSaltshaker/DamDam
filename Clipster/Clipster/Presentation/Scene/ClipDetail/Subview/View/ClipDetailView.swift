@@ -8,6 +8,8 @@ final class ClipDetailView: UIView {
     let editButton = EditButton()
     let deleteButton = DeleteButton()
 
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let urlMetadataStackView = URLMetadataStackView()
 
     private let urlView: URLView = {
@@ -24,6 +26,27 @@ final class ClipDetailView: UIView {
     }()
 
     private let selectedFolderView = SelectedFolderView(type: .clip, mode: .detail)
+
+    private let recentVisitedDateLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
+        return label
+    }()
+
+    private let recentEditedDateLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
+        return label
+    }()
+
+    private let createdDateLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black500
+        label.font = .pretendard(size: 12, weight: .regular)
+        return label
+    }()
 
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 
@@ -42,6 +65,9 @@ final class ClipDetailView: UIView {
         memoView.memoTextView.text = clip.memo
         memoView.memoLimitLabel.text = clip.memoLimit
         selectedFolderView.folderRowView.setDisplay(folder)
+        recentVisitedDateLabel.text = clip.recentVisitedDate
+        recentEditedDateLabel.text = clip.recentEditedDate
+        createdDateLabel.text = clip.createdDate
     }
 
     func setLoading(_ isLoading: Bool) {
@@ -71,8 +97,25 @@ private extension ClipDetailView {
     }
 
     func setHierarchy() {
-        [commonNavigationView, urlMetadataStackView, urlView, memoView, selectedFolderView, activityIndicator]
+        [
+            commonNavigationView,
+            scrollView
+        ]
             .forEach { addSubview($0) }
+
+        scrollView.addSubview(contentView)
+
+        [
+            urlMetadataStackView,
+            urlView,
+            memoView,
+            selectedFolderView,
+            activityIndicator,
+            recentVisitedDateLabel,
+            recentEditedDateLabel,
+            createdDateLabel
+        ]
+            .forEach { contentView.addSubview($0) }
     }
 
     func setConstraints() {
@@ -89,8 +132,18 @@ private extension ClipDetailView {
             make.size.equalTo(48)
         }
 
+        scrollView.snp.makeConstraints { make in
+            make.top.equalTo(commonNavigationView.snp.bottom)
+            make.directionalHorizontalEdges.bottom.equalToSuperview()
+        }
+
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(scrollView)
+            make.width.equalTo(scrollView)
+        }
+
         urlMetadataStackView.snp.makeConstraints { make in
-            make.top.equalTo(commonNavigationView.snp.bottom).offset(24)
+            make.top.equalToSuperview().offset(24)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
 
@@ -107,7 +160,22 @@ private extension ClipDetailView {
         selectedFolderView.snp.makeConstraints { make in
             make.top.equalTo(memoView.snp.bottom).offset(40)
             make.directionalHorizontalEdges.equalToSuperview().inset(24)
-            make.bottom.lessThanOrEqualToSuperview().inset(24)
+        }
+
+        recentVisitedDateLabel.snp.makeConstraints { make in
+            make.top.equalTo(selectedFolderView.snp.bottom).offset(48)
+            make.centerX.equalToSuperview()
+        }
+
+        recentEditedDateLabel.snp.makeConstraints { make in
+            make.top.equalTo(recentVisitedDateLabel.snp.bottom).offset(8)
+            make.centerX.equalToSuperview()
+        }
+
+        createdDateLabel.snp.makeConstraints { make in
+            make.top.equalTo(recentEditedDateLabel.snp.bottom).offset(8)
+            make.bottom.equalToSuperview().inset(24)
+            make.centerX.equalToSuperview()
         }
 
         activityIndicator.snp.makeConstraints { make in
