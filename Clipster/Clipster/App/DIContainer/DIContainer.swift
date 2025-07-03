@@ -49,6 +49,17 @@ final class DIContainer {
         DefaultDatabaseService(client: supabaseClient)
     }
 
+    func makeAuthRepository() -> AuthRepository {
+        DefaultAuthRepository(
+            socialLoginServices: [
+                .apple: makeAppleLoginService(),
+                .google: makeGoogleLoginService()
+            ],
+            authService: makeAuthService(),
+            userService: makeUserService(),
+        )
+    }
+
     func makeClipRepository() -> ClipRepository {
         DefaultClipRepository(storage: makeClipStorage(), cache: cache)
     }
@@ -62,14 +73,7 @@ final class DIContainer {
     }
 
     func makeLoginUseCase() -> LoginUseCase {
-        DefaultLoginUseCase(
-            socialLoginServices: [
-                .apple: makeAppleLoginService(),
-                .google: makeGoogleLoginService()
-            ],
-            authService: makeAuthService(),
-            userService: makeUserService(),
-        )
+        DefaultLoginUseCase(authRepository: makeAuthRepository())
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
