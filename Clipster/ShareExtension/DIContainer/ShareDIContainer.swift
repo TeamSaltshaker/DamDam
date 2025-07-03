@@ -60,11 +60,16 @@ final class ShareDIContainer {
         DefaultFilterSubfoldersUseCase()
     }
 
+    func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
+        DefaultFetchSavePathLayoutOptionUseCase()
+    }
+
     func makeFolderSelectorReactorForClip(parentFolder: Folder?) -> FolderSelectorReactor {
         FolderSelectorReactor(
             fetchTopLevelFoldersUseCase: makeFetchTopLevelFoldersUseCase(),
             findFolderPathUseCase: makeFindFolderPathUseCase(),
             filterSubfoldersUseCase: makeFilterSubfoldersUseCase(),
+            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutOptionUseCase(),
             parentFolder: parentFolder
         )
     }
