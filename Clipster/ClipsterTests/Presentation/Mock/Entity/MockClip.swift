@@ -46,4 +46,19 @@ enum MockClip {
             deletedAt: nil
         )
     ]
+
+    static var someClip = Clip(
+        id: UUID(),
+        folderID: UUID(),
+        url: URL(string: "https://example.com/1")!,
+        title: "Example Title 1",
+        subtitle: "Example Subtitle 1",
+        memo: "Clip 1",
+        thumbnailImageURL: URL(string: "https://example.com/thumb1.png"),
+        screenshotData: nil,
+        createdAt: Date(),
+        lastVisitedAt: nil,
+        updatedAt: Date(),
+        deletedAt: nil
+    )
 }
