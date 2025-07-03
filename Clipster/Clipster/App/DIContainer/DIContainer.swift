@@ -45,10 +45,6 @@ final class DIContainer {
         GoogleLoginService()
     }
 
-    func makeDatabaseService() -> DatabaseService {
-        DefaultDatabaseService(client: supabaseClient)
-    }
-
     func makeAuthRepository() -> AuthRepository {
         DefaultAuthRepository(
             socialLoginServices: [
