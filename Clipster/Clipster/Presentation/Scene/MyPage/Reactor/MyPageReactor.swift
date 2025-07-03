@@ -7,6 +7,7 @@ final class MyPageReactor: Reactor {
         case tapCell(MyPageItem)
         case changeTheme(ThemeOption)
         case changeSavePathLayout(SavePathOption)
+        case changeFolderSort(FolderSortOption)
     }
 
     enum Mutation {
@@ -64,6 +65,7 @@ final class MyPageReactor: Reactor {
     private let withdrawUseCase: WithdrawUseCase
     private let saveThemeOptionUseCase: SaveThemeOptionUseCase
     private let saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
+    private let saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase
 
     init(
         loginUseCase: LoginUseCase,
@@ -74,7 +76,8 @@ final class MyPageReactor: Reactor {
         logoutUseCase: LogoutUseCase,
         withdrawUseCase: WithdrawUseCase,
         saveThemeOptionUseCase: SaveThemeOptionUseCase,
-        saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
+        saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase,
+        saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase
     ) {
         self.loginUseCase = loginUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
@@ -85,6 +88,7 @@ final class MyPageReactor: Reactor {
         self.withdrawUseCase = withdrawUseCase
         self.saveThemeOptionUseCase = saveThemeOptionUseCase
         self.saveSavePathLayoutOptionUseCase = saveSavePathLayoutOptionUseCase
+        self.saveFolderSortOptionUseCase = saveFolderSortOptionUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -150,6 +154,19 @@ final class MyPageReactor: Reactor {
                     in: currentState.sectionModel
                 )
                 return .setSectionModel(sectionModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
+            }
+        case .changeFolderSort(let option):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                _ = try await saveFolderSortOptionUseCase.execute(option).get()
+                let updatedModels = replacingFolderSortItem(
+                    with: option,
+                    in: currentState.sectionModel
+                )
+                return .setSectionModel(updatedModels)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
@@ -341,6 +358,26 @@ private extension MyPageReactor {
             }) {
                 var newItems = section.items
                 newItems[index] = .detail(.savePath(newOption))
+                return MyPageSectionModel(section: section.section, items: newItems)
+            } else {
+                return section
+            }
+        }
+    }
+
+    func replacingFolderSortItem(
+        with newOption: FolderSortOption,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if let index = section.items.firstIndex(where: {
+                if case .dropdown(.folderSort) = $0 {
+                    return true
+                }
+                return false
+            }) {
+                var newItems = section.items
+                newItems[index] = .dropdown(.folderSort(newOption))
                 return MyPageSectionModel(section: section.section, items: newItems)
             } else {
                 return section

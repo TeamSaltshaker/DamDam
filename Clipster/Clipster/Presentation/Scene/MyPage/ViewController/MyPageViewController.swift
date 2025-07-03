@@ -128,8 +128,8 @@ extension MyPageViewController {
                         title: "폴더 정렬 순서",
                         current: currentOption,
                         options: availableOptions
-                    ) { selected in
-                        print(selected)
+                    ) { [weak self] selected in
+                        self?.reactor?.action.onNext(.changeFolderSort(selected))
                     }
                 case .showSelectClipSort:
                     break

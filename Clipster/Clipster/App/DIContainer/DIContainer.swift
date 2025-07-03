@@ -409,7 +409,8 @@ final class DIContainer {
             logoutUseCase: makeLogoutUseCase(),
             withdrawUseCase: makeWithdrawUseCase(),
             saveThemeOptionUseCase: makeSaveThemeUseCase(),
-            saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase()
+            saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase(),
+            saveFolderSortOptionUseCase: makeSaveFolderSortUseCase()
         )
     }
 }
