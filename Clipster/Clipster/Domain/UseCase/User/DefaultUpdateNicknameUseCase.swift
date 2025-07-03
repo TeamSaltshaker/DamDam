@@ -1,12 +1,11 @@
 final class DefaultUpdateNicknameUseCase: UpdateNicknameUseCase {
-    private let userService: UserService
+    private let userRepository: UserRepository
 
-    init(userService: UserService) {
-        self.userService = userService
+    init(userRepository: UserRepository) {
+        self.userRepository = userRepository
     }
 
     func execute(nickname: String) async -> Result<User, Error> {
-        await userService.updateNickname(nickname)
-            .mapError { _ in DomainError.unknownError }
+        await userRepository.updateNickname(nickname)
     }
 }
