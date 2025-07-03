@@ -1,4 +1,3 @@
-import RxRelay
 import RxSwift
 import SnapKit
 import UIKit
@@ -75,7 +74,7 @@ final class SingleOptionSelectorViewController<Option: SelectableOption>: UIView
             ) as? RadioCell else { return UITableViewCell() }
 
             let isSelected = item == self.selected
-            cell.setDisplay(text: item.displayText, isSelected: isSelected)
+            cell.setDisplay(title: item.displayText, isSelected: isSelected)
             return cell
         }
     }
