@@ -38,10 +38,16 @@ final class MyPageViewController: UIViewController, View {
 extension MyPageViewController {
     func bindAction(to reactor: Reactor) {
         myPageView.action
-            .bind { action in
+            .bind { [weak self] action in
+                guard let self else { return }
+
                 switch action {
                 case .tapCell(let item):
-                    reactor.action.onNext(.tapCell(item))
+                    if case let .account(accountItem) = item {
+                        self.handleAccountItem(accountItem)
+                    } else {
+                        reactor.action.onNext(.tapCell(item))
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -104,5 +110,39 @@ extension MyPageViewController {
                 }
             }
             .disposed(by: disposeBag)
+    }
+}
+
+private extension MyPageViewController {
+    func handleAccountItem(_ accountItem: AccountItem) {
+        let alert: UIAlertController
+
+        switch accountItem {
+        case .logout:
+            alert = UIAlertController(
+                title: "로그아웃",
+                message: "하시겠습니까?",
+                preferredStyle: .alert
+            )
+
+            alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+            alert.addAction(UIAlertAction(title: "로그아웃", style: .destructive) { [weak self] _ in
+                self?.reactor?.action.onNext(.tapCell(.account(.logout)))
+            })
+
+        case .withdraw:
+            alert = UIAlertController(
+                title: "회원탈퇴",
+                message: "하시겠습니까?",
+                preferredStyle: .alert
+            )
+
+            alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+            alert.addAction(UIAlertAction(title: "탈퇴", style: .destructive) { [weak self] _ in
+                self?.reactor?.action.onNext(.tapCell(.account(.withdraw)))
+            })
+        }
+
+        present(alert, animated: true)
     }
 }
