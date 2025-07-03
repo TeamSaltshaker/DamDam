@@ -85,6 +85,10 @@ final class DIContainer {
         DefaultLoginUseCase(authRepository: makeAuthRepository())
     }
 
+    func makeLogoutUseCase() -> LogoutUseCase {
+        DefaultLogoutUseCase(authRepository: makeAuthRepository())
+    }
+
     func makeCreateClipUseCase() -> CreateClipUseCase {
         DefaultCreateClipUseCase(clipRepository: makeClipRepository())
     }

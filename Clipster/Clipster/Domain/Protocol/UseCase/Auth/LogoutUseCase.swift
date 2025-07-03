@@ -1,3 +1,3 @@
 protocol LogoutUseCase {
-    func execute() async -> Result<Bool, Error>
+    func execute() async -> Result<Void, Error>
 }
