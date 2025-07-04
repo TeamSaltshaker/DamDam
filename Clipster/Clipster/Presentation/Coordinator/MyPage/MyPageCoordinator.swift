@@ -35,9 +35,6 @@ extension MyPageCoordinator {
         )
 
         vc.modalPresentationStyle = .pageSheet
-        if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
-        }
 
         navigationController.present(vc, animated: true)
     }
@@ -56,7 +53,7 @@ extension MyPageCoordinator {
 
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
+            sheet.detents = [.custom { _ in 290 }]
         }
 
         navigationController.present(vc, animated: true)
@@ -77,7 +74,7 @@ extension MyPageCoordinator {
 
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.custom { $0.maximumDetentValue * 0.5 }]
+            sheet.detents = [.custom { _ in 290 }]
         }
 
         navigationController.present(vc, animated: true)
@@ -98,7 +95,7 @@ extension MyPageCoordinator {
 
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.custom { $0.maximumDetentValue * 0.5 }]
+            sheet.detents = [.custom { _ in 290 }]
         }
 
         navigationController.present(vc, animated: true)
@@ -115,7 +112,7 @@ extension MyPageCoordinator {
 
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
+            sheet.detents = [.custom { _ in 290 }]
         }
 
         navigationController.present(vc, animated: true)
