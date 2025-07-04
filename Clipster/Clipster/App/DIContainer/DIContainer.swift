@@ -213,6 +213,34 @@ final class DIContainer {
         DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
     }
 
+    func makeFetchClipSortUseCase() -> FetchClipSortOptionUseCase {
+        DefaultFetchClipSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchFolderSortUseCase() -> FetchFolderSortOptionUseCase {
+        DefaultFetchFolderSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchSavePathLayoutUseCase() -> FetchSavePathLayoutOptionUseCase {
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeFetchThemeUseCase() -> FetchThemeOptionUseCase {
+        DefaultFetchThemeOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveClipSortUseCase() -> SaveClipSortOptionUseCase {
+        DefaultSaveClipSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveFolderSortUseCase() -> SaveFolderSortOptionUseCase {
+        DefaultSaveFolderSortOptionUseCase(userDefaults: userDefaults)
+    }
+
+    func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
+        DefaultSaveThemeOptionUseCase(userDefaults: userDefaults)
+    }
+
     func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
         DefaultFetchSavePathLayoutOptionUseCase()
     }
@@ -356,6 +384,18 @@ final class DIContainer {
             searchFoldersUseCase: makeSearchFoldersUseCase(),
             searchClipsUseCase: makeSearchClipsUseCase(),
             visitClipUseCase: makeVisitClipUseCase()
+        )
+    }
+
+    func makeMyPageReactor() -> MyPageReactor {
+        MyPageReactor(
+            loginUseCase: makeLoginUseCase(),
+            fetchThemeUseCase: makeFetchThemeUseCase(),
+            fetchFolderSortUseCase: makeFetchFolderSortUseCase(),
+            fetchClipSortUseCase: makeFetchClipSortUseCase(),
+            fetchSavePathLayoutUseCase: makeFetchSavePathLayoutUseCase(),
+            logoutUseCase: makeLogoutUseCase(),
+            withdrawUseCase: makeWithdrawUseCase()
         )
     }
 }

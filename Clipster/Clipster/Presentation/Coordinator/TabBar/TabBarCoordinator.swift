@@ -17,15 +17,17 @@ final class TabBarCoordinator: Coordinator {
     }
 
     func start() {
-        let homeNavi = UINavigationController()
-        homeNavi.isNavigationBarHidden = true
+        let homeCoordinator = makeHomeCoordinator()
+        let searchCoordinator = makeSearchCoordinator()
+        let myPageCoordinator = makeMyPageCoordinator()
 
-        let homeCoordinator = HomeCoordinator(
-            navigationController: homeNavi,
-            diContainer: diContainer
-        )
         addChild(homeCoordinator)
+        addChild(searchCoordinator)
+        addChild(myPageCoordinator)
+
         homeCoordinator.start()
+        searchCoordinator.showSearch()
+        myPageCoordinator.start()
 
         navigationController.setViewControllers([tabBarController], animated: false)
     }
@@ -33,13 +35,46 @@ final class TabBarCoordinator: Coordinator {
 
 extension TabBarCoordinator {
     func didSelect(tab: TabBarMode) {
-        switch tab {
-        case .home:
-            tabBarController.switchTo(children[tab.rawValue].navigationController)
-        case .search:
-            tabBarController.switchTo(UIViewController())
-        case .myPage:
-            tabBarController.switchTo(UIViewController())
-        }
+        guard children.indices.contains(tab.rawValue) else { return }
+        let targetVC = children[tab.rawValue].navigationController
+        tabBarController.switchTo(targetVC)
+    }
+}
+
+private extension TabBarCoordinator {
+    func makeHomeCoordinator() -> HomeCoordinator {
+        let naviVC = UINavigationController()
+        naviVC.isNavigationBarHidden = true
+
+        let coordinator = HomeCoordinator(
+            navigationController: naviVC,
+            diContainer: diContainer
+        )
+
+        return coordinator
+    }
+
+    func makeSearchCoordinator() -> HomeCoordinator {
+        let naviVC = UINavigationController()
+        naviVC.isNavigationBarHidden = true
+
+        let coordinator = HomeCoordinator(
+            navigationController: naviVC,
+            diContainer: diContainer
+        )
+
+        return coordinator
+    }
+
+    func makeMyPageCoordinator() -> MyPageCoordinator {
+        let naviVC = UINavigationController()
+        naviVC.isNavigationBarHidden = true
+
+        let coordinator = MyPageCoordinator(
+            navigationController: naviVC,
+            diContainer: diContainer
+        )
+
+        return coordinator
     }
 }
