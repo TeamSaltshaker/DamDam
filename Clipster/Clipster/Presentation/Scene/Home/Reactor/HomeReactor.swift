@@ -61,6 +61,10 @@ final class HomeReactor: Reactor {
     private let deleteClipUseCase: DeleteClipUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let visitClipUseCase: VisitClipUseCase
+    private let fetchClipSortOptionUseCase: FetchClipSortOptionUseCase
+    private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
+    private let sortClipsUseCase: SortClipsUseCase
+    private let sortFoldersUseCase: SortFoldersUseCase
 
     init(
         fetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase,
@@ -68,7 +72,11 @@ final class HomeReactor: Reactor {
         fetchTopLevelClipsUseCase: FetchTopLevelClipsUseCase,
         deleteClipUseCase: DeleteClipUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
-        visitClipUseCase: VisitClipUseCase
+        visitClipUseCase: VisitClipUseCase,
+        fetchClipSortOptionUseCase: FetchClipSortOptionUseCase,
+        fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase,
+        sortClipsUseCase: SortClipsUseCase,
+        sortFoldersUseCase: SortFoldersUseCase
     ) {
         self.fetchUnvisitedClipsUseCase = fetchUnvisitedClipsUseCase
         self.fetchTopLevelFoldersUseCase = fetchTopLevelFoldersUseCase
@@ -76,6 +84,10 @@ final class HomeReactor: Reactor {
         self.deleteClipUseCase = deleteClipUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         self.visitClipUseCase = visitClipUseCase
+        self.fetchClipSortOptionUseCase = fetchClipSortOptionUseCase
+        self.fetchFolderSortOptionUseCase = fetchFolderSortOptionUseCase
+        self.sortClipsUseCase = sortClipsUseCase
+        self.sortFoldersUseCase = sortFoldersUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -91,13 +103,27 @@ final class HomeReactor: Reactor {
                     async let unvisitedClipsResult = fetchUnvisitedClipsUseCase.execute().get()
                     async let foldersResult = fetchTopLevelFoldersUseCase.execute().get()
                     async let clipsResult = fetchTopLevelClipsUseCase.execute().get()
-                    let (unvisitedClips, folders, clips) = try await (
+                    async let clipSortOption = fetchClipSortOptionUseCase.execute().get()
+                    async let folderSortOption = fetchFolderSortOptionUseCase.execute().get()
+
+                    let (
+                        unvisitedClips,
+                        folders,
+                        clips,
+                        clipSort,
+                        folderSort
+                    ) = try await (
                         unvisitedClipsResult,
                         foldersResult,
-                        clipsResult
+                        clipsResult,
+                        clipSortOption,
+                        folderSortOption
                     )
 
-                    return .setHomeDisplay(unvisitedClips, folders, clips)
+                    let sortedFolders = sortFoldersUseCase.execute(folders, by: folderSort)
+                    let sortedClips = sortClipsUseCase.execute(clips, by: clipSort)
+
+                    return .setHomeDisplay(unvisitedClips, sortedFolders, sortedClips)
                 },
                 .just(.setPhase(.success))
             )
