@@ -34,7 +34,7 @@ extension MyPageItem {
 
     var titleColor: UIColor {
         switch self {
-        case .sectionTitle: .blue400
+        case .sectionTitle: .blue600
         case .account(let item): item.titleColor
         case .version: .black500
         default: .black100
