@@ -4,10 +4,8 @@ import UIKit
 final class LoginCell: UICollectionViewCell {
     private let imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = 14
-        imageView.layer.borderColor = UIColor.black900.cgColor
-        imageView.layer.borderWidth = 1
-        imageView.contentMode = .center
+        imageView.backgroundColor = .clear
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
@@ -42,7 +40,6 @@ final class LoginCell: UICollectionViewCell {
 
     func setDisplay(_ login: LoginType) {
         imageView.image = login.icon
-        imageView.backgroundColor = login.backgroundColor
         titleLabel.text = login.title
     }
 }
@@ -69,7 +66,7 @@ private extension LoginCell {
 
     func setConstraints() {
         imageView.snp.makeConstraints { make in
-            make.size.equalTo(28)
+            make.size.equalTo(20)
         }
 
         stackView.snp.makeConstraints { make in
