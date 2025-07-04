@@ -11,7 +11,7 @@ final class DefaultFetchClipSortOptionUseCase: FetchClipSortOptionUseCase {
     func execute() async -> Result<ClipSortOption, Error> {
         guard let raw = userDefaults.string(forKey: key),
               let option = convertFromRawString(raw) else {
-            return .success(.title(.descending))
+            return .success(.createdAt(.ascending))
         }
 
         return .success(option)
