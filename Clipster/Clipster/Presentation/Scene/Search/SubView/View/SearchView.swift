@@ -2,13 +2,6 @@ import SnapKit
 import UIKit
 
 final class SearchView: UIView {
-    let backButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.chevronLeft, for: .normal)
-        button.contentHorizontalAlignment = .left
-        return button
-    }()
-
     let searchTextField = SearchTextField()
 
     let collectionView: UICollectionView = {
@@ -49,21 +42,14 @@ private extension SearchView {
     }
 
     func setHierarchy() {
-        [backButton, searchTextField, collectionView, emptyView]
+        [searchTextField, collectionView, emptyView]
             .forEach { addSubview($0) }
     }
 
     func setConstraints() {
-        backButton.snp.makeConstraints { make in
-            make.centerY.equalTo(searchTextField)
-            make.leading.equalToSuperview().offset(24)
-            make.size.equalTo(46)
-        }
-
         searchTextField.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).inset(4)
-            make.leading.equalTo(backButton.snp.trailing).offset(4)
-            make.trailing.equalToSuperview().inset(24)
+            make.directionalHorizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(48)
         }
 
