@@ -22,7 +22,7 @@ private extension SelectButton {
 
         let normalAttributes: [NSAttributedString.Key: Any] = [
             .font: normalFont,
-            .foregroundColor: UIColor.blue400
+            .foregroundColor: UIColor.blue600
         ]
         let disabledAttributes: [NSAttributedString.Key: Any] = [
             .font: disabledFont,
