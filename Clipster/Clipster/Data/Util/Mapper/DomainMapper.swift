@@ -1,6 +1,16 @@
 import Foundation
 
 struct DomainMapper {
+    func user(from dto: UserDTO) -> User {
+        User(
+            id: dto.id,
+            nickname: dto.nickname,
+            createdAt: dto.createdAt,
+            updatedAt: dto.updatedAt,
+            deletedAt: dto.deletedAt,
+        )
+    }
+
     func folder(from entity: FolderEntity) -> Folder? {
         guard let folders = entity.folders?.compactMap(folder),
               let clips = entity.clips?.compactMap(clip) else {

@@ -87,7 +87,7 @@ extension HomeCoordinator {
         onSelect: @escaping (Folder?) -> Void,
     ) {
         let reactor = diContainer.makeFolderSelectorReactorForClip(parentFolder: parentFolder)
-        let vc = FolderSelectorViewController(reactor: reactor, coordinator: self)
+        let vc = FolderSelectorViewController(reactor: reactor)
         vc.onSelectionComplete = onSelect
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
@@ -103,7 +103,7 @@ extension HomeCoordinator {
         onSelect: @escaping (Folder?) -> Void,
     ) {
         let reactor = diContainer.makeFolderSelectorReactorForFolder(parentFolder: parentFolder, folder: folder)
-        let vc = FolderSelectorViewController(reactor: reactor, coordinator: self)
+        let vc = FolderSelectorViewController(reactor: reactor)
         vc.onSelectionComplete = onSelect
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {

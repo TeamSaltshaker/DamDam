@@ -1,3 +1,3 @@
 protocol LoginUseCase {
-    func execute(type: LoginType) async -> Result<String, Error>
+    func execute(type: LoginType) async -> Result<User, Error>
 }

@@ -1,14 +1,11 @@
 final class DefaultLoginUseCase: LoginUseCase {
-    private let loginServices: [LoginType: SocialLoginService]
+    private let authRepository: AuthRepository
 
-    init(loginServices: [LoginType: SocialLoginService]) {
-        self.loginServices = loginServices
+    init(authRepository: AuthRepository) {
+        self.authRepository = authRepository
     }
 
-    func execute(type: LoginType) async -> Result<String, Error> {
-        guard let service = loginServices[type] else {
-            return .failure(LoginError.unsupportedType)
-        }
-        return await service.login()
+    func execute(type: LoginType) async -> Result<User, Error> {
+        await authRepository.login(type: type)
     }
 }

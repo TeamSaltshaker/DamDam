@@ -40,23 +40,38 @@ final class CommonNavigationView: UIView {
         titleLabel.text = title
     }
 
+    func setTitleLabelFont(_ font: UIFont) {
+        titleLabel.font = font
+    }
+
     func setLeftItem(_ item: UIButton) {
+        clearStackView(leftStackView)
         leftStackView.addArrangedSubview(item)
     }
 
     func setLeftItems(_ items: [UIButton]) {
+        clearStackView(leftStackView)
         items.forEach {
             leftStackView.addArrangedSubview($0)
         }
     }
 
     func setRightItem(_ item: UIButton) {
+        clearStackView(rightStackView)
         rightStackView.addArrangedSubview(item)
     }
 
     func setRightItems(_ items: [UIButton]) {
+        clearStackView(rightStackView)
         items.forEach {
             rightStackView.addArrangedSubview($0)
+        }
+    }
+
+    private func clearStackView(_ stackView: UIStackView) {
+        stackView.arrangedSubviews.forEach { view in
+            stackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
         }
     }
 }

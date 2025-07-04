@@ -2,12 +2,6 @@ import Foundation
 import ReactorKit
 
 final class EditClipReactor: Reactor {
-    enum ClipValidType {
-        case valid
-        case validWithWarning
-        case invalid
-    }
-
     enum EditClipReactorType {
         case edit
         case create
@@ -135,7 +129,7 @@ final class EditClipReactor: Reactor {
                     clipValidType = .invalid
                 }
                 return .merge(
-                    .just(Mutation.updateURLMetadata(toURLMetaDisplay(entity: metadata))),
+                    .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: metadata))),
                     .just(Mutation.updateIsValidURL(clipValidType))
                 )
             }
@@ -306,18 +300,6 @@ final class EditClipReactor: Reactor {
 }
 
 private extension EditClipReactor {
-    func toURLMetaDisplay(entity: URLMetadata?) -> URLMetadataDisplay? {
-        entity.map {
-            URLMetadataDisplay(
-                url: $0.url,
-                title: $0.title,
-                description: $0.description,
-                thumbnailImageURL: $0.thumbnailImageURL,
-                screenshotImageData: $0.screenshotData
-            )
-        }
-    }
-
     func makeURLMetaDisplayOnlyURL(urlString: String) -> URLMetadataDisplay? {
         guard let url = URL(string: urlString) else { return nil }
         return URLMetadataDisplay(
@@ -327,22 +309,5 @@ private extension EditClipReactor {
             thumbnailImageURL: nil,
             screenshotImageData: nil
         )
-    }
-}
-
-extension Observable {
-    static func fromAsync<T>(_ block: @escaping () async throws -> T) -> Observable<T> {
-        Single.create { emitter in
-            Task {
-                do {
-                    let result = try await block()
-                    emitter(.success(result))
-                } catch {
-                    emitter(.failure(error))
-                }
-            }
-            return Disposables.create()
-        }
-        .asObservable()
     }
 }
