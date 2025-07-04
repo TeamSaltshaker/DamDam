@@ -311,7 +311,6 @@ private extension MyPageReactor {
                 ]
             ),
             .init(section: .notificationSettings, items: [.chevron(.notificationSetting)]),
-            .init(section: .trash, items: [.chevron(.trash)]),
             .init(section: .support, items: [.chevron(.support)])
         ]
     }
