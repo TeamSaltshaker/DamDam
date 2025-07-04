@@ -121,7 +121,14 @@ final class MyPageReactor: Reactor {
                 .just(.setPhase(.success))
             )
             .catch {
-                .just(.setPhase(.error($0.localizedDescription)))
+                .concat(
+                    .fromAsync { [weak self] in
+                        guard let self else { throw DomainError.unknownError }
+                        let sectionModels = try await makeSectionModels(isLogin: false)
+                        return .setSectionModel(sectionModels)
+                    },
+                    .just(.setPhase(.error($0.localizedDescription)))
+                )
             }
         case .tapCell(let item):
             switch item {
