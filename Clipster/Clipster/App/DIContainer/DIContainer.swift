@@ -137,10 +137,6 @@ final class DIContainer {
         DefaultFetchUnvisitedClipsUseCase(clipRepository: makeClipRepository())
     }
 
-    func makeSaveRecentVisitedClipUseCase() -> SaveRecentVisitedClipUseCase {
-        DefaultSaveRecentVisitedClipUseCase()
-    }
-
     func makeSearchClipsUseCase() -> SearchClipsUseCase {
         DefaultSearchClipsUseCase()
     }
@@ -374,7 +370,6 @@ final class DIContainer {
             fetchRecentQueriesUseCase: makeFetchRecentQueriesUseCase(),
             fetchRecentVisitedClipsUseCase: makeFetchRecentVisitedClipsUseCase(),
             saveRecentQueryUseCase: makeSaveRecentQueryUseCase(),
-            saveRecentVisitedClipUseCase: makeSaveRecentVisitedClipUseCase(),
             deleteRecentQueryUseCase: makeDeleteRecentQueryUseCase(),
             deleteAllRecentQueriesUseCase: makeDeleteAllRecentQueriesUseCase(),
             deleteRecentVisitedClipUseCase: makeDeleteRecentVisitedClipUseCase(),
@@ -383,7 +378,11 @@ final class DIContainer {
             deleteClipUseCase: makeDeleteClipUseCase(),
             searchFoldersUseCase: makeSearchFoldersUseCase(),
             searchClipsUseCase: makeSearchClipsUseCase(),
-            visitClipUseCase: makeVisitClipUseCase()
+            visitClipUseCase: makeVisitClipUseCase(),
+            fetchFolderSortOptionUseCase: makeFetchFolderSortUseCase(),
+            fetchClipSortOptionUseCase: makeFetchClipSortUseCase(),
+            sortFoldersUseCase: makeSortFoldersUseCase(),
+            sortClipsUseCase: makeSortClipsUseCase()
         )
     }
 
