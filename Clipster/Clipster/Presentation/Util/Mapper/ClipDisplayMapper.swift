@@ -20,11 +20,14 @@ struct ClipDisplayMapper {
         let recentVisitedDate = formatDateString(prefix: "최근 방문한 날짜:", date: clip.lastVisitedAt, fallback: "방문 이력 없음")
         let recentEditedDate = formatDateString(prefix: "최근 수정한 날짜:", date: clip.updatedAt)
         let createdDate = formatDateString(prefix: "생성된 날짜:", date: clip.createdAt)
+        let isShowSubTitle = !clip.subtitle.contains("알 수 없음") && clip.memo.isEmpty
 
         return ClipDisplay(
             id: clip.id,
             urlMetadata: urlMetadataDisplay,
+            subTitle: clip.subtitle,
             memo: clip.memo.isEmpty ? " " : clip.memo,
+            isShowSubTitle: isShowSubTitle,
             memoLimit: "\(clip.memo.count) / 100",
             isVisited: clip.lastVisitedAt != nil,
             recentVisitedDate: recentVisitedDate,

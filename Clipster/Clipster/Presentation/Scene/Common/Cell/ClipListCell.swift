@@ -67,8 +67,9 @@ final class ClipListCell: UICollectionViewListCell {
         } else {
             thumbnailImageView.image = .none
         }
+
         titleLabel.text = display.urlMetadata.title
-        memoLabel.text = display.memo
+        memoLabel.text = display.isShowSubTitle ? display.subTitle : display.memo
         visitIndicatorView.isHidden = display.isVisited
     }
 }
