@@ -78,7 +78,7 @@ private extension MyPageView {
                   let items = dataSource?.snapshot().itemIdentifiers(inSection: sectionKind)
             else { return nil }
             switch sectionKind {
-            case .login:
+            case .login, .welcome:
                 return makeLoginSectionLayout(items: items)
             case .etc:
                 return makeAccountSectionLayout(items: items)
@@ -279,12 +279,12 @@ private extension MyPageView {
         ) { [weak self] header, _, indexPath in
             guard
                 let self,
-                let sectionIdentifier = dataSource?.sectionIdentifier(for: indexPath.section)
+                let sectionKind = dataSource?.sectionIdentifier(for: indexPath.section)
             else { return }
 
-            switch sectionIdentifier {
-            case .login(let title):
-                header.setTitle(title)
+            switch sectionKind {
+            case .login, .welcome:
+                header.setTitle(sectionKind.title)
                 header.setTitleFont(size: 28, weight: .extraBold)
             default:
                 break

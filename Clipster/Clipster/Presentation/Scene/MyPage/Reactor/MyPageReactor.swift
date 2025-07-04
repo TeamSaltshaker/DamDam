@@ -243,7 +243,7 @@ private extension MyPageReactor {
         let nickname = user.nickname
 
         return [
-            .init(section: .login("\(nickname) 님 환영합니다."), items: []),
+            .init(section: .welcome(nickname), items: []),
             .init(
                 section: .profile,
                 items: [
@@ -257,7 +257,7 @@ private extension MyPageReactor {
     func makeGuestSpecificSections() -> [MyPageSectionModel] {
         [
             .init(
-                section: .login("로그인"),
+                section: .login,
                 items: [
                     .login(.apple),
                     .login(.google)
