@@ -43,9 +43,24 @@ final class FolderSelectorReactor: Reactor {
 
         var title: String {
             if isAccordion {
-                if let folderID = highlightedFolderID,
-                   let highlightedFolder = displayableFolders.first(where: { $0.id == folderID }) {
-                    return highlightedFolder.title
+                if let highlightedID = self.highlightedFolderID {
+                    if highlightedID == Self.homeFolderID {
+                        return "홈"
+                    }
+
+                    func find(id: UUID, in folders: [Folder]) -> Folder? {
+                        for folder in folders {
+                            if folder.id == id { return folder }
+                            if let found = find(id: id, in: folder.folders) {
+                                return found
+                            }
+                        }
+                        return nil
+                    }
+
+                    if let foundFolder = find(id: highlightedID, in: self.topLevelFolders) {
+                        return foundFolder.title
+                    }
                 }
                 return "홈"
             } else {
