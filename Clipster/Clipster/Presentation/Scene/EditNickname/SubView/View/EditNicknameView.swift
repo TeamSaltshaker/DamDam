@@ -72,6 +72,7 @@ final class EditNicknameView: UIView {
     }
 
     func setDisplay(_ nickname: String) {
+        nicknameTextField.becomeFirstResponder()
         nicknameTextField.text = nickname
     }
 
@@ -159,6 +160,14 @@ private extension EditNicknameView {
         saveButton.rx.tap
             .map { Action.tapSave }
             .bind(to: action)
+            .disposed(by: disposeBag)
+
+        let tap = UITapGestureRecognizer()
+        containerView.addGestureRecognizer(tap)
+        tap.rx.event
+            .bind { [weak self] _ in
+                self?.nicknameTextField.becomeFirstResponder()
+            }
             .disposed(by: disposeBag)
     }
 }
