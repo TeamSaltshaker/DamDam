@@ -18,6 +18,15 @@ final class DefaultFetchRecentVisitedClipsUseCase: FetchRecentVisitedClipsUseCas
             return .success([])
         }
 
-        return await clipRepository.fetchRecentVisitedClips(for: ids).mapError { $0 as Error }
+        let result = await clipRepository.fetchRecentVisitedClips(for: ids)
+
+        switch result {
+        case .success(let clips):
+            let clipDictionary = Dictionary(uniqueKeysWithValues: clips.map { ($0.id, $0) })
+            let sortedClips = ids.compactMap { clipDictionary[$0] }
+            return .success(sortedClips)
+        case .failure(let error):
+            return .failure(error)
+        }
     }
 }
