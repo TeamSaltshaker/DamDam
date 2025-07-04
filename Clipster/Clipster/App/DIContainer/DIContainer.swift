@@ -400,7 +400,9 @@ final class DIContainer {
 
     func makeMyPageReactor() -> MyPageReactor {
         MyPageReactor(
+            checkLoginStatusUseCase: makeCheckLoginStatusUseCase(),
             loginUseCase: makeLoginUseCase(),
+            fetchCurrentUserUseCase: makeFetchCurrentUserUseCase(),
             fetchThemeUseCase: makeFetchThemeUseCase(),
             fetchFolderSortUseCase: makeFetchFolderSortOptionUseCase(),
             fetchClipSortUseCase: makeFetchClipSortOptionUseCase(),

@@ -57,7 +57,9 @@ final class MyPageReactor: Reactor {
 
     let initialState = State()
 
+    private let checkLoginStatusUseCase: CheckLoginStatusUseCase
     private let loginUseCase: LoginUseCase
+    private let fetchCurrentUserUseCase: FetchCurrentUserUseCase
     private let fetchThemeUseCase: FetchThemeOptionUseCase
     private let fetchFolderSortUseCase: FetchFolderSortOptionUseCase
     private let fetchClipSortUseCase: FetchClipSortOptionUseCase
@@ -70,7 +72,9 @@ final class MyPageReactor: Reactor {
     private let saveClipSortOptionUseCase: SaveClipSortOptionUseCase
 
     init(
+        checkLoginStatusUseCase: CheckLoginStatusUseCase,
         loginUseCase: LoginUseCase,
+        fetchCurrentUserUseCase: FetchCurrentUserUseCase,
         fetchThemeUseCase: FetchThemeOptionUseCase,
         fetchFolderSortUseCase: FetchFolderSortOptionUseCase,
         fetchClipSortUseCase: FetchClipSortOptionUseCase,
@@ -82,7 +86,9 @@ final class MyPageReactor: Reactor {
         saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase,
         saveClipSortOptionUseCase: SaveClipSortOptionUseCase
     ) {
+        self.checkLoginStatusUseCase = checkLoginStatusUseCase
         self.loginUseCase = loginUseCase
+        self.fetchCurrentUserUseCase = fetchCurrentUserUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
         self.fetchFolderSortUseCase = fetchFolderSortUseCase
         self.fetchClipSortUseCase = fetchClipSortUseCase
@@ -104,8 +110,8 @@ final class MyPageReactor: Reactor {
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
                     guard let self else { throw DomainError.unknownError }
-
-                    let sectionModels = try await makeSectionModels(isLogin: true)
+                    let isLogin = await checkLoginStatusUseCase.execute()
+                    let sectionModels = try await makeSectionModels(isLogin: isLogin)
                     return .setSectionModel(sectionModels)
                 },
                 .just(.setPhase(.success))
@@ -115,8 +121,21 @@ final class MyPageReactor: Reactor {
             }
         case .tapCell(let item):
             switch item {
-            case .login:
-                return .empty()
+            case .login(let type):
+                return .concat(
+                    .just(.setPhase(.loading)),
+                    .fromAsync { [weak self] in
+                        guard let self else { throw DomainError.unknownError }
+
+                        _ = try await loginUseCase.execute(type: type).get()
+                        let sectionModels = try await makeSectionModels(isLogin: true)
+                        return .setSectionModel(sectionModels)
+                    },
+                    .just(.setPhase(.success))
+                )
+                .catch {
+                    .just(.setPhase(.error($0.localizedDescription)))
+                }
             case .chevron(let chevronItem):
                 return .just(makeChevronItemMutation(item: chevronItem))
             case .detail(let detailItem):
@@ -220,10 +239,11 @@ private extension MyPageReactor {
     }
 
     func makeUserSpecificSections() async throws -> [MyPageSectionModel] {
-        let nickName = "김담담"
+        let user = try await fetchCurrentUserUseCase.execute().get()
+        let nickname = user.nickname
 
         return [
-            .init(section: .login("\(nickName) 님 환영합니다."), items: []),
+            .init(section: .login("\(nickname) 님 환영합니다."), items: []),
             .init(
                 section: .profile,
                 items: [
