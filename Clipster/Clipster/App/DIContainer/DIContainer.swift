@@ -1,9 +1,10 @@
 import CoreData
 import Foundation
+import Supabase
 
 final class DIContainer {
     private let container: NSPersistentContainer
-    private let supabaseService: SupabaseService
+    private let supabaseClient: SupabaseClient
     private let cache: FolderClipCache
     private let userDefaults: UserDefaults
 
@@ -15,7 +16,7 @@ final class DIContainer {
         userDefaults: UserDefaults
     ) {
         self.container = container ?? CoreDataStack.shared.container
-        supabaseService = SupabaseService(url: supabaseURL, key: supabaseKey)
+        supabaseClient = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
         self.cache = cache
         self.userDefaults = userDefaults
     }
@@ -28,12 +29,32 @@ final class DIContainer {
         DefaultFolderStorage(container: container, mapper: DomainMapper())
     }
 
+    func makeUserService() -> UserService {
+        DefaultUserService(client: supabaseClient)
+    }
+
+    func makeAuthService() -> AuthService {
+        DefaultAuthService(client: supabaseClient)
+    }
+
     func makeAppleLoginService() -> SocialLoginService {
         AppleLoginService()
     }
 
     func makeGoogleLoginService() -> SocialLoginService {
         GoogleLoginService()
+    }
+
+    func makeAuthRepository() -> AuthRepository {
+        DefaultAuthRepository(
+            socialLoginServices: [
+                .apple: makeAppleLoginService(),
+                .google: makeGoogleLoginService()
+            ],
+            authService: makeAuthService(),
+            userService: makeUserService(),
+            mapper: DomainMapper(),
+        )
     }
 
     func makeClipRepository() -> ClipRepository {
@@ -48,11 +69,28 @@ final class DIContainer {
         DefaultURLRepository()
     }
 
+    func makeUserRepository() -> UserRepository {
+        DefaultUserRepository(
+            authService: makeAuthService(),
+            userService: makeUserService(),
+            mapper: DomainMapper(),
+        )
+    }
+
+    func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {
+        DefaultCheckLoginStatusUseCase(authRepository: makeAuthRepository())
+    }
+
     func makeLoginUseCase() -> LoginUseCase {
-        DefaultLoginUseCase(loginServices: [
-            .apple: makeAppleLoginService(),
-            .google: makeGoogleLoginService()
-        ])
+        DefaultLoginUseCase(authRepository: makeAuthRepository())
+    }
+
+    func makeLogoutUseCase() -> LogoutUseCase {
+        DefaultLogoutUseCase(authRepository: makeAuthRepository())
+    }
+
+    func makeWithdrawUseCase() -> WithdrawUseCase {
+        DefaultWithdrawUseCase(authRepository: makeAuthRepository())
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
@@ -181,6 +219,14 @@ final class DIContainer {
 
     func makeParseURLUseCase() -> ParseURLUseCase {
         DefaultParseURLUseCase(urlMetaRepository: makeURLRepository())
+    }
+
+    func makeFetchCurrentUserUseCase() -> FetchCurrentUserUseCase {
+        DefaultFetchCurrentUserUseCase(userRepository: makeUserRepository())
+    }
+
+    func makeUpdateNicknameUseCase() -> UpdateNicknameUseCase {
+        DefaultUpdateNicknameUseCase(userRepository: makeUserRepository())
     }
 
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
