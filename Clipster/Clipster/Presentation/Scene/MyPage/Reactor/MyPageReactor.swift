@@ -9,6 +9,7 @@ final class MyPageReactor: Reactor {
         case changeSavePathLayout(SavePathOption)
         case changeFolderSort(FolderSortOption)
         case changeClipSort(ClipSortOption)
+        case changeNickName(String)
     }
 
     enum Mutation {
@@ -32,7 +33,7 @@ final class MyPageReactor: Reactor {
         }
 
         enum Route {
-            case showEditNickName
+            case showEditNickName(String)
             case showSelectTheme(
                 currentOption: ThemeOption,
                 availableOptions: [ThemeOption]
@@ -70,6 +71,7 @@ final class MyPageReactor: Reactor {
     private let saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase
     private let saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase
     private let saveClipSortOptionUseCase: SaveClipSortOptionUseCase
+    private let updateNicknameUseCase: UpdateNicknameUseCase
 
     init(
         checkLoginStatusUseCase: CheckLoginStatusUseCase,
@@ -84,7 +86,8 @@ final class MyPageReactor: Reactor {
         saveThemeOptionUseCase: SaveThemeOptionUseCase,
         saveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase,
         saveFolderSortOptionUseCase: SaveFolderSortOptionUseCase,
-        saveClipSortOptionUseCase: SaveClipSortOptionUseCase
+        saveClipSortOptionUseCase: SaveClipSortOptionUseCase,
+        updateNicknameUseCase: UpdateNicknameUseCase
     ) {
         self.checkLoginStatusUseCase = checkLoginStatusUseCase
         self.loginUseCase = loginUseCase
@@ -99,6 +102,7 @@ final class MyPageReactor: Reactor {
         self.saveSavePathLayoutOptionUseCase = saveSavePathLayoutOptionUseCase
         self.saveFolderSortOptionUseCase = saveFolderSortOptionUseCase
         self.saveClipSortOptionUseCase = saveClipSortOptionUseCase
+        self.updateNicknameUseCase = updateNicknameUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -207,6 +211,22 @@ final class MyPageReactor: Reactor {
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
             }
+        case .changeNickName(let newNickname):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+
+                _ = try await updateNicknameUseCase.execute(nickname: newNickname).get()
+
+                let updatedModels = replacingNickname(
+                    with: newNickname,
+                    in: currentState.sectionModel
+                )
+
+                return .setSectionModel(updatedModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
+            }
         }
     }
 
@@ -303,7 +323,16 @@ private extension MyPageReactor {
     func makeChevronItemMutation(item: ChevronItem) -> Mutation {
         switch item {
         case .nicknameEdit:
-            return .setRoute(.showEditNickName)
+            let nickname = currentState.sectionModel
+                .compactMap { section -> String? in
+                    if case let .welcome(name) = section.section {
+                        return name
+                    }
+                    return nil
+                }
+                .first ?? "알 수 없음"
+
+            return .setRoute(.showEditNickName(nickname))
         case .notificationSetting:
             return .setRoute(.showNotificationSetting)
         case .trash:
@@ -362,6 +391,19 @@ private extension MyPageReactor {
 }
 
 private extension MyPageReactor {
+    func replacingNickname(
+        with newNickname: String,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if case .welcome = section.section {
+                return MyPageSectionModel(section: .welcome(newNickname), items: section.items)
+            } else {
+                return section
+            }
+        }
+    }
+
     func replacingThemeItem(
         with newOption: ThemeOption,
         in models: [MyPageSectionModel]

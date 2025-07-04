@@ -25,6 +25,23 @@ extension MyPageCoordinator {
         navigationController.pushViewController(vc, animated: true)
     }
 
+    func editNickname(
+        nickname: String,
+        onSave: @escaping (String) -> Void
+    ) {
+        let vc = EditNicknameViewController(
+            currentNickname: nickname,
+            onSave: onSave
+        )
+
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
+        }
+
+        navigationController.present(vc, animated: true)
+    }
+
     func showSelectTheme(
         current: ThemeOption,
         options: [ThemeOption],

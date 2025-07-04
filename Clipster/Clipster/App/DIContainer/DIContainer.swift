@@ -412,7 +412,8 @@ final class DIContainer {
             saveThemeOptionUseCase: makeSaveThemeUseCase(),
             saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase(),
             saveFolderSortOptionUseCase: makeSaveFolderSortUseCase(),
-            saveClipSortOptionUseCase: makeSaveClipSortUseCase()
+            saveClipSortOptionUseCase: makeSaveClipSortUseCase(),
+            updateNicknameUseCase: makeUpdateNicknameUseCase()
         )
     }
 }
