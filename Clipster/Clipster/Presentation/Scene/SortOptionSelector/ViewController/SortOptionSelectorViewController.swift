@@ -8,7 +8,7 @@ final class SortOptionSelectorViewController<Option: SortableOption>: UIViewCont
 
     let disposeBag = DisposeBag()
 
-    private let options: [Option]
+    private var options: [Option]
     private var selected: Option
     private let onSelect: (Option) -> Void
     private var dataSource: UITableViewDiffableDataSource<Section, Item>?
@@ -48,7 +48,9 @@ final class SortOptionSelectorViewController<Option: SortableOption>: UIViewCont
         selected: Option,
         onSelect: @escaping (Option) -> Void
     ) {
-        self.options = options
+        self.options = options.map {
+            $0.isSameSortBasis(as: selected) ? selected : $0
+        }
         self.selected = selected
         self.onSelect = onSelect
         super.init(nibName: nil, bundle: nil)
@@ -73,7 +75,7 @@ final class SortOptionSelectorViewController<Option: SortableOption>: UIViewCont
                 for: indexPath
             ) as? SortOptionCell else { return UITableViewCell() }
 
-            let isSelected = item == self.selected
+            let isSelected = item.isSameSortBasis(as: self.selected)
             cell.setDisplay(
                 title: item.displayText,
                 isSelected: isSelected,
@@ -96,10 +98,11 @@ final class SortOptionSelectorViewController<Option: SortableOption>: UIViewCont
             selected = toggled
             onSelect(toggled)
 
-            guard var snapshot = dataSource?.snapshot() else { return }
-            snapshot.insertItems([toggled], beforeItem: newSelected)
-            snapshot.deleteItems([newSelected])
-            dataSource?.apply(snapshot, animatingDifferences: false)
+            if let index = options.firstIndex(where: { $0.isSameSortBasis(as: toggled) }) {
+                options[index] = toggled
+            }
+
+            applySnapshot()
         } else {
             let oldSelected = selected
             selected = newSelected
