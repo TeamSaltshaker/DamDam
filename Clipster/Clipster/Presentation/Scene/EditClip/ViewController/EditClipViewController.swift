@@ -155,16 +155,6 @@ extension EditClipViewController: View {
 
     private func bindState(from reactor: EditClipReactor) {
         reactor.state
-            .map { ($0.type, $0.isShowKeyboard) }
-            .filter { $0 == .create && $1 }
-            .take(1)
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] _ in
-                self?.editClipView.urlView.urlTextField.becomeFirstResponder()
-            }
-            .disposed(by: disposeBag)
-
-        reactor.state
             .compactMap(\.clip)
             .take(1)
             .map { _ in Reactor.Action.fetchFolder }
@@ -190,6 +180,25 @@ extension EditClipViewController: View {
                 )
             }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { ($0.type, $0.shouldReadPastedboardURL) }
+            .filter { $0.0 == .create && $0.1 }
+            .take(1)
+            .subscribe { [weak self] in
+                guard let self else { return }
+                if case .next = $0 {
+                    if UIPasteboard.general.hasURLs, let url = UIPasteboard.general.url {
+                        reactor.action.onNext(.editingURLTextField)
+                        reactor.action.onNext(.editURLTextField(url.absoluteString))
+                        reactor.action.onNext(.validifyURL(url.absoluteString))
+                    } else {
+                        editClipView.urlView.urlTextField.becomeFirstResponder()
+                    }
+                    UIPasteboard.general.url = nil
+                }
+            }
             .disposed(by: disposeBag)
 
         reactor.state
