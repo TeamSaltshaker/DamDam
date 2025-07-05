@@ -213,11 +213,11 @@ final class DIContainer {
         DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
     }
 
-    func makeFetchClipSortUseCase() -> FetchClipSortOptionUseCase {
+    func makeFetchClipSortOptionUseCase() -> FetchClipSortOptionUseCase {
         DefaultFetchClipSortOptionUseCase(userDefaults: userDefaults)
     }
 
-    func makeFetchFolderSortUseCase() -> FetchFolderSortOptionUseCase {
+    func makeFetchFolderSortOptionUseCase() -> FetchFolderSortOptionUseCase {
         DefaultFetchFolderSortOptionUseCase(userDefaults: userDefaults)
     }
 
@@ -320,8 +320,8 @@ final class DIContainer {
         FolderReactor(
             folder: folder,
             fetchFolderUseCase: makeFetchFolderUseCase(),
-            fetchFolderSortOptionUseCase: makeFetchFolderSortUseCase(),
-            fetchClipSortOptionUseCase: makeFetchClipSortUseCase(),
+            fetchFolderSortOptionUseCase: makeFetchFolderSortOptionUseCase(),
+            fetchClipSortOptionUseCase: makeFetchClipSortOptionUseCase(),
             sortFoldersUseCase: makeSortFoldersUseCase(),
             sortClipsUseCase: makeSortClipsUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
@@ -395,8 +395,8 @@ final class DIContainer {
         MyPageReactor(
             loginUseCase: makeLoginUseCase(),
             fetchThemeUseCase: makeFetchThemeUseCase(),
-            fetchFolderSortUseCase: makeFetchFolderSortUseCase(),
-            fetchClipSortUseCase: makeFetchClipSortUseCase(),
+            fetchFolderSortUseCase: makeFetchFolderSortOptionUseCase(),
+            fetchClipSortUseCase: makeFetchClipSortOptionUseCase(),
             fetchSavePathLayoutUseCase: makeFetchSavePathLayoutUseCase(),
             logoutUseCase: makeLogoutUseCase(),
             withdrawUseCase: makeWithdrawUseCase()
