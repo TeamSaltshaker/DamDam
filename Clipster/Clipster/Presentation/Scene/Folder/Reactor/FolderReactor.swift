@@ -13,7 +13,7 @@ final class FolderReactor: Reactor {
     }
 
     enum Mutation {
-        case reloadFolder(Folder)
+        case fetchFolder(Folder)
         case setPhase(Phase)
         case setRoute(Route)
     }
@@ -98,7 +98,7 @@ final class FolderReactor: Reactor {
         case .viewWillAppear:
             return .concat(
                 .just(.setPhase(.loading)),
-                reloadFolderMutation(),
+                fetchFolderMutation(),
                 .just(.setPhase(.success)),
             )
         case .didTapCell(let indexPath):
@@ -143,7 +143,7 @@ final class FolderReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 deleteMutation(at: indexPath),
-                reloadFolderMutation(),
+                fetchFolderMutation(),
             )
         }
     }
@@ -152,7 +152,7 @@ final class FolderReactor: Reactor {
         var newState = state
 
         switch mutation {
-        case .reloadFolder(let folder):
+        case .fetchFolder(let folder):
             self.folder = folder
             newState.currentFolderTitle = folder.title
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
@@ -169,7 +169,7 @@ final class FolderReactor: Reactor {
 }
 
 private extension FolderReactor {
-    func reloadFolderMutation() -> Observable<Mutation> {
+    func fetchFolderMutation() -> Observable<Mutation> {
         .fromAsync { [weak self] in
             guard let self else {
                 let message = DomainError.unknownError.localizedDescription
@@ -189,7 +189,7 @@ private extension FolderReactor {
                 updatedAt: folder.updatedAt,
                 deletedAt: folder.deletedAt,
             )
-            return .reloadFolder(sortedFolder)
+            return .fetchFolder(sortedFolder)
         }
         .catch { error in
             .just(.setPhase(.error(error.localizedDescription)))
