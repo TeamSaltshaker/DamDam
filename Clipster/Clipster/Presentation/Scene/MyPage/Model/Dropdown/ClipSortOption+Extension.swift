@@ -35,3 +35,30 @@ extension ClipSortOption {
         }
     }
 }
+
+extension ClipSortOption: SortableOption {
+    func toggled() -> ClipSortOption {
+        switch self {
+        case .title(let dir):
+            return .title(dir == .ascending ? .descending : .ascending)
+        case .lastVisitedAt(let dir):
+            return .lastVisitedAt(dir == .ascending ? .descending : .ascending)
+        case .createdAt(let dir):
+            return .createdAt(dir == .ascending ? .descending : .ascending)
+        case .updatedAt(let dir):
+            return .updatedAt(dir == .ascending ? .descending : .ascending)
+        }
+    }
+
+    func isSameSortBasis(as other: ClipSortOption) -> Bool {
+        switch (self, other) {
+        case (.title, .title),
+             (.lastVisitedAt, .lastVisitedAt),
+             (.createdAt, .createdAt),
+             (.updatedAt, .updatedAt):
+            return true
+        default:
+            return false
+        }
+    }
+}
