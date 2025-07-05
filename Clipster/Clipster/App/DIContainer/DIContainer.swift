@@ -242,7 +242,7 @@ final class DIContainer {
     }
 
     func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase()
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
     }
 
     func makeParseURLUseCase() -> ParseURLUseCase {
