@@ -5,6 +5,10 @@ import RxSwift
 final class FolderReactorTests: XCTestCase {
     private var folder: Folder!
     private var fetchFolderUseCase: FetchFolderUseCase!
+    private var fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase!
+    private var fetchClipSortOptionUseCase: FetchClipSortOptionUseCase!
+    private var sortFoldersUseCase: SortFoldersUseCase!
+    private var sortClipsUseCase: SortClipsUseCase!
     private var deleteFolderUseCase: DeleteFolderUseCase!
     private var visitClipUseCase: VisitClipUseCase!
     private var deleteClipUseCase: DeleteClipUseCase!
@@ -15,12 +19,20 @@ final class FolderReactorTests: XCTestCase {
         super.setUp()
         folder = MockFolder.someFolder
         fetchFolderUseCase = MockFetchFolderUseCase()
+        fetchFolderSortOptionUseCase = MockFetchFolderSortOptionUseCase()
+        fetchClipSortOptionUseCase = MockFetchClipSortOptionUseCase()
+        sortFoldersUseCase = MockSortFoldersUseCase()
+        sortClipsUseCase = MockSortClipsUseCase()
         deleteFolderUseCase = MockDeleteFolderUseCase()
         visitClipUseCase = MockVisitClipUseCase()
         deleteClipUseCase = MockDeleteClipUseCase()
         reactor = FolderReactor(
             folder: folder,
             fetchFolderUseCase: fetchFolderUseCase,
+            fetchFolderSortOptionUseCase: fetchFolderSortOptionUseCase,
+            fetchClipSortOptionUseCase: fetchClipSortOptionUseCase,
+            sortFoldersUseCase: sortFoldersUseCase,
+            sortClipsUseCase: sortClipsUseCase,
             deleteFolderUseCase: deleteFolderUseCase,
             visitClipUseCase: visitClipUseCase,
             deleteClipUseCase: deleteClipUseCase,
@@ -34,6 +46,10 @@ final class FolderReactorTests: XCTestCase {
         deleteClipUseCase = nil
         visitClipUseCase = nil
         deleteFolderUseCase = nil
+        sortClipsUseCase = nil
+        sortFoldersUseCase = nil
+        fetchClipSortOptionUseCase = nil
+        fetchFolderSortOptionUseCase = nil
         fetchFolderUseCase = nil
         folder = nil
         super.tearDown()
@@ -46,6 +62,10 @@ final class FolderReactorTests: XCTestCase {
         XCTAssertEqual(reactor.currentState.phase, .idle)
         XCTAssertNil(reactor.currentState.route)
         XCTAssertFalse((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
+        XCTAssertFalse((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
+        XCTAssertFalse((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
+        XCTAssertFalse((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
+        XCTAssertFalse((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
     }
 
     func test_viewWillAppear_이후진입() {
@@ -69,6 +89,10 @@ final class FolderReactorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
+        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
+        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
     }
 
     func test_폴더_셀_탭() {
@@ -309,6 +333,10 @@ final class FolderReactorTests: XCTestCase {
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
         XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
+        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
+        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
     }
 
     func test_클립_삭제_탭() {
@@ -333,6 +361,10 @@ final class FolderReactorTests: XCTestCase {
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
         XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
+        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
+        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
+        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
     }
 
     func test_유효하지_않은_삭제_탭() {
@@ -356,6 +388,10 @@ final class FolderReactorTests: XCTestCase {
         XCTAssertFalse((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
         XCTAssertFalse((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
         XCTAssertFalse((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
+        XCTAssertFalse((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
+        XCTAssertFalse((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
+        XCTAssertFalse((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
+        XCTAssertFalse((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
     }
 }
 
