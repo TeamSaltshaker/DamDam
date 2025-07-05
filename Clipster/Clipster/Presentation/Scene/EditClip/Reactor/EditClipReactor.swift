@@ -29,7 +29,7 @@ final class EditClipReactor: Reactor {
         case updateCurrentFolder(Folder?)
         case updateIsSuccessedEditClip(Bool)
         case updateIsLoading(Bool)
-        case updateIsShowKeyboard(Bool)
+        case updateShouldReadPastedboardURL(Bool)
     }
 
     struct State {
@@ -50,7 +50,7 @@ final class EditClipReactor: Reactor {
         var isURLValid = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
-        var isShowKeyboard: Bool = false
+        var shouldReadPastedboardURL: Bool = false
     }
 
     var initialState: State
@@ -216,7 +216,7 @@ final class EditClipReactor: Reactor {
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         case .viewDidAppear:
-            return .just(.updateIsShowKeyboard(true))
+            return .just(.updateShouldReadPastedboardURL(true))
         }
     }
 
@@ -277,8 +277,8 @@ final class EditClipReactor: Reactor {
             newState.isHiddenURLValidationStackView = currentState.urlString.isEmpty
             newState.urlValidationImageResource = .none
             newState.isHiddenURLValidationStackView = false
-        case .updateIsShowKeyboard(let value):
-            newState.isShowKeyboard = value
+        case .updateShouldReadPastedboardURL(let value):
+            newState.shouldReadPastedboardURL = value
         }
         return newState
     }
