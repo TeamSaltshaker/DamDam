@@ -17,7 +17,12 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        showTab()
+        let hasSeen = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+        if hasSeen {
+            showTab()
+        } else {
+            showOnboarding()
+        }
     }
 }
 
@@ -29,6 +34,19 @@ extension AppCoordinator {
         )
         addChild(tabBarCoordinator)
         tabBarCoordinator.start()
+    }
+
+    func showOnboarding() {
+        let onboardingVC = OnboardingViewController()
+        onboardingVC.onFinish = { [weak self] in
+            guard let self else { return }
+
+            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            navigationController.dismiss(animated: true)
+            showTab()
+        }
+        onboardingVC.modalPresentationStyle = .fullScreen
+        navigationController.present(onboardingVC, animated: false)
     }
 
     func handleSharedURL(_ urlString: String) {
