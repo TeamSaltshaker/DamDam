@@ -25,6 +25,26 @@ extension MyPageCoordinator {
         navigationController.pushViewController(vc, animated: true)
     }
 
+    func showSelectTheme(
+        current: ThemeOption,
+        options: [ThemeOption],
+        onSelect: @escaping (ThemeOption) -> Void
+    ) {
+        let vc = SingleOptionSelectorViewController<ThemeOption>(
+            title: "테마",
+            options: options,
+            selected: current,
+            onSelect: onSelect
+        )
+
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
+        }
+
+        navigationController.present(vc, animated: true)
+    }
+
     func showAppSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)

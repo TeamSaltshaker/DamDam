@@ -5,16 +5,19 @@ final class MyPageReactor: Reactor {
     enum Action {
         case viewWillAppear
         case tapCell(MyPageItem)
+        case changeTheme(ThemeOption)
     }
 
     enum Mutation {
         case setSectionModel([MyPageSectionModel])
+        case setIsScrollToTop(Bool)
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
 
     struct State {
         var sectionModel: [MyPageSectionModel] = []
+        @Pulse var isScrollToTop: Bool = false
         @Pulse var phase: Phase = .idle
         @Pulse var route: Route?
 
@@ -58,6 +61,7 @@ final class MyPageReactor: Reactor {
     private let fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase
     private let logoutUseCase: LogoutUseCase
     private let withdrawUseCase: WithdrawUseCase
+    private let saveThemeOptionUseCase: SaveThemeOptionUseCase
 
     init(
         loginUseCase: LoginUseCase,
@@ -66,7 +70,8 @@ final class MyPageReactor: Reactor {
         fetchClipSortUseCase: FetchClipSortOptionUseCase,
         fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase,
         logoutUseCase: LogoutUseCase,
-        withdrawUseCase: WithdrawUseCase
+        withdrawUseCase: WithdrawUseCase,
+        saveThemeOptionUseCase: SaveThemeOptionUseCase
     ) {
         self.loginUseCase = loginUseCase
         self.fetchThemeUseCase = fetchThemeUseCase
@@ -75,6 +80,7 @@ final class MyPageReactor: Reactor {
         self.fetchSavePathLayoutUseCase = fetchSavePathLayoutUseCase
         self.logoutUseCase = logoutUseCase
         self.withdrawUseCase = withdrawUseCase
+        self.saveThemeOptionUseCase = saveThemeOptionUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -112,6 +118,7 @@ final class MyPageReactor: Reactor {
                         guard let self else { throw DomainError.unknownError }
                         return try await makeAccountItemMutation(item: accountItem)
                     },
+                    .just(.setIsScrollToTop(true)),
                     .just(.setPhase(.success))
                 )
                 .catch {
@@ -119,6 +126,17 @@ final class MyPageReactor: Reactor {
                 }
             default:
                 return .empty()
+            }
+        case .changeTheme(let option):
+            return .fromAsync { [weak self] in
+                guard let self else { throw DomainError.unknownError }
+                _ = try await saveThemeOptionUseCase.execute(option).get()
+                let sectionModels = replacingThemeItem(with: option, in: currentState.sectionModel)
+                print(sectionModels)
+                return .setSectionModel(sectionModels)
+            }
+            .catch {
+                .just(.setPhase(.error($0.localizedDescription)))
             }
         }
     }
@@ -128,6 +146,8 @@ final class MyPageReactor: Reactor {
         switch mutation {
         case .setSectionModel(let model):
             newState.sectionModel = model
+        case .setIsScrollToTop(let isScrollToTop):
+            newState.isScrollToTop = isScrollToTop
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):
@@ -267,6 +287,28 @@ private extension MyPageReactor {
             _ = try await withdrawUseCase.execute().get()
             let sectionModetls = try await makeSectionModels(isLogin: false)
             return .setSectionModel(sectionModetls)
+        }
+    }
+}
+
+private extension MyPageReactor {
+    func replacingThemeItem(
+        with newOption: ThemeOption,
+        in models: [MyPageSectionModel]
+    ) -> [MyPageSectionModel] {
+        models.map { section in
+            if let index = section.items.firstIndex(where: {
+                if case .detail(.theme) = $0 {
+                    return true
+                }
+                return false
+            }) {
+                var newItems = section.items
+                newItems[index] = .detail(.theme(newOption))
+                return MyPageSectionModel(section: section.section, items: newItems)
+            } else {
+                return section
+            }
         }
     }
 }
