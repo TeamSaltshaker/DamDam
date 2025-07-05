@@ -13,7 +13,7 @@ final class FolderReactor: Reactor {
     }
 
     enum Mutation {
-        case reloadFolder(Folder)
+        case fetchFolder(Folder)
         case setPhase(Phase)
         case setRoute(Route)
     }
@@ -51,9 +51,12 @@ final class FolderReactor: Reactor {
 
     let initialState: State
     private var folder: Folder
-    private var isFirstAppear = true
 
     private let fetchFolderUseCase: FetchFolderUseCase
+    private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
+    private let fetchClipSortOptionUseCase: FetchClipSortOptionUseCase
+    private let sortFoldersUseCase: SortFoldersUseCase
+    private let sortClipsUseCase: SortClipsUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let visitClipUseCase: VisitClipUseCase
     private let deleteClipUseCase: DeleteClipUseCase
@@ -61,21 +64,29 @@ final class FolderReactor: Reactor {
     init(
         folder: Folder,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase,
+        fetchClipSortOptionUseCase: FetchClipSortOptionUseCase,
+        sortFoldersUseCase: SortFoldersUseCase,
+        sortClipsUseCase: SortClipsUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
         visitClipUseCase: VisitClipUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchFolderSortOptionUseCase = fetchFolderSortOptionUseCase
+        self.fetchClipSortOptionUseCase = fetchClipSortOptionUseCase
+        self.sortFoldersUseCase = sortFoldersUseCase
+        self.sortClipsUseCase = sortClipsUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         self.visitClipUseCase = visitClipUseCase
         self.deleteClipUseCase = deleteClipUseCase
 
         initialState = State(
-            currentFolderTitle: folder.title,
-            folders: folder.folders.map { FolderDisplayMapper.map($0) },
-            clips: folder.clips.map { ClipDisplayMapper.map($0) },
-            isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
+            currentFolderTitle: "",
+            folders: [],
+            clips: [],
+            isEmptyViewHidden: true,
             phase: .idle,
         )
     }
@@ -85,13 +96,9 @@ final class FolderReactor: Reactor {
 
         switch action {
         case .viewWillAppear:
-            if isFirstAppear {
-                isFirstAppear = false
-                return .empty()
-            }
             return .concat(
                 .just(.setPhase(.loading)),
-                reloadFolderMutation(),
+                fetchFolderMutation(),
                 .just(.setPhase(.success)),
             )
         case .didTapCell(let indexPath):
@@ -136,7 +143,7 @@ final class FolderReactor: Reactor {
             return .concat(
                 .just(.setPhase(.loading)),
                 deleteMutation(at: indexPath),
-                reloadFolderMutation(),
+                fetchFolderMutation(),
             )
         }
     }
@@ -145,7 +152,7 @@ final class FolderReactor: Reactor {
         var newState = state
 
         switch mutation {
-        case .reloadFolder(let folder):
+        case .fetchFolder(let folder):
             self.folder = folder
             newState.currentFolderTitle = folder.title
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
@@ -162,14 +169,27 @@ final class FolderReactor: Reactor {
 }
 
 private extension FolderReactor {
-    func reloadFolderMutation() -> Observable<Mutation> {
+    func fetchFolderMutation() -> Observable<Mutation> {
         .fromAsync { [weak self] in
             guard let self else {
                 let message = DomainError.unknownError.localizedDescription
                 return .setPhase(.error(message))
             }
             let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
-            return .reloadFolder(folder)
+            let folderSortOption = try await fetchFolderSortOptionUseCase.execute().get()
+            let clipSortOption = try await fetchClipSortOptionUseCase.execute().get()
+            let sortedFolder = Folder(
+                id: folder.id,
+                parentFolderID: folder.parentFolderID,
+                title: folder.title,
+                depth: folder.depth,
+                folders: sortFoldersUseCase.execute(folder.folders, by: folderSortOption),
+                clips: sortClipsUseCase.execute(folder.clips, by: clipSortOption),
+                createdAt: folder.createdAt,
+                updatedAt: folder.updatedAt,
+                deletedAt: folder.deletedAt,
+            )
+            return .fetchFolder(sortedFolder)
         }
         .catch { error in
             .just(.setPhase(.error(error.localizedDescription)))
