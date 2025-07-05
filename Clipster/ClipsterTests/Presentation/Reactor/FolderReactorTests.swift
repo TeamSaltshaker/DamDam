@@ -4,14 +4,14 @@ import RxSwift
 
 final class FolderReactorTests: XCTestCase {
     private var folder: Folder!
-    private var fetchFolderUseCase: FetchFolderUseCase!
-    private var fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase!
-    private var fetchClipSortOptionUseCase: FetchClipSortOptionUseCase!
-    private var sortFoldersUseCase: SortFoldersUseCase!
-    private var sortClipsUseCase: SortClipsUseCase!
-    private var deleteFolderUseCase: DeleteFolderUseCase!
-    private var visitClipUseCase: VisitClipUseCase!
-    private var deleteClipUseCase: DeleteClipUseCase!
+    private var fetchFolderUseCase: MockFetchFolderUseCase!
+    private var fetchFolderSortOptionUseCase: MockFetchFolderSortOptionUseCase!
+    private var fetchClipSortOptionUseCase: MockFetchClipSortOptionUseCase!
+    private var sortFoldersUseCase: MockSortFoldersUseCase!
+    private var sortClipsUseCase: MockSortClipsUseCase!
+    private var deleteFolderUseCase: MockDeleteFolderUseCase!
+    private var visitClipUseCase: MockVisitClipUseCase!
+    private var deleteClipUseCase: MockDeleteClipUseCase!
     private var reactor: FolderReactor!
     private var disposeBag: DisposeBag!
 
@@ -61,11 +61,11 @@ final class FolderReactorTests: XCTestCase {
 
         XCTAssertEqual(reactor.currentState.phase, .idle)
         XCTAssertNil(reactor.currentState.route)
-        XCTAssertFalse((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
-        XCTAssertFalse((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
-        XCTAssertFalse((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
-        XCTAssertFalse((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
-        XCTAssertFalse((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
+        XCTAssertFalse(fetchFolderUseCase.didCallExecute)
+        XCTAssertFalse(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertFalse(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertFalse(sortFoldersUseCase.didCallExecute)
+        XCTAssertFalse(sortClipsUseCase.didCallExecute)
     }
 
     func test_viewWillAppear_이후진입() {
@@ -88,11 +88,11 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
-        XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
-        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
-        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
+        XCTAssertTrue(fetchFolderUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(sortFoldersUseCase.didCallExecute)
+        XCTAssertTrue(sortClipsUseCase.didCallExecute)
     }
 
     func test_폴더_셀_탭() {
@@ -144,7 +144,7 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [phaseExpectation, routeExpectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
-        XCTAssertTrue((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
+        XCTAssertTrue(visitClipUseCase.didCallExecute)
         XCTAssertEqual(routeResult, .webView(folder.clips[0].url))
     }
 
@@ -166,7 +166,7 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResult, .error("Invalid section"))
-        XCTAssertFalse((visitClipUseCase as! MockVisitClipUseCase).didCallExecute)
+        XCTAssertFalse(visitClipUseCase.didCallExecute)
     }
 
     func test_폴더_추가_탭() {
@@ -331,12 +331,12 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
-        XCTAssertTrue((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
-        XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
-        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
-        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
+        XCTAssertTrue(deleteFolderUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(sortFoldersUseCase.didCallExecute)
+        XCTAssertTrue(sortClipsUseCase.didCallExecute)
     }
 
     func test_클립_삭제_탭() {
@@ -359,12 +359,12 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
-        XCTAssertTrue((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
-        XCTAssertTrue((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
-        XCTAssertTrue((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
-        XCTAssertTrue((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
-        XCTAssertTrue((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
+        XCTAssertTrue(deleteClipUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(sortFoldersUseCase.didCallExecute)
+        XCTAssertTrue(sortClipsUseCase.didCallExecute)
     }
 
     func test_유효하지_않은_삭제_탭() {
@@ -385,13 +385,13 @@ final class FolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResult, .error("Invalid section"))
-        XCTAssertFalse((deleteFolderUseCase as! MockDeleteFolderUseCase).didCallExecute)
-        XCTAssertFalse((deleteClipUseCase as! MockDeleteClipUseCase).didCallExecute)
-        XCTAssertFalse((fetchFolderUseCase as! MockFetchFolderUseCase).didCallExecute)
-        XCTAssertFalse((fetchFolderSortOptionUseCase as! MockFetchFolderSortOptionUseCase).didCallExecute)
-        XCTAssertFalse((fetchClipSortOptionUseCase as! MockFetchClipSortOptionUseCase).didCallExecute)
-        XCTAssertFalse((sortFoldersUseCase as! MockSortFoldersUseCase).didCallExecute)
-        XCTAssertFalse((sortClipsUseCase as! MockSortClipsUseCase).didCallExecute)
+        XCTAssertFalse(deleteFolderUseCase.didCallExecute)
+        XCTAssertFalse(deleteClipUseCase.didCallExecute)
+        XCTAssertFalse(fetchFolderUseCase.didCallExecute)
+        XCTAssertFalse(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertFalse(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertFalse(sortFoldersUseCase.didCallExecute)
+        XCTAssertFalse(sortClipsUseCase.didCallExecute)
     }
 }
 
