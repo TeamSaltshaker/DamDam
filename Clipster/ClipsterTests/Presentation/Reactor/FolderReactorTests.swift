@@ -55,20 +55,7 @@ final class FolderReactorTests: XCTestCase {
         super.tearDown()
     }
 
-    func test_viewWillAppear_최초진입() {
-        reactor.action.onNext(.viewWillAppear)
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 1.0))
-
-        XCTAssertEqual(reactor.currentState.phase, .idle)
-        XCTAssertNil(reactor.currentState.route)
-        XCTAssertFalse(fetchFolderUseCase.didCallExecute)
-        XCTAssertFalse(fetchFolderSortOptionUseCase.didCallExecute)
-        XCTAssertFalse(fetchClipSortOptionUseCase.didCallExecute)
-        XCTAssertFalse(sortFoldersUseCase.didCallExecute)
-        XCTAssertFalse(sortClipsUseCase.didCallExecute)
-    }
-
-    func test_viewWillAppear_이후진입() {
+    func test_viewWillAppear() {
         let expectation = expectation(description: #function)
         var phaseResults = [FolderReactor.Phase]()
 
@@ -83,7 +70,6 @@ final class FolderReactorTests: XCTestCase {
             }
             .disposed(by: disposeBag)
 
-        reactor.action.onNext(.viewWillAppear)
         reactor.action.onNext(.viewWillAppear)
 
         wait(for: [expectation], timeout: 1.0)
