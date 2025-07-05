@@ -51,7 +51,6 @@ final class FolderReactor: Reactor {
 
     let initialState: State
     private var folder: Folder
-    private var isFirstAppear = true
 
     private let fetchFolderUseCase: FetchFolderUseCase
     private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
@@ -84,10 +83,10 @@ final class FolderReactor: Reactor {
         self.deleteClipUseCase = deleteClipUseCase
 
         initialState = State(
-            currentFolderTitle: folder.title,
-            folders: folder.folders.map { FolderDisplayMapper.map($0) },
-            clips: folder.clips.map { ClipDisplayMapper.map($0) },
-            isEmptyViewHidden: !folder.folders.isEmpty || !folder.clips.isEmpty,
+            currentFolderTitle: "",
+            folders: [],
+            clips: [],
+            isEmptyViewHidden: true,
             phase: .idle,
         )
     }
@@ -97,10 +96,6 @@ final class FolderReactor: Reactor {
 
         switch action {
         case .viewWillAppear:
-            if isFirstAppear {
-                isFirstAppear = false
-                return .empty()
-            }
             return .concat(
                 .just(.setPhase(.loading)),
                 reloadFolderMutation(),
