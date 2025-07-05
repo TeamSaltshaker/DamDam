@@ -333,7 +333,11 @@ final class DIContainer {
             fetchTopLevelClipsUseCase: makeFetchTopLevelClipsUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
-            visitClipUseCase: makeVisitClipUseCase()
+            visitClipUseCase: makeVisitClipUseCase(),
+            fetchClipSortOptionUseCase: makeFetchClipSortUseCase(),
+            fetchFolderSortOptionUseCase: makeFetchFolderSortUseCase(),
+            sortClipsUseCase: makeSortClipsUseCase(),
+            SortFoldersUseCase: makeSortFoldersUseCase()
         )
     }
 

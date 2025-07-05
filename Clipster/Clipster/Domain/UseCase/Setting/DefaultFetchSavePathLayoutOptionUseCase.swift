@@ -11,7 +11,7 @@ final class DefaultFetchSavePathLayoutOptionUseCase: FetchSavePathLayoutOptionUs
     func execute() async -> Result<SavePathOption, Error> {
         let raw = userDefaults.integer(forKey: key)
         guard let option = SavePathOption(rawValue: raw) else {
-            return .success(.skip)
+            return .success(.expand)
         }
 
         return .success(option)
