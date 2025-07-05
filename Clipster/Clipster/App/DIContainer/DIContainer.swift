@@ -387,8 +387,8 @@ final class DIContainer {
             searchFoldersUseCase: makeSearchFoldersUseCase(),
             searchClipsUseCase: makeSearchClipsUseCase(),
             visitClipUseCase: makeVisitClipUseCase(),
-            fetchFolderSortOptionUseCase: makeFetchFolderSortUseCase(),
-            fetchClipSortOptionUseCase: makeFetchClipSortUseCase(),
+            fetchFolderSortOptionUseCase: makeFetchFolderSortOptionUseCase(),
+            fetchClipSortOptionUseCase: makeFetchClipSortOptionUseCase(),
             sortFoldersUseCase: makeSortFoldersUseCase(),
             sortClipsUseCase: makeSortClipsUseCase()
         )
