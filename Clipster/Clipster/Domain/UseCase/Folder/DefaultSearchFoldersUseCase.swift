@@ -6,7 +6,7 @@ final class DefaultSearchFoldersUseCase: SearchFoldersUseCase {
         }
 
         return folders.filter {
-            $0.title.localizedCaseInsensitiveContains(query)
+            $0.title.localizedCaseInsensitiveContains(trimmedQuery)
         }
     }
 }

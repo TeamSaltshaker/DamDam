@@ -7,8 +7,8 @@ final class DefaultSearchClipsUseCase: SearchClipsUseCase {
 
         return clips.filter {
             $0.url.absoluteString.localizedCaseInsensitiveContains(trimmedQuery) ||
-            $0.title.localizedCaseInsensitiveContains(query) ||
-            $0.memo.localizedCaseInsensitiveContains(query)
+            $0.title.localizedCaseInsensitiveContains(trimmedQuery) ||
+            $0.memo.localizedCaseInsensitiveContains(trimmedQuery)
         }
     }
 }
