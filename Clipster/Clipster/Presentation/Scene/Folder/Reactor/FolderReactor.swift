@@ -54,6 +54,10 @@ final class FolderReactor: Reactor {
     private var isFirstAppear = true
 
     private let fetchFolderUseCase: FetchFolderUseCase
+    private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
+    private let fetchClipSortOptionUseCase: FetchClipSortOptionUseCase
+    private let sortFoldersUseCase: SortFoldersUseCase
+    private let sortClipsUseCase: SortClipsUseCase
     private let deleteFolderUseCase: DeleteFolderUseCase
     private let visitClipUseCase: VisitClipUseCase
     private let deleteClipUseCase: DeleteClipUseCase
@@ -61,12 +65,20 @@ final class FolderReactor: Reactor {
     init(
         folder: Folder,
         fetchFolderUseCase: FetchFolderUseCase,
+        fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase,
+        fetchClipSortOptionUseCase: FetchClipSortOptionUseCase,
+        sortFoldersUseCase: SortFoldersUseCase,
+        sortClipsUseCase: SortClipsUseCase,
         deleteFolderUseCase: DeleteFolderUseCase,
         visitClipUseCase: VisitClipUseCase,
         deleteClipUseCase: DeleteClipUseCase,
     ) {
         self.folder = folder
         self.fetchFolderUseCase = fetchFolderUseCase
+        self.fetchFolderSortOptionUseCase = fetchFolderSortOptionUseCase
+        self.fetchClipSortOptionUseCase = fetchClipSortOptionUseCase
+        self.sortFoldersUseCase = sortFoldersUseCase
+        self.sortClipsUseCase = sortClipsUseCase
         self.deleteFolderUseCase = deleteFolderUseCase
         self.visitClipUseCase = visitClipUseCase
         self.deleteClipUseCase = deleteClipUseCase
@@ -169,7 +181,20 @@ private extension FolderReactor {
                 return .setPhase(.error(message))
             }
             let folder = try await fetchFolderUseCase.execute(id: folder.id).get()
-            return .reloadFolder(folder)
+            let folderSortOption = try await fetchFolderSortOptionUseCase.execute().get()
+            let clipSortOption = try await fetchClipSortOptionUseCase.execute().get()
+            let sortedFolder = Folder(
+                id: folder.id,
+                parentFolderID: folder.parentFolderID,
+                title: folder.title,
+                depth: folder.depth,
+                folders: sortFoldersUseCase.execute(folder.folders, by: folderSortOption),
+                clips: sortClipsUseCase.execute(folder.clips, by: clipSortOption),
+                createdAt: folder.createdAt,
+                updatedAt: folder.updatedAt,
+                deletedAt: folder.deletedAt,
+            )
+            return .reloadFolder(sortedFolder)
         }
         .catch { error in
             .just(.setPhase(.error(error.localizedDescription)))
