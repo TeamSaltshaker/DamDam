@@ -34,13 +34,6 @@ final class ClipListCell: UICollectionViewListCell {
         return stackView
     }()
 
-    private let chevronImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = .chevronRight
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-
     private let visitIndicatorView: UIView = {
         let view = UIView()
         view.backgroundColor = .blue600
@@ -74,8 +67,9 @@ final class ClipListCell: UICollectionViewListCell {
         } else {
             thumbnailImageView.image = .none
         }
+
         titleLabel.text = display.urlMetadata.title
-        memoLabel.text = display.memo
+        memoLabel.text = display.isShowSubTitle ? display.subTitle : display.memo
         visitIndicatorView.isHidden = display.isVisited
     }
 }
@@ -99,7 +93,6 @@ private extension ClipListCell {
         [
             thumbnailImageView,
             stackView,
-            chevronImageView,
             visitIndicatorView
         ].forEach { contentView.addSubview($0) }
     }
@@ -107,7 +100,7 @@ private extension ClipListCell {
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(12)
-            make.leading.equalToSuperview().inset(44)
+            make.leading.equalToSuperview().inset(40)
             make.bottom.equalToSuperview().inset(12).priority(.high)
             make.width.equalTo(64)
             make.height.equalTo(48)
@@ -115,13 +108,7 @@ private extension ClipListCell {
 
         stackView.snp.makeConstraints { make in
             make.leading.equalTo(thumbnailImageView.snp.trailing).offset(16)
-            make.centerY.equalToSuperview()
-        }
-
-        chevronImageView.snp.makeConstraints { make in
-            make.leading.equalTo(stackView.snp.trailing).offset(16)
-            make.trailing.equalToSuperview().inset(20)
-            make.size.equalTo(24)
+            make.trailing.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
         }
 

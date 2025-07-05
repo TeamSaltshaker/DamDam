@@ -5,7 +5,7 @@ final class AddFAButton: UIButton {
         let button = UIButton()
         button.backgroundColor = .blue600
         button.setImage(.plus.withTintColor(.white900), for: .normal)
-        button.layer.cornerRadius = 24
+        button.layer.cornerRadius = 28
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.15
         button.layer.shadowRadius = 8
@@ -72,12 +72,12 @@ private extension AddFAButton {
 
     func setConstraints() {
         self.snp.makeConstraints { make in
-            make.size.equalTo(60)
+            make.size.equalTo(68)
         }
 
         innerButton.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.size.equalTo(48)
+            make.size.equalTo(56)
         }
     }
 }

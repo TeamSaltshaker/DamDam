@@ -326,7 +326,7 @@ private extension FolderView {
 
         addButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(18)
-            make.bottom.equalToSuperview().inset(28)
+            make.bottom.equalToSuperview().inset(24)
         }
 
         collectionView.snp.makeConstraints { make in

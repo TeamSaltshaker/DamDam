@@ -92,7 +92,7 @@ private extension FolderListCell {
     func setConstraints() {
         folderImageContainerView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(12)
-            make.leading.equalToSuperview().inset(44)
+            make.leading.equalToSuperview().inset(40)
             make.bottom.equalToSuperview().inset(12).priority(.high)
             make.size.equalTo(48)
         }
