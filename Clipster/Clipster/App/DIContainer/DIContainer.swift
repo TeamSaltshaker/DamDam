@@ -233,6 +233,10 @@ final class DIContainer {
         DefaultSaveFolderSortOptionUseCase(userDefaults: userDefaults)
     }
 
+    func makeSaveSavePathLayoutOptionUseCase() -> SaveSavePathLayoutOptionUseCase {
+        DefaultSaveSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+    }
+
     func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
         DefaultSaveThemeOptionUseCase(userDefaults: userDefaults)
     }
@@ -403,7 +407,8 @@ final class DIContainer {
             fetchSavePathLayoutUseCase: makeFetchSavePathLayoutUseCase(),
             logoutUseCase: makeLogoutUseCase(),
             withdrawUseCase: makeWithdrawUseCase(),
-            saveThemeOptionUseCase: makeSaveThemeUseCase()
+            saveThemeOptionUseCase: makeSaveThemeUseCase(),
+            saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase()
         )
     }
 }

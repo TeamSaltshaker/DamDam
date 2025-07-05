@@ -1,8 +1,8 @@
 import SnapKit
 import UIKit
 
-final class RadioCell: UITableViewCell {
-    private let radioImageView: UIImageView = {
+final class RadioLabelView: UIView {
+    private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .radioUnselected
         imageView.backgroundColor = .clear
@@ -16,8 +16,8 @@ final class RadioCell: UITableViewCell {
         return label
     }()
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configure()
     }
 
@@ -25,13 +25,13 @@ final class RadioCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setDisplay(text: String, isSelected: Bool) {
-        titleLabel.text = text
-        radioImageView.image = isSelected ? .radioSelected : .radioUnselected
+    func setDisplay(title: String, isSelected: Bool) {
+        titleLabel.text = title
+        imageView.image = isSelected ? .radioSelected : .radioUnselected
     }
 }
 
-private extension RadioCell {
+private extension RadioLabelView {
     func configure() {
         setAttributes()
         setHierarchy()
@@ -39,25 +39,30 @@ private extension RadioCell {
     }
 
     func setAttributes() {
-        contentView.backgroundColor = .white900
+        backgroundColor = .clear
     }
 
     func setHierarchy() {
         [
-            radioImageView,
+            imageView,
             titleLabel
-        ].forEach { contentView.addSubview($0) }
+        ].forEach { addSubview($0) }
     }
 
     func setConstraints() {
-        radioImageView.snp.makeConstraints { make in
+        snp.makeConstraints { make in
+            make.height.equalTo(48)
+        }
+
+        imageView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.size.equalTo(48)
             make.centerY.equalToSuperview()
         }
 
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(radioImageView.snp.trailing).offset(4)
+            make.leading.equalTo(imageView.snp.trailing).offset(4)
+            make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
     }

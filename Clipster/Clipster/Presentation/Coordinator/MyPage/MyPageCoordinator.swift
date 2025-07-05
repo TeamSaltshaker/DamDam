@@ -45,6 +45,23 @@ extension MyPageCoordinator {
         navigationController.present(vc, animated: true)
     }
 
+    func showSelectSavePathLayout(
+        current: SavePathOption,
+        onSelect: @escaping (SavePathOption) -> Void
+    ) {
+        let vc = SavePathOptionSelectorViewController(
+            selected: current,
+            onSelect: onSelect
+        )
+
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.custom { $0.maximumDetentValue * 0.4 }]
+        }
+
+        navigationController.present(vc, animated: true)
+    }
+
     func showAppSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)

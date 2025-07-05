@@ -127,8 +127,12 @@ extension MyPageViewController {
                     break
                 case .showSelectClipSort:
                     break
-                case .showSelectSavePathLayout:
-                    break
+                case .showSelectSavePathLayout(let currentOption, _):
+                    coordinator?.showSelectSavePathLayout(
+                        current: currentOption
+                    ) { [weak self] selected in
+                        self?.reactor?.action.onNext(.changeSavePathLayout(selected))
+                    }
                 case .showNotificationSetting:
                     coordinator?.showAppSettings()
                 case .showTrash:
