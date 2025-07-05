@@ -320,6 +320,10 @@ final class DIContainer {
         FolderReactor(
             folder: folder,
             fetchFolderUseCase: makeFetchFolderUseCase(),
+            fetchFolderSortOptionUseCase: makeFetchFolderSortUseCase(),
+            fetchClipSortOptionUseCase: makeFetchClipSortUseCase(),
+            sortFoldersUseCase: makeSortFoldersUseCase(),
+            sortClipsUseCase: makeSortClipsUseCase(),
             deleteFolderUseCase: makeDeleteFolderUseCase(),
             visitClipUseCase: makeVisitClipUseCase(),
             deleteClipUseCase: makeDeleteClipUseCase(),
