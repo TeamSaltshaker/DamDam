@@ -6,15 +6,15 @@ final class SearchReactor: Reactor {
     enum SearchSection: Hashable {
         case recentQueries(headerTitle: String)
         case recentVisitedClips(headerTitle: String)
-        case folderResults(headerTitle: String, count: Int)
-        case clipResults(headerTitle: String, count: Int)
+        case folderResults(headerTitle: String)
+        case clipResults(headerTitle: String)
 
         var title: String {
             switch self {
             case .recentQueries(let headerTitle),
                  .recentVisitedClips(let headerTitle),
-                 .folderResults(let headerTitle, _),
-                 .clipResults(let headerTitle, _):
+                 .folderResults(let headerTitle),
+                 .clipResults(let headerTitle):
                 return headerTitle
             }
         }
@@ -46,7 +46,7 @@ final class SearchReactor: Reactor {
     }
 
     enum Action {
-        case viewDidLoad
+        case viewWillAppear
         case updateQuery(String)
         case endEditingQuery
         case clearButtonTapped
@@ -107,7 +107,6 @@ final class SearchReactor: Reactor {
     private let fetchRecentQueriesUseCase: FetchRecentQueriesUseCase
     private let fetchRecentVisitedClipsUseCase: FetchRecentVisitedClipsUseCase
     private let saveRecentQueryUseCase: SaveRecentQueryUseCase
-    private let saveRecentVisitedClipUseCase: SaveRecentVisitedClipUseCase
     private let deleteRecentQueryUseCase: DeleteRecentQueryUseCase
     private let deleteAllRecentQueriesUseCase: DeleteAllRecentQueriesUseCase
     private let deleteRecentVisitedClipUseCase: DeleteRecentVisitedClipUseCase
@@ -117,9 +116,15 @@ final class SearchReactor: Reactor {
     private let searchFoldersUseCase: SearchFoldersUseCase
     private let searchClipsUseCase: SearchClipsUseCase
     private let visitClipUseCase: VisitClipUseCase
+    private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
+    private let fetchClipSortOptionUseCase: FetchClipSortOptionUseCase
+    private let sortFoldersUseCase: SortFoldersUseCase
+    private let sortClipsUseCase: SortClipsUseCase
 
     private var allFolders: [Folder] = []
     private var allClips: [Clip] = []
+    private var folderSortOption: FolderSortOption = .createdAt(.ascending)
+    private var clipSortOption: ClipSortOption = .createdAt(.descending)
 
     init(
         fetchAllFoldersUseCase: FetchAllFoldersUseCase,
@@ -127,7 +132,6 @@ final class SearchReactor: Reactor {
         fetchRecentQueriesUseCase: FetchRecentQueriesUseCase,
         fetchRecentVisitedClipsUseCase: FetchRecentVisitedClipsUseCase,
         saveRecentQueryUseCase: SaveRecentQueryUseCase,
-        saveRecentVisitedClipUseCase: SaveRecentVisitedClipUseCase,
         deleteRecentQueryUseCase: DeleteRecentQueryUseCase,
         deleteAllRecentQueriesUseCase: DeleteAllRecentQueriesUseCase,
         deleteRecentVisitedClipUseCase: DeleteRecentVisitedClipUseCase,
@@ -136,14 +140,17 @@ final class SearchReactor: Reactor {
         deleteClipUseCase: DeleteClipUseCase,
         searchFoldersUseCase: SearchFoldersUseCase,
         searchClipsUseCase: SearchClipsUseCase,
-        visitClipUseCase: VisitClipUseCase
+        visitClipUseCase: VisitClipUseCase,
+        fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase,
+        fetchClipSortOptionUseCase: FetchClipSortOptionUseCase,
+        sortFoldersUseCase: SortFoldersUseCase,
+        sortClipsUseCase: SortClipsUseCase,
     ) {
         self.fetchAllFoldersUseCase = fetchAllFoldersUseCase
         self.fetchAllClipsUseCase = fetchAllClipsUseCase
         self.fetchRecentQueriesUseCase = fetchRecentQueriesUseCase
         self.fetchRecentVisitedClipsUseCase = fetchRecentVisitedClipsUseCase
         self.saveRecentQueryUseCase = saveRecentQueryUseCase
-        self.saveRecentVisitedClipUseCase = saveRecentVisitedClipUseCase
         self.deleteRecentQueryUseCase = deleteRecentQueryUseCase
         self.deleteAllRecentQueriesUseCase = deleteAllRecentQueriesUseCase
         self.deleteRecentVisitedClipUseCase = deleteRecentVisitedClipUseCase
@@ -153,94 +160,91 @@ final class SearchReactor: Reactor {
         self.searchFoldersUseCase = searchFoldersUseCase
         self.searchClipsUseCase = searchClipsUseCase
         self.visitClipUseCase = visitClipUseCase
+        self.fetchFolderSortOptionUseCase = fetchFolderSortOptionUseCase
+        self.fetchClipSortOptionUseCase = fetchClipSortOptionUseCase
+        self.sortFoldersUseCase = sortFoldersUseCase
+        self.sortClipsUseCase = sortClipsUseCase
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .viewDidLoad:
-            return prepareData()
+        case .viewWillAppear:
+            let query = currentState.query
+            if query.isEmpty {
+                return prepareData()
+            } else {
+                return .concat(
+                    .fromAsync { [weak self] in
+                        guard let self else { return }
+                        allFolders = try await fetchAllFoldersUseCase.execute().get()
+                        allClips = try await fetchAllClipsUseCase.execute().get()
+                        folderSortOption = try await fetchFolderSortOptionUseCase.execute().get()
+                        clipSortOption = try await fetchClipSortOptionUseCase.execute().get()
+                    }
+                    .flatMap { _ -> Observable<Mutation> in .empty() }
+                    .catch { .just(.setPhase(.error($0.localizedDescription))) },
+                    .just(self.executeSearch(with: query))
+                )
+            }
         case .updateQuery(let query):
-            let setQuery = Observable.just(Mutation.setQuery(query))
-            let searchOrLoadInitial = Observable.just(query)
-                .flatMap { [weak self] query -> Observable<Mutation> in
+            let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            let setQuery = Observable.just(Mutation.setQuery(trimmedQuery))
+            let searchOrLoadInitial = Observable.just(trimmedQuery)
+                .flatMap { [weak self] trimmedQuery -> Observable<Mutation> in
                     guard let self else { return .empty() }
 
-                    if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if trimmedQuery.isEmpty {
                         return prepareData()
                     } else {
-                        return .just(executeSearch(with: query))
+                        return .just(executeSearch(with: trimmedQuery))
                     }
                 }
             return .merge(setQuery, searchOrLoadInitial)
         case .endEditingQuery:
             let query = currentState.query
-            guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmedQuery.isEmpty else {
                 return .empty()
             }
-            return .fromAsync { [weak self] in
-                self?.saveRecentQueryUseCase.execute(query)
-            }
-            .flatMap { _ in Observable.empty() }
-            .catch { _ in .empty() }
+            saveRecentQueryUseCase.execute(trimmedQuery)
+            return .empty()
         case .clearButtonTapped:
             return .concat(
                 .just(.setQuery("")),
                 self.prepareData()
             )
         case .deleteRecentQueryTapped(let query):
-            return .concat(
-                .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    self?.deleteRecentQueryUseCase.execute(query)
-                    return .deleteRecentQuery(query)
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
-                .just(.setPhase(.idle))
-            )
+            deleteRecentQueryUseCase.execute(query)
+            return .just(.deleteRecentQuery(query))
         case .deleteAllRecentQueriesTapped:
-            return .concat(
-                .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    self?.deleteAllRecentQueriesUseCase.execute()
-                    return .deleteAllRecentQueries
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
-                .just(.setPhase(.idle))
-            )
+            deleteAllRecentQueriesUseCase.execute()
+            return .just(.deleteAllRecentQueries)
         case .deleteRecentVisitedClipTapped(let clip):
-            return .concat(
-                .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    self?.deleteRecentVisitedClipUseCase.execute(clip.id.uuidString)
-                    return .deleteRecentVisitedClip(clip)
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
-                .just(.setPhase(.idle))
-            )
+            deleteRecentVisitedClipUseCase.execute(clip.id.uuidString)
+            return .just(.deleteRecentVisitedClip(clip))
         case .deleteAllRecentVisitedClipsTapped:
-            return .concat(
-                .just(.setPhase(.loading)),
-                .fromAsync { [weak self] in
-                    self?.deleteAllRecentVisitedClipsUseCase.execute()
-                    return .deleteAllRecentVisitedClips
-                }
-                .catch { .just(.setPhase(.error($0.localizedDescription))) },
-                .just(.setPhase(.idle))
-            )
+            deleteAllRecentVisitedClipsUseCase.execute()
+            return .just(.deleteAllRecentVisitedClips)
         case .itemTapped(let item):
             switch item {
             case .recentQuery(let query):
-                return .concat(
-                    .just(.setQuery(query)),
+                let saveQuery = Observable<Mutation>.fromAsync { [weak self] in
+                    self?.saveRecentQueryUseCase.execute(query)
+                }
+                .flatMap { Observable<Mutation>.empty() }
+                .catch { _ in Observable<Mutation>.empty() }
+
+                let update = Observable.concat(
+                    .just(Mutation.setQuery(query)),
                     .just(executeSearch(with: query))
                 )
+                return .merge(saveQuery, update)
             case .recentVisitedClip(let clipDisplay), .clip(let clipDisplay, _):
                 guard let clip = self.allClips.first(where: { $0.id == clipDisplay.id }) else {
                     return .empty()
                 }
 
                 return .fromAsync { [weak self] in
-                    _ = try await self?.saveRecentVisitedClipUseCase.execute(clip.id).get()
                     _ = try await self?.visitClipUseCase.execute(clip: clip).get()
                     return .setRoute(.showWebView(clip.url))
                 }
@@ -280,35 +284,35 @@ final class SearchReactor: Reactor {
                 guard let folder = self.allFolders.first(where: { $0.id == folderDisplay.id }) else {
                     return .empty()
                 }
-
                 return .concat(
                     .just(.setPhase(.loading)),
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
                         _ = try await deleteFolderUseCase.execute(folder).get()
+                        allFolders.removeAll { $0.id == folder.id }
                         return .deleteFolder(folder)
                     }
                     .catch { .just(.setPhase(.error($0.localizedDescription))) },
                     .just(.setPhase(.idle))
                 )
             case .clip(let clipDisplay, _):
-                guard let clip = self.allClips.first(where: { $0.id == clipDisplay.id }) else {
+                guard let clip = allClips.first(where: { $0.id == clipDisplay.id }) else {
                     return .empty()
                 }
-
                 return .concat(
                     .just(.setPhase(.loading)),
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
                         _ = try await deleteClipUseCase.execute(clip).get()
+                        allClips.removeAll { $0.id == clip.id }
                         return .deleteClip(clip)
                     }
                     .catch { .just(.setPhase(.error($0.localizedDescription))) },
                     .just(.setPhase(.idle))
                 )
-            default: break
+            default:
+                return .empty()
             }
-            return .empty()
         }
     }
 
@@ -354,7 +358,7 @@ final class SearchReactor: Reactor {
                 return newState
             }
             newState.sections[index].items.removeAll {
-                if case .clip(let clipDisplay, _) = $0 { return clipDisplay.id == clip.id }
+                if case .recentVisitedClip(let clipDisplay) = $0 { return clipDisplay.id == clip.id }
                 return false
             }
             if newState.sections[index].items.isEmpty {
@@ -369,22 +373,21 @@ final class SearchReactor: Reactor {
                 return false
             }
         case .deleteFolder(let deletedFolder):
-            allFolders.removeAll { $0.id == deletedFolder.id }
             newState.sections.indices.forEach { index in
                 newState.sections[index].items.removeAll {
                     if case .folder(let folderDisplay, _) = $0 { return folderDisplay.id == deletedFolder.id }
                     return false
                 }
             }
-
+            newState.sections.removeAll { $0.items.isEmpty }
         case .deleteClip(let deletedClip):
-            allClips.removeAll { $0.id == deletedClip.id }
             newState.sections.indices.forEach { index in
                 newState.sections[index].items.removeAll {
                     if case .clip(let clipDisplay, _) = $0 { return clipDisplay.id == deletedClip.id }
                     return false
                 }
             }
+            newState.sections.removeAll { $0.items.isEmpty }
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):
@@ -403,9 +406,13 @@ private extension SearchReactor {
             let clips = try await self.fetchAllClipsUseCase.execute().get()
             let recentQueries = self.fetchRecentQueriesUseCase.execute()
             let recentVisitedClips = try await self.fetchRecentVisitedClipsUseCase.execute().get()
+            let folderSortOption = try await self.fetchFolderSortOptionUseCase.execute().get()
+            let clipSortOption = try await self.fetchClipSortOptionUseCase.execute().get()
 
             self.allFolders = folders
             self.allClips = clips
+            self.folderSortOption = folderSortOption
+            self.clipSortOption = clipSortOption
 
             return (recentQueries, recentVisitedClips)
         }
@@ -419,24 +426,29 @@ private extension SearchReactor {
             }
             return .setSections(sections)
         }
-        .catch { _ in .just(.setSections([])) }
+        .catch { error in
+            .just(.setPhase(.error(error.localizedDescription)))
+        }
     }
 
     private func executeSearch(with query: String) -> Mutation {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let filteredFolders = self.searchFoldersUseCase.execute(query: trimmedQuery, in: self.allFolders)
-        let filteredClips = self.searchClipsUseCase.execute(query: trimmedQuery, in: self.allClips)
+        let filteredFolders = searchFoldersUseCase.execute(query: trimmedQuery, in: allFolders)
+        let filteredClips = searchClipsUseCase.execute(query: trimmedQuery, in: allClips)
 
-        let folderItems = filteredFolders.map { SearchItem.folder(folder: FolderDisplayMapper.map($0), query: query) }
-        let clipItems = filteredClips.map { SearchItem.clip(clip: ClipDisplayMapper.map($0), query: query) }
+        let sortedFolders = sortFoldersUseCase.execute(filteredFolders, by: folderSortOption)
+        let sortedClips = sortClipsUseCase.execute(filteredClips, by: clipSortOption)
+
+        let folderItems = sortedFolders.map { SearchItem.folder(folder: FolderDisplayMapper.map($0), query: trimmedQuery) }
+        let clipItems = sortedClips.map { SearchItem.clip(clip: ClipDisplayMapper.map($0), query: trimmedQuery) }
 
         var sections: [SearchSectionModel] = []
         if !folderItems.isEmpty {
-            sections.append(.init(section: .folderResults(headerTitle: "폴더", count: folderItems.count), items: folderItems))
+            sections.append(.init(section: .folderResults(headerTitle: "폴더"), items: folderItems))
         }
         if !clipItems.isEmpty {
-            sections.append(.init(section: .clipResults(headerTitle: "클립", count: clipItems.count), items: clipItems))
+            sections.append(.init(section: .clipResults(headerTitle: "클립"), items: clipItems))
         }
 
         return .setSections(sections)

@@ -27,9 +27,17 @@ final class SearchViewController: UIViewController, View {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        reactor?.action.onNext(.viewDidLoad)
         configure()
         hideKeyboardWhenTappedBackground()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        reactor?.action.onNext(.viewWillAppear)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        searchView.searchTextField.becomeFirstResponder()
     }
 
     func bind(reactor: Reactor) {
@@ -41,14 +49,8 @@ final class SearchViewController: UIViewController, View {
 
 private extension SearchViewController {
     func bindAction(to reactor: Reactor) {
-        searchView.backButton.rx.tap
-            .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.navigationController?.popViewController(animated: true)
-            }
-            .disposed(by: disposeBag)
-
         searchView.searchTextField.rx.text.orEmpty
+            .skip(1)
             .observe(on: MainScheduler.instance)
             .distinctUntilChanged()
             .map(Reactor.Action.updateQuery)
@@ -196,10 +198,10 @@ private extension SearchViewController {
                     .map { Reactor.Action.deleteAllRecentVisitedClipsTapped }
                     .bind(to: reactor.action)
                     .disposed(by: headerView.disposeBag)
-            case .folderResults(_, let count), .clipResults(_, let count):
+            case .folderResults, .clipResults:
                 headerView.setDeleteAllButtonVisible(false)
                 headerView.setCountLabelVisible(true)
-                headerView.countLabel.text = "\(count)개"
+                headerView.countLabel.text = "\(section.items.count)개"
             }
         }
 
