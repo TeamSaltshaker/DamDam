@@ -14,11 +14,4 @@ extension LoginType {
         case .google: .googleIcon
         }
     }
-
-    var backgroundColor: UIColor {
-        switch self {
-        case .apple: .black50
-        case .google: .clear
-        }
-    }
 }
