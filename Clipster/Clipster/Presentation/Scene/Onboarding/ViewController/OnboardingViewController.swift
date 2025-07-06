@@ -21,7 +21,7 @@ final class OnboardingViewController: UIViewController {
         .init(
             image: .onboardingLongTap,
             title: "롱탭 기능",
-            description: "롱탭을 이용해서 상세정보, 편집,\n그리고 삭제를 할 수 있습니다."
+            description: "길게 탭하여 상세정보, 편집,\n그리고 삭제를 할 수 있습니다."
         ),
         .init(
             image: .onboardingFolder,
