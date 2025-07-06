@@ -138,7 +138,7 @@ private extension FolderView {
             config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
                 let delete = UIContextualAction(
                     style: .destructive,
-                    title: "삭제"
+                    title: nil,
                 ) { [weak self] _, _, completion in
                     self?.performAction(for: indexPath) {
                         .didTapDeleteButton($0, $1.displayTitle)

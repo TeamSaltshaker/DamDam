@@ -291,7 +291,10 @@ private extension SearchViewController {
             case .recentQueries, .recentVisitedClips:
                 return nil
             default:
-                let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { _, _, completion in
+                let deleteAction = UIContextualAction(
+                    style: .destructive,
+                    title: nil,
+                ) { _, _, completion in
                     self.presentDeleteAlert(title: item.title) {
                         self.reactor?.action.onNext(.deleteTapped(item))
                     }
