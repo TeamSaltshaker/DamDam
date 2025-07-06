@@ -9,4 +9,5 @@ struct FolderDTO: Codable {
     var editedAt: Date
     var updatedAt: Date
     var deletedAt: Date?
+    var userID: UUID?
 }
