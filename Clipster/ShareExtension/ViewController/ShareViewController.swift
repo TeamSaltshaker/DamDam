@@ -157,6 +157,8 @@ extension ShareViewController: View {
                     make.bottom.equalToSuperview().inset(bottomInset)
                 }
 
+                shareView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+
                 UIView.animate(withDuration: duration) {
                     self.view.layoutIfNeeded()
                 }
@@ -356,10 +358,11 @@ private extension ShareViewController {
 
     func setConstraints() {
         shareView.snp.makeConstraints { make in
-            make.top.equalToSuperview().priority(.low)
+//            make.top.equalToSuperview().priority(.low)
+            make.top.greaterThanOrEqualToSuperview()
             make.directionalHorizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.equalTo(shareView.scrollContainerView.snp.height).offset(56)
+            make.height.equalTo(shareView.scrollContainerView.snp.height).offset(56).priority(.low)
         }
     }
 }
