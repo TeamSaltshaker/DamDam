@@ -268,7 +268,6 @@ extension ShareViewController: View {
                 vc.modalPresentationStyle = .pageSheet
                 if let sheet = vc.sheetPresentationController {
                     sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
-                    sheet.prefersGrabberVisible = true
                 }
                 self.present(vc, animated: true)
 
