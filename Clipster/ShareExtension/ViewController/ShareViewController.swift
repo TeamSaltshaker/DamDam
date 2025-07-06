@@ -358,7 +358,6 @@ private extension ShareViewController {
 
     func setConstraints() {
         shareView.snp.makeConstraints { make in
-//            make.top.equalToSuperview().priority(.low)
             make.top.greaterThanOrEqualToSuperview()
             make.directionalHorizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
