@@ -63,7 +63,7 @@ final class DefaultFolderService: FolderService {
         do {
             let insertedDTO: FolderDTO = try await client
                 .from("Folders")
-                .insert(dto)
+                .insert(signedDTO(dto))
                 .select()
                 .single()
                 .execute()
@@ -80,7 +80,7 @@ final class DefaultFolderService: FolderService {
         do {
             let updatedDTO: FolderDTO = try await client
                 .from("Folders")
-                .update(dto)
+                .update(signedDTO(dto))
                 .eq("id", value: dto.id)
                 .is("deletedAt", value: nil)
                 .select()
@@ -154,5 +154,21 @@ final class DefaultFolderService: FolderService {
         } catch {
             throw DatabaseError.deleteFailed
         }
+    }
+}
+
+private extension DefaultFolderService {
+    func signedDTO(_ dto: FolderDTO) -> FolderDTO {
+        FolderDTO(
+            id: dto.id,
+            parentID: dto.parentID,
+            title: dto.title,
+            depth: dto.depth,
+            createdAt: dto.createdAt,
+            editedAt: dto.editedAt,
+            updatedAt: dto.updatedAt,
+            deletedAt: dto.deletedAt,
+            userID: client.auth.currentUser?.id,
+        )
     }
 }

@@ -97,7 +97,7 @@ final class DefaultClipService: ClipService {
         do {
             let insertedDTO: ClipDTO = try await client
                 .from("Clips")
-                .insert(dto)
+                .insert(signedDTO(dto))
                 .select()
                 .single()
                 .execute()
@@ -114,7 +114,7 @@ final class DefaultClipService: ClipService {
         do {
             let updatedDTO: ClipDTO = try await client
                 .from("Clips")
-                .update(dto)
+                .update(signedDTO(dto))
                 .eq("id", value: dto.id)
                 .is("deletedAt", value: nil)
                 .select()
@@ -146,5 +146,23 @@ final class DefaultClipService: ClipService {
             print("\(Self.self): ❌ Delete failed. \(error.localizedDescription)")
             return .failure(.deleteFailed)
         }
+    }
+}
+
+private extension DefaultClipService {
+    func signedDTO(_ dto: ClipDTO) -> ClipDTO {
+        ClipDTO(
+            id: dto.id,
+            parentID: dto.parentID,
+            urlString: dto.urlString,
+            title: dto.title,
+            memo: dto.memo,
+            thumbnailImageURLString: dto.thumbnailImageURLString,
+            createdAt: dto.createdAt,
+            lastVisitedAt: dto.lastVisitedAt,
+            editedAt: dto.editedAt,
+            updatedAt: dto.updatedAt,
+            userID: client.auth.currentUser?.id,
+        )
     }
 }
