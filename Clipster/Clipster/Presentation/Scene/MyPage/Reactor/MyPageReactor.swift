@@ -114,8 +114,7 @@ final class MyPageReactor: Reactor {
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
                     guard let self else { throw DomainError.unknownError }
-                    let isLogin = await checkLoginStatusUseCase.execute()
-                    let sectionModels = try await makeSectionModels(isLogin: isLogin)
+                    let sectionModels = try await makeSectionModels(isLogin: false)
                     return .setSectionModel(sectionModels)
                 },
                 .just(.setPhase(.success))
@@ -257,7 +256,7 @@ private extension MyPageReactor {
     func makeSectionModels(isLogin: Bool) async throws -> [MyPageSectionModel] {
         async let specificSections = isLogin
         ? makeUserSpecificSections()
-        : makeGuestSpecificSections()
+        : []
 
         async let sharedSections = makeSharedSections()
         let etcSection = makeEtcSection(isLogin: isLogin)
@@ -310,7 +309,6 @@ private extension MyPageReactor {
                     .detail(.savePath(savePathLayout))
                 ]
             ),
-            .init(section: .notificationSettings, items: [.chevron(.notificationSetting)]),
             .init(section: .support, items: [.chevron(.support)])
         ]
     }
