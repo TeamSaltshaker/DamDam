@@ -5,6 +5,8 @@ final class ShareView: UIView {
     private let baseBackgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .cell
+        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        view.layer.cornerRadius = 16
         return view
     }()
 
