@@ -42,11 +42,11 @@ final class SearchClipRowView: UIView {
     }
 
     func setDisplay(_ clip: ClipDisplay, query: String = "") {
-        if let imageData = clip.urlMetadata.screenshotImageData,
-           let image = UIImage(data: imageData) {
-            thumbnailImageView.image = image
-        } else if let url = clip.urlMetadata.thumbnailImageURL {
-            thumbnailImageView.kf.setImage(with: url)
+        if let thumbnailURL = clip.urlMetadata.thumbnailImageURL {
+            thumbnailImageView.kf.setImage(with: thumbnailURL)
+        } else if let screenshotImageData = clip.urlMetadata.screenshotImageData,
+                  let screenshotImage = UIImage(data: screenshotImageData) {
+            thumbnailImageView.image = screenshotImage
         } else {
             thumbnailImageView.image = .none
         }
