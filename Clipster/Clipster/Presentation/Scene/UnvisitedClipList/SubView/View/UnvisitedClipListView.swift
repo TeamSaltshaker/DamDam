@@ -95,7 +95,7 @@ private extension UnvisitedClipListView {
 
                 let delete = UIContextualAction(
                     style: .destructive,
-                    title: "삭제"
+                    title: nil,
                 ) { [weak self] _, _, completion in
                     self?.action.accept(.delete(
                         index: indexPath.item,

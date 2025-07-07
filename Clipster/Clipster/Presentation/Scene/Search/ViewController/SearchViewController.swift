@@ -291,7 +291,10 @@ private extension SearchViewController {
             case .recentQueries, .recentVisitedClips:
                 return nil
             default:
-                let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { _, _, completion in
+                let deleteAction = UIContextualAction(
+                    style: .destructive,
+                    title: nil,
+                ) { _, _, completion in
                     self.presentDeleteAlert(title: item.title) {
                         self.reactor?.action.onNext(.deleteTapped(item))
                     }
@@ -390,13 +393,13 @@ extension SearchViewController: UICollectionViewDelegate {
 
 private extension SearchViewController {
     func makeEditAction(for item: SearchReactor.SearchItem) -> UIAction {
-        .init(title: "편집", image: .pen) { [weak self] _ in
+        .init(title: "편집", image: .pen.withTintColor(.textPrimary)) { [weak self] _ in
             self?.reactor?.action.onNext(.editTapped(item))
         }
     }
 
     func makeDetailAction(for item: SearchReactor.SearchItem) -> UIAction {
-        .init(title: "상세정보", image: .info) { [weak self] _ in
+        .init(title: "상세정보", image: .info.withTintColor(.textPrimary)) { [weak self] _ in
             self?.reactor?.action.onNext(.detailTapped(item))
         }
     }

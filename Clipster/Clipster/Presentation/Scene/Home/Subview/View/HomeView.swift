@@ -295,7 +295,7 @@ private extension HomeView {
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             let delete = UIContextualAction(
                 style: .destructive,
-                title: "삭제"
+                title: nil,
             ) { [weak self] _, _, completion in
                 self?.performAction(for: indexPath) { .delete(indexPath: $0, title: $1.displayTitle) }
                 completion(true)
