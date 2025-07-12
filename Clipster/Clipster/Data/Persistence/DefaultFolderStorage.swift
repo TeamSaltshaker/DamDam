@@ -53,8 +53,7 @@ final class DefaultFolderStorage: FolderStorage {
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+                        self.filterFolderRecursively(entity)
                     }
 
                     let allFolders = entities.compactMap(self.mapper.folder)
@@ -79,8 +78,7 @@ final class DefaultFolderStorage: FolderStorage {
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+                        self.filterFolderRecursively(entity)
                     }
 
                     let topLevelFolders = entities.compactMap(self.mapper.folder)
