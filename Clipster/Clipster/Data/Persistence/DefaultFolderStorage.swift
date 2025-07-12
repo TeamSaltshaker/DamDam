@@ -42,13 +42,6 @@ final class DefaultFolderStorage: FolderStorage {
         }
     }
 
-    private func filterFolderRecursively(_ entity: FolderEntity) {
-        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
-
-        entity.folders?.forEach { filterFolderRecursively($0) }
-    }
-
     func fetchAllFolders() async -> Result<[Folder], CoreDataError> {
         await withCheckedContinuation { [weak self] continuation in
             guard let self else { return }
@@ -220,8 +213,17 @@ final class DefaultFolderStorage: FolderStorage {
             }
         }
     }
+}
 
-    private func deleteFolder(_ entity: FolderEntity, deletedAt: Date?) {
+private extension DefaultFolderStorage {
+    func filterFolderRecursively(_ entity: FolderEntity) {
+        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
+        entity.folders?.forEach { filterFolderRecursively($0) }
+    }
+
+    func deleteFolder(_ entity: FolderEntity, deletedAt: Date?) {
         entity.deletedAt = deletedAt
 
         entity.folders?
