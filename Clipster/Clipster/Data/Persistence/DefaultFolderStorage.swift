@@ -201,7 +201,7 @@ final class DefaultFolderStorage: FolderStorage {
                         return
                     }
 
-                    self.deleteFolder(entity, deletedAt: folder.deletedAt)
+                    self.deleteFolderRecursively(entity, deletedAt: folder.deletedAt)
 
                     try context.save()
                     print("\(Self.self): ✅ Update successfully")
@@ -223,13 +223,13 @@ private extension DefaultFolderStorage {
         entity.folders?.forEach { filterFolderRecursively($0) }
     }
 
-    func deleteFolder(_ entity: FolderEntity, deletedAt: Date?) {
+    func deleteFolderRecursively(_ entity: FolderEntity, deletedAt: Date?) {
         entity.deletedAt = deletedAt
 
         entity.folders?
             .filter { $0.deletedAt == nil }
             .forEach { subEntity in
-                deleteFolder(subEntity, deletedAt: deletedAt)
+                deleteFolderRecursively(subEntity, deletedAt: deletedAt)
             }
 
         entity.clips?
