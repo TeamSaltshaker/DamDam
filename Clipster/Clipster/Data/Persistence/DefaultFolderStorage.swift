@@ -24,8 +24,8 @@ final class DefaultFolderStorage: FolderStorage {
                         continuation.resume(returning: .failure(.entityNotFound))
                         return
                     }
-                    entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                    entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
+                    self.filterFolderRecursively(entity)
 
                     guard let folder = self.mapper.folder(from: entity) else {
                         print("\(Self.self): ❌ Failed to fetch: Mapping failed")
@@ -40,6 +40,13 @@ final class DefaultFolderStorage: FolderStorage {
                 }
             }
         }
+    }
+
+    private func filterFolderRecursively(_ entity: FolderEntity) {
+        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
+        entity.folders?.forEach { filterFolderRecursively($0) }
     }
 
     func fetchAllFolders() async -> Result<[Folder], CoreDataError> {
