@@ -28,7 +28,7 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
     }
 }
 
-private extension DefaultParseURLUseCase {
+extension DefaultParseURLUseCase {
     func sanitizeURL(urlString: String) -> Result<URL, URLValidationError> {
         let lowercased = urlString.lowercased()
         let correctedURLString: String
