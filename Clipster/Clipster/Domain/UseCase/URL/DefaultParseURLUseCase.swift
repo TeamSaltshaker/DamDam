@@ -63,8 +63,7 @@ extension DefaultParseURLUseCase {
         let ogTitle = extractOGContent(html: html, property: "og:title")
         let title = ogTitle ?? extractHTMLTagContent(html: html, property: "title") ?? "제목 없음"
 
-        let ogDescription = extractOGContent(html: html, property: "og:description")
-        let description = ogDescription ?? extractHTMLTagContent(html: html, property: "description") ?? "내용 없음"
+        let ogDescription = extractOGContent(html: html, property: "og:description") ?? "내용 없음"
 
         var thumbnailImageURL: String?
 
@@ -116,8 +115,12 @@ extension DefaultParseURLUseCase {
     }
 
     func extractYouTubeVideoID(from url: URL) -> String? {
+        if let host = url.host(percentEncoded: false), !host.contains("youtu") {
+            return nil
+        }
+
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-            if components.host?.contains("youtube.com") == true || components.host?.contains("m.youtube.com") == true {
+            if components.host?.contains("youtube.com") == true {
                 if let queryItems = components.queryItems {
                     for item in queryItems {
                         if item.name == "v", let videoID = item.value {
