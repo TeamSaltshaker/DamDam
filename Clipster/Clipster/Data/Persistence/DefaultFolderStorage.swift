@@ -24,8 +24,8 @@ final class DefaultFolderStorage: FolderStorage {
                         continuation.resume(returning: .failure(.entityNotFound))
                         return
                     }
-                    entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                    entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
+                    self.filterFolderRecursively(entity)
 
                     guard let folder = self.mapper.folder(from: entity) else {
                         print("\(Self.self): ❌ Failed to fetch: Mapping failed")
@@ -53,8 +53,7 @@ final class DefaultFolderStorage: FolderStorage {
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+                        self.filterFolderRecursively(entity)
                     }
 
                     let allFolders = entities.compactMap(self.mapper.folder)
@@ -79,8 +78,7 @@ final class DefaultFolderStorage: FolderStorage {
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
-                        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+                        self.filterFolderRecursively(entity)
                     }
 
                     let topLevelFolders = entities.compactMap(self.mapper.folder)
@@ -201,7 +199,7 @@ final class DefaultFolderStorage: FolderStorage {
                         return
                     }
 
-                    self.deleteFolder(entity, deletedAt: folder.deletedAt)
+                    self.deleteFolderRecursively(entity, deletedAt: folder.deletedAt)
 
                     try context.save()
                     print("\(Self.self): ✅ Update successfully")
@@ -213,14 +211,23 @@ final class DefaultFolderStorage: FolderStorage {
             }
         }
     }
+}
 
-    private func deleteFolder(_ entity: FolderEntity, deletedAt: Date?) {
+private extension DefaultFolderStorage {
+    func filterFolderRecursively(_ entity: FolderEntity) {
+        entity.folders = entity.folders?.filter { $0.deletedAt == nil }
+        entity.clips = entity.clips?.filter { $0.deletedAt == nil }
+
+        entity.folders?.forEach { filterFolderRecursively($0) }
+    }
+
+    func deleteFolderRecursively(_ entity: FolderEntity, deletedAt: Date?) {
         entity.deletedAt = deletedAt
 
         entity.folders?
             .filter { $0.deletedAt == nil }
             .forEach { subEntity in
-                deleteFolder(subEntity, deletedAt: deletedAt)
+                deleteFolderRecursively(subEntity, deletedAt: deletedAt)
             }
 
         entity.clips?

@@ -9,15 +9,17 @@ final class DefaultFetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase {
         await folderRepository.fetchTopLevelFolders()
             .map { folders in
                 folders
-                    .map(recursivelySortFolder)
+                    .map(sortFolderRecursively)
                     .sorted { $0.createdAt < $1.createdAt }
             }
             .mapError { $0 as Error }
     }
+}
 
-    private func recursivelySortFolder(_ folder: Folder) -> Folder {
+private extension DefaultFetchTopLevelFoldersUseCase {
+    func sortFolderRecursively(_ folder: Folder) -> Folder {
         let sortedFolders = folder.folders
-            .map(recursivelySortFolder)
+            .map(sortFolderRecursively)
             .sorted { $0.createdAt < $1.createdAt }
         let sortedClips = folder.clips
             .sorted { $0.createdAt > $1.createdAt }
