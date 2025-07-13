@@ -28,7 +28,7 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
     }
 }
 
-private extension DefaultParseURLUseCase {
+extension DefaultParseURLUseCase {
     func sanitizeURL(urlString: String) -> Result<URL, URLValidationError> {
         let lowercased = urlString.lowercased()
         let correctedURLString: String
@@ -63,21 +63,18 @@ private extension DefaultParseURLUseCase {
         let ogTitle = extractOGContent(html: html, property: "og:title")
         let title = ogTitle ?? extractHTMLTagContent(html: html, property: "title") ?? "제목 없음"
 
-        let ogDescription = extractOGContent(html: html, property: "og:description")
-        let description = ogDescription ?? extractHTMLTagContent(html: html, property: "description") ?? "내용 없음"
+        let ogDescription = extractOGContent(html: html, property: "og:description") ?? "내용 없음"
 
         var thumbnailImageURL: String?
 
-        if let host = url.host(percentEncoded: false), host.contains("youtu") {
-            if let videoID = extractYouTubeVideoID(from: url) {
-                thumbnailImageURL = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
-            }
+        if let videoID = extractYouTubeVideoID(from: url) {
+            thumbnailImageURL = makeYouTubeThumbnailURL(videoID: videoID)
         }
 
         return URLMetadata(
             url: url,
             title: title.isEmpty ? url.absoluteString : title,
-            description: description,
+            description: ogDescription,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),
             screenshotData: screenshotData
         )
@@ -116,8 +113,12 @@ private extension DefaultParseURLUseCase {
     }
 
     func extractYouTubeVideoID(from url: URL) -> String? {
+        if let host = url.host(percentEncoded: false), !host.contains("youtu") {
+            return nil
+        }
+
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-            if components.host?.contains("youtube.com") == true || components.host?.contains("m.youtube.com") == true {
+            if components.host?.contains("youtube.com") == true {
                 if let queryItems = components.queryItems {
                     for item in queryItems {
                         if item.name == "v", let videoID = item.value {
@@ -133,5 +134,9 @@ private extension DefaultParseURLUseCase {
             }
         }
         return nil
+    }
+
+    func makeYouTubeThumbnailURL(videoID: String) -> String {
+        "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
     }
 }
