@@ -67,16 +67,14 @@ extension DefaultParseURLUseCase {
 
         var thumbnailImageURL: String?
 
-        if let host = url.host(percentEncoded: false), host.contains("youtu") {
-            if let videoID = extractYouTubeVideoID(from: url) {
-                thumbnailImageURL = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
-            }
+        if let videoID = extractYouTubeVideoID(from: url) {
+            thumbnailImageURL = makeYouTubeThumbnailURL(videoID: videoID)
         }
 
         return URLMetadata(
             url: url,
             title: title.isEmpty ? url.absoluteString : title,
-            description: description,
+            description: ogDescription,
             thumbnailImageURL: URL(string: thumbnailImageURL ?? ""),
             screenshotData: screenshotData
         )
@@ -136,5 +134,9 @@ extension DefaultParseURLUseCase {
             }
         }
         return nil
+    }
+
+    func makeYouTubeThumbnailURL(videoID: String) -> String {
+        "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
     }
 }
