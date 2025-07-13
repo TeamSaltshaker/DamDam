@@ -10,7 +10,8 @@ extension String {
             ]
         )
 
-        guard let regex = try? NSRegularExpression(pattern: query, options: .caseInsensitive) else {
+        let escapedQuery = NSRegularExpression.escapedPattern(for: query)
+        guard let regex = try? NSRegularExpression(pattern: escapedQuery, options: .caseInsensitive) else {
             return attributedString
         }
 
