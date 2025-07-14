@@ -110,7 +110,6 @@ final class EditClipReactor: Reactor {
     private let updateClipUseCase: UpdateClipUseCase
 
     init(
-        urlText: String = "",
         currentFolder: Folder? = nil,
         parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
