@@ -275,16 +275,6 @@ final class DIContainer {
         )
     }
 
-    func makeEditClipReactor(urlString: String) -> EditClipReactor {
-        EditClipReactor(
-            urlText: urlString,
-            parseURLUseCase: makeParseURLUseCase(),
-            fetchFolderUseCase: makeFetchFolderUseCase(),
-            createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
-        )
-    }
-
     func makeEditClipReactor(folder: Folder?) -> EditClipReactor {
         EditClipReactor(
             currentFolder: folder,
