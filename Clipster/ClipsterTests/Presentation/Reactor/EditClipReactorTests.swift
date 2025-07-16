@@ -62,4 +62,9 @@ final class EditClipReactorTests: XCTestCase {
         let reactor = createReactor(type: .edit)
         XCTAssertEqual(reactor.currentState.navigationTitle, "클립 수정")
     }
+
+    func test_viewDidAppear() {
+        reactor.action.onNext(.viewDidAppear)
+        XCTAssertEqual(reactor.currentState.shouldReadPastedboardURL, true)
+    }
 }
