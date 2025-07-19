@@ -28,21 +28,66 @@ final class ShareReactor: Reactor {
     }
 
     struct State {
-        var isReadyToExtractURL = false
-        var urlString: String = ""
-        var isHiddenURLMetadataStackView = true
-        var isHiddenURLValidationStackView = true
-        var urlMetadataDisplay: URLMetadataDisplay?
-        var isLoading = false
-        var urlValidationImageResource: ImageResource?
-        var urlValidationLabelText: String = ""
-        var isURLValid = false
-        var urlTextFieldBorderColor: ColorResource = .black900
         var currentFolder: Folder?
+        var urlString: String = ""
         var memoText: String = ""
-        var memoLimit: String = "0 / 100"
+        var isReadyToExtractURL = false
+        var urlMetadataDisplay: URLMetadataDisplay?
+        var urlValidationResult: ClipValidType?
+        var isLoading = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
+
+        var memoLimit: String {
+            "\(memoText.count) / 100"
+        }
+        var isURLValid: Bool {
+            guard let result = urlValidationResult else { return false }
+            return result != .invalid
+        }
+        var isHiddenURLMetadataStackView: Bool {
+            urlMetadataDisplay?.thumbnailImageURL == nil &&
+            urlMetadataDisplay?.screenshotImageData == nil
+        }
+        var isHiddenURLValidationStackView: Bool {
+            urlString.isEmpty
+        }
+        var urlTextFieldBorderColor: ColorResource {
+            guard !urlString.isEmpty, let result = urlValidationResult else { return .dialogueStroke }
+            switch result {
+            case .valid:
+                return .appPrimary
+            case .validWithWarning:
+                return .yellow600
+            case .invalid:
+                return .red600
+            }
+        }
+        var urlValidationLabelText: String {
+            if isLoading { return "URL 분석 중..." }
+            guard let result = urlValidationResult else { return "" }
+            switch result {
+            case .valid:
+                return "올바른 URL 입니다."
+            case .validWithWarning:
+                return "올바른 URL이지만, 미리보기를 불러 올 수 없습니다."
+            case .invalid:
+                return "올바르지 않은 URL 입니다."
+            }
+        }
+        var urlValidationImageResource: ImageResource? {
+            guard !isLoading, let result = urlValidationResult else {
+                return .none
+            }
+            switch result {
+            case .valid:
+                return .checkBlue
+            case .invalid:
+                return .xCircleRed
+            case .validWithWarning:
+                return .infoYellow
+            }
+        }
     }
 
     var initialState: State
@@ -168,52 +213,15 @@ final class ShareReactor: Reactor {
             newState.isReadyToExtractURL = value
         case .updateURLString(let text):
             newState.urlString = text
-            if text.isEmpty {
-                newState.isHiddenURLValidationStackView = true
-            }
         case .updateMemo(let text):
             newState.memoText = text
-            newState.memoLimit = "\(text.count) / 100"
         case .updateIsValidURL(let type):
-            switch type {
-            case .valid:
-                newState.isURLValid = true
-                newState.urlValidationImageResource = .checkBlue
-                newState.urlValidationLabelText = "올바른 URL 입니다."
-                if !currentState.urlString.isEmpty {
-                    newState.urlTextFieldBorderColor = .appPrimary
-                }
-            case .validWithWarning:
-                newState.isURLValid = true
-                newState.urlValidationImageResource = .infoYellow
-                newState.urlValidationLabelText = "올바른 URL이지만, 미리보기를 불러 올 수 없습니다."
-                if !currentState.urlString.isEmpty {
-                    newState.urlTextFieldBorderColor = .yellow600
-                }
-            case .invalid:
-                newState.isURLValid = false
-                newState.urlValidationImageResource = .xCircleRed
-                newState.urlValidationLabelText = "올바르지 않은 URL 입니다."
-                if !currentState.urlString.isEmpty {
-                    newState.urlTextFieldBorderColor = .red600
-                }
-            }
+            newState.urlValidationResult = type
             newState.isLoading = false
-
-            if currentState.urlString.isEmpty {
-                newState.urlValidationImageResource = .none
-                newState.urlTextFieldBorderColor = .black900
-                newState.isHiddenURLValidationStackView = true
-            }
         case .updateURLMetadata(let urlMetaDisplay):
             newState.urlMetadataDisplay = urlMetaDisplay
-            newState.isHiddenURLMetadataStackView = urlMetaDisplay?.thumbnailImageURL == nil && urlMetaDisplay?.screenshotImageData == nil
         case .updateIsLoading(let value):
             newState.isLoading = value
-            newState.urlValidationLabelText = "URL 분석 중..."
-            newState.isHiddenURLValidationStackView = currentState.urlString.isEmpty
-            newState.urlValidationImageResource = .none
-            newState.isHiddenURLValidationStackView = false
         case .updateIsTappedFolderView(let value):
             newState.isTappedFolderView = value
         case .updateCurrentFolder(let newFolder):
