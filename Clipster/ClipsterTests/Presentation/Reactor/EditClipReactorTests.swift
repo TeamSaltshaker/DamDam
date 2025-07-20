@@ -67,4 +67,17 @@ final class EditClipReactorTests: XCTestCase {
         reactor.action.onNext(.viewDidAppear)
         XCTAssertEqual(reactor.currentState.shouldReadPastedboardURL, true)
     }
+
+    func test_url_입력했을_때_공백_제거() {
+        reactor.action.onNext(.editURLTextField(" https://google.com "))
+        XCTAssertEqual(reactor.currentState.urlString, "https://google.com")
+    }
+
+    func test_url_빈_문자열_일_때_() {
+        reactor.action.onNext(.editURLTextField("https://google.com"))
+        reactor.action.onNext(.editURLTextField(""))
+
+        XCTAssertEqual(reactor.currentState.urlString, "")
+        XCTAssertTrue(reactor.currentState.isHiddenURLValidationStackView)
+    }
 }
