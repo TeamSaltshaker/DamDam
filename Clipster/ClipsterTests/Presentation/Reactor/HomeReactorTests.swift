@@ -74,7 +74,16 @@ final class HomeReactorTests: XCTestCase {
         waitUntilHomeDataLoaded()
 
         // then
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
+
+        XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
+        XCTAssertTrue(fetchTopLevelFoldersUseCase.didCallExecute)
+        XCTAssertTrue(fetchTopLevelClipsUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(sortClipsUseCase.didCallExecute)
+        XCTAssertTrue(sortFoldersUseCase.didCallExecute)
+
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.unvisitedClips.count,
             MockClip.unvisitedClips.count
@@ -111,7 +120,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_클립_추가_탭_시_클립_추가_화면으로_이동() {
@@ -255,7 +264,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
         XCTAssertTrue(deleteClipUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
@@ -286,7 +295,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_폴더_셀_탭_시_폴더_화면으로_이동() {
@@ -357,7 +366,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
         XCTAssertTrue(deleteFolderUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
@@ -388,7 +397,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_모든_클립_보기를_누르면_클립_리스트로_이동() {
