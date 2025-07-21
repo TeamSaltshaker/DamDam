@@ -10,10 +10,10 @@ final class DefaultClipStorage: ClipStorage {
     }
 
     func fetchClip(by id: UUID) async -> Result<Clip, CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = ClipEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
                 request.fetchLimit = 1
@@ -24,7 +24,7 @@ final class DefaultClipStorage: ClipStorage {
                         continuation.resume(returning: .failure(.entityNotFound))
                         return
                     }
-                    guard let clip = self.mapper.clip(from: entity) else {
+                    guard let clip = mapper.clip(from: entity) else {
                         print("\(Self.self): ❌ Failed to fetch: Mapping failed")
                         continuation.resume(returning: .failure(.mapFailed))
                         return
@@ -40,16 +40,16 @@ final class DefaultClipStorage: ClipStorage {
     }
 
     func fetchAllClips() async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = ClipEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "deletedAt == nil")
 
                 do {
                     let entities = try context.fetch(request)
-                    let allClips = entities.compactMap(self.mapper.clip)
+                    let allClips = entities.compactMap(mapper.clip)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(allClips))
                 } catch {
@@ -61,16 +61,16 @@ final class DefaultClipStorage: ClipStorage {
     }
 
     func fetchTopLevelClips() async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = ClipEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
 
                 do {
                     let entities = try context.fetch(request)
-                    let topLevelClips = entities.compactMap(self.mapper.clip)
+                    let topLevelClips = entities.compactMap(mapper.clip)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(topLevelClips))
                 } catch {
@@ -82,16 +82,16 @@ final class DefaultClipStorage: ClipStorage {
     }
 
     func fetchUnvisitedClips() async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = ClipEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
 
                 do {
                     let entities = try context.fetch(request)
-                    let unvisitedClips = entities.compactMap(self.mapper.clip)
+                    let unvisitedClips = entities.compactMap(mapper.clip)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(unvisitedClips))
                 } catch {
@@ -103,16 +103,16 @@ final class DefaultClipStorage: ClipStorage {
     }
 
     func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = ClipEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id IN %@ AND deletedAt == nil", ids)
 
                 do {
                     let entities = try context.fetch(request)
-                    let recentVisitedClips = entities.compactMap(self.mapper.clip)
+                    let recentVisitedClips = entities.compactMap(mapper.clip)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(recentVisitedClips))
                 } catch {
