@@ -10,10 +10,10 @@ final class DefaultFolderStorage: FolderStorage {
     }
 
     func fetchFolder(by id: UUID) async -> Result<Folder, CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = FolderEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
                 request.fetchLimit = 1
@@ -25,9 +25,9 @@ final class DefaultFolderStorage: FolderStorage {
                         return
                     }
 
-                    self.filterFolderRecursively(entity)
+                    filterFolderRecursively(entity)
 
-                    guard let folder = self.mapper.folder(from: entity) else {
+                    guard let folder = mapper.folder(from: entity) else {
                         print("\(Self.self): ❌ Failed to fetch: Mapping failed")
                         continuation.resume(returning: .failure(.mapFailed))
                         return
@@ -43,20 +43,20 @@ final class DefaultFolderStorage: FolderStorage {
     }
 
     func fetchAllFolders() async -> Result<[Folder], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = FolderEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "deletedAt == nil")
 
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        self.filterFolderRecursively(entity)
+                        filterFolderRecursively(entity)
                     }
 
-                    let allFolders = entities.compactMap(self.mapper.folder)
+                    let allFolders = entities.compactMap(mapper.folder)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(allFolders))
                 } catch {
@@ -68,20 +68,20 @@ final class DefaultFolderStorage: FolderStorage {
     }
 
     func fetchTopLevelFolders() async -> Result<[Folder], CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = FolderEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "parentFolder == nil AND deletedAt == nil")
 
                 do {
                     let entities = try context.fetch(request)
                     for entity in entities {
-                        self.filterFolderRecursively(entity)
+                        filterFolderRecursively(entity)
                     }
 
-                    let topLevelFolders = entities.compactMap(self.mapper.folder)
+                    let topLevelFolders = entities.compactMap(mapper.folder)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(topLevelFolders))
                 } catch {
@@ -184,10 +184,10 @@ final class DefaultFolderStorage: FolderStorage {
     }
 
     func deleteFolder(_ folder: Folder) async -> Result<Void, CoreDataError> {
-        await withCheckedContinuation { [weak self] continuation in
-            guard let self else { return }
+        await withCheckedContinuation { continuation in
+            container.performBackgroundTask { [weak self] context in
+                guard let self else { return }
 
-            container.performBackgroundTask { context in
                 let request = FolderEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", folder.id as CVarArg)
                 request.fetchLimit = 1
@@ -199,7 +199,7 @@ final class DefaultFolderStorage: FolderStorage {
                         return
                     }
 
-                    self.deleteFolderRecursively(entity, deletedAt: folder.deletedAt)
+                    deleteFolderRecursively(entity, deletedAt: folder.deletedAt)
 
                     try context.save()
                     print("\(Self.self): ✅ Update successfully")
