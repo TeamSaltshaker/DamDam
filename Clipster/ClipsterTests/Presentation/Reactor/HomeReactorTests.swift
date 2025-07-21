@@ -11,6 +11,10 @@ final class HomeReactorTests: XCTestCase {
     private var deleteClipUseCase: MockDeleteClipUseCase!
     private var deleteFolderUseCase: MockDeleteFolderUseCase!
     private var visitClipUseCase: MockVisitClipUseCase!
+    private var fetchClipSortOptionUseCase: MockFetchClipSortOptionUseCase!
+    private var fetchFolderSortOptionUseCase: MockFetchFolderSortOptionUseCase!
+    private var sortClipsUseCase: MockSortClipsUseCase!
+    private var sortFoldersUseCase: MockSortFoldersUseCase!
 
     private var reactor: HomeReactor!
 
@@ -25,13 +29,22 @@ final class HomeReactorTests: XCTestCase {
         deleteClipUseCase = MockDeleteClipUseCase()
         deleteFolderUseCase = MockDeleteFolderUseCase()
         visitClipUseCase = MockVisitClipUseCase()
+        fetchClipSortOptionUseCase = MockFetchClipSortOptionUseCase()
+        fetchFolderSortOptionUseCase = MockFetchFolderSortOptionUseCase()
+        sortClipsUseCase = MockSortClipsUseCase()
+        sortFoldersUseCase = MockSortFoldersUseCase()
+
         reactor = HomeReactor(
             fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
             fetchTopLevelClipsUseCase: fetchTopLevelClipsUseCase,
             deleteClipUseCase: deleteClipUseCase,
             deleteFolderUseCase: deleteFolderUseCase,
-            visitClipUseCase: visitClipUseCase
+            visitClipUseCase: visitClipUseCase,
+            fetchClipSortOptionUseCase: fetchClipSortOptionUseCase,
+            fetchFolderSortOptionUseCase: fetchFolderSortOptionUseCase,
+            sortClipsUseCase: sortClipsUseCase,
+            sortFoldersUseCase: sortFoldersUseCase
         )
     }
 
@@ -61,7 +74,16 @@ final class HomeReactorTests: XCTestCase {
         waitUntilHomeDataLoaded()
 
         // then
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
+
+        XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
+        XCTAssertTrue(fetchTopLevelFoldersUseCase.didCallExecute)
+        XCTAssertTrue(fetchTopLevelClipsUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(sortClipsUseCase.didCallExecute)
+        XCTAssertTrue(sortFoldersUseCase.didCallExecute)
+
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.unvisitedClips.count,
             MockClip.unvisitedClips.count
@@ -98,7 +120,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_클립_추가_탭_시_클립_추가_화면으로_이동() {
@@ -242,7 +264,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
         XCTAssertTrue(deleteClipUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
@@ -273,7 +295,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_폴더_셀_탭_시_폴더_화면으로_이동() {
@@ -344,7 +366,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [deleteExpectation], timeout: 1.0)
-        assertPhaseForSuccessCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .success])
         XCTAssertTrue(deleteFolderUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
@@ -375,7 +397,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        assertPhaseForFailureCase(phaseHistory)
+        XCTAssertEqual(phaseHistory, [.loading, .error("")])
     }
 
     func test_모든_클립_보기를_누르면_클립_리스트로_이동() {
@@ -406,27 +428,40 @@ private extension HomeReactorTests {
         reactor.action.onNext(.viewWillAppear)
         wait(for: [expectation], timeout: 1.0)
     }
+}
 
-    func assertPhaseForSuccessCase(_ history: [HomeReactor.State.Phase]) {
-        XCTAssertTrue(
-            history.first.map { if case .loading = $0 { true } else { false } } ?? false,
-            "첫 번째 phase는 .loading이어야 합니다."
-        )
-        XCTAssertTrue(
-            history.last.map { if case .success = $0 { true } else { false } } ?? false,
-            "마지막 phase는 .success이어야 합니다."
-        )
+extension HomeReactor.State.Phase: @retroactive Equatable {
+    public static func == (lhs: HomeReactor.State.Phase, rhs: HomeReactor.State.Phase) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.loading, .loading), (.success, .success), (.error, .error):
+            return true
+        default:
+            return false
+        }
     }
+}
 
-    func assertPhaseForFailureCase(_ history: [HomeReactor.State.Phase]) {
-        XCTAssertTrue(
-            history.first.map { if case .loading = $0 { true } else { false } } ?? false,
-            "첫 번째 phase는 .loading이어야 합니다."
-        )
-
-        XCTAssertTrue(
-            history.last.map { if case .error = $0 { true } else { false } } ?? false,
-            "마지막 phase는 .error이어야 합니다."
-        )
+extension HomeReactor.State.Route: @retroactive Equatable {
+    public static func == (lhs: HomeReactor.State.Route, rhs: HomeReactor.State.Route) -> Bool {
+        switch (lhs, rhs) {
+        case (.showAddFolder, .showAddFolder):
+            return true
+        case (.showAddClip(let a), .showAddClip(let b)):
+            return a?.id == b?.id // Folder가 Identifiable하거나 Equatable
+        case (.showWebView(let a), .showWebView(let b)):
+            return a == b
+        case (.showFolder(let a), .showFolder(let b)):
+            return a.id == b.id
+        case (.showDetailClip(let a), .showDetailClip(let b)):
+            return a.id == b.id
+        case (.showEditClip(let a), .showEditClip(let b)):
+            return a.id == b.id
+        case (.showEditFolder(let a), .showEditFolder(let b)):
+            return a.id == b.id
+        case (.showUnvisitedClipList(let a), .showUnvisitedClipList(let b)):
+            return a.map(\.id) == b.map(\.id)
+        default:
+            return false
+        }
     }
 }
