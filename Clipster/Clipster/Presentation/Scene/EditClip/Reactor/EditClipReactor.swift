@@ -37,7 +37,7 @@ final class EditClipReactor: Reactor {
         var clip: Clip?
         var currentFolder: Folder?
         var navigationTitle: String
-        var urlString: String
+        var urlString: String = ""
         var memoText: String = ""
         var memoLimit: String = "0 / 100"
         var urlValidationImageResource: ImageResource?
@@ -61,7 +61,6 @@ final class EditClipReactor: Reactor {
     private let updateClipUseCase: UpdateClipUseCase
 
     init(
-        urlText: String = "",
         currentFolder: Folder? = nil,
         parseURLUseCase: ParseURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
@@ -72,7 +71,6 @@ final class EditClipReactor: Reactor {
             type: .create,
             currentFolder: currentFolder,
             navigationTitle: "클립 추가",
-            urlString: urlText,
         )
         self.parseURLUseCase = parseURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase

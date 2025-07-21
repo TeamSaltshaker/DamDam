@@ -55,14 +55,4 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             print("\(Self.self): ❌ Invalid Supabase URL")
         }
     }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        if let urlString = userDefaults.string(forKey: "sharedURL") {
-            userDefaults.removeObject(forKey: "sharedURL")
-
-            DispatchQueue.main.async {
-                self.appCoordinator?.handleSharedURL(urlString)
-            }
-        }
-    }
 }

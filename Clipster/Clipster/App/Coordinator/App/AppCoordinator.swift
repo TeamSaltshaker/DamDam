@@ -60,12 +60,4 @@ extension AppCoordinator {
         onboardingVC.modalPresentationStyle = .fullScreen
         navigationController.present(onboardingVC, animated: false)
     }
-
-    func handleSharedURL(_ urlString: String) {
-        if let homeCoordinator = children.compactMap({ $0 as? HomeCoordinator }).first {
-            homeCoordinator.showEditClipFromSharedURL(urlString: urlString)
-        } else {
-            print("HomeCoordinator가 아직 초기화되지 않았습니다.")
-        }
-    }
 }
