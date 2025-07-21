@@ -11,6 +11,10 @@ final class HomeReactorTests: XCTestCase {
     private var deleteClipUseCase: MockDeleteClipUseCase!
     private var deleteFolderUseCase: MockDeleteFolderUseCase!
     private var visitClipUseCase: MockVisitClipUseCase!
+    private var fetchClipSortOptionUseCase: MockFetchClipSortOptionUseCase!
+    private var fetchFolderSortOptionUseCase: MockFetchFolderSortOptionUseCase!
+    private var sortClipsUseCase: MockSortClipsUseCase!
+    private var sortFoldersUseCase: MockSortFoldersUseCase!
 
     private var reactor: HomeReactor!
 
@@ -25,13 +29,22 @@ final class HomeReactorTests: XCTestCase {
         deleteClipUseCase = MockDeleteClipUseCase()
         deleteFolderUseCase = MockDeleteFolderUseCase()
         visitClipUseCase = MockVisitClipUseCase()
+        fetchClipSortOptionUseCase = MockFetchClipSortOptionUseCase()
+        fetchFolderSortOptionUseCase = MockFetchFolderSortOptionUseCase()
+        sortClipsUseCase = MockSortClipsUseCase()
+        sortFoldersUseCase = MockSortFoldersUseCase()
+
         reactor = HomeReactor(
             fetchUnvisitedClipsUseCase: fetchUnvisitedClipsUseCase,
             fetchTopLevelFoldersUseCase: fetchTopLevelFoldersUseCase,
             fetchTopLevelClipsUseCase: fetchTopLevelClipsUseCase,
             deleteClipUseCase: deleteClipUseCase,
             deleteFolderUseCase: deleteFolderUseCase,
-            visitClipUseCase: visitClipUseCase
+            visitClipUseCase: visitClipUseCase,
+            fetchClipSortOptionUseCase: fetchClipSortOptionUseCase,
+            fetchFolderSortOptionUseCase: fetchFolderSortOptionUseCase,
+            sortClipsUseCase: sortClipsUseCase,
+            sortFoldersUseCase: sortFoldersUseCase
         )
     }
 
