@@ -419,27 +419,40 @@ private extension HomeReactorTests {
         reactor.action.onNext(.viewWillAppear)
         wait(for: [expectation], timeout: 1.0)
     }
+}
 
-    func assertPhaseForSuccessCase(_ history: [HomeReactor.State.Phase]) {
-        XCTAssertTrue(
-            history.first.map { if case .loading = $0 { true } else { false } } ?? false,
-            "첫 번째 phase는 .loading이어야 합니다."
-        )
-        XCTAssertTrue(
-            history.last.map { if case .success = $0 { true } else { false } } ?? false,
-            "마지막 phase는 .success이어야 합니다."
-        )
+extension HomeReactor.State.Phase: @retroactive Equatable {
+    public static func == (lhs: HomeReactor.State.Phase, rhs: HomeReactor.State.Phase) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.loading, .loading), (.success, .success), (.error, .error):
+            return true
+        default:
+            return false
+        }
     }
+}
 
-    func assertPhaseForFailureCase(_ history: [HomeReactor.State.Phase]) {
-        XCTAssertTrue(
-            history.first.map { if case .loading = $0 { true } else { false } } ?? false,
-            "첫 번째 phase는 .loading이어야 합니다."
-        )
-
-        XCTAssertTrue(
-            history.last.map { if case .error = $0 { true } else { false } } ?? false,
-            "마지막 phase는 .error이어야 합니다."
-        )
+extension HomeReactor.State.Route: @retroactive Equatable {
+    public static func == (lhs: HomeReactor.State.Route, rhs: HomeReactor.State.Route) -> Bool {
+        switch (lhs, rhs) {
+        case (.showAddFolder, .showAddFolder):
+            return true
+        case (.showAddClip(let a), .showAddClip(let b)):
+            return a?.id == b?.id // Folder가 Identifiable하거나 Equatable
+        case (.showWebView(let a), .showWebView(let b)):
+            return a == b
+        case (.showFolder(let a), .showFolder(let b)):
+            return a.id == b.id
+        case (.showDetailClip(let a), .showDetailClip(let b)):
+            return a.id == b.id
+        case (.showEditClip(let a), .showEditClip(let b)):
+            return a.id == b.id
+        case (.showEditFolder(let a), .showEditFolder(let b)):
+            return a.id == b.id
+        case (.showUnvisitedClipList(let a), .showUnvisitedClipList(let b)):
+            return a.map(\.id) == b.map(\.id)
+        default:
+            return false
+        }
     }
 }
