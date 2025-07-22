@@ -172,4 +172,13 @@ final class EditClipReactorTests: XCTestCase {
 
         XCTAssertTrue(reactor.currentState.isTappedFolderView)
     }
+
+    func test_changeFolder시_currentFolder_정상_반영() {
+        let mockFolder = MockFolder.someFolder
+
+        reactor.action.onNext(.changeFolder(mockFolder))
+
+        XCTAssertNotNil(reactor.currentState.currentFolder)
+        XCTAssertEqual(reactor.currentState.currentFolder?.id, mockFolder.id)
+    }
 }
