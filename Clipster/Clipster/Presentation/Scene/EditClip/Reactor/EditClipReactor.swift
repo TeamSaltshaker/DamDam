@@ -8,6 +8,7 @@ final class EditClipReactor: Reactor {
     }
 
     enum Action {
+        case fetchInitialData
         case viewDidAppear
         case editURLTextField(String)
         case validifyURL(String)
@@ -16,7 +17,6 @@ final class EditClipReactor: Reactor {
         case tapFolderView
         case changeFolder(Folder?)
         case saveClip
-        case fetchFolder
         case disappearFolderSelectorView
     }
 
@@ -167,9 +167,24 @@ final class EditClipReactor: Reactor {
         self.updateClipUseCase = updateClipUseCase
     }
 
+    func transform(action: Observable<Action>) -> Observable<Action> {
+        let initialAction = (initialState.type == .edit && initialState.clip?.folderID != nil) ? Observable.just(Action.fetchInitialData)
+            : Observable.empty()
+
+        return Observable.merge(action, initialAction)
+    }
+
     func mutate(action: Action) -> Observable<Mutation> {
         print("\(Self.self) \(action)")
         switch action {
+        case .fetchInitialData:
+            guard let clip = currentState.clip,
+                  let folderID = clip.folderID else { return .empty() }
+            return .fromAsync {
+                try await self.fetchFolderUseCase.execute(id: folderID).get()
+            }
+            .map { .updateCurrentFolder($0) }
+            .catchAndReturn(.updateCurrentFolder(nil))
         case .editURLTextField(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .just(.updateURLString(trimmed))
@@ -271,14 +286,6 @@ final class EditClipReactor: Reactor {
                 .map { .updateIsSuccessedEditClip(true) }
                 .catchAndReturn(.updateIsSuccessedEditClip(false))
             }
-        case .fetchFolder:
-            guard let clip = currentState.clip,
-                  let folderID = clip.folderID else { return .empty() }
-            return .fromAsync {
-                try await self.fetchFolderUseCase.execute(id: folderID).get()
-            }
-            .map { .updateCurrentFolder($0) }
-            .catchAndReturn(.updateCurrentFolder(nil))
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         case .viewDidAppear:

@@ -155,13 +155,6 @@ extension EditClipViewController: View {
 
     private func bindState(from reactor: EditClipReactor) {
         reactor.state
-            .compactMap(\.clip)
-            .take(1)
-            .map { _ in Reactor.Action.fetchFolder }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        reactor.state
             .map(\.memoText)
             .take(1)
             .asDriver(onErrorJustReturn: "")
