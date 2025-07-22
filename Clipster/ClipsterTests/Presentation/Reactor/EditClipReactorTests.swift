@@ -181,4 +181,57 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertNotNil(reactor.currentState.currentFolder)
         XCTAssertEqual(reactor.currentState.currentFolder?.id, mockFolder.id)
     }
+
+    func test_클립_추가_시_saveClip() {
+        let reactor = EditClipReactor(
+            type: .create,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            fetchFolderUseCase: fetchFolderUseCase,
+            createClipUseCase: createClipUseCase,
+            updateClipUseCase: updateClipUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .filter { $0 }
+            .subscribe(onNext: { result in
+                expectation.fulfill()
+            })
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.saveClip)
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(createClipUseCase.didCallExecute)
+        XCTAssertNotNil(createClipUseCase.receivedClip)
+    }
+
+    func test_클립_편집_시_saveClip() {
+        let reactor = EditClipReactor(
+            type: .edit,
+            clip: MockClip.someClip,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            fetchFolderUseCase: fetchFolderUseCase,
+            createClipUseCase: createClipUseCase,
+            updateClipUseCase: updateClipUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .filter { $0 }
+            .subscribe(onNext: { result in
+                expectation.fulfill()
+            })
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.saveClip)
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(updateClipUseCase.didCallExecute)
+        XCTAssertNotNil(updateClipUseCase.receivedClip)
+    }
 }
