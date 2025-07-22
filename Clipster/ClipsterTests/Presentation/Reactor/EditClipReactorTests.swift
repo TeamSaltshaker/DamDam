@@ -166,4 +166,10 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertEqual(reactor.currentState.memoText, "메모 테스트")
         XCTAssertEqual(reactor.currentState.memoLimit, "6 / 100")
     }
+
+    func test_tapFolderView() {
+        reactor.action.onNext(.tapFolderView)
+
+        XCTAssertTrue(reactor.currentState.isTappedFolderView)
+    }
 }
