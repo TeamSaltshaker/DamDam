@@ -159,5 +159,11 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertTrue(reactor.currentState.isLoading)
         XCTAssertEqual(reactor.currentState.urlValidationLabelText, "URL 분석 중...")
     }
-    
+
+    func test_editMemo() {
+        reactor.action.onNext(.editMemo(" 메모 테스트 "))
+
+        XCTAssertEqual(reactor.currentState.memoText, "메모 테스트")
+        XCTAssertEqual(reactor.currentState.memoLimit, "6 / 100")
+    }
 }
