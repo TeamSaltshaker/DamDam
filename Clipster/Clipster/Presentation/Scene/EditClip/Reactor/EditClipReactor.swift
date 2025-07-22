@@ -14,7 +14,7 @@ final class EditClipReactor: Reactor {
         case editingURLTextField
         case editMemo(String)
         case tapFolderView
-        case editFolder(Folder?)
+        case changeFolder(Folder?)
         case saveClip
         case fetchFolder
         case disappearFolderSelectorView
@@ -197,7 +197,7 @@ final class EditClipReactor: Reactor {
             return .just(.updateMemo(trimmed))
         case .tapFolderView:
             return .just(.updateIsTappedFolderView(true))
-        case .editFolder(let newFolder):
+        case .changeFolder(let newFolder):
             return .just(.updateCurrentFolder(newFolder))
         case .saveClip:
             switch currentState.type {

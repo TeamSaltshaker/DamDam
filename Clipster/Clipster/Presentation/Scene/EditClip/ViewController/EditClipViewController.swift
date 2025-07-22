@@ -99,7 +99,7 @@ extension EditClipViewController: View {
                 guard let self else { return }
                 let parentFolder = reactor.currentState.currentFolder
                 coordinator?.showAddFolder(parentFolder: parentFolder) { [weak reactor] in
-                    reactor?.action.onNext(.editFolder($0))
+                    reactor?.action.onNext(.changeFolder($0))
                 }
             }
             .disposed(by: disposeBag)
@@ -276,7 +276,7 @@ extension EditClipViewController: View {
             .drive { [weak self] currentFolder in
                 guard let self else { return }
                 coordinator?.showFolderSelectorForClip(parentFolder: currentFolder) { [weak reactor] in
-                    reactor?.action.onNext(.editFolder($0))
+                    reactor?.action.onNext(.changeFolder($0))
                 }
                 reactor.action.onNext(.disappearFolderSelectorView)
             }
