@@ -152,4 +152,12 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertEqual(reactor.currentState.urlValidationResult, .invalid)
         XCTAssertFalse(reactor.currentState.isLoading)
     }
+
+    func test_editingURLTextField_isLoading이_true() {
+        reactor.action.onNext(.editingURLTextField)
+
+        XCTAssertTrue(reactor.currentState.isLoading)
+        XCTAssertEqual(reactor.currentState.urlValidationLabelText, "URL 분석 중...")
+    }
+    
 }
