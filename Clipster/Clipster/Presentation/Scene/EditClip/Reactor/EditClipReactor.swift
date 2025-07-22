@@ -109,6 +109,28 @@ final class EditClipReactor: Reactor {
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
 
+    #if DEBUG
+    init(
+        type: EditClipReactorType,
+        clip: Clip? = nil,
+        urlMetadataDisplay: URLMetadataDisplay,
+        parseURLUseCase: ParseURLUseCase,
+        fetchFolderUseCase: FetchFolderUseCase,
+        createClipUseCase: CreateClipUseCase,
+        updateClipUseCase: UpdateClipUseCase
+    ) {
+        self.initialState = State(
+            type: type,
+            clip: clip,
+            urlMetadataDisplay: urlMetadataDisplay
+        )
+        self.parseURLUseCase = parseURLUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
+        self.createClipUseCase = createClipUseCase
+        self.updateClipUseCase = updateClipUseCase
+    }
+    #endif
+
     init(
         currentFolder: Folder? = nil,
         parseURLUseCase: ParseURLUseCase,
