@@ -234,4 +234,42 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertTrue(updateClipUseCase.didCallExecute)
         XCTAssertNotNil(updateClipUseCase.receivedClip)
     }
+
+    func test_fetchFolder_성공() {
+        let reactor = createReactor(type: .edit)
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.currentFolder)
+            .compactMap { $0 }
+            .subscribe { folder in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.fetchFolder)
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertNotNil(reactor.currentState.currentFolder)
+        XCTAssertTrue(fetchFolderUseCase.didCallExecute)
+    }
+
+    func test_fetchFolder_실패() {
+        let reactor = createReactor(type: .edit)
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.currentFolder)
+            .skip(1)
+            .subscribe { folder in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        fetchFolderUseCase.shouldSucceed = false
+
+        reactor.action.onNext(.fetchFolder)
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertNil(reactor.currentState.currentFolder)
+        XCTAssertTrue(fetchFolderUseCase.didCallExecute)
+    }
 }
