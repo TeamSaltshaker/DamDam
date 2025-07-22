@@ -272,4 +272,12 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertNil(reactor.currentState.currentFolder)
         XCTAssertTrue(fetchFolderUseCase.didCallExecute)
     }
+
+    func test_disappearFolderSelectorView() {
+        reactor.action.onNext(.tapFolderView)
+        XCTAssertTrue(reactor.currentState.isTappedFolderView)
+
+        reactor.action.onNext(.disappearFolderSelectorView)
+        XCTAssertFalse(reactor.currentState.isTappedFolderView)
+    }
 }
