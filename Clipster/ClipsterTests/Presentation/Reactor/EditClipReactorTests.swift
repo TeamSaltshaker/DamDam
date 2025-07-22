@@ -182,7 +182,7 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertEqual(reactor.currentState.currentFolder?.id, mockFolder.id)
     }
 
-    func test_클립_추가_시_saveClip() {
+    func test_클립_추가_시_saveClip_성공() {
         let reactor = EditClipReactor(
             type: .create,
             urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
@@ -208,7 +208,37 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertNotNil(createClipUseCase.receivedClip)
     }
 
-    func test_클립_편집_시_saveClip() {
+    func test_클립_추가_시_saveClip_실패() {
+        let reactor = EditClipReactor(
+            type: .create,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            fetchFolderUseCase: fetchFolderUseCase,
+            createClipUseCase: createClipUseCase,
+            updateClipUseCase: updateClipUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .skip(1)
+            .subscribe(onNext: { result in
+                if !result {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        createClipUseCase.shouldSucceed = false
+        reactor.action.onNext(.saveClip)
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertFalse(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(createClipUseCase.didCallExecute)
+        XCTAssertNotNil(createClipUseCase.receivedClip)
+    }
+
+    func test_클립_편집_시_saveClip_성공() {
         let reactor = EditClipReactor(
             type: .edit,
             clip: MockClip.someClip,
@@ -231,6 +261,38 @@ final class EditClipReactorTests: XCTestCase {
         reactor.action.onNext(.saveClip)
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(updateClipUseCase.didCallExecute)
+        XCTAssertNotNil(updateClipUseCase.receivedClip)
+    }
+
+    func test_클립_편집_시_saveClip_실패() {
+        let reactor = EditClipReactor(
+            type: .edit,
+            clip: MockClip.someClip,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            fetchFolderUseCase: fetchFolderUseCase,
+            createClipUseCase: createClipUseCase,
+            updateClipUseCase: updateClipUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .skip(1)
+            .subscribe(onNext: { result in
+                if !result {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        updateClipUseCase.shouldSucceed = false
+        reactor.action.onNext(.saveClip)
+
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertFalse(reactor.currentState.isSuccessedEditClip)
         XCTAssertTrue(updateClipUseCase.didCallExecute)
         XCTAssertNotNil(updateClipUseCase.receivedClip)
     }
