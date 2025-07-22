@@ -93,7 +93,7 @@ final class EditClipReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetaData, true))
+        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, true))
 
         reactor.action.onNext(.validifyURL("https://google.com"))
 
