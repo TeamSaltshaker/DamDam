@@ -94,10 +94,10 @@ final class EditClipReactor: Reactor {
             switch result {
             case .valid:
                 return .checkBlue
-            case .invalid:
-                return .xCircleRed
             case .validWithWarning:
                 return .infoYellow
+            case .invalid:
+                return .xCircleRed
             }
         }
     }

@@ -426,4 +426,31 @@ final class EditClipReactorTests: XCTestCase {
 
         XCTAssertEqual(state.urlValidationLabelText, "올바르지 않은 URL 입니다.")
     }
+
+    func test_urlValidationResult_valid일_때_urlValidationImageResource() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlValidationResult: .valid
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .checkBlue)
+    }
+
+    func test_urlValidationResult_validWithWarning일_때_urlValidationImageResource() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlValidationResult: .validWithWarning
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .infoYellow)
+    }
+
+    func test_urlValidationResult_invalid일_때_urlValidationImageResource() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlValidationResult: .invalid
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .xCircleRed)
+    }
 }
