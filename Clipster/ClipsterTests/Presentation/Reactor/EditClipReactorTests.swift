@@ -369,4 +369,34 @@ final class EditClipReactorTests: XCTestCase {
 
         XCTAssertFalse(state.isHiddenURLMetadataStackView)
     }
+
+    func test_urlValidationResult_valid일_때_urlTextFieldBorderColor() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlString: "테스트",
+            urlValidationResult: .valid
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .appPrimary)
+    }
+
+    func test_urlValidationResult_validWithWarning일_때_urlTextFieldBorderColor() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlString: "테스트",
+            urlValidationResult: .validWithWarning
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .yellow600)
+    }
+
+    func test_urlValidationResult_invalid일_때_urlTextFieldBorderColor() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlString: "테스트",
+            urlValidationResult: .invalid
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .red600)
+    }
 }
