@@ -207,6 +207,60 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(routeResult, .showDetailClip(MockClip.someClip))
     }
+
+    func test_클립_삭제_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapDelete(clipIndex))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue(deleteClipUseCase.didCallExecute)
+        XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.clips.count, MockClip.unvisitedClips.count)
+    }
+
+    func test_클립_삭제_탭_실패() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+        deleteClipUseCase.shouldSucceed = false
+
+        reactor.pulse(\.$phase)
+            .compactMap { $0 }
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .error("") {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapDelete(clipIndex))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .error("")])
+        XCTAssertTrue(deleteClipUseCase.didCallExecute)
+        XCTAssertFalse(fetchUnvisitedClipsUseCase.didCallExecute)
+    }
 }
 
 extension UnvisitedClipListReactor.State.Phase: @retroactive Equatable {
