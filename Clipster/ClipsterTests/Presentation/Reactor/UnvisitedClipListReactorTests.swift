@@ -122,6 +122,27 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         XCTAssertEqual(phaseResults, [.loading, .error("")])
         XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
     }
+
+    func test_뒤로가기_버튼_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapBack)
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .back)
+    }
 }
 
 extension UnvisitedClipListReactor.State.Phase: @retroactive Equatable {
