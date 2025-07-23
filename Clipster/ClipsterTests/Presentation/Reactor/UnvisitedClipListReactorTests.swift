@@ -3,6 +3,9 @@ import RxSwift
 @testable import Clipster
 
 final class UnvisitedClipListReactorTests: XCTestCase {
+    typealias Phase = UnvisitedClipListReactor.State.Phase
+    typealias Route = UnvisitedClipListReactor.State.Route
+
     private var disposeBag: DisposeBag!
 
     private var clips: [Clip] = []
@@ -37,6 +40,87 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         deleteClipUseCase = nil
         visitClipUseCase = nil
         reactor = nil
+    }
+
+    func test_화면_첫_진입시_초기_클립_사용() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.viewWillAppear)
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertFalse(fetchUnvisitedClipsUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.clips.count, clips.count)
+    }
+
+    func test_화면_첫_진입이_아닐시_클립_불러오기() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.action.onNext(.viewWillAppear)
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.1))
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.viewWillAppear)
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.clips.count, MockClip.unsortedClips.count)
+    }
+
+    func test_화면_첫_진입이_아닐시_클립_불러오기_실패() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+        fetchUnvisitedClipsUseCase.shouldSucceed = false
+
+        reactor.action.onNext(.viewWillAppear)
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.1))
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .error("") {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.viewWillAppear)
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .error("")])
+        XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
     }
 }
 
