@@ -23,7 +23,7 @@ final class EditClipReactor: Reactor {
     enum Mutation {
         case updateURLString(String)
         case updateMemo(String)
-        case updateIsValidURL(ClipValidType)
+        case updateIsValidURL(ParseResultType)
         case updateURLMetadata(URLMetadataDisplay?)
         case updateIsTappedFolderView(Bool)
         case updateCurrentFolder(Folder?)
@@ -39,7 +39,7 @@ final class EditClipReactor: Reactor {
         var urlString: String = ""
         var memoText: String = ""
         var urlMetadataDisplay: URLMetadataDisplay?
-        var urlValidationResult: ClipValidType?
+        var urlValidationResult: ParseResultType?
         var isLoading = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
@@ -156,7 +156,7 @@ final class EditClipReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
                 let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
-                let clipValidType: ClipValidType
+                let clipValidType: ParseResultType
                 switch (metadata, isValidURL) {
                 case (.some, true):
                     clipValidType = .valid
