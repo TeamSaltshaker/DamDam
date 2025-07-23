@@ -342,4 +342,31 @@ final class EditClipReactorTests: XCTestCase {
         reactor.action.onNext(.disappearFolderSelectorView)
         XCTAssertFalse(reactor.currentState.isTappedFolderView)
     }
+
+    func test_섬네일_이미지와_스크린샷_없을_때_isHiddenURLMetadataStackView_true() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
+        )
+
+        XCTAssertTrue(state.isHiddenURLMetadataStackView)
+    }
+
+    func test_섬네일_이미지_있을_때_isHiddenURLMetadataStackView_false() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithThumbnail
+        )
+
+        XCTAssertFalse(state.isHiddenURLMetadataStackView)
+    }
+
+    func test_스크린샷_있을_때_isHiddenURLMetadataStackView_false() {
+        let state = EditClipReactor.State(
+            type: .create,
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithScreenshot
+        )
+
+        XCTAssertFalse(state.isHiddenURLMetadataStackView)
+    }
 }
