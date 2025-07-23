@@ -165,6 +165,27 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         XCTAssertEqual(routeResult, .showWebView(MockClip.someClip.url))
         XCTAssertTrue(visitClipUseCase.didCallExecute)
     }
+
+    func test_클립_상세정보_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapDetail(clipIndex))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .showDetailClip(MockClip.someClip))
+    }
 }
 
 extension UnvisitedClipListReactor.State.Phase: @retroactive Equatable {
