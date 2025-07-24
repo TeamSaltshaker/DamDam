@@ -117,7 +117,6 @@
 				Domain/UseCase/Setting/DefaultFetchSavePathLayoutOptionUseCase.swift,
 				Domain/UseCase/ShareExtension/DefaultExtractExtensionContextUseCase.swift,
 				Domain/UseCase/URL/DefaultParseURLUseCase.swift,
-				Presentation/Model/ClipValidType.swift,
 				Presentation/Model/FolderDisplay.swift,
 				Presentation/Model/URLMetadataDisplay.swift,
 				Presentation/Resource/Color.xcassets,

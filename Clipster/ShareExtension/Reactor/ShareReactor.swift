@@ -19,7 +19,7 @@ final class ShareReactor: Reactor {
         case updateIsReadyExtractURL(Bool)
         case updateURLString(String)
         case updateURLMetadata(URLMetadataDisplay?)
-        case updateIsValidURL(ClipValidType)
+        case updateIsValidURL(ParseResultType)
         case updateIsLoading(Bool)
         case updateMemo(String)
         case updateIsTappedFolderView(Bool)
@@ -131,7 +131,7 @@ final class ShareReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
                 let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
-                let clipValidType: ClipValidType
+                let clipValidType: ParseResultType
                 switch (metadata, isValidURL) {
                 case (.some, true):
                     clipValidType = .valid
