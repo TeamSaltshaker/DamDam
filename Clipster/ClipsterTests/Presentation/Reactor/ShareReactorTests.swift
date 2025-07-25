@@ -216,4 +216,10 @@ final class ShareReactorTests: XCTestCase {
         XCTAssertTrue(createClipUseCase.didCallExecute)
         XCTAssertNotNil(createClipUseCase.receivedClip)
     }
+
+    func test_disappearFolderSelectorView() {
+        reactor.action.onNext(.disappearFolderSelectorView)
+
+        XCTAssertFalse(reactor.currentState.isTappedFolderView)
+    }
 }
