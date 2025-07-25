@@ -1,0 +1,159 @@
+import XCTest
+import RxSwift
+@testable import Clipster
+
+final class MyPageReactorTests: XCTestCase {
+    typealias Phase = MyPageReactor.State.Phase
+    typealias Route = MyPageReactor.State.Route
+
+    private var disposeBag: DisposeBag!
+
+    private var checkLoginStatusUseCase: MockCheckLoginStatusUseCase!
+    private var loginUseCase: MockLoginUseCase!
+    private var fetchCurrentUserUseCase: MockFetchCurrentUserUseCase!
+    private var fetchThemeOptionUseCase: MockFetchThemeOptionUseCase!
+    private var fetchFolderSortOptionUseCase: MockFetchFolderSortOptionUseCase!
+    private var fetchClipSortOptionUseCase: MockFetchClipSortOptionUseCase!
+    private var fetchSavePathLayoutOptionUseCase: MockFetchSavePathLayoutOptionUseCase!
+    private var logoutUseCase: MockLogoutUseCase!
+    private var withdrawUseCase: MockWithdrawUseCase!
+    private var saveThemeOptionUseCase: MockSaveThemeOptionUseCase!
+    private var saveSavePathLayoutOptionUseCase: MockSaveSavePathLayoutOptionUseCase!
+    private var saveFolderSortOptionUseCase: MockSaveFolderSortOptionUseCase!
+    private var saveClipSortOptionUseCase: MockSaveClipSortOptionUseCase!
+    private var updateNicknameUseCase: MockUpdateNicknameUseCase!
+
+    private var reactor: MyPageReactor!
+
+    private var defaultSectionModels: [MyPageSectionModel] {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+
+        return [
+            .init(
+                section: .systemSettings,
+                items: [
+                    .sectionTitle(MyPageSection.systemSettings.title),
+                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
+                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
+                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
+                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
+                ]
+            ),
+            .init(section: .support, items: [.chevron(.support)]),
+            .init(section: .etc, items: [.version(appVersion)])
+        ]
+    }
+
+    override func setUp() {
+        disposeBag = DisposeBag()
+
+        checkLoginStatusUseCase = MockCheckLoginStatusUseCase()
+        loginUseCase = MockLoginUseCase()
+        fetchCurrentUserUseCase = MockFetchCurrentUserUseCase()
+        fetchThemeOptionUseCase = MockFetchThemeOptionUseCase()
+        fetchFolderSortOptionUseCase = MockFetchFolderSortOptionUseCase()
+        fetchClipSortOptionUseCase = MockFetchClipSortOptionUseCase()
+        fetchSavePathLayoutOptionUseCase = MockFetchSavePathLayoutOptionUseCase()
+        logoutUseCase = MockLogoutUseCase()
+        withdrawUseCase = MockWithdrawUseCase()
+        saveThemeOptionUseCase = MockSaveThemeOptionUseCase()
+        saveSavePathLayoutOptionUseCase = MockSaveSavePathLayoutOptionUseCase()
+        saveFolderSortOptionUseCase = MockSaveFolderSortOptionUseCase()
+        saveClipSortOptionUseCase = MockSaveClipSortOptionUseCase()
+        updateNicknameUseCase = MockUpdateNicknameUseCase()
+
+        reactor = MyPageReactor(
+            checkLoginStatusUseCase: checkLoginStatusUseCase,
+            loginUseCase: loginUseCase,
+            fetchCurrentUserUseCase: fetchCurrentUserUseCase,
+            fetchThemeOptionUseCase: fetchThemeOptionUseCase,
+            fetchFolderSortOptionUseCase: fetchFolderSortOptionUseCase,
+            fetchClipSortOptionUseCase: fetchClipSortOptionUseCase,
+            fetchSavePathLayoutOptionUseCase: fetchSavePathLayoutOptionUseCase,
+            logoutUseCase: logoutUseCase,
+            withdrawUseCase: withdrawUseCase,
+            saveThemeOptionUseCase: saveThemeOptionUseCase,
+            saveSavePathLayoutOptionUseCase: saveSavePathLayoutOptionUseCase,
+            saveFolderSortOptionUseCase: saveFolderSortOptionUseCase,
+            saveClipSortOptionUseCase: saveClipSortOptionUseCase,
+            updateNicknameUseCase: updateNicknameUseCase
+        )
+    }
+
+    override func tearDown() {
+        disposeBag = nil
+        checkLoginStatusUseCase = nil
+        loginUseCase = nil
+        fetchCurrentUserUseCase = nil
+        fetchThemeOptionUseCase = nil
+        fetchFolderSortOptionUseCase = nil
+        fetchClipSortOptionUseCase = nil
+        fetchSavePathLayoutOptionUseCase = nil
+        logoutUseCase = nil
+        withdrawUseCase = nil
+        saveThemeOptionUseCase = nil
+        saveSavePathLayoutOptionUseCase = nil
+        saveFolderSortOptionUseCase = nil
+        saveClipSortOptionUseCase = nil
+        updateNicknameUseCase = nil
+        reactor = nil
+    }
+}
+
+extension MyPageSectionModel: @retroactive Equatable {
+    public static func == (lhs: MyPageSectionModel, rhs: MyPageSectionModel) -> Bool {
+        return lhs.section == rhs.section && lhs.items == rhs.items
+    }
+}
+
+extension MyPageReactor.State.Phase: @retroactive Equatable {
+    public static func == (
+        lhs: MyPageReactor.State.Phase,
+        rhs: MyPageReactor.State.Phase
+    ) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.loading, .loading), (.success, .success), (.error, .error):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+extension MyPageReactor.State.Route: @retroactive Equatable {
+    public static func == (
+        lhs: MyPageReactor.State.Route,
+        rhs: MyPageReactor.State.Route
+    ) -> Bool {
+        switch (lhs, rhs) {
+        case (.showEditNickName(let a), .showEditNickName(let b)):
+            return a == b
+        case let (
+            .showSelectTheme(currentOptionA, availableOptionsA),
+            .showSelectTheme(currentOptionB, availableOptionsB)
+        ):
+            return currentOptionA == currentOptionB && availableOptionsA == availableOptionsB
+        case let (
+            .showSelectFolderSort(currentOptionA, availableOptionsA),
+            .showSelectFolderSort(currentOptionB, availableOptionsB)
+        ):
+            return currentOptionA == currentOptionB && availableOptionsA == availableOptionsB
+        case let (
+            .showSelectClipSort(currentOptionA, availableOptionsA),
+            .showSelectClipSort(currentOptionB, availableOptionsB)
+        ):
+            return currentOptionA == currentOptionB && availableOptionsA == availableOptionsB
+        case let (
+            .showSelectSavePathLayout(currentOptionA, availableOptionsA),
+            .showSelectSavePathLayout(currentOptionB, availableOptionsB)
+        ):
+            return currentOptionA == currentOptionB && availableOptionsA == availableOptionsB
+        case (.showNotificationSetting, .showNotificationSetting),
+             (.showTrash, .showTrash),
+             (.showSupport, .showSupport):
+            return true
+        default:
+            return false
+        }
+    }
+}

@@ -2,8 +2,8 @@
 
 final class MockFetchSavePathLayoutOptionUseCase: FetchSavePathLayoutOptionUseCase {
     var shouldSucceed = true
-    var option: SavePathOption = .expand
     private(set) var didCallExecute = false
+    var option: SavePathOption = .expand
 
     func execute() async -> Result<SavePathOption, Error> {
         didCallExecute = true
