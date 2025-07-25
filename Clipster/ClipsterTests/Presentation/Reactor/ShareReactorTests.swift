@@ -57,4 +57,11 @@ final class ShareReactorTests: XCTestCase {
         XCTAssertTrue(extractExtensionContextUseCase.didCallExecute)
         XCTAssertNotNil(extractExtensionContextUseCase.receivedExtensionItems)
     }
+
+    func test_editURLTextField() {
+        let text = "   https://google.com   "
+        reactor.action.onNext(.editURLTextField(text))
+
+        XCTAssertEqual(reactor.currentState.urlString, "https://google.com")
+    }
 }
