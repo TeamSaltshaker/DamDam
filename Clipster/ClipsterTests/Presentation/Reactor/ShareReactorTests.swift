@@ -36,4 +36,25 @@ final class ShareReactorTests: XCTestCase {
 
         XCTAssertTrue(reactor.currentState.isReadyToExtractURL)
     }
+
+    func test_extractedExtensionItems() {
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.urlString)
+            .skip(1)
+            .subscribe { result in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+
+        extractExtensionContextUseCase.executeResult = .success(URL(string: "https://google.com")!)
+
+        reactor.action.onNext(.extractedExtensionItems([NSExtensionItem()]))
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(reactor.currentState.urlString, "https://google.com")
+        XCTAssertTrue(extractExtensionContextUseCase.didCallExecute)
+        XCTAssertNotNil(extractExtensionContextUseCase.receivedExtensionItems)
+    }
 }
