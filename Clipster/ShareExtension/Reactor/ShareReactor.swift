@@ -96,6 +96,23 @@ final class ShareReactor: Reactor {
     private let createClipUseCase: CreateClipUseCase
     private let extractExtensionContextUseCase: ExtractExtensionContextUseCase
 
+    #if DEBUG
+    init(
+        urlMetadataDisplay: URLMetadataDisplay,
+        parseURLUseCase: ParseURLUseCase,
+        createClipUseCase: CreateClipUseCase,
+        extractExtensionContextUseCase: ExtractExtensionContextUseCase
+    ) {
+        initialState = State(
+            urlMetadataDisplay: urlMetadataDisplay
+        )
+
+        self.parseURLUseCase = parseURLUseCase
+        self.createClipUseCase = createClipUseCase
+        self.extractExtensionContextUseCase = extractExtensionContextUseCase
+    }
+    #endif
+
     init(
         parseURLUseCase: ParseURLUseCase,
         createClipUseCase: CreateClipUseCase,
