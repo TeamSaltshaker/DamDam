@@ -222,4 +222,103 @@ final class ShareReactorTests: XCTestCase {
 
         XCTAssertFalse(reactor.currentState.isTappedFolderView)
     }
+
+    func test_섬네일_이미지와_스크린샷_없을_때_isHiddenURLMetadataStackView_true() {
+        let state = ShareReactor.State(
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
+        )
+
+        XCTAssertTrue(state.isHiddenURLMetadataStackView)
+    }
+
+    func test_섬네일_이미지_있을_때_isHiddenURLMetadataStackView_false() {
+        let state = ShareReactor.State(
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithThumbnail
+        )
+
+        XCTAssertFalse(state.isHiddenURLMetadataStackView)
+    }
+
+    func test_스크린샷_있을_때_isHiddenURLMetadataStackView_false() {
+        let state = ShareReactor.State(
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithScreenshot
+        )
+
+        XCTAssertFalse(state.isHiddenURLMetadataStackView)
+    }
+
+    func test_urlValidationResult_valid일_때_urlTextFieldBorderColor() {
+        let state = ShareReactor.State(
+            urlString: "테스트",
+            urlValidationResult: .valid
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .appPrimary)
+    }
+
+    func test_urlValidationResult_validWithWarning일_때_urlTextFieldBorderColor() {
+        let state = ShareReactor.State(
+            urlString: "테스트",
+            urlValidationResult: .validWithWarning
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .yellow600)
+    }
+
+    func test_urlValidationResult_invalid일_때_urlTextFieldBorderColor() {
+        let state = ShareReactor.State(
+            urlString: "테스트",
+            urlValidationResult: .invalid
+        )
+
+        XCTAssertEqual(state.urlTextFieldBorderColor, .red600)
+    }
+
+    func test_urlValidationResult_valid일_때_urlValidationLabelText() {
+        let state = ShareReactor.State(
+            urlValidationResult: .valid
+        )
+
+        XCTAssertEqual(state.urlValidationLabelText, "올바른 URL 입니다.")
+    }
+
+    func test_urlValidationResult_validWithWarning일_때_urlValidationLabelText() {
+        let state = ShareReactor.State(
+            urlValidationResult: .validWithWarning
+        )
+
+        XCTAssertEqual(state.urlValidationLabelText, "올바른 URL이지만, 미리보기를 불러 올 수 없습니다.")
+    }
+
+    func test_urlValidationResult_invalid일_때_urlValidationLabelText() {
+        let state = ShareReactor.State(
+            urlValidationResult: .invalid
+        )
+
+        XCTAssertEqual(state.urlValidationLabelText, "올바르지 않은 URL 입니다.")
+    }
+
+    func test_urlValidationResult_valid일_때_urlValidationImageResource() {
+        let state = ShareReactor.State(
+            urlValidationResult: .valid
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .checkBlue)
+    }
+    
+    func test_urlValidationResult_validWithWarning일_때_urlValidationImageResource() {
+        let state = ShareReactor.State(
+            urlValidationResult: .validWithWarning
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .infoYellow)
+    }
+
+    func test_urlValidationResult_invalid일_때_urlValidationImageResource() {
+        let state = ShareReactor.State(
+            urlValidationResult: .invalid
+        )
+
+        XCTAssertEqual(state.urlValidationImageResource, .xCircleRed)
+    }
 }
