@@ -164,4 +164,56 @@ final class ShareReactorTests: XCTestCase {
         XCTAssertNotNil(reactor.currentState.currentFolder)
         XCTAssertEqual(reactor.currentState.currentFolder?.id, mockFolder.id)
     }
+
+    func test_saveClip_성공() {
+        let reactor = ShareReactor(
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            createClipUseCase: createClipUseCase,
+            extractExtensionContextUseCase: extractExtensionContextUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .filter { $0 }
+            .subscribe(onNext: { result in
+                expectation.fulfill()
+            })
+            .disposed(by: disposeBag)
+
+        reactor.action.onNext(.saveClip)
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(createClipUseCase.didCallExecute)
+        XCTAssertNotNil(createClipUseCase.receivedClip)
+    }
+
+    func test_saveClip_실패() {
+        let reactor = ShareReactor(
+            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            parseURLUseCase: parseURLUseCase,
+            createClipUseCase: createClipUseCase,
+            extractExtensionContextUseCase: extractExtensionContextUseCase
+        )
+
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.isSuccessedEditClip)
+            .skip(1)
+            .subscribe(onNext: { result in
+                if !result {
+                    expectation.fulfill()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        createClipUseCase.shouldSucceed = false
+        reactor.action.onNext(.saveClip)
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertFalse(reactor.currentState.isSuccessedEditClip)
+        XCTAssertTrue(createClipUseCase.didCallExecute)
+        XCTAssertNotNil(createClipUseCase.receivedClip)
+    }
 }
