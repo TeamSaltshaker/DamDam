@@ -142,4 +142,11 @@ final class ShareReactorTests: XCTestCase {
 
         XCTAssertTrue(reactor.currentState.isLoading)
     }
+
+    func test_editMemo() {
+        reactor.action.onNext(.editMemo(" 메모 테스트 "))
+
+        XCTAssertEqual(reactor.currentState.memoText, "메모 테스트")
+        XCTAssertEqual(reactor.currentState.memoLimit, "6 / 100")
+    }
 }
