@@ -30,4 +30,10 @@ final class ShareReactorTests: XCTestCase {
         disposeBag = nil
         reactor = nil
     }
+
+    func test_viewWillAppear() {
+        reactor.action.onNext(.viewWillAppear)
+
+        XCTAssertTrue(reactor.currentState.isReadyToExtractURL)
+    }
 }
