@@ -136,4 +136,10 @@ final class ShareReactorTests: XCTestCase {
         XCTAssertEqual(reactor.currentState.urlValidationResult, .invalid)
         XCTAssertFalse(reactor.currentState.isLoading)
     }
+
+    func test_editingURLTextField() {
+        reactor.action.onNext(.editingURLTextField)
+
+        XCTAssertTrue(reactor.currentState.isLoading)
+    }
 }
