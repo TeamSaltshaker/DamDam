@@ -272,7 +272,7 @@ extension ShareViewController: View {
                 self.present(vc, animated: true)
 
                 vc.onSelectionComplete = { [weak self] in
-                    self?.reactor?.action.onNext(.editFolder($0))
+                    self?.reactor?.action.onNext(.changeFolder($0))
                 }
                 self.reactor?.action.onNext(.disappearFolderSelectorView)
             }
