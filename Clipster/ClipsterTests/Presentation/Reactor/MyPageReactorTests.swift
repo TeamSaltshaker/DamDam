@@ -98,6 +98,36 @@ final class MyPageReactorTests: XCTestCase {
         updateNicknameUseCase = nil
         reactor = nil
     }
+
+    func test_viewWillAppear() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.viewWillAppear)
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+
+        XCTAssertTrue(fetchThemeOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
+
+        XCTAssertEqual(reactor.currentState.sectionModel, defaultSectionModels)
+    }
 }
 
 extension MyPageSectionModel: @retroactive Equatable {
