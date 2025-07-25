@@ -229,7 +229,6 @@ final class ShareReactor: Reactor {
         case .updateIsSuccessedEditClip(let value):
             newState.isSuccessedEditClip = value
         }
-
         return newState
     }
 }
