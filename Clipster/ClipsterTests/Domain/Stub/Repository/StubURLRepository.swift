@@ -2,18 +2,18 @@ import Foundation
 @testable import Clipster
 
 final class StubURLRepository: URLRepository {
-    let resolveRedirectURL: URL
+    let resolvedRedirectURL: URL
     let htmlResult: String
-    let captureScreenshot: Data?
+    let capturedScreenshot: Data?
 
     init(
         resolveRedirectURL: URL,
         htmlResult: String,
         captureScreenshot: Data?
     ) {
-        self.resolveRedirectURL = resolveRedirectURL
+        self.resolvedRedirectURL = resolveRedirectURL
         self.htmlResult = htmlResult
-        self.captureScreenshot = captureScreenshot
+        self.capturedScreenshot = captureScreenshot
     }
 
     func fetchHTML(from url: URL) async -> Result<String, URLValidationError> {
@@ -21,10 +21,10 @@ final class StubURLRepository: URLRepository {
     }
     
     func resolveRedirectURL(initialURL: URL) async -> URL {
-        return resolveRedirectURL
+        return resolvedRedirectURL
     }
     
     func captureScreenshot(rect: CGRect?) async -> Data? {
-        return captureScreenshot
+        return capturedScreenshot
     }
 }
