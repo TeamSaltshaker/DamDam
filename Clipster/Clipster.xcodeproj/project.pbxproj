@@ -118,6 +118,7 @@
 				Domain/UseCase/ShareExtension/DefaultExtractExtensionContextUseCase.swift,
 				Domain/UseCase/URL/DefaultParseURLUseCase.swift,
 				Presentation/Model/FolderDisplay.swift,
+				Presentation/Model/ParseResultType.swift,
 				Presentation/Model/URLMetadataDisplay.swift,
 				Presentation/Resource/Color.xcassets,
 				Presentation/Resource/Icon.xcassets,
