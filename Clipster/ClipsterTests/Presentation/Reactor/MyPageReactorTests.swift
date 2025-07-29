@@ -279,6 +279,60 @@ final class MyPageReactorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(routeResult, .showSupport)
     }
+
+    func test_테마_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.detail(.theme(.dark))))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(
+            routeResult,
+            .showSelectTheme(
+                currentOption: .dark,
+                availableOptions: ThemeOption.allCases
+            )
+        )
+    }
+
+    func test_저장_경로_보기_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.detail(.savePath(.expand))))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(
+            routeResult,
+            .showSelectSavePathLayout(
+                currentOption: .expand,
+                availableOptions: SavePathOption.allCases
+            )
+        )
+    }
 }
 
 extension MyPageSectionModel: @retroactive Equatable {
