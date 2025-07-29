@@ -325,9 +325,7 @@ private extension FolderView {
         }
 
         emptyView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(291)
-            make.height.equalTo(146)
-            make.centerX.equalToSuperview()
+            make.center.equalToSuperview()
         }
 
         activityIndicator.snp.makeConstraints { make in
