@@ -33,7 +33,7 @@ final class ShareReactor: Reactor {
         var memoText: String = ""
         var isReadyToExtractURL = false
         var urlMetadataDisplay: URLMetadataDisplay?
-        var urlValidationResult: ClipValidType?
+        var urlValidationResult: ParseResultType?
         var isLoading = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
