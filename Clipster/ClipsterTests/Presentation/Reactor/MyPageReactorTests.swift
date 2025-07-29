@@ -25,7 +25,41 @@ final class MyPageReactorTests: XCTestCase {
 
     private var reactor: MyPageReactor!
 
-    private var defaultSectionModels: [MyPageSectionModel] {
+    private var userSectionModels: [MyPageSectionModel] {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+
+        return [
+            .init(section: .welcome(MockUser.someUser.nickname), items: []),
+            .init(
+                section: .profile,
+                items: [
+                    .sectionTitle(MyPageSection.profile.title),
+                    .chevron(.nicknameEdit)
+                ]
+            ),
+            .init(
+                section: .systemSettings,
+                items: [
+                    .sectionTitle(MyPageSection.systemSettings.title),
+                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
+                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
+                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
+                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
+                ]
+            ),
+            .init(section: .support, items: [.chevron(.support)]),
+            .init(
+                section: .etc,
+                items: [
+                    .account(.logout),
+                    .account(.withdraw),
+                    .version(appVersion)
+                ]
+            )
+        ]
+    }
+
+    private var guestSectionModels: [MyPageSectionModel] {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
 
         return [
@@ -126,7 +160,124 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
         XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
 
-        XCTAssertEqual(reactor.currentState.sectionModel, defaultSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+    }
+
+    func test_로그인_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.login(.apple)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+
+        XCTAssertTrue(loginUseCase.didCallExecute)
+        XCTAssertTrue(fetchThemeOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchFolderSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
+        XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
+
+        XCTAssertEqual(reactor.currentState.sectionModel, userSectionModels)
+    }
+
+    func test_닉네임_변경_탭() {
+        // given
+        reactor.action.onNext(.tapCell(.login(.apple)))
+
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.chevron(.nicknameEdit)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .showEditNickName(MockUser.someUser.nickname))
+    }
+
+    func test_알림설정__탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.chevron(.notificationSetting)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .showNotificationSetting)
+    }
+
+    func test_휴지통__탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.chevron(.trash)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .showTrash)
+    }
+
+    func test_문의하기__탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.chevron(.support)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(routeResult, .showSupport)
     }
 }
 
