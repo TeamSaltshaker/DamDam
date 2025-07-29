@@ -22,10 +22,13 @@ final class FolderReactor: Reactor {
         var currentFolderTitle: String
         var folders: [FolderDisplay]
         var clips: [ClipDisplay]
-        var isEmptyViewHidden: Bool
 
         @Pulse var phase: Phase
         @Pulse var route: Route?
+
+        var isEmptyViewHidden: Bool {
+            !folders.isEmpty || !clips.isEmpty
+        }
     }
 
     enum Phase {
@@ -86,7 +89,6 @@ final class FolderReactor: Reactor {
             currentFolderTitle: "",
             folders: [],
             clips: [],
-            isEmptyViewHidden: true,
             phase: .idle,
         )
     }
@@ -157,7 +159,6 @@ final class FolderReactor: Reactor {
             newState.currentFolderTitle = folder.title
             newState.folders = folder.folders.map(FolderDisplayMapper.map)
             newState.clips = folder.clips.map(ClipDisplayMapper.map)
-            newState.isEmptyViewHidden = !folder.folders.isEmpty || !folder.clips.isEmpty
         case .setPhase(let phase):
             newState.phase = phase
         case .setRoute(let route):
