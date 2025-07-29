@@ -30,29 +30,6 @@ final class EditClipReactorTests: XCTestCase {
         reactor = nil
     }
 
-    private func createReactor(
-        type: EditClipReactor.EditClipReactorType
-    ) -> EditClipReactor {
-        switch type {
-        case .create:
-            return EditClipReactor(
-                currentFolder: MockFolder.someFolder,
-                parseURLUseCase: parseURLUseCase,
-                fetchFolderUseCase: fetchFolderUseCase,
-                createClipUseCase: createClipUseCase,
-                updateClipUseCase: updateClipUseCase
-            )
-        case .edit:
-            return EditClipReactor(
-                clip: MockClip.someClip,
-                parseURLUseCase: parseURLUseCase,
-                fetchFolderUseCase: fetchFolderUseCase,
-                createClipUseCase: createClipUseCase,
-                updateClipUseCase: updateClipUseCase
-            )
-        }
-    }
-
     func test_fetchFolder_성공() {
         let reactor = createReactor(type: .edit)
         let expectation = expectation(description: #function)
@@ -223,7 +200,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_클립_추가_시_saveClip_성공() {
         let reactor = EditClipReactor(
             type: .create,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
@@ -249,7 +226,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_클립_추가_시_saveClip_실패() {
         let reactor = EditClipReactor(
             type: .create,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
@@ -280,7 +257,7 @@ final class EditClipReactorTests: XCTestCase {
         let reactor = EditClipReactor(
             type: .edit,
             clip: MockClip.someClip,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
@@ -307,7 +284,7 @@ final class EditClipReactorTests: XCTestCase {
         let reactor = EditClipReactor(
             type: .edit,
             clip: MockClip.someClip,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
@@ -346,7 +323,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_섬네일_이미지와_스크린샷_없을_때_isHiddenURLMetadataStackView_true() {
         let state = EditClipReactor.State(
             type: .create,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
         )
 
         XCTAssertTrue(state.isHiddenURLMetadataStackView)
@@ -355,7 +332,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_섬네일_이미지_있을_때_isHiddenURLMetadataStackView_false() {
         let state = EditClipReactor.State(
             type: .create,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithThumbnail
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithThumbnail
         )
 
         XCTAssertFalse(state.isHiddenURLMetadataStackView)
@@ -364,7 +341,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_스크린샷_있을_때_isHiddenURLMetadataStackView_false() {
         let state = EditClipReactor.State(
             type: .create,
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithScreenshot
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithScreenshot
         )
 
         XCTAssertFalse(state.isHiddenURLMetadataStackView)
@@ -452,5 +429,30 @@ final class EditClipReactorTests: XCTestCase {
         )
 
         XCTAssertEqual(state.urlValidationImageResource, .xCircleRed)
+    }
+}
+
+private extension EditClipReactorTests {
+    func createReactor(
+        type: EditClipReactor.EditClipReactorType
+    ) -> EditClipReactor {
+        switch type {
+        case .create:
+            return EditClipReactor(
+                currentFolder: MockFolder.someFolder,
+                parseURLUseCase: parseURLUseCase,
+                fetchFolderUseCase: fetchFolderUseCase,
+                createClipUseCase: createClipUseCase,
+                updateClipUseCase: updateClipUseCase
+            )
+        case .edit:
+            return EditClipReactor(
+                clip: MockClip.someClip,
+                parseURLUseCase: parseURLUseCase,
+                fetchFolderUseCase: fetchFolderUseCase,
+                createClipUseCase: createClipUseCase,
+                updateClipUseCase: updateClipUseCase
+            )
+        }
     }
 }

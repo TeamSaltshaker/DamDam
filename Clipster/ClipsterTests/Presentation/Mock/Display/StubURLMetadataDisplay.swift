@@ -1,7 +1,7 @@
 import Foundation
 @testable import Clipster
 
-enum MockURLMetadataDisplay {
+enum StubURLMetadataDisplay {
     static let urlMetaDataDisplay = URLMetadataDisplay(
         url: URL(string: "https://example.com")!,
         title: "Sample Title",
