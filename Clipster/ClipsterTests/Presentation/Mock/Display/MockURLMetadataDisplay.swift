@@ -17,6 +17,7 @@ enum MockURLMetadataDisplay {
         thumbnailImageURL: nil,
         screenshotImageData: nil,
     )
+    
     static let urlMetadataDisplayWithScreenshot = URLMetadataDisplay(
         url: URL(string: "https://example.com")!,
         title: "Sample Title",
