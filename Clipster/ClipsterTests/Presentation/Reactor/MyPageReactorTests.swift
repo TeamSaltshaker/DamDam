@@ -387,6 +387,56 @@ final class MyPageReactorTests: XCTestCase {
             )
         )
     }
+
+    func test_로그아웃_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.account(.logout)))
+
+        // then
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue(logoutUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+    }
+
+    func test_회원탈퇴_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var phaseResults: [Phase] = []
+
+        reactor.pulse(\.$phase)
+            .skip(1)
+            .subscribe { phase in
+                phaseResults.append(phase)
+                if phase == .success {
+                    expectation.fulfill()
+                }
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.account(.withdraw)))
+
+        // then
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(phaseResults, [.loading, .success])
+        XCTAssertTrue(withdrawUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+    }
 }
 
 extension MyPageSectionModel: @retroactive Equatable {
