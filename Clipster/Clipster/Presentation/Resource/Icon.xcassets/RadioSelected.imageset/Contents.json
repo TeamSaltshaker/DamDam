@@ -3,6 +3,16 @@
     {
       "filename" : "RadioSelected.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "radio-selected-blue-dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

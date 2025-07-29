@@ -3,6 +3,16 @@
     {
       "filename" : "ChevronRightBlue.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "chevron-right-blue-dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

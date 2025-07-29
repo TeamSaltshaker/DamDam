@@ -3,6 +3,16 @@
     {
       "filename" : "check-blue.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "check-blue-dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {
