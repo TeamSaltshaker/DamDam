@@ -10,8 +10,8 @@ final class SearchView: UIView {
         return collectionView
     }()
 
-    let emptyView: EmptyView = {
-        let view = EmptyView(type: .searchView)
+    let emptyStateView: EmptyStateView = {
+        let view = EmptyStateView(type: .searchView)
         view.isHidden = true
         return view
     }()
@@ -42,7 +42,7 @@ private extension SearchView {
     }
 
     func setHierarchy() {
-        [searchTextField, collectionView, emptyView]
+        [searchTextField, collectionView, emptyStateView]
             .forEach { addSubview($0) }
     }
 
@@ -58,7 +58,7 @@ private extension SearchView {
             make.directionalHorizontalEdges.bottom.equalToSuperview()
         }
 
-        emptyView.snp.makeConstraints { make in
+        emptyStateView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }

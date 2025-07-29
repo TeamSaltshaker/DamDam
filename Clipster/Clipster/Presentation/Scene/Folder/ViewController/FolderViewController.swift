@@ -90,7 +90,7 @@ private extension FolderViewController {
 
         reactor.state
             .observe(on: MainScheduler.instance)
-            .map(\.isEmptyViewHidden)
+            .map(\.isEmptyStateViewHidden)
             .distinctUntilChanged()
             .bind { [weak self] isHidden in
                 guard let self else { return }
