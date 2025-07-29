@@ -333,6 +333,60 @@ final class MyPageReactorTests: XCTestCase {
             )
         )
     }
+
+    func test_폴더_정렬_순서_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.dropdown(.folderSort(.createdAt(.ascending)))))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(
+            routeResult,
+            .showSelectFolderSort(
+                currentOption: .createdAt(.ascending),
+                availableOptions: FolderSortOption.allCases
+            )
+        )
+    }
+
+    func test_클립_정렬_순서_탭() {
+        // given
+        let expectation = expectation(description: #function)
+        var routeResult: Route?
+
+        reactor.pulse(\.$route)
+            .compactMap { $0 }
+            .subscribe { route in
+                routeResult = route
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.tapCell(.dropdown(.clipSort(.createdAt(.ascending)))))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(
+            routeResult,
+            .showSelectClipSort(
+                currentOption: .createdAt(.ascending),
+                availableOptions: ClipSortOption.allCases
+            )
+        )
+    }
 }
 
 extension MyPageSectionModel: @retroactive Equatable {
