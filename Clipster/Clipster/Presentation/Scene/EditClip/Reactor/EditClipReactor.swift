@@ -8,15 +8,15 @@ final class EditClipReactor: Reactor {
     }
 
     enum Action {
+        case fetchInitialData
         case viewDidAppear
         case editURLTextField(String)
         case validifyURL(String)
         case editingURLTextField
         case editMemo(String)
         case tapFolderView
-        case editFolder(Folder?)
+        case changeFolder(Folder?)
         case saveClip
-        case fetchFolder
         case disappearFolderSelectorView
     }
 
@@ -94,10 +94,10 @@ final class EditClipReactor: Reactor {
             switch result {
             case .valid:
                 return .checkBlue
-            case .invalid:
-                return .xCircleRed
             case .validWithWarning:
                 return .infoYellow
+            case .invalid:
+                return .xCircleRed
             }
         }
     }
@@ -108,6 +108,28 @@ final class EditClipReactor: Reactor {
     private let fetchFolderUseCase: FetchFolderUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
+
+    #if DEBUG
+    init(
+        type: EditClipReactorType,
+        clip: Clip? = nil,
+        urlMetadataDisplay: URLMetadataDisplay,
+        parseURLUseCase: ParseURLUseCase,
+        fetchFolderUseCase: FetchFolderUseCase,
+        createClipUseCase: CreateClipUseCase,
+        updateClipUseCase: UpdateClipUseCase
+    ) {
+        self.initialState = State(
+            type: type,
+            clip: clip,
+            urlMetadataDisplay: urlMetadataDisplay
+        )
+        self.parseURLUseCase = parseURLUseCase
+        self.fetchFolderUseCase = fetchFolderUseCase
+        self.createClipUseCase = createClipUseCase
+        self.updateClipUseCase = updateClipUseCase
+    }
+    #endif
 
     init(
         currentFolder: Folder? = nil,
@@ -145,9 +167,24 @@ final class EditClipReactor: Reactor {
         self.updateClipUseCase = updateClipUseCase
     }
 
+    func transform(action: Observable<Action>) -> Observable<Action> {
+        let initialAction = (initialState.type == .edit && initialState.clip?.folderID != nil) ? Observable.just(Action.fetchInitialData)
+            : Observable.empty()
+
+        return Observable.merge(action, initialAction)
+    }
+
     func mutate(action: Action) -> Observable<Mutation> {
         print("\(Self.self) \(action)")
         switch action {
+        case .fetchInitialData:
+            guard let clip = currentState.clip,
+                  let folderID = clip.folderID else { return .empty() }
+            return .fromAsync {
+                try await self.fetchFolderUseCase.execute(id: folderID).get()
+            }
+            .map { .updateCurrentFolder($0) }
+            .catchAndReturn(.updateCurrentFolder(nil))
         case .editURLTextField(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .just(.updateURLString(trimmed))
@@ -197,7 +234,7 @@ final class EditClipReactor: Reactor {
             return .just(.updateMemo(trimmed))
         case .tapFolderView:
             return .just(.updateIsTappedFolderView(true))
-        case .editFolder(let newFolder):
+        case .changeFolder(let newFolder):
             return .just(.updateCurrentFolder(newFolder))
         case .saveClip:
             switch currentState.type {
@@ -249,14 +286,6 @@ final class EditClipReactor: Reactor {
                 .map { .updateIsSuccessedEditClip(true) }
                 .catchAndReturn(.updateIsSuccessedEditClip(false))
             }
-        case .fetchFolder:
-            guard let clip = currentState.clip,
-                  let folderID = clip.folderID else { return .empty() }
-            return .fromAsync {
-                try await self.fetchFolderUseCase.execute(id: folderID).get()
-            }
-            .map { .updateCurrentFolder($0) }
-            .catchAndReturn(.updateCurrentFolder(nil))
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         case .viewDidAppear:
