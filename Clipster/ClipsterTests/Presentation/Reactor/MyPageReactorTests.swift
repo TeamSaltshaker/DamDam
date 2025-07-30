@@ -25,59 +25,6 @@ final class MyPageReactorTests: XCTestCase {
 
     private var reactor: MyPageReactor!
 
-    private var userSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-
-        return [
-            .init(section: .welcome(MockUser.someUser.nickname), items: []),
-            .init(
-                section: .profile,
-                items: [
-                    .sectionTitle(MyPageSection.profile.title),
-                    .chevron(.nicknameEdit)
-                ]
-            ),
-            .init(
-                section: .systemSettings,
-                items: [
-                    .sectionTitle(MyPageSection.systemSettings.title),
-                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
-                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
-                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
-                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
-                ]
-            ),
-            .init(section: .support, items: [.chevron(.support)]),
-            .init(
-                section: .etc,
-                items: [
-                    .account(.logout),
-                    .account(.withdraw),
-                    .version(appVersion)
-                ]
-            )
-        ]
-    }
-
-    private var guestSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-
-        return [
-            .init(
-                section: .systemSettings,
-                items: [
-                    .sectionTitle(MyPageSection.systemSettings.title),
-                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
-                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
-                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
-                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
-                ]
-            ),
-            .init(section: .support, items: [.chevron(.support)]),
-            .init(section: .etc, items: [.version(appVersion)])
-        ]
-    }
-
     override func setUp() {
         disposeBag = DisposeBag()
 
@@ -436,6 +383,61 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(withdrawUseCase.didCallExecute)
         XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+    }
+}
+
+private extension MyPageReactorTests {
+    var userSectionModels: [MyPageSectionModel] {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+
+        return [
+            .init(section: .welcome(MockUser.someUser.nickname), items: []),
+            .init(
+                section: .profile,
+                items: [
+                    .sectionTitle(MyPageSection.profile.title),
+                    .chevron(.nicknameEdit)
+                ]
+            ),
+            .init(
+                section: .systemSettings,
+                items: [
+                    .sectionTitle(MyPageSection.systemSettings.title),
+                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
+                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
+                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
+                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
+                ]
+            ),
+            .init(section: .support, items: [.chevron(.support)]),
+            .init(
+                section: .etc,
+                items: [
+                    .account(.logout),
+                    .account(.withdraw),
+                    .version(appVersion)
+                ]
+            )
+        ]
+    }
+
+    var guestSectionModels: [MyPageSectionModel] {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+
+        return [
+            .init(
+                section: .systemSettings,
+                items: [
+                    .sectionTitle(MyPageSection.systemSettings.title),
+                    .detail(.theme(self.fetchThemeOptionUseCase.option)),
+                    .dropdown(.folderSort(self.fetchFolderSortOptionUseCase.option)),
+                    .dropdown(.clipSort(self.fetchClipSortOptionUseCase.option)),
+                    .detail(.savePath(self.fetchSavePathLayoutOptionUseCase.option))
+                ]
+            ),
+            .init(section: .support, items: [.chevron(.support)]),
+            .init(section: .etc, items: [.version(appVersion)])
+        ]
     }
 }
 
