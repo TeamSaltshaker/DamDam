@@ -83,7 +83,7 @@ private extension SearchViewController {
             .distinctUntilChanged()
             .map { !$0 }
             .asDriver(onErrorJustReturn: true)
-            .drive(searchView.emptyStateView.rx.isHidden)
+            .drive(searchView.emptyDataView.rx.isHidden)
             .disposed(by: disposeBag)
 
         reactor.state

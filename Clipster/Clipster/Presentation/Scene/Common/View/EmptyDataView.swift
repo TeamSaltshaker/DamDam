@@ -1,7 +1,7 @@
 import SnapKit
 import UIKit
 
-final class EmptyStateView: UIView {
+final class EmptyDataView: UIView {
     enum ViewType {
         case homeView
         case folderView
@@ -49,7 +49,7 @@ final class EmptyStateView: UIView {
         return label
     }()
 
-    init(type: EmptyStateView.ViewType) {
+    init(type: EmptyDataView.ViewType) {
         self.viewType = type
         super.init(frame: .zero)
         configure()
@@ -60,7 +60,7 @@ final class EmptyStateView: UIView {
     }
 }
 
-private extension EmptyStateView {
+private extension EmptyDataView {
     func configure() {
         setAttributes()
         setHierarchy()

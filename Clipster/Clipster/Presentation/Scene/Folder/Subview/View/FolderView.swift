@@ -68,7 +68,7 @@ final class FolderView: UIView {
         return collectionView
     }()
 
-    private let emptyStateView = EmptyStateView(type: .folderView)
+    private let emptyDataView = EmptyDataView(type: .folderView)
 
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 
@@ -104,7 +104,7 @@ final class FolderView: UIView {
     }
 
     func setDisplay(isHidden: Bool) {
-        emptyStateView.isHidden = isHidden
+        emptyDataView.isHidden = isHidden
     }
 
     func setLoading(_ isLoading: Bool) {
@@ -298,7 +298,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, collectionView, emptyStateView, activityIndicator, addButton].forEach {
+        [navigationView, collectionView, emptyDataView, activityIndicator, addButton].forEach {
             addSubview($0)
         }
     }
@@ -324,7 +324,7 @@ private extension FolderView {
             make.bottom.equalToSuperview()
         }
 
-        emptyStateView.snp.makeConstraints { make in
+        emptyDataView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
 

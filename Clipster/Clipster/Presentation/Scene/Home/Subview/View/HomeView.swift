@@ -85,8 +85,8 @@ final class HomeView: UIView {
         return collectionView
     }()
 
-    private let emptyStateView: EmptyStateView = {
-        let view = EmptyStateView(type: .homeView)
+    private let emptyDataView: EmptyDataView = {
+        let view = EmptyDataView(type: .homeView)
         view.isHidden = true
         return view
     }()
@@ -211,7 +211,7 @@ final class HomeView: UIView {
             snapshot.appendItems(clipItem, toSection: .clip)
         }
 
-        emptyStateView.isHidden = !(display.unvisitedClips.isEmpty && display.folders.isEmpty && display.clips.isEmpty)
+        emptyDataView.isHidden = !(display.unvisitedClips.isEmpty && display.folders.isEmpty && display.clips.isEmpty)
 
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -424,7 +424,7 @@ private extension HomeView {
         [
             navigationView,
             collectionView,
-            emptyStateView,
+            emptyDataView,
             loadingIndicator,
             addButton
         ].forEach { addSubview($0) }
@@ -457,7 +457,7 @@ private extension HomeView {
             make.bottom.equalToSuperview()
         }
 
-        emptyStateView.snp.makeConstraints { make in
+        emptyDataView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
 
