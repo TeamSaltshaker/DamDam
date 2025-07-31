@@ -26,7 +26,7 @@ final class FolderReactor: Reactor {
         @Pulse var phase: Phase
         @Pulse var route: Route?
 
-        var isEmptyViewHidden: Bool {
+        var isEmptyDataViewHidden: Bool {
             !folders.isEmpty || !clips.isEmpty
         }
     }

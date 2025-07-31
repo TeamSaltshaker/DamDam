@@ -1,8 +1,8 @@
 import SnapKit
 import UIKit
 
-final class EmptyView: UIView {
-    enum EmptyViewType {
+final class EmptyDataView: UIView {
+    enum ViewType {
         case homeView
         case folderView
         case searchView
@@ -31,7 +31,7 @@ final class EmptyView: UIView {
         }
     }
 
-    private let emptyViewType: EmptyViewType
+    private let viewType: ViewType
 
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -49,8 +49,8 @@ final class EmptyView: UIView {
         return label
     }()
 
-    init(type: EmptyView.EmptyViewType) {
-        self.emptyViewType = type
+    init(type: EmptyDataView.ViewType) {
+        self.viewType = type
         super.init(frame: .zero)
         configure()
     }
@@ -60,7 +60,7 @@ final class EmptyView: UIView {
     }
 }
 
-private extension EmptyView {
+private extension EmptyDataView {
     func configure() {
         setAttributes()
         setHierarchy()
@@ -70,7 +70,7 @@ private extension EmptyView {
     func setAttributes() {
         backgroundColor = .background
 
-        descriptionLabel.text = emptyViewType.description
+        descriptionLabel.text = viewType.description
     }
 
     func setHierarchy() {
@@ -82,12 +82,12 @@ private extension EmptyView {
     func setConstraints() {
         imageView.snp.makeConstraints { make in
             make.top.centerX.equalToSuperview()
-            make.width.equalTo(emptyViewType.imageSize.width)
-            make.height.equalTo(emptyViewType.imageSize.height)
+            make.width.equalTo(viewType.imageSize.width)
+            make.height.equalTo(viewType.imageSize.height)
         }
 
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(emptyViewType.spacing)
+            make.top.equalTo(imageView.snp.bottom).offset(viewType.spacing)
             make.directionalHorizontalEdges.centerX.equalToSuperview()
             make.bottom.equalToSuperview()
         }

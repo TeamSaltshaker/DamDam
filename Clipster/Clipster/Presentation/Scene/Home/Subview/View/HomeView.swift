@@ -85,20 +85,10 @@ final class HomeView: UIView {
         return collectionView
     }()
 
-    private let emptyView: EmptyView = {
-        let view = EmptyView(type: .homeView)
+    private let emptyDataView: EmptyDataView = {
+        let view = EmptyDataView(type: .homeView)
         view.isHidden = true
         return view
-    }()
-
-    private let emptyAddButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.addButtonBlue, for: .normal)
-        button.setImage(.addButtonBlue, for: .highlighted)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.backgroundColor = .clear
-        button.isHidden = true
-        return button
     }()
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
@@ -221,11 +211,7 @@ final class HomeView: UIView {
             snapshot.appendItems(clipItem, toSection: .clip)
         }
 
-        let isEmpty = !(display.unvisitedClips.isEmpty
-                        && display.folders.isEmpty
-                        && display.clips.isEmpty)
-        emptyView.isHidden = isEmpty
-        emptyAddButton.isHidden = isEmpty
+        emptyDataView.isHidden = !(display.unvisitedClips.isEmpty && display.folders.isEmpty && display.clips.isEmpty)
 
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -438,8 +424,7 @@ private extension HomeView {
         [
             navigationView,
             collectionView,
-            emptyView,
-            emptyAddButton,
+            emptyDataView,
             loadingIndicator,
             addButton
         ].forEach { addSubview($0) }
@@ -472,17 +457,8 @@ private extension HomeView {
             make.bottom.equalToSuperview()
         }
 
-        emptyView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(291)
-            make.height.equalTo(146)
-            make.centerX.equalToSuperview()
-        }
-
-        emptyAddButton.snp.makeConstraints { make in
-            make.top.equalTo(emptyView.snp.bottom).offset(32)
-            make.width.equalTo(160)
-            make.height.equalTo(48)
-            make.centerX.equalToSuperview()
+        emptyDataView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
 
         loadingIndicator.snp.makeConstraints { make in
@@ -496,11 +472,6 @@ private extension HomeView {
                 self?.logicalIndexPath(indexPath) ?? indexPath
             }
             .map { Action.tapCell($0) }
-            .bind(to: action)
-            .disposed(by: disposeBag)
-
-        emptyAddButton.rx.tap
-            .map { Action.tapAddClip }
             .bind(to: action)
             .disposed(by: disposeBag)
     }

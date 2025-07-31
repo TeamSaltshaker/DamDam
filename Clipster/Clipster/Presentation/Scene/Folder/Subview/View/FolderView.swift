@@ -68,17 +68,7 @@ final class FolderView: UIView {
         return collectionView
     }()
 
-    private let emptyView = EmptyView(type: .folderView)
-
-    private let emptyAddButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.addButtonBlue, for: .normal)
-        button.setImage(.addButtonBlue, for: .highlighted)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.backgroundColor = .clear
-        button.isHidden = true
-        return button
-    }()
+    private let emptyDataView = EmptyDataView(type: .folderView)
 
     private let activityIndicator = UIActivityIndicatorView(style: .large)
 
@@ -114,8 +104,7 @@ final class FolderView: UIView {
     }
 
     func setDisplay(isHidden: Bool) {
-        emptyView.isHidden = isHidden
-        emptyAddButton.isHidden = isHidden
+        emptyDataView.isHidden = isHidden
     }
 
     func setLoading(_ isLoading: Bool) {
@@ -309,7 +298,7 @@ private extension FolderView {
     }
 
     func setHierarchy() {
-        [navigationView, collectionView, emptyView, emptyAddButton, activityIndicator, addButton].forEach {
+        [navigationView, collectionView, emptyDataView, activityIndicator, addButton].forEach {
             addSubview($0)
         }
     }
@@ -335,17 +324,8 @@ private extension FolderView {
             make.bottom.equalToSuperview()
         }
 
-        emptyView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(291)
-            make.height.equalTo(146)
-            make.centerX.equalToSuperview()
-        }
-
-        emptyAddButton.snp.makeConstraints { make in
-            make.top.equalTo(emptyView.snp.bottom).offset(32)
-            make.width.equalTo(160)
-            make.height.equalTo(48)
-            make.centerX.equalToSuperview()
+        emptyDataView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
 
         activityIndicator.snp.makeConstraints { make in
@@ -418,11 +398,6 @@ private extension FolderView {
                 guard let self else { return }
                 action.accept(.didTapCell(logicalIndexPath(indexPath)))
             }
-            .disposed(by: disposeBag)
-
-        emptyAddButton.rx.tap
-            .map { Action.didTapAddClipButton }
-            .bind(to: action)
             .disposed(by: disposeBag)
     }
 }
