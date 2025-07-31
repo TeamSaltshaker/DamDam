@@ -7,4 +7,5 @@ enum MockError: Error {
     case loginFailed
     case logoutFailed
     case withdrawFailed
+    case parseURLFailed
 }

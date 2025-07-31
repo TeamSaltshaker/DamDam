@@ -34,40 +34,22 @@ final class TabBarView: UIView {
 
     private let homeButton: UIButton = {
         let button = UIButton()
-        let normalImage = UIImage.home
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.textPrimary)
-        let selectedImage = UIImage.home
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.appPrimary)
-        button.setImage(normalImage, for: .normal)
-        button.setImage(selectedImage, for: .selected)
+        button.setImage(.home.withTintColor(.textPrimary), for: .normal)
+        button.setImage(.homeSelected, for: .selected)
         return button
     }()
 
-    private lazy var searchButton: UIButton = {
+    private let searchButton: UIButton = {
         let button = UIButton()
-        let normalImage = UIImage.search
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.textPrimary)
-        let selectedImage = UIImage.search
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.appPrimary)
-        button.setImage(normalImage, for: .normal)
-        button.setImage(selectedImage, for: .selected)
+        button.setImage(.search.withTintColor(.textPrimary), for: .normal)
+        button.setImage(.searchSelected, for: .selected)
         return button
     }()
 
     private let userButton: UIButton = {
         let button = UIButton()
-        let normalImage = UIImage.user
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.textPrimary)
-        let selectedImage = UIImage.user
-            .withRenderingMode(.alwaysOriginal)
-            .withTintColor(.appPrimary)
-        button.setImage(normalImage, for: .normal)
-        button.setImage(selectedImage, for: .selected)
+        button.setImage(.user.withTintColor(.textPrimary), for: .normal)
+        button.setImage(.userSelected, for: .selected)
         return button
     }()
 
