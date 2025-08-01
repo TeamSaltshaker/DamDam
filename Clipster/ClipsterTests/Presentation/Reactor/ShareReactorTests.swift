@@ -167,7 +167,7 @@ final class ShareReactorTests: XCTestCase {
 
     func test_saveClip_성공() {
         let reactor = ShareReactor(
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             createClipUseCase: createClipUseCase,
             extractExtensionContextUseCase: extractExtensionContextUseCase
@@ -191,7 +191,7 @@ final class ShareReactorTests: XCTestCase {
 
     func test_saveClip_실패() {
         let reactor = ShareReactor(
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetaDataDisplay,
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             createClipUseCase: createClipUseCase,
             extractExtensionContextUseCase: extractExtensionContextUseCase
@@ -225,7 +225,7 @@ final class ShareReactorTests: XCTestCase {
 
     func test_섬네일_이미지와_스크린샷_없을_때_isHiddenURLMetadataStackView_true() {
         let state = ShareReactor.State(
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithoutThumbnailAndScreenshot
         )
 
         XCTAssertTrue(state.isHiddenURLMetadataStackView)
@@ -233,7 +233,7 @@ final class ShareReactorTests: XCTestCase {
 
     func test_섬네일_이미지_있을_때_isHiddenURLMetadataStackView_false() {
         let state = ShareReactor.State(
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithThumbnail
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithThumbnail
         )
 
         XCTAssertFalse(state.isHiddenURLMetadataStackView)
@@ -241,7 +241,7 @@ final class ShareReactorTests: XCTestCase {
 
     func test_스크린샷_있을_때_isHiddenURLMetadataStackView_false() {
         let state = ShareReactor.State(
-            urlMetadataDisplay: MockURLMetadataDisplay.urlMetadataDisplayWithScreenshot
+            urlMetadataDisplay: StubURLMetadataDisplay.urlMetadataDisplayWithScreenshot
         )
 
         XCTAssertFalse(state.isHiddenURLMetadataStackView)
