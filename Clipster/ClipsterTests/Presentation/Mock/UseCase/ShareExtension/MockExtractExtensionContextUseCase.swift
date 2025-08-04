@@ -1,5 +1,4 @@
 @testable import Clipster
-import Foundation
 import UniformTypeIdentifiers
 
 final class MockExtractExtensionContextUseCase: ExtractExtensionContextUseCase {
