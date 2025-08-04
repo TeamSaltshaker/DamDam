@@ -10,7 +10,7 @@ final class ShareReactor: Reactor {
         case editingURLTextField
         case editMemo(String)
         case tapFolderView
-        case editFolder(Folder?)
+        case changeFolder(Folder?)
         case saveClip
         case disappearFolderSelectorView
     }
@@ -96,6 +96,23 @@ final class ShareReactor: Reactor {
     private let createClipUseCase: CreateClipUseCase
     private let extractExtensionContextUseCase: ExtractExtensionContextUseCase
 
+    #if DEBUG
+    init(
+        urlMetadataDisplay: URLMetadataDisplay,
+        parseURLUseCase: ParseURLUseCase,
+        createClipUseCase: CreateClipUseCase,
+        extractExtensionContextUseCase: ExtractExtensionContextUseCase
+    ) {
+        initialState = State(
+            urlMetadataDisplay: urlMetadataDisplay
+        )
+
+        self.parseURLUseCase = parseURLUseCase
+        self.createClipUseCase = createClipUseCase
+        self.extractExtensionContextUseCase = extractExtensionContextUseCase
+    }
+    #endif
+
     init(
         parseURLUseCase: ParseURLUseCase,
         createClipUseCase: CreateClipUseCase,
@@ -172,7 +189,7 @@ final class ShareReactor: Reactor {
             return .just(.updateMemo(trimmed))
         case .tapFolderView:
             return .just(.updateIsTappedFolderView(true))
-        case .editFolder(let newFolder):
+        case .changeFolder(let newFolder):
             return .just(.updateCurrentFolder(newFolder))
         case .saveClip:
             guard let urlMetadataDisplay = currentState.urlMetadataDisplay else { return .empty() }
@@ -229,7 +246,6 @@ final class ShareReactor: Reactor {
         case .updateIsSuccessedEditClip(let value):
             newState.isSuccessedEditClip = value
         }
-
         return newState
     }
 }
