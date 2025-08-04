@@ -61,10 +61,10 @@ final class MyPageReactor: Reactor {
     private let checkLoginStatusUseCase: CheckLoginStatusUseCase
     private let loginUseCase: LoginUseCase
     private let fetchCurrentUserUseCase: FetchCurrentUserUseCase
-    private let fetchThemeUseCase: FetchThemeOptionUseCase
-    private let fetchFolderSortUseCase: FetchFolderSortOptionUseCase
-    private let fetchClipSortUseCase: FetchClipSortOptionUseCase
-    private let fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase
+    private let fetchThemeOptionUseCase: FetchThemeOptionUseCase
+    private let fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase
+    private let fetchClipSortOptionUseCase: FetchClipSortOptionUseCase
+    private let fetchSavePathLayoutOptionUseCase: FetchSavePathLayoutOptionUseCase
     private let logoutUseCase: LogoutUseCase
     private let withdrawUseCase: WithdrawUseCase
     private let saveThemeOptionUseCase: SaveThemeOptionUseCase
@@ -77,10 +77,10 @@ final class MyPageReactor: Reactor {
         checkLoginStatusUseCase: CheckLoginStatusUseCase,
         loginUseCase: LoginUseCase,
         fetchCurrentUserUseCase: FetchCurrentUserUseCase,
-        fetchThemeUseCase: FetchThemeOptionUseCase,
-        fetchFolderSortUseCase: FetchFolderSortOptionUseCase,
-        fetchClipSortUseCase: FetchClipSortOptionUseCase,
-        fetchSavePathLayoutUseCase: FetchSavePathLayoutOptionUseCase,
+        fetchThemeOptionUseCase: FetchThemeOptionUseCase,
+        fetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase,
+        fetchClipSortOptionUseCase: FetchClipSortOptionUseCase,
+        fetchSavePathLayoutOptionUseCase: FetchSavePathLayoutOptionUseCase,
         logoutUseCase: LogoutUseCase,
         withdrawUseCase: WithdrawUseCase,
         saveThemeOptionUseCase: SaveThemeOptionUseCase,
@@ -92,10 +92,10 @@ final class MyPageReactor: Reactor {
         self.checkLoginStatusUseCase = checkLoginStatusUseCase
         self.loginUseCase = loginUseCase
         self.fetchCurrentUserUseCase = fetchCurrentUserUseCase
-        self.fetchThemeUseCase = fetchThemeUseCase
-        self.fetchFolderSortUseCase = fetchFolderSortUseCase
-        self.fetchClipSortUseCase = fetchClipSortUseCase
-        self.fetchSavePathLayoutUseCase = fetchSavePathLayoutUseCase
+        self.fetchThemeOptionUseCase = fetchThemeOptionUseCase
+        self.fetchFolderSortOptionUseCase = fetchFolderSortOptionUseCase
+        self.fetchClipSortOptionUseCase = fetchClipSortOptionUseCase
+        self.fetchSavePathLayoutOptionUseCase = fetchSavePathLayoutOptionUseCase
         self.logoutUseCase = logoutUseCase
         self.withdrawUseCase = withdrawUseCase
         self.saveThemeOptionUseCase = saveThemeOptionUseCase
@@ -293,10 +293,10 @@ private extension MyPageReactor {
     }
 
     func makeSharedSections() async throws -> [MyPageSectionModel] {
-        async let theme = fetchThemeUseCase.execute().get()
-        async let folderSort = fetchFolderSortUseCase.execute().get()
-        async let clipSort = fetchClipSortUseCase.execute().get()
-        async let savePathLayout = fetchSavePathLayoutUseCase.execute().get()
+        async let theme = fetchThemeOptionUseCase.execute().get()
+        async let folderSort = fetchFolderSortOptionUseCase.execute().get()
+        async let clipSort = fetchClipSortOptionUseCase.execute().get()
+        async let savePathLayout = fetchSavePathLayoutOptionUseCase.execute().get()
 
         return try await [
             .init(

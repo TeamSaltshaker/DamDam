@@ -4,5 +4,8 @@ enum MockError: Error {
     case createFailed
     case updateFailed
     case markVisitClipFailed
+    case loginFailed
+    case logoutFailed
+    case withdrawFailed
     case parseURLFailed
 }
