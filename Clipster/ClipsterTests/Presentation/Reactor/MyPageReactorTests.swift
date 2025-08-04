@@ -164,7 +164,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertEqual(routeResult, .showEditNickName(MockUser.someUser.nickname))
     }
 
-    func test_알림설정__탭() {
+    func test_알림설정_탭() {
         // given
         let expectation = expectation(description: #function)
         var routeResult: Route?
@@ -185,7 +185,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertEqual(routeResult, .showNotificationSetting)
     }
 
-    func test_휴지통__탭() {
+    func test_휴지통_탭() {
         // given
         let expectation = expectation(description: #function)
         var routeResult: Route?
@@ -206,7 +206,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertEqual(routeResult, .showTrash)
     }
 
-    func test_문의하기__탭() {
+    func test_문의하기_탭() {
         // given
         let expectation = expectation(description: #function)
         var routeResult: Route?
