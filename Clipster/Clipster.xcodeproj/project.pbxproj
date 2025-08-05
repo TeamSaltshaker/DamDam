@@ -84,6 +84,7 @@
 				Data/Model/Persistence/Clipster.xcdatamodeld,
 				Data/Model/Persistence/FolderEntity.swift,
 				Data/Model/Persistence/URLMetadataEntity.swift,
+				Data/Model/Persistence/UserDefaultsKeys.swift,
 				Data/Persistence/CoreDataStack.swift,
 				Data/Persistence/DefaultClipStorage.swift,
 				Data/Persistence/DefaultFolderStorage.swift,
