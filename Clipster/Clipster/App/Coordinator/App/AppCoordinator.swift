@@ -30,7 +30,7 @@ final class AppCoordinator: Coordinator {
 
 private extension AppCoordinator {
     func applySavedTheme() {
-        let fetchThemeUseCase = diContainer.makeFetchThemeUseCase()
+        let fetchThemeUseCase = diContainer.makeFetchThemeOptionUseCase()
         Task {
             let theme = try? await fetchThemeUseCase.execute().get()
             await AppThemeManager.shared.apply(theme: theme ?? .system)

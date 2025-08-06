@@ -221,19 +221,19 @@ final class DIContainer {
         DefaultFetchFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeFetchSavePathLayoutUseCase() -> FetchSavePathLayoutOptionUseCase {
+    func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
         DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeFetchThemeUseCase() -> FetchThemeOptionUseCase {
+    func makeFetchThemeOptionUseCase() -> FetchThemeOptionUseCase {
         DefaultFetchThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeSaveClipSortUseCase() -> SaveClipSortOptionUseCase {
+    func makeSaveClipSortOptionUseCase() -> SaveClipSortOptionUseCase {
         DefaultSaveClipSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeSaveFolderSortUseCase() -> SaveFolderSortOptionUseCase {
+    func makeSaveFolderSortOptionUseCase() -> SaveFolderSortOptionUseCase {
         DefaultSaveFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
@@ -241,12 +241,8 @@ final class DIContainer {
         DefaultSaveSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
+    func makeSaveThemeOptionUseCase() -> SaveThemeOptionUseCase {
         DefaultSaveThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
-    }
-
-    func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeParseURLUseCase() -> ParseURLUseCase {
@@ -404,16 +400,16 @@ final class DIContainer {
             checkLoginStatusUseCase: makeCheckLoginStatusUseCase(),
             loginUseCase: makeLoginUseCase(),
             fetchCurrentUserUseCase: makeFetchCurrentUserUseCase(),
-            fetchThemeOptionUseCase: makeFetchThemeUseCase(),
+            fetchThemeOptionUseCase: makeFetchThemeOptionUseCase(),
             fetchFolderSortOptionUseCase: makeFetchFolderSortOptionUseCase(),
             fetchClipSortOptionUseCase: makeFetchClipSortOptionUseCase(),
-            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutUseCase(),
+            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutOptionUseCase(),
             logoutUseCase: makeLogoutUseCase(),
             withdrawUseCase: makeWithdrawUseCase(),
-            saveThemeOptionUseCase: makeSaveThemeUseCase(),
+            saveThemeOptionUseCase: makeSaveThemeOptionUseCase(),
             saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase(),
-            saveFolderSortOptionUseCase: makeSaveFolderSortUseCase(),
-            saveClipSortOptionUseCase: makeSaveClipSortUseCase(),
+            saveFolderSortOptionUseCase: makeSaveFolderSortOptionUseCase(),
+            saveClipSortOptionUseCase: makeSaveClipSortOptionUseCase(),
             updateNicknameUseCase: makeUpdateNicknameUseCase()
         )
     }
