@@ -13,17 +13,47 @@ final class MyPageReactor: Reactor {
     }
 
     enum Mutation {
-        case setSectionModel([MyPageSectionModel])
+        case setAllPreferences(
+            isLogin: Bool,
+            nickname: String,
+            theme: ThemeOption,
+            folderSort: FolderSortOption,
+            clipSort: ClipSortOption,
+            savePath: SavePathOption
+        )
+        case setLogin(Bool)
+        case setNickname(String)
+        case setThemeOption(ThemeOption)
+        case setFolderSortOption(FolderSortOption)
+        case setClipSortOption(ClipSortOption)
+        case setSavePathOption(SavePathOption)
         case setIsScrollToTop(Bool)
         case setPhase(State.Phase)
         case setRoute(State.Route?)
     }
 
     struct State {
-        var sectionModel: [MyPageSectionModel] = []
+        var isLogin: Bool = false
+        var nickname: String = ""
+        var themeOption: ThemeOption = .system
+        var folderSortOption: FolderSortOption = .createdAt(.descending)
+        var clipSortOption: ClipSortOption = .createdAt(.ascending)
+        var savePathOption: SavePathOption = .expand
+
         @Pulse var isScrollToTop: Bool = false
         @Pulse var phase: Phase = .idle
         @Pulse var route: Route?
+
+        var sectionModels: [MyPageSectionModel] {
+            makeSectionModels(
+                isLogin: isLogin,
+                nickname: nickname,
+                theme: themeOption,
+                folderSort: folderSortOption,
+                clipSort: clipSortOption,
+                savePath: savePathOption
+            )
+        }
 
         enum Phase {
             case idle
@@ -114,20 +144,12 @@ final class MyPageReactor: Reactor {
                 .just(.setPhase(.loading)),
                 .fromAsync { [weak self] in
                     guard let self else { throw DomainError.unknownError }
-                    let sectionModels = try await makeSectionModels(isLogin: false)
-                    return .setSectionModel(sectionModels)
+                    return try await makeAllPreferencesMutation()
                 },
                 .just(.setPhase(.success))
             )
             .catch {
-                .concat(
-                    .fromAsync { [weak self] in
-                        guard let self else { throw DomainError.unknownError }
-                        let sectionModels = try await makeSectionModels(isLogin: false)
-                        return .setSectionModel(sectionModels)
-                    },
-                    .just(.setPhase(.error($0.localizedDescription)))
-                )
+                .just(.setPhase(.error($0.localizedDescription)))
             }
         case .tapCell(let item):
             switch item {
@@ -136,28 +158,25 @@ final class MyPageReactor: Reactor {
                     .just(.setPhase(.loading)),
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
-
                         _ = try await loginUseCase.execute(type: type).get()
-                        let sectionModels = try await makeSectionModels(isLogin: true)
-                        return .setSectionModel(sectionModels)
-                    },
-                    .just(.setPhase(.success))
+                        return try await makeAllPreferencesMutation()
+                    }
                 )
                 .catch {
                     .just(.setPhase(.error($0.localizedDescription)))
                 }
-            case .chevron(let chevronItem):
-                return .just(makeChevronItemMutation(item: chevronItem))
-            case .detail(let detailItem):
-                return .just(makeDetailItemMutation(item: detailItem))
-            case .dropdown(let dropdownItem):
-                return .just(makeDropdownItemMutation(item: dropdownItem))
             case .account(let accountItem):
                 return .concat(
                     .just(.setPhase(.loading)),
                     .fromAsync { [weak self] in
                         guard let self else { throw DomainError.unknownError }
-                        return try await makeAccountItemMutation(item: accountItem)
+                        switch accountItem {
+                        case .logout:
+                            _ = try await logoutUseCase.execute().get()
+                        case .withdraw:
+                            _ = try await withdrawUseCase.execute().get()
+                        }
+                        return try await makeAllPreferencesMutation()
                     },
                     .just(.setIsScrollToTop(true)),
                     .just(.setPhase(.success))
@@ -165,6 +184,8 @@ final class MyPageReactor: Reactor {
                 .catch {
                     .just(.setPhase(.error($0.localizedDescription)))
                 }
+            case .chevron, .detail, .dropdown:
+                return .just(makeRouteMutation(for: item))
             default:
                 return .empty()
             }
@@ -172,8 +193,7 @@ final class MyPageReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveThemeOptionUseCase.execute(option).get()
-                let sectionModels = replacingThemeItem(with: option, in: currentState.sectionModel)
-                return .setSectionModel(sectionModels)
+                return .setThemeOption(option)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
@@ -182,11 +202,7 @@ final class MyPageReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveSavePathLayoutOptionUseCase.execute(option).get()
-                let sectionModels = replacingSavePathItem(
-                    with: option,
-                    in: currentState.sectionModel
-                )
-                return .setSectionModel(sectionModels)
+                return .setSavePathOption(option)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
@@ -195,11 +211,7 @@ final class MyPageReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveFolderSortOptionUseCase.execute(option).get()
-                let updatedModels = replacingFolderSortItem(
-                    with: option,
-                    in: currentState.sectionModel
-                )
-                return .setSectionModel(updatedModels)
+                return .setFolderSortOption(option)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
@@ -208,27 +220,16 @@ final class MyPageReactor: Reactor {
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
                 _ = try await saveClipSortOptionUseCase.execute(option).get()
-                let updatedModels = replacingClipSortItem(
-                    with: option,
-                    in: currentState.sectionModel
-                )
-                return .setSectionModel(updatedModels)
+                return .setClipSortOption(option)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
             }
-        case .changeNickName(let newNickname):
+        case .changeNickName(let nickname):
             return .fromAsync { [weak self] in
                 guard let self else { throw DomainError.unknownError }
-
-                _ = try await updateNicknameUseCase.execute(nickname: newNickname).get()
-
-                let updatedModels = replacingNickname(
-                    with: newNickname,
-                    in: currentState.sectionModel
-                )
-
-                return .setSectionModel(updatedModels)
+                _ = try await updateNicknameUseCase.execute(nickname: nickname).get()
+                return .setNickname(nickname)
             }
             .catch {
                 .just(.setPhase(.error($0.localizedDescription)))
@@ -239,12 +240,29 @@ final class MyPageReactor: Reactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setSectionModel(let model):
-            newState.sectionModel = model
-        case .setIsScrollToTop(let isScrollToTop):
-            newState.isScrollToTop = isScrollToTop
-        case .setPhase(let phase):
-            newState.phase = phase
+        case let .setAllPreferences(isLogin, nickname, theme, folderSort, clipSort, savePath):
+            newState.isLogin = isLogin
+            newState.nickname = nickname
+            newState.themeOption = theme
+            newState.folderSortOption = folderSort
+            newState.clipSortOption = clipSort
+            newState.savePathOption = savePath
+        case .setLogin(let value):
+            newState.isLogin = value
+        case .setNickname(let value):
+            newState.nickname = value
+        case .setThemeOption(let value):
+            newState.themeOption = value
+        case .setFolderSortOption(let value):
+            newState.folderSortOption = value
+        case .setClipSortOption(let value):
+            newState.clipSortOption = value
+        case .setSavePathOption(let value):
+            newState.savePathOption = value
+        case .setIsScrollToTop(let value):
+            newState.isScrollToTop = value
+        case .setPhase(let value):
+            newState.phase = value
         case .setRoute(let route):
             newState.route = route
         }
@@ -253,22 +271,99 @@ final class MyPageReactor: Reactor {
 }
 
 private extension MyPageReactor {
-    func makeSectionModels(isLogin: Bool) async throws -> [MyPageSectionModel] {
-        async let specificSections = isLogin
-        ? makeUserSpecificSections()
-        : []
+    func makeAllPreferencesMutation() async throws -> Mutation {
+        let isLogin = false
+        async let themeOption = fetchThemeOptionUseCase.execute().get()
+        async let folderSortOption = fetchFolderSortOptionUseCase.execute().get()
+        async let clipSortOption = fetchClipSortOptionUseCase.execute().get()
+        async let savePathOption = fetchSavePathLayoutOptionUseCase.execute().get()
 
-        async let sharedSections = makeSharedSections()
-        let etcSection = makeEtcSection(isLogin: isLogin)
+        async let nickname = isLogin ?
+        fetchCurrentUserUseCase.execute().get().nickname
+        : ""
 
-        return try await specificSections + sharedSections + etcSection
+        return try await .setAllPreferences(
+            isLogin: isLogin,
+            nickname: nickname,
+            theme: themeOption,
+            folderSort: folderSortOption,
+            clipSort: clipSortOption,
+            savePath: savePathOption
+        )
     }
 
-    func makeUserSpecificSections() async throws -> [MyPageSectionModel] {
-        let user = try await fetchCurrentUserUseCase.execute().get()
-        let nickname = user.nickname
+    func makeRouteMutation(for item: MyPageItem) -> Mutation {
+        switch item {
+        case .chevron(let chevron):
+            switch chevron {
+            case .nicknameEdit:
+                return .setRoute(.showEditNickName(currentState.nickname))
+            case .support:
+                return .setRoute(.showSupport)
+            case .notificationSetting:
+                return .setRoute(.showNotificationSetting)
+            case .trash:
+                return .setRoute(.showTrash)
+            }
+        case .detail(let detail):
+            switch detail {
+            case .theme(let option):
+                return .setRoute(.showSelectTheme(
+                    currentOption: option,
+                    availableOptions: ThemeOption.allCases
+                ))
+            case .savePath(let option):
+                return .setRoute(.showSelectSavePathLayout(
+                    currentOption: option,
+                    availableOptions: SavePathOption.allCases
+                ))
+            }
+        case .dropdown(let dropdown):
+            switch dropdown {
+            case .folderSort(let option):
+                return .setRoute(.showSelectFolderSort(
+                    currentOption: option,
+                    availableOptions: FolderSortOption.allCases
+                ))
+            case .clipSort(let option):
+                return .setRoute(.showSelectClipSort(
+                    currentOption: option,
+                    availableOptions: ClipSortOption.allCases
+                ))
+            }
+        default:
+            return .setRoute(nil)
+        }
+    }
+}
 
-        return [
+private extension MyPageReactor.State {
+    func makeSectionModels(
+        isLogin: Bool,
+        nickname: String,
+        theme: ThemeOption,
+        folderSort: FolderSortOption,
+        clipSort: ClipSortOption,
+        savePath: SavePathOption
+    ) -> [MyPageSectionModel] {
+        let userSection = isLogin
+        ? makeUserSpecificSections(nickname: nickname)
+        : []
+
+        let sharedSections = makeSharedSections(
+            theme: theme,
+            folderSort: folderSort,
+            clipSort: clipSort,
+            savePathLayout: savePath
+        )
+
+        let etcSection = makeEtcSection(isLogin: isLogin)
+
+        return userSection + sharedSections + etcSection
+    }
+
+    func makeUserSpecificSections(nickname: String) -> [MyPageSectionModel] {
+        [
             .init(section: .welcome(nickname), items: []),
             .init(
                 section: .profile,
@@ -292,13 +387,13 @@ private extension MyPageReactor {
         ]
     }
 
-    func makeSharedSections() async throws -> [MyPageSectionModel] {
-        async let theme = fetchThemeOptionUseCase.execute().get()
-        async let folderSort = fetchFolderSortOptionUseCase.execute().get()
-        async let clipSort = fetchClipSortOptionUseCase.execute().get()
-        async let savePathLayout = fetchSavePathLayoutOptionUseCase.execute().get()
-
-        return try await [
+    func makeSharedSections(
+        theme: ThemeOption,
+        folderSort: FolderSortOption,
+        clipSort: ClipSortOption,
+        savePathLayout: SavePathOption
+    ) -> [MyPageSectionModel] {
+        [
             .init(
                 section: .systemSettings,
                 items: [
@@ -314,177 +409,12 @@ private extension MyPageReactor {
     }
 
     func makeEtcSection(isLogin: Bool) -> [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-        let items: [MyPageItem] = isLogin
-        ? [.account(.logout), .account(.withdraw), .version(appVersion)]
-        : [.version(appVersion)]
-
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
+        var items: [MyPageItem] = [.version(version)]
+        if isLogin {
+            items.insert(.account(.logout), at: 0)
+            items.insert(.account(.withdraw), at: 1)
+        }
         return [.init(section: .etc, items: items)]
-    }
-}
-
-private extension MyPageReactor {
-    func makeChevronItemMutation(item: ChevronItem) -> Mutation {
-        switch item {
-        case .nicknameEdit:
-            let nickname = currentState.sectionModel
-                .compactMap { section -> String? in
-                    if case let .welcome(name) = section.section {
-                        return name
-                    }
-                    return nil
-                }
-                .first ?? "알 수 없음"
-
-            return .setRoute(.showEditNickName(nickname))
-        case .notificationSetting:
-            return .setRoute(.showNotificationSetting)
-        case .trash:
-            return .setRoute(.showTrash)
-        case .support:
-            return .setRoute(.showSupport)
-        }
-    }
-
-    func makeDetailItemMutation(item: DetailItem) -> Mutation {
-        switch item {
-        case .theme(let option):
-            return .setRoute(
-                .showSelectTheme(
-                    currentOption: option,
-                    availableOptions: ThemeOption.allCases
-                )
-            )
-        case .savePath(let option):
-            return .setRoute(
-                .showSelectSavePathLayout(
-                    currentOption: option,
-                    availableOptions: SavePathOption.allCases
-                )
-            )
-        }
-    }
-
-    func makeDropdownItemMutation(item: DropdownItem) -> Mutation {
-        switch item {
-        case .folderSort(let option):
-            return .setRoute(.showSelectFolderSort(
-                currentOption: option,
-                availableOptions: FolderSortOption.allCases
-            ))
-        case .clipSort(let option):
-            return .setRoute(.showSelectClipSort(
-                currentOption: option,
-                availableOptions: ClipSortOption.allCases
-            ))
-        }
-    }
-
-    func makeAccountItemMutation(item: AccountItem) async throws -> Mutation {
-        switch item {
-        case .logout:
-            _ = try await logoutUseCase.execute().get()
-            let sectionModetls = try await makeSectionModels(isLogin: false)
-            return .setSectionModel(sectionModetls)
-        case .withdraw:
-            _ = try await withdrawUseCase.execute().get()
-            let sectionModetls = try await makeSectionModels(isLogin: false)
-            return .setSectionModel(sectionModetls)
-        }
-    }
-}
-
-private extension MyPageReactor {
-    func replacingNickname(
-        with newNickname: String,
-        in models: [MyPageSectionModel]
-    ) -> [MyPageSectionModel] {
-        models.map { section in
-            if case .welcome = section.section {
-                return MyPageSectionModel(section: .welcome(newNickname), items: section.items)
-            } else {
-                return section
-            }
-        }
-    }
-
-    func replacingThemeItem(
-        with newOption: ThemeOption,
-        in models: [MyPageSectionModel]
-    ) -> [MyPageSectionModel] {
-        models.map { section in
-            if let index = section.items.firstIndex(where: {
-                if case .detail(.theme) = $0 {
-                    return true
-                }
-                return false
-            }) {
-                var newItems = section.items
-                newItems[index] = .detail(.theme(newOption))
-                return MyPageSectionModel(section: section.section, items: newItems)
-            } else {
-                return section
-            }
-        }
-    }
-
-    func replacingSavePathItem(
-        with newOption: SavePathOption,
-        in models: [MyPageSectionModel]
-    ) -> [MyPageSectionModel] {
-        models.map { section in
-            if let index = section.items.firstIndex(where: {
-                if case .detail(.savePath) = $0 {
-                    return true
-                }
-                return false
-            }) {
-                var newItems = section.items
-                newItems[index] = .detail(.savePath(newOption))
-                return MyPageSectionModel(section: section.section, items: newItems)
-            } else {
-                return section
-            }
-        }
-    }
-
-    func replacingFolderSortItem(
-        with newOption: FolderSortOption,
-        in models: [MyPageSectionModel]
-    ) -> [MyPageSectionModel] {
-        models.map { section in
-            if let index = section.items.firstIndex(where: {
-                if case .dropdown(.folderSort) = $0 {
-                    return true
-                }
-                return false
-            }) {
-                var newItems = section.items
-                newItems[index] = .dropdown(.folderSort(newOption))
-                return MyPageSectionModel(section: section.section, items: newItems)
-            } else {
-                return section
-            }
-        }
-    }
-
-    func replacingClipSortItem(
-        with newOption: ClipSortOption,
-        in models: [MyPageSectionModel]
-    ) -> [MyPageSectionModel] {
-        models.map { section in
-            if let index = section.items.firstIndex(where: {
-                if case .dropdown(.clipSort) = $0 {
-                    return true
-                }
-                return false
-            }) {
-                var newItems = section.items
-                newItems[index] = .dropdown(.clipSort(newOption))
-                return MyPageSectionModel(section: section.section, items: newItems)
-            } else {
-                return section
-            }
-        }
     }
 }
