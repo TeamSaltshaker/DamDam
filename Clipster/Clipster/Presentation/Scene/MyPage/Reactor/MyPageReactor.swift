@@ -160,7 +160,8 @@ final class MyPageReactor: Reactor {
                         guard let self else { throw DomainError.unknownError }
                         _ = try await loginUseCase.execute(type: type).get()
                         return try await makeAllPreferencesMutation()
-                    }
+                    },
+                    .just(.setPhase(.success))
                 )
                 .catch {
                     .just(.setPhase(.error($0.localizedDescription)))
