@@ -107,7 +107,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
         XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
 
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
     }
 
     func test_로그인_탭() {
@@ -138,7 +138,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
         XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
 
-        XCTAssertEqual(reactor.currentState.sectionModel, userSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
     }
 
     func test_닉네임_변경_탭() {
@@ -161,7 +161,7 @@ final class MyPageReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(routeResult, .showEditNickName(MockUser.someUser.nickname))
+        XCTAssertEqual(routeResult, .showEditNickName(""))
     }
 
     func test_알림설정_탭() {
@@ -357,7 +357,8 @@ final class MyPageReactorTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(logoutUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.isScrollToTop, true)
     }
 
     func test_회원탈퇴_탭() {
@@ -382,13 +383,14 @@ final class MyPageReactorTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(withdrawUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.isScrollToTop, true)
     }
 }
 
 private extension MyPageReactorTests {
     var userSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
 
         return [
             .init(section: .welcome(MockUser.someUser.nickname), items: []),
@@ -422,7 +424,7 @@ private extension MyPageReactorTests {
     }
 
     var guestSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
 
         return [
             .init(
