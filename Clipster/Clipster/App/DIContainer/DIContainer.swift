@@ -214,39 +214,39 @@ final class DIContainer {
     }
 
     func makeFetchClipSortOptionUseCase() -> FetchClipSortOptionUseCase {
-        DefaultFetchClipSortOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchClipSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchFolderSortOptionUseCase() -> FetchFolderSortOptionUseCase {
-        DefaultFetchFolderSortOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchSavePathLayoutUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchThemeUseCase() -> FetchThemeOptionUseCase {
-        DefaultFetchThemeOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveClipSortUseCase() -> SaveClipSortOptionUseCase {
-        DefaultSaveClipSortOptionUseCase(userDefaults: userDefaults)
+        DefaultSaveClipSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveFolderSortUseCase() -> SaveFolderSortOptionUseCase {
-        DefaultSaveFolderSortOptionUseCase(userDefaults: userDefaults)
+        DefaultSaveFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveSavePathLayoutOptionUseCase() -> SaveSavePathLayoutOptionUseCase {
-        DefaultSaveSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+        DefaultSaveSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
-        DefaultSaveThemeOptionUseCase(userDefaults: userDefaults)
+        DefaultSaveThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeParseURLUseCase() -> ParseURLUseCase {
