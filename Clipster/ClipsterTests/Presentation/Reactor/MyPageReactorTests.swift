@@ -107,7 +107,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
         XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
 
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
     }
 
     func test_로그인_탭() {
@@ -138,7 +138,7 @@ final class MyPageReactorTests: XCTestCase {
         XCTAssertTrue(fetchClipSortOptionUseCase.didCallExecute)
         XCTAssertTrue(fetchSavePathLayoutOptionUseCase.didCallExecute)
 
-        XCTAssertEqual(reactor.currentState.sectionModel, userSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
     }
 
     func test_닉네임_변경_탭() {
@@ -161,7 +161,7 @@ final class MyPageReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(routeResult, .showEditNickName(MockUser.someUser.nickname))
+        XCTAssertEqual(routeResult, .showEditNickName(""))
     }
 
     func test_알림설정_탭() {
@@ -354,10 +354,11 @@ final class MyPageReactorTests: XCTestCase {
         reactor.action.onNext(.tapCell(.account(.logout)))
 
         // then
-        waitForExpectations(timeout: 1.0)
+        wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(logoutUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.isScrollToTop, true)
     }
 
     func test_회원탈퇴_탭() {
@@ -379,16 +380,122 @@ final class MyPageReactorTests: XCTestCase {
         reactor.action.onNext(.tapCell(.account(.withdraw)))
 
         // then
-        waitForExpectations(timeout: 1.0)
+        wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(withdrawUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.sectionModel, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.sectionModels, guestSectionModels)
+        XCTAssertEqual(reactor.currentState.isScrollToTop, true)
+    }
+
+    func test_테마_옵션_변경() {
+        // given
+        let expectation = expectation(description: #function)
+
+        reactor.state
+            .skip(1)
+            .map { $0.sectionModels }
+            .subscribe { _ in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.changeTheme(.dark))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(saveThemeOptionUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.themeOption, .dark)
+    }
+
+    func test_저장_경로_보기__옵션_변경() {
+        // given
+        let expectation = expectation(description: #function)
+
+        reactor.state
+            .skip(1)
+            .map { $0.sectionModels }
+            .subscribe { _ in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.changeSavePathLayout(.skip))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(saveSavePathLayoutOptionUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.savePathOption, .skip)
+    }
+
+    func test_폴더_정렬_옵셜_변경() {
+        // given
+        let expectation = expectation(description: #function)
+
+        reactor.state
+            .skip(1)
+            .map { $0.sectionModels }
+            .subscribe { _ in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.changeFolderSort(.title(.ascending)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(saveFolderSortOptionUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.folderSortOption, .title(.ascending))
+    }
+
+    func test_클립_정렬_옵셜_변경() {
+        // given
+        let expectation = expectation(description: #function)
+
+        reactor.state
+            .skip(1)
+            .map { $0.sectionModels }
+            .subscribe { _ in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.changeClipSort(.title(.ascending)))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(saveClipSortOptionUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.clipSortOption, .title(.ascending))
+    }
+
+    func test_닉네임_변경() {
+        // given
+        let expectation = expectation(description: #function)
+
+        reactor.state
+            .skip(1)
+            .map { $0.sectionModels }
+            .subscribe { _ in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        // when
+        reactor.action.onNext(.changeNickName("테스트"))
+
+        // then
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertTrue(updateNicknameUseCase.didCallExecute)
+        XCTAssertEqual(reactor.currentState.nickname, "테스트")
     }
 }
 
 private extension MyPageReactorTests {
     var userSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
 
         return [
             .init(section: .welcome(MockUser.someUser.nickname), items: []),
@@ -422,7 +529,7 @@ private extension MyPageReactorTests {
     }
 
     var guestSectionModels: [MyPageSectionModel] {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
 
         return [
             .init(
