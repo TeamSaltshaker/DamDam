@@ -1,4 +1,4 @@
-protocol UserDefaultsStorage {
+protocol UserDefaultsRepository {
     func hasSeenOnboarding() -> Bool
     func setHasSeenOnboarding(_ hasSeen: Bool)
 

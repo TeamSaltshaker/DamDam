@@ -29,10 +29,6 @@ final class DIContainer {
         DefaultFolderStorage(container: container, mapper: DomainMapper())
     }
 
-    func makeUserDefaultsStorage() -> UserDefaultsStorage {
-        DefaultUserDefaultsStorage(userDefaults: userDefaults)
-    }
-
     func makeUserService() -> UserService {
         DefaultUserService(client: supabaseClient)
     }
@@ -79,6 +75,10 @@ final class DIContainer {
             userService: makeUserService(),
             mapper: DomainMapper(),
         )
+    }
+
+    func makeUserDefaultsRepository() -> UserDefaultsRepository {
+        DefaultUserDefaultsRepository(userDefaults: userDefaults)
     }
 
     func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {

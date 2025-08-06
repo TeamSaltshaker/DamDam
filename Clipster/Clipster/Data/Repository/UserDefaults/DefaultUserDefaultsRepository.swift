@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultUserDefaultsStorage: UserDefaultsStorage {
+final class DefaultUserDefaultsRepository: UserDefaultsRepository {
     private let userDefaults: UserDefaults
 
     init(userDefaults: UserDefaults) {
