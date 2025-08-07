@@ -106,11 +106,14 @@ final class DIContainer {
     }
 
     func makeVisitClipUseCase() -> VisitClipUseCase {
-        DefaultVisitClipUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
+        DefaultVisitClipUseCase(
+            clipRepository: makeClipRepository(),
+            userDefaultsRepository: makeUserDefaultsRepository()
+        )
     }
 
     func makeDeleteAllRecentVisitedClipsUseCase() -> DeleteAllRecentVisitedClipsUseCase {
-        DefaultDeleteAllRecentVisitedClipsUseCase(userDefaults: userDefaults)
+        DefaultDeleteAllRecentVisitedClipsUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
@@ -118,7 +121,7 @@ final class DIContainer {
     }
 
     func makeDeleteRecentVisitedClipUseCase() -> DeleteRecentVisitedClipUseCase {
-        DefaultDeleteRecentVisitedClipUseCase(userDefaults: userDefaults)
+        DefaultDeleteRecentVisitedClipUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchAllClipsUseCase() -> FetchAllClipsUseCase {
@@ -134,7 +137,10 @@ final class DIContainer {
     }
 
     func makeFetchRecentVisitedClipsUseCase() -> FetchRecentVisitedClipsUseCase {
-        DefaultFetchRecentVisitedClipsUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
+        DefaultFetchRecentVisitedClipsUseCase(
+            clipRepository: makeClipRepository(),
+            userDefaultsRepository: makeUserDefaultsRepository()
+        )
     }
 
     func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {
@@ -198,19 +204,19 @@ final class DIContainer {
     }
 
     func makeDeleteAllRecentQueriesUseCase() -> DeleteAllRecentQueriesUseCase {
-        DefaultDeleteAllRecentQueriesUseCase(userDefaults: userDefaults)
+        DefaultDeleteAllRecentQueriesUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeDeleteRecentQueryUseCase() -> DeleteRecentQueryUseCase {
-        DefaultDeleteRecentQueryUseCase(userDefaults: userDefaults)
+        DefaultDeleteRecentQueryUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchRecentQueriesUseCase() -> FetchRecentQueriesUseCase {
-        DefaultFetchRecentQueriesUseCase(userDefaults: userDefaults)
+        DefaultFetchRecentQueriesUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveRecentQueryUseCase() -> SaveRecentQueryUseCase {
-        DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
+        DefaultSaveRecentQueryUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchClipSortOptionUseCase() -> FetchClipSortOptionUseCase {

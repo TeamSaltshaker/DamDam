@@ -1,19 +1,18 @@
 import Foundation
 
 final class DefaultSaveRecentQueryUseCase: SaveRecentQueryUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "recentQueries"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ query: String) {
-        var queries = userDefaults.stringArray(forKey: key) ?? []
+        var queries = userDefaultsRepository.recentQueries()
         queries.removeAll { $0 == query }
         queries.insert(query, at: 0)
         queries = Array(queries.prefix(10))
 
-        userDefaults.set(queries, forKey: key)
+        userDefaultsRepository.setRecentQueries(queries)
     }
 }
