@@ -1,3 +1,3 @@
 protocol FetchHasSeenOnboardingUseCase {
-    func execute() -> Result<Bool, Error>
+    func execute() -> Bool
 }

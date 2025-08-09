@@ -7,7 +7,7 @@ final class DefaultFetchHasSeenOnboardingUseCase: FetchHasSeenOnboardingUseCase 
         self.userDefaultsRepository = userDefaultsRepository
     }
 
-    func execute() -> Result<Bool, Error> {
-        .success(userDefaultsRepository.hasSeenOnboarding())
+    func execute() -> Bool {
+        userDefaultsRepository.hasSeenOnboarding()
     }
 }

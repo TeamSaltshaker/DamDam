@@ -1,3 +1,3 @@
 protocol UpdateHasSeenOnboardingUseCase {
-    func execute(_ hasSeen: Bool) -> Result<Void, Error>
+    func execute(_ hasSeen: Bool)
 }

@@ -7,8 +7,7 @@ final class DefaultUpdateHasSeenOnboardingUseCase: UpdateHasSeenOnboardingUseCas
         self.userDefaultsRepository = userDefaultsRepository
     }
 
-    func execute(_ hasSeen: Bool) -> Result<Void, Error> {
+    func execute(_ hasSeen: Bool) {
         userDefaultsRepository.setHasSeenOnboarding(hasSeen)
-        return .success(())
     }
 }

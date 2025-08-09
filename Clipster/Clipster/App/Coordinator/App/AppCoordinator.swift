@@ -2,6 +2,8 @@ import UIKit
 
 final class AppCoordinator: Coordinator {
     private let diContainer: DIContainer
+    private let fetchHasSeenOnboardingUseCase: FetchHasSeenOnboardingUseCase
+    private let updateHasSeenOnboardingUseCase: UpdateHasSeenOnboardingUseCase
 
     let navigationController: UINavigationController
     weak var parent: Coordinator?
@@ -10,6 +12,8 @@ final class AppCoordinator: Coordinator {
     init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
         self.diContainer = diContainer
+        self.fetchHasSeenOnboardingUseCase = diContainer.makeFetchHasSeenOnboardingUseCase()
+        self.updateHasSeenOnboardingUseCase = diContainer.makeUpdateHasSeenOnboardingUseCase()
     }
 
     deinit {
@@ -19,7 +23,7 @@ final class AppCoordinator: Coordinator {
     func start() {
         applySavedTheme()
 
-        let hasSeen = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+        let hasSeen = fetchHasSeenOnboardingUseCase.execute()
         if hasSeen {
             showTab()
         } else {
@@ -53,7 +57,7 @@ extension AppCoordinator {
         onboardingVC.onFinish = { [weak self] in
             guard let self else { return }
 
-            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            updateHasSeenOnboardingUseCase.execute(true)
             navigationController.dismiss(animated: true)
             showTab()
         }
