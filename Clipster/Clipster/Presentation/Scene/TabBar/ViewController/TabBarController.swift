@@ -9,7 +9,7 @@ final class TabBarViewController: UIViewController {
     private weak var coordinator: TabBarCoordinator?
 
     private var currentVC: UIViewController?
-    private let selectedTab = BehaviorRelay<TabBarMode>(value: .home)
+    private let selectedTab = BehaviorRelay<TabItem>(value: .home)
 
     init(coordinator: TabBarCoordinator) {
         self.coordinator = coordinator
@@ -42,10 +42,10 @@ final class TabBarViewController: UIViewController {
         addChild(vc)
         view.insertSubview(vc.view, belowSubview: tabBarView)
 
-        vc.view.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(tabBarView.snp.top)
+        vc.view.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(tabBarView.snp.top)
         }
 
         vc.didMove(toParent: self)
@@ -69,24 +69,18 @@ private extension TabBarViewController {
         let bottomInset = view.safeAreaInsets.bottom
         let tabBarHeight = bottomInset > 0 ? 100 : 64
 
-        tabBarView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(tabBarHeight)
+        tabBarView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(tabBarHeight)
         }
     }
 
     func setBindings() {
         tabBarView.action
             .bind { [weak self] action in
-                guard let self else { return }
-
                 switch action {
-                case .tapHome:
-                    selectedTab.accept(.home)
-                case .tapSearch:
-                    selectedTab.accept(.search)
-                case .tapUser:
-                    selectedTab.accept(.myPage)
+                case .tap(let mode):
+                    self?.selectedTab.accept(mode)
                 }
             }
             .disposed(by: disposeBag)

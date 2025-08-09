@@ -5,13 +5,13 @@ import UIKit
 
 final class TabBarView: UIView {
     enum Action {
-        case tapHome
-        case tapSearch
-        case tapUser
+        case tap(TabItem)
     }
 
     private let disposeBag = DisposeBag()
     let action = PublishRelay<Action>()
+
+    private let items = TabItem.allCases
 
     private let baseBackgroundView: UIView = {
         let view = UIView()
@@ -28,29 +28,17 @@ final class TabBarView: UIView {
         return stack
     }()
 
-    private let homeContainer = UIView()
-    private let searchContainer = UIView()
-    private let userContainer = UIView()
-
-    private let homeButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.home.withTintColor(.textPrimary), for: .normal)
-        button.setImage(.homeSelected, for: .selected)
-        return button
+    private lazy var containerViews: [TabItem: UIView] = {
+        Dictionary(uniqueKeysWithValues: items.map { ($0, UIView()) })
     }()
 
-    private let searchButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.search.withTintColor(.textPrimary), for: .normal)
-        button.setImage(.searchSelected, for: .selected)
-        return button
-    }()
-
-    private let userButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.user.withTintColor(.textPrimary), for: .normal)
-        button.setImage(.userSelected, for: .selected)
-        return button
+    private lazy var tabButtons: [TabItem: UIButton] = {
+        Dictionary(uniqueKeysWithValues: items.map { mode in
+            let button = UIButton()
+            button.setImage(mode.unselectedImage.withTintColor(.textPrimary), for: .normal)
+            button.setImage(mode.selectedImage, for: .selected)
+            return (mode, button)
+        })
     }()
 
     override init(frame: CGRect) {
@@ -71,13 +59,9 @@ final class TabBarView: UIView {
         layer.shadowPath = path.cgPath
     }
 
-    func updateSelectedTab(_ mode: TabBarMode) {
-        [
-            homeButton,
-            searchButton,
-            userButton
-        ].enumerated().forEach { index, button in
-            button.isSelected = (index == mode.rawValue)
+    func updateSelectedTab(_ mode: TabItem) {
+        tabButtons.forEach { key, button in
+            button.isSelected = (key == mode)
         }
     }
 }
@@ -92,6 +76,7 @@ private extension TabBarView {
 
     func setAttributes() {
         backgroundColor = .background
+
         layer.cornerRadius = 32
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.shadowColor = UIColor.black.cgColor
@@ -102,20 +87,17 @@ private extension TabBarView {
     }
 
     func setHierarchy() {
-        [
-            baseBackgroundView,
-            stackView
-        ].forEach { addSubview($0) }
+        addSubview(baseBackgroundView)
+        addSubview(stackView)
 
-        [
-            homeContainer,
-            searchContainer,
-            userContainer
-        ].forEach { stackView.addArrangedSubview($0) }
+        items.forEach { mode in
+            guard let container = containerViews[mode],
+                  let button = tabButtons[mode]
+            else { return }
 
-        homeContainer.addSubview(homeButton)
-        searchContainer.addSubview(searchButton)
-        userContainer.addSubview(userButton)
+            stackView.addArrangedSubview(container)
+            container.addSubview(button)
+        }
     }
 
     func setConstraints() {
@@ -127,30 +109,20 @@ private extension TabBarView {
             make.edges.equalToSuperview()
         }
 
-        homeButton.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(64)
-        }
-
-        searchButton.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(64)
-        }
-
-        userButton.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(64)
+        tabButtons.forEach { _, button in
+            button.snp.makeConstraints { make in
+                make.top.equalToSuperview()
+                make.horizontalEdges.equalToSuperview()
+                make.height.equalTo(64)
+            }
         }
     }
 
     func setBindings() {
         Observable.merge(
-            homeButton.rx.tap.map { Action.tapHome },
-            searchButton.rx.tap.map { Action.tapSearch },
-            userButton.rx.tap.map { Action.tapUser }
+            tabButtons.map { (mode, button) in
+                button.rx.tap.map { Action.tap(mode) }
+            }
         )
         .bind(to: action)
         .disposed(by: disposeBag)

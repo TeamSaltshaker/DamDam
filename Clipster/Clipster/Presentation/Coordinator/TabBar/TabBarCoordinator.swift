@@ -34,7 +34,7 @@ final class TabBarCoordinator: Coordinator {
 }
 
 extension TabBarCoordinator {
-    func didSelect(tab: TabBarMode) {
+    func didSelect(tab: TabItem) {
         guard children.indices.contains(tab.rawValue) else { return }
         let targetVC = children[tab.rawValue].navigationController
         tabBarController.switchTo(targetVC)
