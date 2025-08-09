@@ -4,6 +4,8 @@ enum TabItem: Int, CaseIterable {
     case home
     case search
     case myPage
+
+    static var defaultTab: TabItem = .home
 }
 
 extension TabItem {
