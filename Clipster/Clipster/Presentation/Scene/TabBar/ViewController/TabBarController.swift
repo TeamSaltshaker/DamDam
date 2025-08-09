@@ -11,6 +11,8 @@ final class TabBarViewController: UIViewController {
     private var currentVC: UIViewController?
     private let selectedTab = BehaviorRelay<TabItem>(value: .defaultTab)
 
+    private var lastTabBarHeight: CGFloat = 0
+
     init(coordinator: TabBarCoordinator) {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
@@ -27,10 +29,15 @@ final class TabBarViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        let baseTabBarHeight: CGFloat = 64
         let bottomInset = view.safeAreaInsets.bottom
-        let tabBarHeight = bottomInset > 0 ? 100 : 64
-        tabBarView.snp.updateConstraints {
-            $0.height.equalTo(tabBarHeight)
+        let tabBarHeight = baseTabBarHeight + bottomInset
+
+        guard lastTabBarHeight != tabBarHeight else { return }
+
+        lastTabBarHeight = tabBarHeight
+        tabBarView.snp.updateConstraints { make in
+            make.height.equalTo(tabBarHeight)
         }
     }
 
@@ -66,12 +73,10 @@ private extension TabBarViewController {
     }
 
     func setConstraints() {
-        let bottomInset = view.safeAreaInsets.bottom
-        let tabBarHeight = bottomInset > 0 ? 100 : 64
-
         tabBarView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(tabBarHeight)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.equalTo(1)
         }
     }
 
