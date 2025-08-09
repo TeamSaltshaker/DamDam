@@ -267,6 +267,14 @@ final class DIContainer {
         DefaultUpdateNicknameUseCase(userRepository: makeUserRepository())
     }
 
+    func makeFetchHasSeenOnboardingUseCase() -> FetchHasSeenOnboardingUseCase {
+        DefaultFetchHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeUpdateHasSeenOnboardingUseCase() -> UpdateHasSeenOnboardingUseCase {
+        DefaultUpdateHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
         ClipDetailReactor(
             fetchFolderUseCase: makeFetchFolderUseCase(),

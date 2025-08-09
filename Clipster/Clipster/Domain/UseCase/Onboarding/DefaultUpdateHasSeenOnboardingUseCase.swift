@@ -1,0 +1,14 @@
+import Foundation
+
+final class DefaultUpdateHasSeenOnboardingUseCase: UpdateHasSeenOnboardingUseCase {
+    private let userDefaultsRepository: UserDefaultsRepository
+
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
+    }
+
+    func execute(_ hasSeen: Bool) -> Result<Void, Error> {
+        userDefaultsRepository.setHasSeenOnboarding(hasSeen)
+        return .success(())
+    }
+}
