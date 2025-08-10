@@ -249,6 +249,10 @@ final class DIContainer {
         DefaultParseURLUseCase(urlMetaRepository: makeURLRepository())
     }
 
+    func makeSanitizeURLUseCase() -> SanitizeURLUseCase {
+        DefaultSanitizeURLUseCase()
+    }
+
     func makeFetchCurrentUserUseCase() -> FetchCurrentUserUseCase {
         DefaultFetchCurrentUserUseCase(userRepository: makeUserRepository())
     }
@@ -269,6 +273,7 @@ final class DIContainer {
     func makeEditClipReactor() -> EditClipReactor {
         EditClipReactor(
             parseURLUseCase: makeParseURLUseCase(),
+            sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
@@ -279,6 +284,7 @@ final class DIContainer {
         EditClipReactor(
             currentFolder: folder,
             parseURLUseCase: makeParseURLUseCase(),
+            sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
@@ -289,6 +295,7 @@ final class DIContainer {
         EditClipReactor(
             clip: clip,
             parseURLUseCase: makeParseURLUseCase(),
+            sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase()
