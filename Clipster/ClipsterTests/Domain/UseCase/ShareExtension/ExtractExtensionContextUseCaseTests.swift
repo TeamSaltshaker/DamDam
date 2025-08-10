@@ -87,4 +87,25 @@ final class ExtractExtensionContextUseCaseTests: XCTestCase {
             XCTFail("URL 추출에 실패했습니다.")
         }
     }
+
+    func test_execute_에러를_반환하여_실패() async {
+        let mockProvider = NSItemProvider(
+            item: nil,
+            typeIdentifier: UTType.url.identifier
+        )
+
+        let extensionItem = NSExtensionItem()
+        extensionItem.attachments = [mockProvider]
+
+        let result = await useCase.execute(
+            extensionItems: [extensionItem]
+        )
+
+        guard case .failure(let error) = result else {
+            XCTFail("Provider가 에러를 반환했으므로 실패해야 합니다.")
+            return
+        }
+
+        XCTAssertEqual(error, .unknownError)
+    }
 }
