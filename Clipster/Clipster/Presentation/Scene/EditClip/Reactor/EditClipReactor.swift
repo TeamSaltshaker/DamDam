@@ -105,6 +105,7 @@ final class EditClipReactor: Reactor {
     var initialState: State
 
     private let parseURLUseCase: ParseURLUseCase
+    private let sanitizeURLUseCase: SanitizeURLUseCase
     private let fetchFolderUseCase: FetchFolderUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
@@ -115,6 +116,7 @@ final class EditClipReactor: Reactor {
         clip: Clip? = nil,
         urlMetadataDisplay: URLMetadataDisplay,
         parseURLUseCase: ParseURLUseCase,
+        sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
@@ -125,6 +127,7 @@ final class EditClipReactor: Reactor {
             urlMetadataDisplay: urlMetadataDisplay
         )
         self.parseURLUseCase = parseURLUseCase
+        self.sanitizeURLUseCase = sanitizeURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
@@ -134,6 +137,7 @@ final class EditClipReactor: Reactor {
     init(
         currentFolder: Folder? = nil,
         parseURLUseCase: ParseURLUseCase,
+        sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
@@ -143,6 +147,7 @@ final class EditClipReactor: Reactor {
             currentFolder: currentFolder
         )
         self.parseURLUseCase = parseURLUseCase
+        self.sanitizeURLUseCase = sanitizeURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
@@ -151,6 +156,7 @@ final class EditClipReactor: Reactor {
     init(
         clip: Clip,
         parseURLUseCase: ParseURLUseCase,
+        sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase
@@ -162,6 +168,7 @@ final class EditClipReactor: Reactor {
             memoText: clip.memo
         )
         self.parseURLUseCase = parseURLUseCase
+        self.sanitizeURLUseCase = sanitizeURLUseCase
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
@@ -192,7 +199,8 @@ final class EditClipReactor: Reactor {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
-                let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                let sanitizedURL = try sanitizeURLUseCase.execute(urlString: trimmed).get()
+                let (metadata, isValidURL) = try await parseURLUseCase.execute(url: sanitizedURL).get()
                 let clipValidType: ParseResultType
                 switch (metadata, isValidURL) {
                 case (.some, true):

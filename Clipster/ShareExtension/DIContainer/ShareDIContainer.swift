@@ -28,6 +28,10 @@ final class ShareDIContainer {
         DefaultParseURLUseCase(urlMetaRepository: makeURLRepository())
     }
 
+    func makeSanitizeURLUseCase() -> SanitizeURLUseCase {
+        DefaultSanitizeURLUseCase()
+    }
+
     func makeExtractExtensionContextUseCase() -> ExtractExtensionContextUseCase {
         DefaultExtractExtensionContextUseCase()
     }
@@ -35,6 +39,7 @@ final class ShareDIContainer {
     func makeShareReactor() -> ShareReactor {
         ShareReactor(
             parseURLUseCase: makeParseURLUseCase(),
+            sanitizeURLUseCase: makeSanitizeURLUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             extractExtensionContextUseCase: makeExtractExtensionContextUseCase()
         )

@@ -93,6 +93,7 @@ final class ShareReactor: Reactor {
     var initialState: State
 
     private let parseURLUseCase: ParseURLUseCase
+    private let sanitizeURLUseCase: SanitizeURLUseCase
     private let createClipUseCase: CreateClipUseCase
     private let extractExtensionContextUseCase: ExtractExtensionContextUseCase
 
@@ -100,6 +101,7 @@ final class ShareReactor: Reactor {
     init(
         urlMetadataDisplay: URLMetadataDisplay,
         parseURLUseCase: ParseURLUseCase,
+        sanitizeURLUseCase: SanitizeURLUseCase,
         createClipUseCase: CreateClipUseCase,
         extractExtensionContextUseCase: ExtractExtensionContextUseCase
     ) {
@@ -108,6 +110,7 @@ final class ShareReactor: Reactor {
         )
 
         self.parseURLUseCase = parseURLUseCase
+        self.sanitizeURLUseCase = sanitizeURLUseCase
         self.createClipUseCase = createClipUseCase
         self.extractExtensionContextUseCase = extractExtensionContextUseCase
     }
@@ -115,12 +118,14 @@ final class ShareReactor: Reactor {
 
     init(
         parseURLUseCase: ParseURLUseCase,
+        sanitizeURLUseCase: SanitizeURLUseCase,
         createClipUseCase: CreateClipUseCase,
         extractExtensionContextUseCase: ExtractExtensionContextUseCase
     ) {
         initialState = State()
 
         self.parseURLUseCase = parseURLUseCase
+        self.sanitizeURLUseCase = sanitizeURLUseCase
         self.createClipUseCase = createClipUseCase
         self.extractExtensionContextUseCase = extractExtensionContextUseCase
     }
@@ -147,7 +152,8 @@ final class ShareReactor: Reactor {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
-                let (metadata, isValidURL) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                let sanitizedURL = try sanitizeURLUseCase.execute(urlString: trimmed).get()
+                let (metadata, isValidURL) = try await parseURLUseCase.execute(url: sanitizedURL).get()
                 let clipValidType: ParseResultType
                 switch (metadata, isValidURL) {
                 case (.some, true):
