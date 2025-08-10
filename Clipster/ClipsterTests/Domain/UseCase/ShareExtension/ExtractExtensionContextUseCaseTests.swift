@@ -108,4 +108,19 @@ final class ExtractExtensionContextUseCaseTests: XCTestCase {
 
         XCTAssertEqual(error, .unknownError)
     }
+
+    func test_execute_attachments가_empty_일_경우_실패() async {
+        let extensionItem = NSExtensionItem()
+        extensionItem.attachments = []
+
+        let result = await useCase.execute(
+            extensionItems: [extensionItem]
+        )
+
+        guard case .failure(let error) = result else {
+            return
+        }
+
+        XCTAssertEqual(error, .unknownError)
+    }
 }
