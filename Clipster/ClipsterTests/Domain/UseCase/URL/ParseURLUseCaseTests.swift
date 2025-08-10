@@ -29,153 +29,6 @@ final class ParseURLUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    func test_prefix로_http가_없을_때_성공() {
-        let input = "naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_http가_입력_됐을_때_성공() {
-        let input = "httpnaver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_https가_입력_됐을_때_성공() {
-        let input = "httpsnaver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_http_세미콜론이_입력_됐을_때_성공() {
-        let input = "http:naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_https_세미콜론이_입력_됐을_때_성공() {
-        let input = "https:naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_http_세미콜론_슬래쉬가_입력_됐을_때_성공() {
-        let input = "http:/naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-
-    func test_prefix로_https_세미콜론_슬래쉬가_입력_됐을_때_성공() {
-        let input = "https:/naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_http_세미콜론_슬래쉬_슬래쉬가_입력_됐을_때_성공() {
-        let input = "http://naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-
-    func test_prefix로_https_세미콜론_슬래쉬_슬래쉬가_입력_됐을_때_성공() {
-        let input = "https://naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
-    func test_prefix로_https_세미콜론_슬래쉬_슬래쉬_슬래쉬가_입력_됐을_때_실패() {
-        let input = "https:///naver.com"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        case .failure(let error):
-            XCTAssertEqual(error, .badURL)
-        }
-    }
-
-    func test_URL타입이_아닌_형식이_입력_될_때_실패() {
-        let input = "abcd"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        case .failure(let error):
-            XCTAssertEqual(error, .badURL)
-        }
-    }
-
-    func test_콜론이_포함되었을_때_성공() {
-        let input = "abcd.efg"
-        let result = useCase.sanitizeURL(urlString: input)
-
-        switch result {
-        case .success(let url):
-            XCTAssertNotNil(url)
-        case .failure:
-            XCTFail("sanitizeURL 실패 input: \(input)")
-        }
-    }
-
     func test_ogTitle_파싱_성공() {
         let mockHTML = """
         <!DOCTYPE html>
@@ -344,7 +197,7 @@ final class ParseURLUseCaseTests: XCTestCase {
         )
         let useCase = DefaultParseURLUseCase(urlMetaRepository: repo)
 
-        let result = await useCase.execute(urlString: "resolved.com")
+        let result = await useCase.execute(url: URL(string: "https://resolved.com")!)
 
         switch result {
         case .success(let (metadata, isValid)):
@@ -371,7 +224,7 @@ final class ParseURLUseCaseTests: XCTestCase {
         )
         let useCase = DefaultParseURLUseCase(urlMetaRepository: repo)
 
-        let result = await useCase.execute(urlString: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        let result = await useCase.execute(url: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
 
         switch result {
         case .success(let (metadata, isValid)):
@@ -399,7 +252,7 @@ final class ParseURLUseCaseTests: XCTestCase {
         )
         let useCase = DefaultParseURLUseCase(urlMetaRepository: repo)
 
-        let result = await useCase.execute(urlString: "https://resolved.com")
+        let result = await useCase.execute(url: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
 
         switch result {
         case .success(let (metadata, isValid)):

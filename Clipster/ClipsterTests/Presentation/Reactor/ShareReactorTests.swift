@@ -4,6 +4,7 @@ import RxSwift
 
 final class ShareReactorTests: XCTestCase {
     private var parseURLUseCase: MockParseURLUseCase!
+    private var sanitizeURLUseCase: MockSanitizeURLUseCase!
     private var createClipUseCase: MockCreateClipUseCase!
     private var extractExtensionContextUseCase: MockExtractExtensionContextUseCase!
     private var disposeBag: DisposeBag!
@@ -12,11 +13,13 @@ final class ShareReactorTests: XCTestCase {
     override func setUp() {
         super.setUp()
         parseURLUseCase = MockParseURLUseCase()
+        sanitizeURLUseCase = MockSanitizeURLUseCase()
         createClipUseCase = MockCreateClipUseCase()
         extractExtensionContextUseCase = MockExtractExtensionContextUseCase()
         disposeBag = DisposeBag()
         reactor = ShareReactor(
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             createClipUseCase: createClipUseCase,
             extractExtensionContextUseCase: extractExtensionContextUseCase
         )
@@ -78,12 +81,13 @@ final class ShareReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, true))
+        sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
 
         reactor.action.onNext(.validifyURL("https://google.com"))
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "https://google.com")
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "https://google.com")
         XCTAssertTrue(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .valid)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -102,12 +106,13 @@ final class ShareReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         parseURLUseCase.executeResult = .success((nil, true))
+        sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "https://a.a")
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "https://a.a")
         XCTAssertTrue(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .validWithWarning)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -126,12 +131,12 @@ final class ShareReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         parseURLUseCase.executeResult = .success((nil, false))
-
+        sanitizeURLUseCase.executeResult = .failure(.badURL)
         reactor.action.onNext(.validifyURL("aaa"))
 
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "aaa")
+        XCTAssertFalse(parseURLUseCase.didCallExecute)
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "aaa")
         XCTAssertFalse(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .invalid)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -169,6 +174,7 @@ final class ShareReactorTests: XCTestCase {
         let reactor = ShareReactor(
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             createClipUseCase: createClipUseCase,
             extractExtensionContextUseCase: extractExtensionContextUseCase
         )
@@ -193,6 +199,7 @@ final class ShareReactorTests: XCTestCase {
         let reactor = ShareReactor(
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             createClipUseCase: createClipUseCase,
             extractExtensionContextUseCase: extractExtensionContextUseCase
         )
