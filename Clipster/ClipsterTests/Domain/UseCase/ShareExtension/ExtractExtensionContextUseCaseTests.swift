@@ -36,4 +36,26 @@ final class ExtractExtensionContextUseCaseTests: XCTestCase {
             XCTFail("URL 추출에 실패했습니다.")
         }
     }
+
+    func test_execute_URL_형태의_텍스트_공유_시_URL_추출_성공() async {
+        let expectedURLString = "http://google.com"
+        let mockProvider = NSItemProvider(
+            item: expectedURLString as NSString,
+            typeIdentifier: UTType.plainText.identifier
+        )
+
+        let extensionItem = NSExtensionItem()
+        extensionItem.attachments = [mockProvider]
+
+        let result = await useCase.execute(
+            extensionItems: [extensionItem]
+        )
+
+        switch result {
+        case .success(let url):
+            XCTAssertEqual(url.absoluteString, expectedURLString)
+        case .failure:
+            XCTFail("URL 추출에 실패했습니다.")
+        }
+    }
 }
