@@ -101,12 +101,12 @@ final class ExtractExtensionContextUseCaseTests: XCTestCase {
             extensionItems: [extensionItem]
         )
 
-        guard case .failure(let error) = result else {
+        switch result {
+        case .success:
             XCTFail("Provider가 에러를 반환했으므로 실패해야 합니다.")
-            return
+        case .failure(let error):
+            XCTAssertEqual(error, .unknownError)
         }
-
-        XCTAssertEqual(error, .unknownError)
     }
 
     func test_execute_attachments가_empty_일_경우_실패() async {
@@ -117,10 +117,11 @@ final class ExtractExtensionContextUseCaseTests: XCTestCase {
             extensionItems: [extensionItem]
         )
 
-        guard case .failure(let error) = result else {
-            return
+        switch result {
+        case .success:
+            XCTFail("attachments가 빈 배열이므로 실패해야 합니다.")
+        case .failure(let error):
+            XCTAssertEqual(error, .unknownError)
         }
-
-        XCTAssertEqual(error, .unknownError)
     }
 }
