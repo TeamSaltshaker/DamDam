@@ -8,7 +8,7 @@ final class MockExtractExtensionContextUseCase: ExtractExtensionContextUseCase {
 
     var executeResult: Result<URL, DomainError>!
 
-    func execute(extensionItems: [NSExtensionItem]) async -> Result<URL, DomainError> {
+    func execute(extensionItems: [NSExtensionItem]) -> Result<URL, DomainError> {
         didCallExecute = true
         receivedExtensionItems = extensionItems
 
