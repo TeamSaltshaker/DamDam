@@ -80,7 +80,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
                     print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
                     continuation.resume(returning: nil)
                 }
-                self.cleanupWebView()
             }
         }
     }
@@ -88,16 +87,17 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
 extension DefaultURLRepository {
     private func complete(with result: Result<(String, Data?), URLValidationError>) {
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
+        print("complete !!")
         guard let currentContinuation = continuation else { return }
-        currentContinuation.resume(returning: result)
         continuation = nil
+        currentContinuation.resume(returning: result)
+        DispatchQueue.main.async { [weak self] in
+            self?.cleanupWebView()
+        }
     }
 
     private func handleTimeout() {
         print("\(Self.self) WKWebView 로드 타임아웃 발생 URL: \(originalURL?.absoluteString ?? "N/A")")
-        webView?.stopLoading()
         complete(with: .failure(.timeOut))
     }
 
