@@ -17,8 +17,7 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         let htmlResult = await urlRepository.fetchHTML(from: resolveFinalURL)
 
         switch htmlResult {
-        case .success(let html):
-            let screenshotData = await urlRepository.captureScreenshot(rect: nil)
+        case .success(let (html, screenshotData)):
             let parsedMetadata = createParsedURLMetadata(url: sanitizeURL, html: html, screenshotData: screenshotData)
             return .success((parsedMetadata, true))
 

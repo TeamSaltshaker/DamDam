@@ -2,12 +2,12 @@ import Foundation
 import WebKit
 
 final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository {
-    private var continuation: CheckedContinuation<Result<String, URLValidationError>, Never>?
+    private var continuation: CheckedContinuation<Result<(String, Data?), URLValidationError>, Never>?
     private var webView: WKWebView?
     private var originalURL: URL?
     private var timeoutTimer: Timer?
 
-    func fetchHTML(from url: URL) async -> Result<String, URLValidationError> {
+    func fetchHTML(from url: URL) async -> Result<(String, Data?), URLValidationError> {
         await withCheckedContinuation { continuation in
             self.cleanupWebView()
 
@@ -87,7 +87,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 }
 
 extension DefaultURLRepository {
-    private func complete(with result: Result<String, URLValidationError>) {
+    private func complete(with result: Result<(String, Data?), URLValidationError>) {
         timeoutTimer?.invalidate()
         timeoutTimer = nil
         guard let currentContinuation = continuation else { return }
@@ -163,8 +163,8 @@ extension DefaultURLRepository {
                     self.complete(with: .failure(.notFoundedWKURL))
                     return
                 }
-
-                self.complete(with: .success(htmlString))
+                let screenShotData = await self.captureScreenshot()
+                self.complete(with: .success((htmlString, screenShotData)))
             } catch {
                 self.complete(with: .failure(.unknown))
             }
