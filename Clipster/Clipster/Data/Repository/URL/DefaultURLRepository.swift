@@ -15,6 +15,16 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             self.originalURL = url
 
             let config = WKWebViewConfiguration()
+            let userContentController = WKUserContentController()
+            let scriptSource = """
+                function checkMetaElements() {
+                    return !!(document.querySelector("meta[property='og:title']") || document.querySelector("title"));
+                }
+                """
+            let script = WKUserScript(source: scriptSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+            userContentController.addUserScript(script)
+            config.userContentController = userContentController
+
             let webViewFrame = CGRect(x: 0, y: 0, width: 375, height: 812)
             self.webView = WKWebView(frame: webViewFrame, configuration: config)
             self.webView?.navigationDelegate = self
@@ -78,6 +88,8 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
 extension DefaultURLRepository {
     private func complete(with result: Result<String, URLValidationError>) {
+        timeoutTimer?.invalidate()
+        timeoutTimer = nil
         guard let currentContinuation = continuation else { return }
         currentContinuation.resume(returning: result)
         continuation = nil
@@ -116,6 +128,24 @@ extension DefaultURLRepository {
 
         Task {
             do {
+                var checkCount = 0
+                let maxChecks = 15
+
+                while checkCount < maxChecks {
+                    let elementsAreReady = try await webView.evaluateJavaScript("checkMetaElements()") as? Bool ?? false
+
+                    if elementsAreReady {
+                        print("\(Self.self) 목표한 메타 태그 발견.")
+                        break
+                    }
+                    checkCount += 1
+                    try await Task.sleep(for: .milliseconds(200))
+                }
+
+                if checkCount == maxChecks {
+                    print("\(Self.self) 목표 메타 태그를 찾지 못 하였습니다.")
+                }
+
                 while true {
                     let readyState = try await webView.evaluateJavaScript("document.readyState") as? String
                     if readyState == "complete" { break }
