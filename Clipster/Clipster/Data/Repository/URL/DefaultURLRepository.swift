@@ -38,24 +38,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
         }
     }
 
-    func resolveRedirectURL(initialURL: URL) async -> URL {
-        var request = URLRequest(url: initialURL)
-        request.httpMethod = "get"
-
-        do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse,
-               let finalURL = httpResponse.url {
-                print("\(Self.self) 리디렉션 최종 URL: \(finalURL)")
-                return finalURL
-            }
-        } catch {
-            print("\(Self.self) 리디렉션 확인 실패: \(error)")
-        }
-
-        return initialURL
-    }
-
     func captureScreenshot(rect: CGRect? = nil) async -> Data? {
         guard let webView = self.webView else {
             print("\(Self.self) WKWebView 인스턴스가 없어 스크린샷을 찍을 수 없습니다.")
@@ -87,7 +69,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 
 extension DefaultURLRepository {
     private func complete(with result: Result<(String, Data?), URLValidationError>) {
-        print("complete !!")
         guard let currentContinuation = continuation else { return }
         continuation = nil
         currentContinuation.resume(returning: result)
