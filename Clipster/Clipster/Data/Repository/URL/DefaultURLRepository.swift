@@ -4,7 +4,6 @@ import WebKit
 final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository {
     private var continuation: CheckedContinuation<Result<(String, Data?), URLValidationError>, Never>?
     private var webView: WKWebView?
-    private var originalURL: URL?
     private var timeoutTimer: Timer?
 
     func fetchHTML(from url: URL) async -> Result<(String, Data?), URLValidationError> {
@@ -12,7 +11,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             self.cleanupWebView()
 
             self.continuation = continuation
-            self.originalURL = url
 
             let config = WKWebViewConfiguration()
             let userContentController = WKUserContentController()
@@ -61,7 +59,6 @@ extension DefaultURLRepository {
         webView?.stopLoading()
         webView?.removeFromSuperview()
         webView = nil
-        originalURL = nil
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation) {
@@ -69,7 +66,7 @@ extension DefaultURLRepository {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
-        print("\(Self.self) WKWebView 초기 로드 실패: \(error.localizedDescription) URL: \(originalURL?.absoluteString ?? "N/A")")
+        print("\(Self.self) WKWebView 초기 로드 실패: \(error.localizedDescription) URL: \(webView.url?.absoluteString ?? "N/A")")
         complete(with: .failure(.unsupportedURL))
     }
 
@@ -125,7 +122,7 @@ extension DefaultURLRepository {
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation, withError error: Error) {
-        print("\(Self.self) WKWebView 로드 중 오류 발생: \(error.localizedDescription) URL: \(originalURL?.absoluteString ?? "N/A")")
+        print("\(Self.self) WKWebView 로드 중 오류 발생: \(error.localizedDescription) URL: \(webView.url?.absoluteString ?? "N/A")")
         complete(with: .failure(.unsupportedURL))
     }
 
