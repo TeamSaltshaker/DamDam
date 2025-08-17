@@ -8,7 +8,6 @@ final class ParseURLUseCaseTests: XCTestCase {
         super.setUp()
         useCase = DefaultParseURLUseCase(
             urlMetaRepository: StubURLRepository(
-                resolveRedirectURL: URL(string: "www.google.com")!,
                 htmlResult: """
                 <!DOCTYPE html>
                 <html lang="en">
@@ -191,7 +190,6 @@ final class ParseURLUseCaseTests: XCTestCase {
             """
         let mockScreenshot = "image".data(using: .utf8)!
         let repo = StubURLRepository(
-            resolveRedirectURL: URL(string: "https://resolved.com")!,
             htmlResult:  mockHTML,
             captureScreenshot: mockScreenshot
         )
@@ -218,7 +216,6 @@ final class ParseURLUseCaseTests: XCTestCase {
             """
         let mockScreenshot = "image".data(using: .utf8)!
         let repo = StubURLRepository(
-            resolveRedirectURL: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!,
             htmlResult:  mockHTML,
             captureScreenshot: mockScreenshot
         )
@@ -246,7 +243,6 @@ final class ParseURLUseCaseTests: XCTestCase {
                 </html>
             """
         let repo = StubURLRepository(
-            resolveRedirectURL: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!,
             htmlResult:  mockHTML,
             captureScreenshot: nil
         )
