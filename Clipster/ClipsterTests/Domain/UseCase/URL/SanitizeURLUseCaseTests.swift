@@ -87,7 +87,6 @@ final class SanitizeURLUseCaseTests: XCTestCase {
         }
     }
 
-
     func test_prefix로_https_세미콜론_슬래쉬가_입력_됐을_때_성공() {
         let input = "https:/naver.com"
         let result = useCase.execute(urlString: input)
@@ -111,7 +110,6 @@ final class SanitizeURLUseCaseTests: XCTestCase {
             XCTFail("sanitizeURL 실패 input: \(input)")
         }
     }
-
 
     func test_prefix로_https_세미콜론_슬래쉬_슬래쉬가_입력_됐을_때_성공() {
         let input = "https://naver.com"
