@@ -5,11 +5,13 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
     private var continuation: CheckedContinuation<Result<(String, Data?), URLValidationError>, Never>?
     private var webView: WKWebView?
     private var timeoutTimer: Timer?
+    private var isCompleted = false
 
     func fetchHTML(from url: URL) async -> Result<(String, Data?), URLValidationError> {
         await withCheckedContinuation { continuation in
             self.cleanupWebView()
 
+            self.isCompleted = false
             self.continuation = continuation
 
             let config = WKWebViewConfiguration()
@@ -38,29 +40,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 }
 
 extension DefaultURLRepository {
-    private func complete(with result: Result<(String, Data?), URLValidationError>) {
-        guard let currentContinuation = continuation else { return }
-        continuation = nil
-        currentContinuation.resume(returning: result)
-        DispatchQueue.main.async { [weak self] in
-            self?.cleanupWebView()
-        }
-    }
-
-    private func handleTimeout() {
-        print("\(Self.self) WKWebView 로드 타임아웃 발생 URL: \(originalURL?.absoluteString ?? "N/A")")
-        complete(with: .failure(.timeOut))
-    }
-
-    private func cleanupWebView() {
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
-        webView?.navigationDelegate = nil
-        webView?.stopLoading()
-        webView?.removeFromSuperview()
-        webView = nil
-    }
-
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation) {
         print("\(Self.self) WKWebView 로드 시작: \(webView.url?.absoluteString ?? "Unknown URL")")
     }
@@ -73,34 +52,9 @@ extension DefaultURLRepository {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation) {
         print("\(Self.self) WKWebView 로드 완료: \(webView.url?.absoluteString ?? "Unknown URL")")
 
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
-
         Task {
             do {
-                var checkCount = 0
-                let maxChecks = 15
-
-                while checkCount < maxChecks {
-                    let elementsAreReady = try await webView.evaluateJavaScript("checkMetaElements()") as? Bool ?? false
-
-                    if elementsAreReady {
-                        print("\(Self.self) 목표한 메타 태그 발견.")
-                        break
-                    }
-                    checkCount += 1
-                    try await Task.sleep(for: .milliseconds(200))
-                }
-
-                if checkCount == maxChecks {
-                    print("\(Self.self) 목표 메타 태그를 찾지 못 하였습니다.")
-                }
-
-                while true {
-                    let readyState = try await webView.evaluateJavaScript("document.readyState") as? String
-                    if readyState == "complete" { break }
-                    try await Task.sleep(for: .milliseconds(200))
-                }
+                try await waitForDOMContentLoaded(webView: webView)
 
                 guard let htmlString = try await webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") as? String, !htmlString.isEmpty else {
                     print("\(Self.self) HTML 불러오기 실패")
@@ -125,32 +79,73 @@ extension DefaultURLRepository {
         print("\(Self.self) WKWebView 로드 중 오류 발생: \(error.localizedDescription) URL: \(webView.url?.absoluteString ?? "N/A")")
         complete(with: .failure(.unsupportedURL))
     }
+}
 
-    private func captureScreenshot(rect: CGRect? = nil) async -> Data? {
+private extension DefaultURLRepository {
+    func complete(with result: Result<(String, Data?), URLValidationError>) {
+        guard !isCompleted, let currentContinuation = continuation else { return }
+        isCompleted = true
+
+        timeoutTimer?.invalidate()
+        timeoutTimer = nil
+
+        continuation = nil
+        currentContinuation.resume(returning: result)
+        DispatchQueue.main.async { [weak self] in
+            self?.cleanupWebView()
+        }
+    }
+
+    func handleTimeout() {
+        print("\(Self.self) WKWebView 로드 타임아웃 발생 URL: \(webView?.url?.absoluteString ?? "N/A")")
+        complete(with: .failure(.timeOut))
+    }
+
+    func cleanupWebView() {
+        timeoutTimer?.invalidate()
+        timeoutTimer = nil
+        webView?.navigationDelegate = nil
+        webView?.stopLoading()
+        webView?.removeFromSuperview()
+        webView = nil
+        webView?.navigationDelegate = nil
+    }
+
+    func captureScreenshot(rect: CGRect? = nil) async -> Data? {
         guard let webView = self.webView else {
             print("\(Self.self) WKWebView 인스턴스가 없어 스크린샷을 찍을 수 없습니다.")
             return nil
         }
 
-        return await withCheckedContinuation { continuation in
-            let configuration = WKSnapshotConfiguration()
+        let configuration = WKSnapshotConfiguration()
 
-            if let rect = rect {
-                configuration.rect = rect
-            }
+        if let rect = rect {
+            configuration.rect = rect
+        }
 
-            webView.takeSnapshot(with: configuration) { image, error in
-                if let error = error {
-                    print("\(Self.self) 스크린샷 캡처 실패: \(error.localizedDescription)")
-                    continuation.resume(returning: nil)
-                } else if let image = image {
-                    print("\(Self.self) 스크린샷 캡처 성공.")
-                    continuation.resume(returning: image.jpegData(compressionQuality: 0.5))
-                } else {
-                    print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
-                    continuation.resume(returning: nil)
-                }
+        do {
+            let image = try await webView.takeSnapshot(configuration: configuration)
+            print("\(Self.self) 스크린샷 캡처 성공")
+            return image.jpegData(compressionQuality: 0.5)
+        } catch {
+            print("\(Self.self) 스크린샷 캡처 실패: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    func waitForDOMContentLoaded(webView: WKWebView) async throws {
+        var checkCount = 0
+        let maxChecks = 15
+
+        while checkCount < maxChecks {
+            let elementsAreReady = try await webView.evaluateJavaScript("checkMetaElements()") as? Bool ?? false
+
+            if elementsAreReady {
+                print("\(Self.self) DOM Content 발견.")
+                break
             }
+            checkCount += 1
+            try await Task.sleep(for: .milliseconds(200))
         }
     }
 }
