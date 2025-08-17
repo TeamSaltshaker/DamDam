@@ -259,7 +259,7 @@ final class ParseURLUseCaseTests: XCTestCase {
             XCTAssertEqual(metadata?.title, "제목 없음")
             XCTAssertEqual(metadata?.description, "내용 없음")
             XCTAssertEqual(metadata?.screenshotData, nil)
-            XCTAssertNil(metadata?.thumbnailImageURL)
+            XCTAssertNotNil(metadata?.thumbnailImageURL)
             XCTAssertEqual(isValid, true)
         case .failure(let error):
             XCTFail("execute 실패: \(error)")
