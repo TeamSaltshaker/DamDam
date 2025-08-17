@@ -37,34 +37,6 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             }
         }
     }
-
-    func captureScreenshot(rect: CGRect? = nil) async -> Data? {
-        guard let webView = self.webView else {
-            print("\(Self.self) WKWebView 인스턴스가 없어 스크린샷을 찍을 수 없습니다.")
-            return nil
-        }
-
-        return await withCheckedContinuation { continuation in
-            let configuration = WKSnapshotConfiguration()
-
-            if let rect = rect {
-                configuration.rect = rect
-            }
-
-            webView.takeSnapshot(with: configuration) { image, error in
-                if let error = error {
-                    print("\(Self.self) 스크린샷 캡처 실패: \(error.localizedDescription)")
-                    continuation.resume(returning: nil)
-                } else if let image = image {
-                    print("\(Self.self) 스크린샷 캡처 성공.")
-                    continuation.resume(returning: image.jpegData(compressionQuality: 0.5))
-                } else {
-                    print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
-                    continuation.resume(returning: nil)
-                }
-            }
-        }
-    }
 }
 
 extension DefaultURLRepository {
@@ -155,5 +127,33 @@ extension DefaultURLRepository {
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation, withError error: Error) {
         print("\(Self.self) WKWebView 로드 중 오류 발생: \(error.localizedDescription) URL: \(originalURL?.absoluteString ?? "N/A")")
         complete(with: .failure(.unsupportedURL))
+    }
+
+    private func captureScreenshot(rect: CGRect? = nil) async -> Data? {
+        guard let webView = self.webView else {
+            print("\(Self.self) WKWebView 인스턴스가 없어 스크린샷을 찍을 수 없습니다.")
+            return nil
+        }
+
+        return await withCheckedContinuation { continuation in
+            let configuration = WKSnapshotConfiguration()
+
+            if let rect = rect {
+                configuration.rect = rect
+            }
+
+            webView.takeSnapshot(with: configuration) { image, error in
+                if let error = error {
+                    print("\(Self.self) 스크린샷 캡처 실패: \(error.localizedDescription)")
+                    continuation.resume(returning: nil)
+                } else if let image = image {
+                    print("\(Self.self) 스크린샷 캡처 성공.")
+                    continuation.resume(returning: image.jpegData(compressionQuality: 0.5))
+                } else {
+                    print("\(Self.self) 스크린샷 캡처 결과 이미지가 없습니다.")
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
     }
 }
