@@ -4,6 +4,7 @@ import RxSwift
 
 final class EditClipReactorTests: XCTestCase {
     private var parseURLUseCase: MockParseURLUseCase!
+    private var sanitizeURLUseCase: MockSanitizeURLUseCase!
     private var fetchFolderUseCase: MockFetchFolderUseCase!
     private var createClipUseCase: MockCreateClipUseCase!
     private var updateClipUseCase: MockUpdateClipUseCase!
@@ -13,6 +14,7 @@ final class EditClipReactorTests: XCTestCase {
     override func setUp() {
         super.setUp()
         parseURLUseCase = MockParseURLUseCase()
+        sanitizeURLUseCase = MockSanitizeURLUseCase()
         fetchFolderUseCase = MockFetchFolderUseCase()
         createClipUseCase = MockCreateClipUseCase()
         updateClipUseCase = MockUpdateClipUseCase()
@@ -23,6 +25,7 @@ final class EditClipReactorTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         parseURLUseCase = nil
+        sanitizeURLUseCase = nil
         fetchFolderUseCase = nil
         createClipUseCase = nil
         updateClipUseCase = nil
@@ -108,13 +111,14 @@ final class EditClipReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
+        sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
         parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, true))
 
         reactor.action.onNext(.validifyURL("https://google.com"))
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "https://google.com")
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "https://google.com")
         XCTAssertTrue(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .valid)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -133,12 +137,13 @@ final class EditClipReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         parseURLUseCase.executeResult = .success((nil, true))
+        sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "https://a.a")
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "https://a.a")
         XCTAssertTrue(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .validWithWarning)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -157,12 +162,12 @@ final class EditClipReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         parseURLUseCase.executeResult = .success((nil, false))
-
+        sanitizeURLUseCase.executeResult = .failure(.badURL)
         reactor.action.onNext(.validifyURL("aaa"))
 
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertTrue(parseURLUseCase.didCallExecute)
-        XCTAssertEqual(parseURLUseCase.receivedURLString, "aaa")
+        XCTAssertFalse(parseURLUseCase.didCallExecute)
+        XCTAssertEqual(sanitizeURLUseCase.receivedURLString, "aaa")
         XCTAssertFalse(reactor.currentState.isURLValid)
         XCTAssertEqual(reactor.currentState.urlValidationResult, .invalid)
         XCTAssertFalse(reactor.currentState.isLoading)
@@ -202,6 +207,7 @@ final class EditClipReactorTests: XCTestCase {
             type: .create,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase
@@ -228,6 +234,7 @@ final class EditClipReactorTests: XCTestCase {
             type: .create,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase
@@ -259,6 +266,7 @@ final class EditClipReactorTests: XCTestCase {
             clip: MockClip.someClip,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase
@@ -286,6 +294,7 @@ final class EditClipReactorTests: XCTestCase {
             clip: MockClip.someClip,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
+            sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase
@@ -441,6 +450,7 @@ private extension EditClipReactorTests {
             return EditClipReactor(
                 currentFolder: MockFolder.someFolder,
                 parseURLUseCase: parseURLUseCase,
+                sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
                 updateClipUseCase: updateClipUseCase
@@ -449,6 +459,7 @@ private extension EditClipReactorTests {
             return EditClipReactor(
                 clip: MockClip.someClip,
                 parseURLUseCase: parseURLUseCase,
+                sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
                 updateClipUseCase: updateClipUseCase
