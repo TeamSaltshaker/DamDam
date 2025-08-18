@@ -55,7 +55,7 @@ extension MyPageViewController {
 
     func bindState(from reactor: Reactor) {
         reactor.state
-            .map { $0.sectionModel }
+            .map { $0.sectionModels }
             .distinctUntilChanged { lhs, rhs in
                 guard lhs.count == rhs.count else { return false }
 
