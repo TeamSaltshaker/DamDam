@@ -199,7 +199,8 @@ final class EditClipReactor: Reactor {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
-                let (urlMetadata, parseResult) = try await parseURLUseCase.execute(urlString: trimmed).get()
+                let sanitizedURL = try sanitizeURLUseCase.execute(urlString: trimmed).get()
+                let (urlMetadata, parseResult) = try await parseURLUseCase.execute(url: sanitizedURL).get()
 
                 return .merge(
                     .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: urlMetadata))),

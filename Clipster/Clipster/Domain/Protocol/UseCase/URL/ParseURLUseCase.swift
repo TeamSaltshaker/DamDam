@@ -1,5 +1,5 @@
 import Foundation
 
 protocol ParseURLUseCase {
-    func execute(urlString: String) async -> Result<(URLMetadata, ParseResultType), URLValidationError>
+    func execute(url: URL) async -> Result<(URLMetadata, ParseResultType), URLValidationError>
 }

@@ -7,8 +7,8 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         self.urlRepository = urlMetaRepository
     }
 
+    func execute(url: URL) async -> Result<(URLMetadata, ParseResultType), URLValidationError> {
         let htmlResult = await urlRepository.fetchHTML(from: url)
-    func execute(urlString: String) async -> Result<(URLMetadata, ParseResultType), URLValidationError> {
 
         switch htmlResult {
         case .success(let (html, screenshotData)):
