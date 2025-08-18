@@ -7,14 +7,13 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
         self.urlRepository = urlMetaRepository
     }
 
-    func execute(url: URL) async -> Result<(URLMetadata?, Bool), URLValidationError> {
         let htmlResult = await urlRepository.fetchHTML(from: url)
+    func execute(urlString: String) async -> Result<(URLMetadata, ParseResultType), URLValidationError> {
 
         switch htmlResult {
         case .success(let (html, screenshotData)):
-            let parsedMetadata = createParsedURLMetadata(url: url, html: html, screenshotData: screenshotData)
-            return .success((parsedMetadata, true))
-
+            let parsedMetadata = createParsedURLMetadata(url: sanitizeURL, html: html, screenshotData: screenshotData)
+            return .success((parsedMetadata, .valid))
         case .failure(let error):
             return .failure(error)
         }

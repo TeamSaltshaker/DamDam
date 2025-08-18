@@ -152,20 +152,11 @@ final class ShareReactor: Reactor {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.empty() }
-                let sanitizedURL = try sanitizeURLUseCase.execute(urlString: trimmed).get()
-                let (metadata, isValidURL) = try await parseURLUseCase.execute(url: sanitizedURL).get()
-                let clipValidType: ParseResultType
-                switch (metadata, isValidURL) {
-                case (.some, true):
-                    clipValidType = .valid
-                case (nil, true):
-                    clipValidType = .validWithWarning
-                case (_, false):
-                    clipValidType = .invalid
-                }
+                let (urlMetadata, parseResult) = try await parseURLUseCase.execute(urlString: trimmed).get()
+
                 return .merge(
-                    .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: metadata))),
-                    .just(Mutation.updateIsValidURL(clipValidType))
+                    .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: urlMetadata))),
+                    .just(Mutation.updateIsValidURL(parseResult))
                 )
             }
             .flatMap { $0 }
@@ -177,8 +168,6 @@ final class ShareReactor: Reactor {
                             .just(Mutation.updateURLMetadata(nil)),
                             .just(Mutation.updateIsValidURL(.invalid))
                         )
-                    case .unknown:
-                        return .empty()
                     default:
                         return Observable.merge(
                             .just(Mutation.updateURLMetadata(self.makeURLMetaDisplayOnlyURL(urlString: self.currentState.urlString))),
