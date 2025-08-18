@@ -8,13 +8,10 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
     }
 
     func execute(url: URL) async -> Result<(URLMetadata?, Bool), URLValidationError> {
-        let resolveFinalURL = await urlRepository.resolveRedirectURL(initialURL: url)
-
-        let htmlResult = await urlRepository.fetchHTML(from: resolveFinalURL)
+        let htmlResult = await urlRepository.fetchHTML(from: url)
 
         switch htmlResult {
-        case .success(let html):
-            let screenshotData = await urlRepository.captureScreenshot(rect: nil)
+        case .success(let (html, screenshotData)):
             let parsedMetadata = createParsedURLMetadata(url: url, html: html, screenshotData: screenshotData)
             return .success((parsedMetadata, true))
 
