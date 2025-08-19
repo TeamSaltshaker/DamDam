@@ -80,7 +80,7 @@ final class ShareReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, true))
+        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, .valid))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
 
         reactor.action.onNext(.validifyURL("https://google.com"))
@@ -105,7 +105,7 @@ final class ShareReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((nil, true))
+        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
@@ -130,7 +130,6 @@ final class ShareReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((nil, false))
         sanitizeURLUseCase.executeResult = .failure(.badURL)
         reactor.action.onNext(.validifyURL("aaa"))
 

@@ -112,7 +112,7 @@ final class EditClipReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, true))
+        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, .valid))
 
         reactor.action.onNext(.validifyURL("https://google.com"))
 
@@ -136,7 +136,7 @@ final class EditClipReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((nil, true))
+        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
@@ -161,7 +161,6 @@ final class EditClipReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((nil, false))
         sanitizeURLUseCase.executeResult = .failure(.badURL)
         reactor.action.onNext(.validifyURL("aaa"))
 
