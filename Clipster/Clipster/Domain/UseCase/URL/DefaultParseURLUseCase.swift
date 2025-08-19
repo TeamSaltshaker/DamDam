@@ -12,8 +12,14 @@ final class DefaultParseURLUseCase: ParseURLUseCase {
 
         switch htmlResult {
         case .success(let (html, screenshotData)):
-            let parsedMetadata = createParsedURLMetadata(url: sanitizeURL, html: html, screenshotData: screenshotData)
-            return .success((parsedMetadata, .valid))
+            let parsedMetadata = createParsedURLMetadata(url: url, html: html, screenshotData: screenshotData)
+            if parsedMetadata.thumbnailImageURL == nil,
+               parsedMetadata.screenshotData == nil {
+                return .success((parsedMetadata, .validWithWarning))
+            } else {
+                return .success((parsedMetadata, .valid))
+            }
+
         case .failure(let error):
             return .failure(error)
         }
