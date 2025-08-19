@@ -86,15 +86,15 @@ final class HomeReactorTests: XCTestCase {
 
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.unvisitedClips.count,
-            MockClip.unvisitedClips.count
+            StubClip.unvisitedClips.count
         )
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
-            MockFolder.rootFolders.count
+            StubFolder.rootFolders.count
         )
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.clips.count,
-            MockClip.unvisitedClips.count
+            StubClip.unvisitedClips.count
         )
     }
 
@@ -135,7 +135,7 @@ final class HomeReactorTests: XCTestCase {
               case let .showAddClip(folder) = route else {
             return XCTFail("tapAddClip → showAddClip 화면 이동 실패")
         }
-        XCTAssertEqual(folder?.id, MockFolder.rootFolders[0].id)
+        XCTAssertEqual(folder?.id, StubFolder.rootFolders[0].id)
     }
 
     func test_폴더_추가_탭_시_폴더_추가_화면으로_이동() {
@@ -174,7 +174,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [routeExpectation], timeout: 1.0)
-        XCTAssertEqual(routedURL, MockClip.unvisitedClips[0].url)
+        XCTAssertEqual(routedURL, StubClip.unvisitedClips[0].url)
         XCTAssertTrue(visitClipUseCase.didCallExecute, "클립 방문 처리 유스케이스가 호출되어야 합니다.")
     }
 
@@ -222,7 +222,7 @@ final class HomeReactorTests: XCTestCase {
               case let .showDetailClip(clip) = route else {
             return XCTFail("tapDetail → showDetailClip 화면 이동 실패")
         }
-        XCTAssertEqual(clip.id, MockClip.unvisitedClips[0].id)
+        XCTAssertEqual(clip.id, StubClip.unvisitedClips[0].id)
     }
 
     func test_클립_수정_탭_시_클립_수정_화면으로_이동() {
@@ -238,7 +238,7 @@ final class HomeReactorTests: XCTestCase {
               case let .showEditClip(clip) = route else {
             return XCTFail("tapEdit → showEditClip 화면 이동 실패")
         }
-        XCTAssertEqual(clip.id, MockClip.unvisitedClips[0].id)
+        XCTAssertEqual(clip.id, StubClip.unvisitedClips[0].id)
     }
 
     func test_클립_삭제_성공시_홈_데이터_갱신됨() {
@@ -268,7 +268,7 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertTrue(deleteClipUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
-            MockFolder.rootFolders.count
+            StubFolder.rootFolders.count
         )
     }
 
@@ -323,7 +323,7 @@ final class HomeReactorTests: XCTestCase {
 
         // then
         wait(for: [routeExpectation], timeout: 1.0)
-        XCTAssertEqual(routedFolder?.id, MockFolder.rootFolders[0].id)
+        XCTAssertEqual(routedFolder?.id, StubFolder.rootFolders[0].id)
     }
 
     func test_폴더_수정_탭_시_폴더_수정_화면으로_이동() {
@@ -340,7 +340,7 @@ final class HomeReactorTests: XCTestCase {
             return XCTFail("tapEdit → showEditFolder 화면 이동 실패")
         }
 
-        XCTAssertEqual(folder.id, MockFolder.rootFolders[0].id)
+        XCTAssertEqual(folder.id, StubFolder.rootFolders[0].id)
     }
 
     func test_폴더_삭제_성공시_홈_데이터_갱신됨() {
@@ -370,7 +370,7 @@ final class HomeReactorTests: XCTestCase {
         XCTAssertTrue(deleteFolderUseCase.didCallExecute)
         XCTAssertEqual(
             reactor.currentState.homeDisplay?.folders.count,
-            MockFolder.rootFolders.count
+            StubFolder.rootFolders.count
         )
     }
 
@@ -413,7 +413,7 @@ final class HomeReactorTests: XCTestCase {
             return XCTFail("tapShowAllClips → showUnvisitedClipList 화면 이동 실패")
         }
 
-        XCTAssertEqual(clips.map { $0.id }, MockClip.unvisitedClips.map { $0.id })
+        XCTAssertEqual(clips.map { $0.id }, StubClip.unvisitedClips.map { $0.id })
     }
 }
 

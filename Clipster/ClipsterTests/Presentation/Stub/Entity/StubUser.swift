@@ -1,7 +1,7 @@
 import Foundation
 @testable import Clipster
 
-enum MockUser {
+enum StubUser {
     static let someUser: User = .init(
         id: UUID(),
         nickname: "김담담",

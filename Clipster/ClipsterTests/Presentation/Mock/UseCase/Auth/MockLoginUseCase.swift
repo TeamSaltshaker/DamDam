@@ -6,6 +6,6 @@ final class MockLoginUseCase: LoginUseCase {
 
     func execute(type: LoginType) async -> Result<User, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockUser.someUser) : .failure(MockError.loginFailed)
+        return shouldSucceed ? .success(StubUser.someUser) : .failure(MockError.loginFailed)
     }
 }

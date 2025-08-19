@@ -498,7 +498,7 @@ private extension MyPageReactorTests {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "알 수 없음"
 
         return [
-            .init(section: .welcome(MockUser.someUser.nickname), items: []),
+            .init(section: .welcome(StubUser.someUser.nickname), items: []),
             .init(
                 section: .profile,
                 items: [

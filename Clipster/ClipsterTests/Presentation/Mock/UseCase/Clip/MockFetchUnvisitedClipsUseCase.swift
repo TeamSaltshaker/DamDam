@@ -6,6 +6,6 @@ final class MockFetchUnvisitedClipsUseCase: FetchUnvisitedClipsUseCase {
 
     func execute() async -> Result<[Clip], Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockClip.unvisitedClips) : .failure(MockError.deleteFailed)
+        return shouldSucceed ? .success(StubClip.unvisitedClips) : .failure(MockError.deleteFailed)
     }
 }

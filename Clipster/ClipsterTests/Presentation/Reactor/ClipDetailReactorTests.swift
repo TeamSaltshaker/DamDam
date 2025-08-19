@@ -12,7 +12,7 @@ final class ClipDetailReactorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        clip = MockClip.someClip
+        clip = StubClip.someClip
         fetchFolderUseCase = MockFetchFolderUseCase()
         deleteClipUseCase = MockDeleteClipUseCase()
         fetchClipUseCase = MockFetchClipUseCase()

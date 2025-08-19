@@ -80,7 +80,7 @@ final class ShareReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, .valid))
+        parseURLUseCase.executeResult = .success((StubURLMetadata.urlMetadata, .valid))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
 
         reactor.action.onNext(.validifyURL("https://google.com"))
@@ -105,7 +105,7 @@ final class ShareReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
+        parseURLUseCase.executeResult = .success((StubURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
@@ -161,7 +161,7 @@ final class ShareReactorTests: XCTestCase {
     }
 
     func test_editFolder() {
-        let mockFolder = MockFolder.someFolder
+        let mockFolder = StubFolder.someFolder
 
         reactor.action.onNext(.changeFolder(mockFolder))
 

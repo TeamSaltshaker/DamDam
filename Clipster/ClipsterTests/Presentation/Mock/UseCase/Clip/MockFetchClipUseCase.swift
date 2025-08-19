@@ -7,6 +7,6 @@ final class MockFetchClipUseCase: FetchClipUseCase {
 
     func execute(id: UUID) async -> Result<Clip, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockClip.someClip) : .failure(MockError.fetchFailed)
+        return shouldSucceed ? .success(StubClip.someClip) : .failure(MockError.fetchFailed)
     }
 }

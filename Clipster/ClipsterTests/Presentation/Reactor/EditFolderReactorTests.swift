@@ -44,7 +44,7 @@ final class EditFolderReactorTests: XCTestCase {
         createReactor(folder: nil)
         XCTAssertEqual(reactor.currentState.navigationTitle, "폴더 추가")
 
-        createReactor(folder: MockFolder.folderToEdit)
+        createReactor(folder: StubFolder.folderToEdit)
         XCTAssertEqual(reactor.currentState.navigationTitle, "폴더 편집")
     }
 
@@ -99,7 +99,7 @@ final class EditFolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(matches(phaseResults.first, .loading))
-        XCTAssertTrue(matches(phaseResults.last, .success(folder: MockFolder.folderToEdit)))
+        XCTAssertTrue(matches(phaseResults.last, .success(folder: StubFolder.folderToEdit)))
         XCTAssertTrue(createFolderUseCase.didCallExecute)
         XCTAssertFalse(updateFolderUseCase.didCallExecute)
     }
@@ -131,7 +131,7 @@ final class EditFolderReactorTests: XCTestCase {
     }
 
     func test_저장_버튼_탭_편집_성공() {
-        createReactor(folder: MockFolder.folderToEdit)
+        createReactor(folder: StubFolder.folderToEdit)
         updateFolderUseCase.shouldSucceed = true
 
         let expectation = expectation(description: #function)
@@ -150,13 +150,13 @@ final class EditFolderReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(matches(phaseResults.first, .loading))
-        XCTAssertTrue(matches(phaseResults.last, .success(folder: MockFolder.folderToEdit)))
+        XCTAssertTrue(matches(phaseResults.last, .success(folder: StubFolder.folderToEdit)))
         XCTAssertTrue(updateFolderUseCase.didCallExecute)
         XCTAssertFalse(createFolderUseCase.didCallExecute)
     }
 
     func test_저장_버튼_탭_편집_실패() {
-        createReactor(folder: MockFolder.folderToEdit)
+        createReactor(folder: StubFolder.folderToEdit)
         updateFolderUseCase.shouldSucceed = false
 
         let expectation = expectation(description: #function)

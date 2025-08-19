@@ -6,6 +6,6 @@ final class MockFetchTopLevelFoldersUseCase: FetchTopLevelFoldersUseCase {
 
     func execute() async -> Result<[Folder], Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockFolder.rootFolders) : .failure(MockError.deleteFailed)
+        return shouldSucceed ? .success(StubFolder.rootFolders) : .failure(MockError.deleteFailed)
     }
 }

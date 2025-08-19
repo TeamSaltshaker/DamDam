@@ -112,7 +112,7 @@ final class EditClipReactorTests: XCTestCase {
 
         reactor.action.onNext(.editingURLTextField)
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://google.com")!)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadata, .valid))
+        parseURLUseCase.executeResult = .success((StubURLMetadata.urlMetadata, .valid))
 
         reactor.action.onNext(.validifyURL("https://google.com"))
 
@@ -136,7 +136,7 @@ final class EditClipReactorTests: XCTestCase {
             .disposed(by: disposeBag)
 
         reactor.action.onNext(.editingURLTextField)
-        parseURLUseCase.executeResult = .success((MockURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
+        parseURLUseCase.executeResult = .success((StubURLMetadata.urlMetadataWithoutThumbnailAndScreenshot, .validWithWarning))
         sanitizeURLUseCase.executeResult = .success(URL(string: "https://a.a")!)
 
         reactor.action.onNext(.validifyURL("https://a.a"))
@@ -193,7 +193,7 @@ final class EditClipReactorTests: XCTestCase {
     }
 
     func test_changeFolder시_currentFolder_정상_반영() {
-        let mockFolder = MockFolder.someFolder
+        let mockFolder = StubFolder.someFolder
 
         reactor.action.onNext(.changeFolder(mockFolder))
 
@@ -262,7 +262,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_클립_편집_시_saveClip_성공() {
         let reactor = EditClipReactor(
             type: .edit,
-            clip: MockClip.someClip,
+            clip: StubClip.someClip,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             sanitizeURLUseCase: sanitizeURLUseCase,
@@ -290,7 +290,7 @@ final class EditClipReactorTests: XCTestCase {
     func test_클립_편집_시_saveClip_실패() {
         let reactor = EditClipReactor(
             type: .edit,
-            clip: MockClip.someClip,
+            clip: StubClip.someClip,
             urlMetadataDisplay: StubURLMetadataDisplay.urlMetaDataDisplay,
             parseURLUseCase: parseURLUseCase,
             sanitizeURLUseCase: sanitizeURLUseCase,
@@ -447,7 +447,7 @@ private extension EditClipReactorTests {
         switch type {
         case .create:
             return EditClipReactor(
-                currentFolder: MockFolder.someFolder,
+                currentFolder: StubFolder.someFolder,
                 parseURLUseCase: parseURLUseCase,
                 sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
@@ -456,7 +456,7 @@ private extension EditClipReactorTests {
             )
         case .edit:
             return EditClipReactor(
-                clip: MockClip.someClip,
+                clip: StubClip.someClip,
                 parseURLUseCase: parseURLUseCase,
                 sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
