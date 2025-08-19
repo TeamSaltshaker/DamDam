@@ -9,4 +9,12 @@ enum MockURLMetadata {
         thumbnailImageURL: URL(string: "https://example.com/thumb.png"),
         screenshotData: nil,
     )
+
+    static let urlMetadataWithoutThumbnailAndScreenshot = URLMetadata(
+        url: URL(string: "https://example.com")!,
+        title: "Sample Title",
+        description: "example",
+        thumbnailImageURL: nil,
+        screenshotData: nil,
+    )
 }
