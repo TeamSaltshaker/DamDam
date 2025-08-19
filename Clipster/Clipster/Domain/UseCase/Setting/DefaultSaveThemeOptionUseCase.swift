@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultSaveThemeOptionUseCase: SaveThemeOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "appThemeOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ option: ThemeOption) async -> Result<Void, Error> {
-        userDefaults.set(option.rawValue, forKey: key)
+        userDefaultsRepository.setAppThemeOption(option.rawValue)
         await AppThemeManager.shared.apply(theme: option)
         return .success(())
     }

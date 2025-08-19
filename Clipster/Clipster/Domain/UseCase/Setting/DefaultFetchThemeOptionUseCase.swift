@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultFetchThemeOptionUseCase: FetchThemeOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "appThemeOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute() async -> Result<ThemeOption, Error> {
-        let raw = userDefaults.integer(forKey: key)
+        let raw = userDefaultsRepository.appThemeOption()
         guard let option = ThemeOption(rawValue: raw) else {
             return .success(.system)
         }

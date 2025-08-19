@@ -77,6 +77,10 @@ final class DIContainer {
         )
     }
 
+    func makeUserDefaultsRepository() -> UserDefaultsRepository {
+        DefaultUserDefaultsRepository(userDefaults: userDefaults)
+    }
+
     func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {
         DefaultCheckLoginStatusUseCase(authRepository: makeAuthRepository())
     }
@@ -102,11 +106,14 @@ final class DIContainer {
     }
 
     func makeVisitClipUseCase() -> VisitClipUseCase {
-        DefaultVisitClipUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
+        DefaultVisitClipUseCase(
+            clipRepository: makeClipRepository(),
+            userDefaultsRepository: makeUserDefaultsRepository()
+        )
     }
 
     func makeDeleteAllRecentVisitedClipsUseCase() -> DeleteAllRecentVisitedClipsUseCase {
-        DefaultDeleteAllRecentVisitedClipsUseCase(userDefaults: userDefaults)
+        DefaultDeleteAllRecentVisitedClipsUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeDeleteClipUseCase() -> DeleteClipUseCase {
@@ -114,7 +121,7 @@ final class DIContainer {
     }
 
     func makeDeleteRecentVisitedClipUseCase() -> DeleteRecentVisitedClipUseCase {
-        DefaultDeleteRecentVisitedClipUseCase(userDefaults: userDefaults)
+        DefaultDeleteRecentVisitedClipUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchAllClipsUseCase() -> FetchAllClipsUseCase {
@@ -130,7 +137,10 @@ final class DIContainer {
     }
 
     func makeFetchRecentVisitedClipsUseCase() -> FetchRecentVisitedClipsUseCase {
-        DefaultFetchRecentVisitedClipsUseCase(clipRepository: makeClipRepository(), userDefaults: userDefaults)
+        DefaultFetchRecentVisitedClipsUseCase(
+            clipRepository: makeClipRepository(),
+            userDefaultsRepository: makeUserDefaultsRepository()
+        )
     }
 
     func makeFetchUnvisitedClipsUseCase() -> FetchUnvisitedClipsUseCase {
@@ -194,55 +204,51 @@ final class DIContainer {
     }
 
     func makeDeleteAllRecentQueriesUseCase() -> DeleteAllRecentQueriesUseCase {
-        DefaultDeleteAllRecentQueriesUseCase(userDefaults: userDefaults)
+        DefaultDeleteAllRecentQueriesUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeDeleteRecentQueryUseCase() -> DeleteRecentQueryUseCase {
-        DefaultDeleteRecentQueryUseCase(userDefaults: userDefaults)
+        DefaultDeleteRecentQueryUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchRecentQueriesUseCase() -> FetchRecentQueriesUseCase {
-        DefaultFetchRecentQueriesUseCase(userDefaults: userDefaults)
+        DefaultFetchRecentQueriesUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeSaveRecentQueryUseCase() -> SaveRecentQueryUseCase {
-        DefaultSaveRecentQueryUseCase(userDefaults: userDefaults)
+        DefaultSaveRecentQueryUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchClipSortOptionUseCase() -> FetchClipSortOptionUseCase {
-        DefaultFetchClipSortOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchClipSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchFolderSortOptionUseCase() -> FetchFolderSortOptionUseCase {
-        DefaultFetchFolderSortOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeFetchSavePathLayoutUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeFetchThemeUseCase() -> FetchThemeOptionUseCase {
-        DefaultFetchThemeOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeSaveClipSortUseCase() -> SaveClipSortOptionUseCase {
-        DefaultSaveClipSortOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeSaveFolderSortUseCase() -> SaveFolderSortOptionUseCase {
-        DefaultSaveFolderSortOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeSaveSavePathLayoutOptionUseCase() -> SaveSavePathLayoutOptionUseCase {
-        DefaultSaveSavePathLayoutOptionUseCase(userDefaults: userDefaults)
-    }
-
-    func makeSaveThemeUseCase() -> SaveThemeOptionUseCase {
-        DefaultSaveThemeOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase(userDefaults: userDefaults)
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeFetchThemeOptionUseCase() -> FetchThemeOptionUseCase {
+        DefaultFetchThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeSaveClipSortOptionUseCase() -> SaveClipSortOptionUseCase {
+        DefaultSaveClipSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeSaveFolderSortOptionUseCase() -> SaveFolderSortOptionUseCase {
+        DefaultSaveFolderSortOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeSaveSavePathLayoutOptionUseCase() -> SaveSavePathLayoutOptionUseCase {
+        DefaultSaveSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeSaveThemeOptionUseCase() -> SaveThemeOptionUseCase {
+        DefaultSaveThemeOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeParseURLUseCase() -> ParseURLUseCase {
@@ -259,6 +265,14 @@ final class DIContainer {
 
     func makeUpdateNicknameUseCase() -> UpdateNicknameUseCase {
         DefaultUpdateNicknameUseCase(userRepository: makeUserRepository())
+    }
+
+    func makeFetchHasSeenOnboardingUseCase() -> FetchHasSeenOnboardingUseCase {
+        DefaultFetchHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
+    }
+
+    func makeUpdateHasSeenOnboardingUseCase() -> UpdateHasSeenOnboardingUseCase {
+        DefaultUpdateHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
@@ -400,16 +414,16 @@ final class DIContainer {
             checkLoginStatusUseCase: makeCheckLoginStatusUseCase(),
             loginUseCase: makeLoginUseCase(),
             fetchCurrentUserUseCase: makeFetchCurrentUserUseCase(),
-            fetchThemeOptionUseCase: makeFetchThemeUseCase(),
+            fetchThemeOptionUseCase: makeFetchThemeOptionUseCase(),
             fetchFolderSortOptionUseCase: makeFetchFolderSortOptionUseCase(),
             fetchClipSortOptionUseCase: makeFetchClipSortOptionUseCase(),
-            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutUseCase(),
+            fetchSavePathLayoutOptionUseCase: makeFetchSavePathLayoutOptionUseCase(),
             logoutUseCase: makeLogoutUseCase(),
             withdrawUseCase: makeWithdrawUseCase(),
-            saveThemeOptionUseCase: makeSaveThemeUseCase(),
+            saveThemeOptionUseCase: makeSaveThemeOptionUseCase(),
             saveSavePathLayoutOptionUseCase: makeSaveSavePathLayoutOptionUseCase(),
-            saveFolderSortOptionUseCase: makeSaveFolderSortUseCase(),
-            saveClipSortOptionUseCase: makeSaveClipSortUseCase(),
+            saveFolderSortOptionUseCase: makeSaveFolderSortOptionUseCase(),
+            saveClipSortOptionUseCase: makeSaveClipSortOptionUseCase(),
             updateNicknameUseCase: makeUpdateNicknameUseCase()
         )
     }

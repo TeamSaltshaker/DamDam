@@ -1,17 +1,16 @@
 import Foundation
 
 final class DefaultDeleteRecentQueryUseCase: DeleteRecentQueryUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "recentQueries"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ query: String) {
-        var queries = userDefaults.stringArray(forKey: key) ?? []
+        var queries = userDefaultsRepository.recentQueries()
         queries.removeAll { $0 == query }
 
-        userDefaults.set(queries, forKey: key)
+        userDefaultsRepository.setRecentQueries(queries)
     }
 }

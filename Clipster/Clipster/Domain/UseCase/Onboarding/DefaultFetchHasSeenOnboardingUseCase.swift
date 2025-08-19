@@ -1,13 +1,13 @@
 import Foundation
 
-final class DefaultFetchRecentQueriesUseCase: FetchRecentQueriesUseCase {
+final class DefaultFetchHasSeenOnboardingUseCase: FetchHasSeenOnboardingUseCase {
     private let userDefaultsRepository: UserDefaultsRepository
 
     init(userDefaultsRepository: UserDefaultsRepository) {
         self.userDefaultsRepository = userDefaultsRepository
     }
 
-    func execute() -> [String] {
-        userDefaultsRepository.recentQueries()
+    func execute() -> Bool {
+        userDefaultsRepository.hasSeenOnboarding()
     }
 }

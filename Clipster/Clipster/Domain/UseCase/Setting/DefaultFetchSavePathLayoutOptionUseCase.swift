@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultFetchSavePathLayoutOptionUseCase: FetchSavePathLayoutOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "savePathOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute() async -> Result<SavePathOption, Error> {
-        let raw = userDefaults.integer(forKey: key)
+        let raw = userDefaultsRepository.savePathOption()
         guard let option = SavePathOption(rawValue: raw) else {
             return .success(.expand)
         }

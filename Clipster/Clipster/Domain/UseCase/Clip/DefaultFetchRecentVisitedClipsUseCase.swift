@@ -2,16 +2,15 @@ import Foundation
 
 final class DefaultFetchRecentVisitedClipsUseCase: FetchRecentVisitedClipsUseCase {
     private let clipRepository: ClipRepository
-    private let userDefaults: UserDefaults
-    private let key = "recentVisitedClips"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(clipRepository: ClipRepository, userDefaults: UserDefaults) {
+    init(clipRepository: ClipRepository, userDefaultsRepository: UserDefaultsRepository) {
         self.clipRepository = clipRepository
-        self.userDefaults = userDefaults
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute() async -> Result<[Clip], Error> {
-        let stringIDs = userDefaults.stringArray(forKey: key) ?? []
+        let stringIDs = userDefaultsRepository.recentVisitedClips()
         let ids = stringIDs.compactMap { UUID(uuidString: $0) }
 
         guard !ids.isEmpty else {

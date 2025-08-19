@@ -1,16 +1,15 @@
 import Foundation
 
 final class DefaultSaveClipSortOptionUseCase: SaveClipSortOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "clipSortOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ option: ClipSortOption) async -> Result<Void, Error> {
         let raw = convertToRawString(from: option)
-        userDefaults.set(raw, forKey: key)
+        userDefaultsRepository.setClipSortOption(raw)
         return .success(())
     }
 }

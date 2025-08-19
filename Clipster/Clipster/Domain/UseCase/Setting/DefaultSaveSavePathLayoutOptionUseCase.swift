@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultSaveSavePathLayoutOptionUseCase: SaveSavePathLayoutOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "savePathOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ option: SavePathOption) async -> Result<Void, Error> {
-        userDefaults.set(option.rawValue, forKey: key)
+        userDefaultsRepository.setSavePathOption(option.rawValue)
         return .success(())
     }
 }

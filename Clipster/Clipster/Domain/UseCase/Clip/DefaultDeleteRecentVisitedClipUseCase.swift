@@ -1,17 +1,16 @@
 import Foundation
 
 final class DefaultDeleteRecentVisitedClipUseCase: DeleteRecentVisitedClipUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "recentVisitedClips"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ id: String) {
-        var ids = userDefaults.stringArray(forKey: key) ?? []
+        var ids = userDefaultsRepository.recentVisitedClips()
         ids.removeAll { $0 == id }
 
-        userDefaults.set(ids, forKey: key)
+        userDefaultsRepository.setRecentVisitedClips(ids)
     }
 }

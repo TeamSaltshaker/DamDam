@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultFetchFolderSortOptionUseCase: FetchFolderSortOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "folderSortOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute() async -> Result<FolderSortOption, Error> {
-        guard let raw = userDefaults.string(forKey: key),
+        guard let raw = userDefaultsRepository.folderSortOption(),
               let option = convertFromRawString(raw) else {
             return .success(.createdAt(.descending))
         }

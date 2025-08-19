@@ -1,16 +1,15 @@
 import Foundation
 
 final class DefaultSaveFolderSortOptionUseCase: SaveFolderSortOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "folderSortOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute(_ option: FolderSortOption) async -> Result<Void, Error> {
         let raw = convertToRawString(from: option)
-        userDefaults.set(raw, forKey: key)
+        userDefaultsRepository.setFolderSortOption(raw)
         return .success(())
     }
 }

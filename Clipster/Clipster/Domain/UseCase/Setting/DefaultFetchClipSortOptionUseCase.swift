@@ -1,15 +1,14 @@
 import Foundation
 
 final class DefaultFetchClipSortOptionUseCase: FetchClipSortOptionUseCase {
-    private let userDefaults: UserDefaults
-    private let key = "clipSortOption"
+    private let userDefaultsRepository: UserDefaultsRepository
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(userDefaultsRepository: UserDefaultsRepository) {
+        self.userDefaultsRepository = userDefaultsRepository
     }
 
     func execute() async -> Result<ClipSortOption, Error> {
-        guard let raw = userDefaults.string(forKey: key),
+        guard let raw = userDefaultsRepository.clipSortOption(),
               let option = convertFromRawString(raw) else {
             return .success(.createdAt(.ascending))
         }

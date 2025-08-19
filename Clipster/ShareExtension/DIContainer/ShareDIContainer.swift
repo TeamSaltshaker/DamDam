@@ -2,10 +2,20 @@ import CoreData
 import Foundation
 
 final class ShareDIContainer {
+    private let appGroupID: String = {
+        #if DEBUG
+        return "group.com.saltshaker.clipster.debug"
+        #else
+        return "group.com.saltshaker.clipster"
+        #endif
+    }()
+
     private let container: NSPersistentContainer
+    private let userDefaults: UserDefaults
 
     init() {
         self.container = CoreDataStack.shared.container
+        self.userDefaults = UserDefaults(suiteName: appGroupID) ?? .standard
     }
 
     func makeClipStorage() -> ClipStorage {
@@ -53,6 +63,10 @@ final class ShareDIContainer {
         DefaultFolderRepository(storage: makeFolderStorage(), cache: nil)
     }
 
+    func makeUserDefaultsRepository() -> UserDefaultsRepository {
+        DefaultUserDefaultsRepository(userDefaults: userDefaults)
+    }
+
     func makeFetchTopLevelFoldersUseCase() -> FetchTopLevelFoldersUseCase {
         DefaultFetchTopLevelFoldersUseCase(folderRepository: makeFolderRepository())
     }
@@ -66,7 +80,7 @@ final class ShareDIContainer {
     }
 
     func makeFetchSavePathLayoutOptionUseCase() -> FetchSavePathLayoutOptionUseCase {
-        DefaultFetchSavePathLayoutOptionUseCase()
+        DefaultFetchSavePathLayoutOptionUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
     func makeFolderSelectorReactorForClip(parentFolder: Folder?) -> FolderSelectorReactor {
