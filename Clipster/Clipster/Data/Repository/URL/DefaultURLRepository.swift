@@ -44,6 +44,10 @@ extension DefaultURLRepository {
         print("\(Self.self) WKWebView 로드 시작: \(webView.url?.absoluteString ?? "Unknown URL")")
     }
 
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation) {
+        print("\(Self.self) WKWebView 리다이렉션 발생 \(webView.url?.absoluteString ?? "Unknown URL")")
+    }
+
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
         print("\(Self.self) WKWebView 초기 로드 실패: \(error.localizedDescription) URL: \(webView.url?.absoluteString ?? "N/A")")
         complete(with: .failure(.unsupportedURL))
