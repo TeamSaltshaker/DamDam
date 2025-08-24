@@ -6,9 +6,15 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
     private var webView: WKWebView?
     private var timeoutTimer: Timer?
     private var isCompleted = false
+    private var didAttemptRetry = false
+    private var lastKnownContentURL: URL?
 
     func fetchHTML(from url: URL) async -> Result<(String, Data?), URLValidationError> {
         await withCheckedContinuation { continuation in
+            self.didAttemptRetry = false
+            self.lastKnownContentURL = url
+            let urlForFirstRequest = url
+
             self.cleanupWebView()
 
             self.isCompleted = false
@@ -29,7 +35,7 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
             self.webView = WKWebView(frame: webViewFrame, configuration: config)
             self.webView?.navigationDelegate = self
 
-            let request = URLRequest(url: url)
+            let request = URLRequest(url: urlForFirstRequest)
             self.webView?.load(request)
 
             self.timeoutTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
@@ -46,6 +52,11 @@ extension DefaultURLRepository {
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation) {
         print("\(Self.self) WKWebView 리다이렉션 발생 \(webView.url?.absoluteString ?? "Unknown URL")")
+        if let newURL = webView.url {
+            if !newURL.absoluteString.contains("login") && !newURL.absoluteString.contains("sign") {
+                self.lastKnownContentURL = newURL
+            }
+        }
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
@@ -58,6 +69,29 @@ extension DefaultURLRepository {
 
         Task {
             do {
+                if await self.isLoginPage(webView: webView) {
+                    if !self.didAttemptRetry,
+                       let contentURL = self.lastKnownContentURL,
+                       let strippedURL = contentURL.strippingQueryParameters()
+                    {
+                        if contentURL.absoluteString != strippedURL.absoluteString {
+                            print("\(Self.self) 로그인 페이지 감지, 파라미터 제거 후 재 요청 시도 \(strippedURL)")
+                            self.didAttemptRetry = true
+
+                            let request = URLRequest(url: strippedURL)
+                            webView.load(request)
+                            return
+                        }
+                    }
+
+                    if webView.url == nil {
+                        self.complete(with: .failure(.detectedLoginPage))
+                    } else {
+                        self.complete(with: .failure(.notFoundedWKURL))
+                    }
+                    return
+                }
+
                 try await waitForDOMContentLoaded(webView: webView)
 
                 guard let htmlString = try await webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") as? String, !htmlString.isEmpty else {
@@ -151,5 +185,43 @@ private extension DefaultURLRepository {
             checkCount += 1
             try await Task.sleep(for: .milliseconds(200))
         }
+    }
+
+    func isLoginPage(webView: WKWebView) async -> Bool {
+        let script = """
+            (function() {
+                const loginKeywordsInURL = ['login', 'sign', 'auth', 'account'];
+                const currentURL = window.location.href.toLowerCase();
+                if (loginKeywordsInURL.some(keyword => currentURL.includes(keyword))) {
+                    return true;
+                }
+                if (document.querySelector("input[type='password']")) {
+                    return true;
+                }
+                const loginKeywordsInTitle = ['로그인', 'login', 'sign'];
+                const pageTitle = document.title.toLowerCase();
+            
+                if (loginKeywordsInTitle.some(keyword => pageTitle.includes(keyword))) {
+                    return true;
+                }
+                return false
+            })();
+            """
+        if let result = try? await webView.evaluateJavaScript(script) as? Bool {
+            return result
+        }
+
+        return false
+    }
+}
+
+extension URL {
+    func strippingQueryParameters() -> URL? {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else {
+            return nil
+        }
+
+        components.queryItems = nil
+        return components.url
     }
 }

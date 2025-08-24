@@ -4,5 +4,6 @@ enum URLValidationError: Error {
     case unsupportedURL
     case emptyHTMLContent
     case notFoundedWKURL
+    case detectedLoginPage
     case unknown
 }
