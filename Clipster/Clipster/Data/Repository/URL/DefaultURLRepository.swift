@@ -46,6 +46,11 @@ final class DefaultURLRepository: NSObject, WKNavigationDelegate, URLRepository 
 }
 
 extension DefaultURLRepository {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
+        print("\(Self.self) decidePolicyForAction: \(webView.url?.absoluteString ?? "Unknown URL")")
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation) {
         print("\(Self.self) WKWebView 로드 시작: \(webView.url?.absoluteString ?? "Unknown URL")")
     }
