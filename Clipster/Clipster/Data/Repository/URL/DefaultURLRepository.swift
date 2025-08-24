@@ -58,7 +58,8 @@ extension DefaultURLRepository {
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation) {
         print("\(Self.self) WKWebView 리다이렉션 발생 \(webView.url?.absoluteString ?? "Unknown URL")")
         if let newURL = webView.url {
-            if !newURL.absoluteString.contains("login") && !newURL.absoluteString.contains("sign") {
+            if !newURL.absoluteString.contains("login") &&
+                !newURL.absoluteString.contains("sign") {
                 self.lastKnownContentURL = newURL
             }
         }
@@ -77,8 +78,7 @@ extension DefaultURLRepository {
                 if await self.isLoginPage(webView: webView) {
                     if !self.didAttemptRetry,
                        let contentURL = self.lastKnownContentURL,
-                       let strippedURL = contentURL.strippingQueryParameters()
-                    {
+                       let strippedURL = contentURL.strippingQueryParameters() {
                         if contentURL.absoluteString != strippedURL.absoluteString {
                             print("\(Self.self) 로그인 페이지 감지, 파라미터 제거 후 재 요청 시도 \(strippedURL)")
                             self.didAttemptRetry = true
@@ -205,7 +205,7 @@ private extension DefaultURLRepository {
                 }
                 const loginKeywordsInTitle = ['로그인', 'login', 'sign'];
                 const pageTitle = document.title.toLowerCase();
-            
+
                 if (loginKeywordsInTitle.some(keyword => pageTitle.includes(keyword))) {
                     return true;
                 }
