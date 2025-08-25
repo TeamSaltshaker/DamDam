@@ -179,17 +179,29 @@ extension EditClipViewController: View {
             .map { ($0.type, $0.shouldReadPastedboardURL) }
             .filter { $0.0 == .create && $0.1 }
             .take(1)
+            .observe(on: MainScheduler.instance)
             .subscribe { [weak self] in
-                guard let self else { return }
-                if case .next = $0 {
-                    if UIPasteboard.general.hasURLs, let url = UIPasteboard.general.url {
-                        reactor.action.onNext(.editingURLTextField)
-                        reactor.action.onNext(.editURLTextField(url.absoluteString))
-                        reactor.action.onNext(.validifyURL(url.absoluteString))
-                    } else {
-                        editClipView.urlView.urlTextField.becomeFirstResponder()
+                guard let self, case .next = $0 else { return }
+                Task {
+                    do {
+                        let patterns = try await UIPasteboard.general.detectedPatterns(for: [\.probableWebURL])
+                        if patterns.contains(\.probableWebURL) {
+                            await MainActor.run {
+                                if let pastedString = UIPasteboard.general.string {
+                                    if let url = self.extractURL(from: pastedString) {
+                                        reactor.action.onNext(.editingURLTextField)
+                                        reactor.action.onNext(.editURLTextField(url.absoluteString))
+                                        reactor.action.onNext(.validifyURL(url.absoluteString))
+                                        UIPasteboard.general.string = nil
+                                    }
+                                }
+                            }
+                        } else {
+                            self.editClipView.urlView.urlTextField.becomeFirstResponder()
+                        }
+                    } catch {
+                        self.editClipView.urlView.urlTextField.becomeFirstResponder()
                     }
-                    UIPasteboard.general.url = nil
                 }
             }
             .disposed(by: disposeBag)
@@ -339,5 +351,21 @@ extension EditClipViewController: View {
 extension EditClipViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+}
+
+private extension EditClipViewController {
+    func extractURL(from text: String) -> URL? {
+        do {
+            let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+            let matches = detector.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
+            if let firstMatch = matches.first, let url = firstMatch.url {
+                return url
+            }
+        } catch {
+            print("\(Self.self) NSDataDetector 생성 중 오류 발생: \(error)")
+        }
+
+        return nil
     }
 }
