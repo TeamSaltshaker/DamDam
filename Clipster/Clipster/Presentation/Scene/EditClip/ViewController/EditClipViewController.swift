@@ -188,7 +188,7 @@ extension EditClipViewController: View {
                         if patterns.contains(\.probableWebURL) {
                             await MainActor.run {
                                 if let pastedString = UIPasteboard.general.string {
-                                    if let url = self.extractURL(from: pastedString) {
+                                    if let url = self.extractURLFromPasteboard(from: pastedString) {
                                         reactor.action.onNext(.editingURLTextField)
                                         reactor.action.onNext(.editURLTextField(url.absoluteString))
                                         reactor.action.onNext(.validifyURL(url.absoluteString))
@@ -355,7 +355,7 @@ extension EditClipViewController: UIGestureRecognizerDelegate {
 }
 
 private extension EditClipViewController {
-    func extractURL(from text: String) -> URL? {
+    func extractURLFromPasteboard(from text: String) -> URL? {
         do {
             let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
             let matches = detector.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
