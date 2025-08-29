@@ -78,7 +78,7 @@ extension DefaultURLRepository {
                 if await self.isLoginPage(webView: webView) {
                     if !self.didAttemptRetry,
                        let contentURL = self.lastKnownContentURL,
-                       let strippedURL = contentURL.strippingQueryParameters() {
+                       let strippedURL = self.strippingQueryParameters(url: contentURL) {
                         if contentURL.absoluteString != strippedURL.absoluteString {
                             print("\(Self.self) 로그인 페이지 감지, 파라미터 제거 후 재 요청 시도 \(strippedURL)")
                             self.didAttemptRetry = true
@@ -218,11 +218,9 @@ private extension DefaultURLRepository {
 
         return false
     }
-}
 
-extension URL {
-    func strippingQueryParameters() -> URL? {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else {
+    func strippingQueryParameters(url: URL) -> URL? {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             return nil
         }
 
