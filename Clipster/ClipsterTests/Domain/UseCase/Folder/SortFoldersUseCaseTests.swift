@@ -3,7 +3,7 @@ import XCTest
 
 final class SortFoldersUseCaseTests: XCTestCase {
     private var useCase: SortFoldersUseCase!
-    private var folders = MockFolder.rootFolders
+    private var folders = StubFolder.rootFolders
 
     override func setUp() {
         super.setUp()

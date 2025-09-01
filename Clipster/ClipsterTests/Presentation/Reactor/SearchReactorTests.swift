@@ -106,7 +106,7 @@ final class SearchReactorTests: XCTestCase {
 
     func test_뷰_나타났을때_초기_데이터_로드() {
         fetchRecentQueriesUseCase.queries = ["Swift", "ReactorKit"]
-        fetchRecentVisitedClipsUseCase.clips = MockClip.unvisitedClips
+        fetchRecentVisitedClipsUseCase.clips = StubClip.unvisitedClips
 
         let expectation = expectation(description: #function)
 
@@ -148,10 +148,10 @@ final class SearchReactorTests: XCTestCase {
     func test_쿼리_업데이트시_검색_실행() {
         let query = "T"
 
-        fetchAllFoldersUseCase.folders = [MockFolder.someFolder]
-        fetchAllClipsUseCase.clips = [MockClip.someClip]
-        searchFoldersUseCase.folders = [MockFolder.someFolder]
-        searchClipsUseCase.clips = [MockClip.someClip]
+        fetchAllFoldersUseCase.folders = [StubFolder.someFolder]
+        fetchAllClipsUseCase.clips = [StubClip.someClip]
+        searchFoldersUseCase.folders = [StubFolder.someFolder]
+        searchClipsUseCase.clips = [StubClip.someClip]
 
         waitForViewDidLoad()
 
@@ -275,7 +275,7 @@ final class SearchReactorTests: XCTestCase {
 
     func test_검색결과_폴더_삭제() {
         let query = "iOS"
-        let folder = MockFolder.someFolder
+        let folder = StubFolder.someFolder
 
         fetchAllFoldersUseCase.folders = [folder]
         searchFoldersUseCase.folders = [folder]
@@ -314,7 +314,7 @@ final class SearchReactorTests: XCTestCase {
     }
 
     func test_클립_아이템_탭시_웹뷰() {
-        let clip = MockClip.someClip
+        let clip = StubClip.someClip
         fetchAllClipsUseCase.clips = [clip]
         waitForViewDidLoad()
 
@@ -336,7 +336,7 @@ final class SearchReactorTests: XCTestCase {
 
     func test_검색결과_클립_삭제() {
         let query = "Example"
-        let clip = MockClip.someClip
+        let clip = StubClip.someClip
 
         fetchAllClipsUseCase.clips = [clip]
         searchClipsUseCase.clips = [clip]

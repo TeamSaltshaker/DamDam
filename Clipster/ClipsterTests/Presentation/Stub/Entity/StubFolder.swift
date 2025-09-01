@@ -1,7 +1,7 @@
 import Foundation
 @testable import Clipster
 
-enum MockFolder {
+enum StubFolder {
     static let rootFolders: [Folder] = {
         let today = Date()
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!

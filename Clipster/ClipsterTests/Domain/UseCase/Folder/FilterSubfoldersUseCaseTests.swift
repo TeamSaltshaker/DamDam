@@ -15,8 +15,8 @@ final class FilterSubfoldersUseCaseTests: XCTestCase {
     }
 
     func test_최상위폴더_목록에서_자기자신을_제외하고_반환() {
-        let tree = MockFolder.rootFolders + [MockFolder.someFolder]
-        let folder = MockFolder.someFolder
+        let tree = StubFolder.rootFolders + [StubFolder.someFolder]
+        let folder = StubFolder.someFolder
 
         let result = useCase.execute(folder, from: tree)
 
@@ -25,8 +25,8 @@ final class FilterSubfoldersUseCaseTests: XCTestCase {
     }
 
     func test_하위폴더_목록에서_자기자신을_제외하고_반환() {
-        let tree = [MockFolder.someFolder]
-        let folder = MockFolder.someFolder.folders.first!
+        let tree = [StubFolder.someFolder]
+        let folder = StubFolder.someFolder.folders.first!
 
         let result = useCase.execute(folder, from: tree)
 
@@ -39,8 +39,8 @@ final class FilterSubfoldersUseCaseTests: XCTestCase {
     }
 
     func test_제외할_폴더가_없으면_전체_폴더_목록_반환() {
-        let folderTree = [MockFolder.someFolder]
-        let nonExistentFolder = MockFolder.folderToEdit
+        let folderTree = [StubFolder.someFolder]
+        let nonExistentFolder = StubFolder.folderToEdit
 
         let result = useCase.execute(nonExistentFolder, from: folderTree)
 

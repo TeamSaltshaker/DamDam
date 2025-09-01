@@ -64,16 +64,16 @@ final class FolderSelectorReactorTests: XCTestCase {
     }
 
     func test_아코디언_모드_초기화() {
-        let folder = MockFolder.someFolder.folders.first!
+        let folder = StubFolder.someFolder.folders.first!
         createReactor(parentFolder: folder)
         fetchLayoutOptionUseCase.option = .expand
-        findFolderPathUseCase.pathToReturn = [MockFolder.someFolder, folder]
+        findFolderPathUseCase.pathToReturn = [StubFolder.someFolder, folder]
 
         waitForViewDidLoad()
 
         XCTAssertTrue(reactor.currentState.isAccordion)
         XCTAssertEqual(reactor.currentState.highlightedFolderID, folder.id)
-        XCTAssertTrue(reactor.currentState.expandedFolderIDs.contains(MockFolder.someFolder.id))
+        XCTAssertTrue(reactor.currentState.expandedFolderIDs.contains(StubFolder.someFolder.id))
     }
 
     func test_아코디언_모드_폴더_선택시_하이라이트_변경() {
@@ -81,7 +81,7 @@ final class FolderSelectorReactorTests: XCTestCase {
         fetchLayoutOptionUseCase.option = .expand
         waitForViewDidLoad()
 
-        let folder = MockFolder.someFolder.folders.first!
+        let folder = StubFolder.someFolder.folders.first!
         reactor.action.onNext(.selectedFolder(id: folder.id))
 
         XCTAssertEqual(reactor.currentState.highlightedFolderID, folder.id)
@@ -92,11 +92,11 @@ final class FolderSelectorReactorTests: XCTestCase {
         fetchLayoutOptionUseCase.option = .expand
         waitForViewDidLoad()
 
-        reactor.action.onNext(.toggleExpansion(id: MockFolder.someFolder.id))
-        XCTAssertTrue(reactor.currentState.expandedFolderIDs.contains(MockFolder.someFolder.id))
+        reactor.action.onNext(.toggleExpansion(id: StubFolder.someFolder.id))
+        XCTAssertTrue(reactor.currentState.expandedFolderIDs.contains(StubFolder.someFolder.id))
 
-        reactor.action.onNext(.toggleExpansion(id: MockFolder.someFolder.id))
-        XCTAssertFalse(reactor.currentState.expandedFolderIDs.contains(MockFolder.someFolder.id))
+        reactor.action.onNext(.toggleExpansion(id: StubFolder.someFolder.id))
+        XCTAssertFalse(reactor.currentState.expandedFolderIDs.contains(StubFolder.someFolder.id))
     }
 
     func test_아코디언_모드_확인_버튼_탭() {
@@ -104,7 +104,7 @@ final class FolderSelectorReactorTests: XCTestCase {
         fetchLayoutOptionUseCase.option = .expand
         waitForViewDidLoad()
 
-        let targetFolder = MockFolder.rootFolders.first!
+        let targetFolder = StubFolder.rootFolders.first!
         let accordionExpectation = expectation(description: #function)
 
         reactor.state
@@ -142,10 +142,10 @@ final class FolderSelectorReactorTests: XCTestCase {
     }
 
     func test_리스트_모드_초기화() {
-        let uikitFolder = MockFolder.someFolder.folders.first!
+        let uikitFolder = StubFolder.someFolder.folders.first!
         createReactor(parentFolder: uikitFolder)
         fetchLayoutOptionUseCase.option = .skip
-        findFolderPathUseCase.pathToReturn = [MockFolder.someFolder, uikitFolder]
+        findFolderPathUseCase.pathToReturn = [StubFolder.someFolder, uikitFolder]
 
         waitForViewDidLoad()
 
@@ -158,16 +158,16 @@ final class FolderSelectorReactorTests: XCTestCase {
         fetchLayoutOptionUseCase.option = .skip
         waitForViewDidLoad()
 
-        reactor.action.onNext(.selectedFolder(id: MockFolder.rootFolders.first!.id))
+        reactor.action.onNext(.selectedFolder(id: StubFolder.rootFolders.first!.id))
 
-        XCTAssertEqual(reactor.currentState.currentPath.last?.id, MockFolder.rootFolders.first!.id)
+        XCTAssertEqual(reactor.currentState.currentPath.last?.id, StubFolder.rootFolders.first!.id)
     }
 
     func test_리스트_모드_상위폴더로_이동() {
         createReactor()
         fetchLayoutOptionUseCase.option = .skip
         reactor.action.onNext(.viewDidLoad)
-        reactor.action.onNext(.selectedFolder(id: MockFolder.someFolder.id))
+        reactor.action.onNext(.selectedFolder(id: StubFolder.someFolder.id))
 
         reactor.action.onNext(.backButtonTapped)
 
@@ -179,7 +179,7 @@ final class FolderSelectorReactorTests: XCTestCase {
         fetchLayoutOptionUseCase.option = .skip
         waitForViewDidLoad()
 
-        let targetFolder = MockFolder.rootFolders.first!
+        let targetFolder = StubFolder.rootFolders.first!
         let listExpectation = expectation(description: #function)
 
         reactor.state

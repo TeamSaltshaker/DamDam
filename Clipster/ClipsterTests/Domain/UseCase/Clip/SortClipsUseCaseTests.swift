@@ -3,7 +3,7 @@ import XCTest
 
 final class SortClipsUseCaseTests: XCTestCase {
     private var useCase: SortClipsUseCase!
-    private let clips = MockClip.unsortedClips
+    private let clips = StubClip.unsortedClips
 
     override func setUp() {
         super.setUp()

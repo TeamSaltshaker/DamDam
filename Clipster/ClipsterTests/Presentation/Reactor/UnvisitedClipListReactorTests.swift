@@ -20,7 +20,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
     override func setUp() {
         disposeBag = DisposeBag()
 
-        clips = [MockClip.someClip]
+        clips = [StubClip.someClip]
         fetchUnvisitedClipsUseCase = MockFetchUnvisitedClipsUseCase()
         deleteClipUseCase = MockDeleteClipUseCase()
         visitClipUseCase = MockVisitClipUseCase()
@@ -92,7 +92,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.clips.count, MockClip.unsortedClips.count)
+        XCTAssertEqual(reactor.currentState.clips.count, StubClip.unsortedClips.count)
     }
 
     func test_화면_첫_진입이_아닐시_클립_불러오기_실패() {
@@ -162,7 +162,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(routeResult, .showWebView(MockClip.someClip.url))
+        XCTAssertEqual(routeResult, .showWebView(StubClip.someClip.url))
         XCTAssertTrue(visitClipUseCase.didCallExecute)
     }
 
@@ -184,7 +184,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(routeResult, .showDetailClip(MockClip.someClip))
+        XCTAssertEqual(routeResult, .showDetailClip(StubClip.someClip))
     }
 
     func test_클립_편집_탭() {
@@ -205,7 +205,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
 
         // then
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(routeResult, .showDetailClip(MockClip.someClip))
+        XCTAssertEqual(routeResult, .showDetailClip(StubClip.someClip))
     }
 
     func test_클립_삭제_탭() {
@@ -232,7 +232,7 @@ final class UnvisitedClipListReactorTests: XCTestCase {
         XCTAssertEqual(phaseResults, [.loading, .success])
         XCTAssertTrue(deleteClipUseCase.didCallExecute)
         XCTAssertTrue(fetchUnvisitedClipsUseCase.didCallExecute)
-        XCTAssertEqual(reactor.currentState.clips.count, MockClip.unvisitedClips.count)
+        XCTAssertEqual(reactor.currentState.clips.count, StubClip.unvisitedClips.count)
     }
 
     func test_클립_삭제_탭_실패() {

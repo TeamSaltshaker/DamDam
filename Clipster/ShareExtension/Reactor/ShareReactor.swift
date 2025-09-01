@@ -150,43 +150,30 @@ final class ShareReactor: Reactor {
             return .just(.updateURLString(trimmed))
         case .validifyURL(let text):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            return .fromAsync { [weak self] in
-                guard let self else { return Observable<Mutation>.empty() }
-                let sanitizedURL = try sanitizeURLUseCase.execute(urlString: trimmed).get()
-                let (metadata, isValidURL) = try await parseURLUseCase.execute(url: sanitizedURL).get()
-                let clipValidType: ParseResultType
-                switch (metadata, isValidURL) {
-                case (.some, true):
-                    clipValidType = .valid
-                case (nil, true):
-                    clipValidType = .validWithWarning
-                case (_, false):
-                    clipValidType = .invalid
+            let sanitizedResult = sanitizeURLUseCase.execute(urlString: trimmed)
+            switch sanitizedResult {
+            case .success(let sanitizedURL):
+                return .fromAsync { [weak self] in
+                    guard let self else { return Observable<Mutation>.empty() }
+                    let (urlMetadata, parseResult) = try await parseURLUseCase.execute(url: sanitizedURL).get()
+
+                    return .merge(
+                        .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: urlMetadata))),
+                        .just(Mutation.updateIsValidURL(parseResult))
+                    )
                 }
-                return .merge(
-                    .just(Mutation.updateURLMetadata(URLMetadataDisplayMapper.map(urlMetaData: metadata))),
-                    .just(Mutation.updateIsValidURL(clipValidType))
+                .flatMap { $0 }
+                .catch { _ in
+                    Observable.merge(
+                        .just(Mutation.updateURLMetadata(self.makeURLMetaDisplayOnlyURL(urlString: self.currentState.urlString))),
+                        .just(Mutation.updateIsValidURL(.validWithWarning))
+                    )
+                }
+            case .failure:
+                return Observable.merge(
+                    .just(Mutation.updateURLMetadata(nil)),
+                    .just(Mutation.updateIsValidURL(.invalid))
                 )
-            }
-            .flatMap { $0 }
-            .catch { error in
-                if let urlValidationError = error as? URLValidationError {
-                    switch urlValidationError {
-                    case .badURL:
-                        return Observable.merge(
-                            .just(Mutation.updateURLMetadata(nil)),
-                            .just(Mutation.updateIsValidURL(.invalid))
-                        )
-                    case .unknown:
-                        return .empty()
-                    default:
-                        return Observable.merge(
-                            .just(Mutation.updateURLMetadata(self.makeURLMetaDisplayOnlyURL(urlString: self.currentState.urlString))),
-                            .just(Mutation.updateIsValidURL(.validWithWarning))
-                        )
-                    }
-                }
-                return .empty()
             }
         case .editingURLTextField:
             return .just(.updateIsLoading(true))

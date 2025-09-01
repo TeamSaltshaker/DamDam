@@ -17,7 +17,7 @@ final class FolderReactorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        folder = MockFolder.someFolder
+        folder = StubFolder.someFolder
         fetchFolderUseCase = MockFetchFolderUseCase()
         fetchFolderSortOptionUseCase = MockFetchFolderSortOptionUseCase()
         fetchClipSortOptionUseCase = MockFetchClipSortOptionUseCase()

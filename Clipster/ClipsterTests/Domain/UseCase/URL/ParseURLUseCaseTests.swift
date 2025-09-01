@@ -198,12 +198,12 @@ final class ParseURLUseCaseTests: XCTestCase {
         let result = await useCase.execute(url: URL(string: "https://resolved.com")!)
 
         switch result {
-        case .success(let (metadata, isValid)):
-            XCTAssertEqual(metadata?.title, "테스트 제목")
-            XCTAssertEqual(metadata?.description, "테스트 설명")
-            XCTAssertEqual(metadata?.screenshotData, mockScreenshot)
-            XCTAssertNil(metadata?.thumbnailImageURL)
-            XCTAssertEqual(isValid, true)
+        case .success(let (metadata, parseResult)):
+            XCTAssertEqual(metadata.title, "테스트 제목")
+            XCTAssertEqual(metadata.description, "테스트 설명")
+            XCTAssertEqual(metadata.screenshotData, mockScreenshot)
+            XCTAssertNil(metadata.thumbnailImageURL)
+            XCTAssertEqual(parseResult, .valid)
         case .failure(let error):
             XCTFail("execute 실패: \(error)")
         }
@@ -224,12 +224,12 @@ final class ParseURLUseCaseTests: XCTestCase {
         let result = await useCase.execute(url: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
 
         switch result {
-        case .success(let (metadata, isValid)):
-            XCTAssertEqual(metadata?.title, "테스트 제목")
-            XCTAssertEqual(metadata?.description, "테스트 설명")
-            XCTAssertEqual(metadata?.screenshotData, mockScreenshot)
-            XCTAssertNotNil(metadata?.thumbnailImageURL)
-            XCTAssertEqual(isValid, true)
+        case .success(let (metadata, parseResult)):
+            XCTAssertEqual(metadata.title, "테스트 제목")
+            XCTAssertEqual(metadata.description, "테스트 설명")
+            XCTAssertEqual(metadata.screenshotData, mockScreenshot)
+            XCTAssertNotNil(metadata.thumbnailImageURL)
+            XCTAssertEqual(parseResult, .valid)
         case .failure(let error):
             XCTFail("execute 실패: \(error)")
         }
@@ -251,12 +251,12 @@ final class ParseURLUseCaseTests: XCTestCase {
         let result = await useCase.execute(url: URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
 
         switch result {
-        case .success(let (metadata, isValid)):
-            XCTAssertEqual(metadata?.title, "제목 없음")
-            XCTAssertEqual(metadata?.description, "내용 없음")
-            XCTAssertEqual(metadata?.screenshotData, nil)
-            XCTAssertNotNil(metadata?.thumbnailImageURL)
-            XCTAssertEqual(isValid, true)
+        case .success(let (metadata, parseResult)):
+            XCTAssertEqual(metadata.title, "제목 없음")
+            XCTAssertEqual(metadata.description, "내용 없음")
+            XCTAssertEqual(metadata.screenshotData, nil)
+            XCTAssertNotNil(metadata.thumbnailImageURL)
+            XCTAssertEqual(parseResult, .valid)
         case .failure(let error):
             XCTFail("execute 실패: \(error)")
         }

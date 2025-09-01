@@ -6,6 +6,6 @@ final class MockUpdateNicknameUseCase: UpdateNicknameUseCase {
 
     func execute(nickname: String) async -> Result<User, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockUser.someUser) : .failure(MockError.updateFailed)
+        return shouldSucceed ? .success(StubUser.someUser) : .failure(MockError.updateFailed)
     }
 }

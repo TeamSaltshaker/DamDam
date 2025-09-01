@@ -1,7 +1,7 @@
 import Foundation
 @testable import Clipster
 
-enum MockClip {
+enum StubClip {
     static let unvisitedClips: [Clip] = [
         Clip(
             id: UUID(),

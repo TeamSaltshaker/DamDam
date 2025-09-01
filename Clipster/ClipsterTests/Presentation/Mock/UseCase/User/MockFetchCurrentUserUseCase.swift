@@ -6,6 +6,6 @@ final class MockFetchCurrentUserUseCase: FetchCurrentUserUseCase {
 
     func execute() async -> Result<User, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockUser.someUser) : .failure(MockError.fetchFailed)
+        return shouldSucceed ? .success(StubUser.someUser) : .failure(MockError.fetchFailed)
     }
 }

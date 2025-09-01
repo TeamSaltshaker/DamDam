@@ -7,6 +7,6 @@ final class MockFetchFolderUseCase: FetchFolderUseCase {
 
     func execute(id: UUID) async -> Result<Clipster.Folder, Error> {
         didCallExecute = true
-        return shouldSucceed ? .success(MockFolder.someFolder) : .failure(MockError.fetchFailed)
+        return shouldSucceed ? .success(StubFolder.someFolder) : .failure(MockError.fetchFailed)
     }
 }

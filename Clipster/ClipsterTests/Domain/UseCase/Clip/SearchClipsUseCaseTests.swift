@@ -3,7 +3,7 @@ import XCTest
 
 final class SearchClipsUseCaseTests: XCTestCase {
     private var useCase: SearchClipsUseCase!
-    private let clips = MockClip.unvisitedClips
+    private let clips = StubClip.unvisitedClips
 
     override func setUp() {
         super.setUp()
