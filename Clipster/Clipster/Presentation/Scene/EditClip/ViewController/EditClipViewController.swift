@@ -186,21 +186,26 @@ extension EditClipViewController: View {
                     do {
                         let patterns = try await UIPasteboard.general.detectedPatterns(for: [\.probableWebURL])
                         if patterns.contains(\.probableWebURL) {
-                            await MainActor.run {
-                                if let pastedString = UIPasteboard.general.string {
-                                    if let url = self.extractURLFromPasteboard(from: pastedString) {
-                                        reactor.action.onNext(.editingURLTextField)
-                                        reactor.action.onNext(.editURLTextField(url.absoluteString))
-                                        reactor.action.onNext(.validifyURL(url.absoluteString))
+                            if let pastedString = UIPasteboard.general.string {
+                                if let url = self.extractURLFromPasteboard(from: pastedString) {
+                                    reactor.action.onNext(.editingURLTextField)
+                                    reactor.action.onNext(.editURLTextField(url.absoluteString))
+                                    reactor.action.onNext(.validifyURL(url.absoluteString))
+
+                                    await MainActor.run {
                                         UIPasteboard.general.string = nil
                                     }
                                 }
                             }
                         } else {
-                            self.editClipView.urlView.urlTextField.becomeFirstResponder()
+                            _ = await MainActor.run {
+                                self.editClipView.urlView.urlTextField.becomeFirstResponder()
+                            }
                         }
                     } catch {
-                        self.editClipView.urlView.urlTextField.becomeFirstResponder()
+                        _ = await MainActor.run {
+                            self.editClipView.urlView.urlTextField.becomeFirstResponder()
+                        }
                     }
                 }
             }
