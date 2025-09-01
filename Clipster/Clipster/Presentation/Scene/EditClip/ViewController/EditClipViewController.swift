@@ -179,7 +179,6 @@ extension EditClipViewController: View {
             .map { ($0.type, $0.shouldReadPastedboardURL) }
             .filter { $0.0 == .create && $0.1 }
             .take(1)
-            .observe(on: MainScheduler.instance)
             .subscribe { [weak self] in
                 guard let self, case .next = $0 else { return }
                 Task {
