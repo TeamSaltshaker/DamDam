@@ -9,7 +9,6 @@ final class TabBarViewController: UIViewController {
     private weak var coordinator: TabBarCoordinator?
 
     private var currentVC: UIViewController?
-    private let selectedTab = BehaviorRelay<TabItem>(value: .defaultTab)
 
     private var lastTabBarHeight: CGFloat = 0
 
@@ -58,6 +57,10 @@ final class TabBarViewController: UIViewController {
         vc.didMove(toParent: self)
         currentVC = vc
     }
+
+    func updateSelectedTab(_ item: TabItem) {
+        tabBarView.updateSelectedTab(item)
+    }
 }
 
 private extension TabBarViewController {
@@ -84,19 +87,9 @@ private extension TabBarViewController {
         tabBarView.action
             .bind { [weak self] action in
                 switch action {
-                case .tap(let mode):
-                    self?.selectedTab.accept(mode)
+                case .tap(let item):
+                    self?.coordinator?.didTap(tab: item)
                 }
-            }
-            .disposed(by: disposeBag)
-
-        selectedTab
-            .distinctUntilChanged()
-            .subscribe { [weak self] mode in
-                guard let self else { return }
-
-                tabBarView.updateSelectedTab(mode)
-                coordinator?.didSelect(tab: mode)
             }
             .disposed(by: disposeBag)
     }
