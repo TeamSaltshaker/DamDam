@@ -151,6 +151,22 @@ extension EditClipViewController: View {
                 editClipView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
             }
             .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.isShowKeyboard)
+            .filter { $0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] in
+                guard let self, case .next = $0 else { return }
+                editClipView.urlView.urlTextField.becomeFirstResponder()
+            }
+//            .asDriver(onErrorDriveWith: .empty())
+//            .debug()
+//            .drive { [weak self] in
+//                guard let self else { return }
+//                self.editClipView.urlView.urlTextField.becomeFirstResponder()
+//            }
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: EditClipReactor) {
@@ -176,38 +192,31 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { ($0.type, $0.shouldReadPastedboardURL) }
+            .map { ($0.type, $0.shouldReadPasteboardURL) }
             .filter { $0.0 == .create && $0.1 }
             .take(1)
-            .subscribe { [weak self] in
-                guard let self, case .next = $0 else { return }
-                Task {
-                    do {
-                        let patterns = try await UIPasteboard.general.detectedPatterns(for: [\.probableWebURL])
-                        if patterns.contains(\.probableWebURL) {
-                            if let pastedString = UIPasteboard.general.string {
-                                if let url = self.extractFirstURL(from: pastedString) {
-                                    reactor.action.onNext(.editingURLTextField)
-                                    reactor.action.onNext(.editURLTextField(url.absoluteString))
-                                    reactor.action.onNext(.validifyURL(url.absoluteString))
+            .observe(on: MainScheduler.asyncInstance)
+            .map { _ in Reactor.Action.extractURLFromPasteboard }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
 
-                                    await MainActor.run {
-                                        UIPasteboard.general.string = nil
-                                    }
-                                }
-                            }
-                        } else {
-                            _ = await MainActor.run {
-                                self.editClipView.urlView.urlTextField.becomeFirstResponder()
-                            }
-                        }
-                    } catch {
-                        _ = await MainActor.run {
-                            self.editClipView.urlView.urlTextField.becomeFirstResponder()
-                        }
-                    }
+        reactor.state
+            .map { ($0.extractedURL, $0.type) }
+            .filter { $0.1 == .create }
+            .map { $0.0 }
+            .skip(1)
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .debug()
+            .subscribe(onNext: { url in
+                if let url = url {
+                    reactor.action.onNext(.editingURLTextField)
+                    reactor.action.onNext(.editURLTextField(url.absoluteString))
+                    reactor.action.onNext(.validifyURL(url.absoluteString))
+                } else {
+                    reactor.action.onNext(.showKeyboard)
                 }
-            }
+            })
             .disposed(by: disposeBag)
 
         reactor.state
@@ -355,21 +364,5 @@ extension EditClipViewController: View {
 extension EditClipViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         true
-    }
-}
-
-private extension EditClipViewController {
-    func extractFirstURL(from text: String) -> URL? {
-        do {
-            let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-            let matches = detector.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-            if let firstMatch = matches.first, let url = firstMatch.url {
-                return url
-            }
-        } catch {
-            print("\(Self.self) NSDataDetector 생성 중 오류 발생: \(error)")
-        }
-
-        return nil
     }
 }

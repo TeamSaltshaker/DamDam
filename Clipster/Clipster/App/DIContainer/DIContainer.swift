@@ -275,6 +275,10 @@ final class DIContainer {
         DefaultUpdateHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
+    func makeExtractURLPasteboardUseCase() -> ExtractURLPasteboardUseCase {
+        DefaultExtractURLPasteboardUseCase()
+    }
+
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
         ClipDetailReactor(
             fetchFolderUseCase: makeFetchFolderUseCase(),
@@ -290,7 +294,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLPasteboardUseCase: makeExtractURLPasteboardUseCase()
         )
     }
 
@@ -301,7 +306,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLPasteboardUseCase: makeExtractURLPasteboardUseCase()
         )
     }
 
@@ -312,7 +318,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLPasteboardUseCase: makeExtractURLPasteboardUseCase()
         )
     }
 
