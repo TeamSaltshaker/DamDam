@@ -31,7 +31,7 @@ final class EditClipReactor: Reactor {
         case updateCurrentFolder(Folder?)
         case updateIsSuccessedEditClip(Bool)
         case updateIsLoading(Bool)
-        case updateShouldReadPastedboardURL(Bool)
+        case updateIsViewDidAppear(Bool)
         case updateExtractedURL(URL?)
         case updateIsShowKeyboard(Bool)
     }
@@ -47,7 +47,7 @@ final class EditClipReactor: Reactor {
         var isLoading = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
-        var shouldReadPasteboardURL: Bool = false
+        var isViewDidAppear: Bool = false
         var extractedURL: URL?
         var isShowKeyboard: Bool = false
 
@@ -310,7 +310,7 @@ final class EditClipReactor: Reactor {
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         case .viewDidAppear:
-            return .just(.updateShouldReadPastedboardURL(true))
+            return .just(.updateIsViewDidAppear(true))
         case .extractURLFromPasteboard:
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.just(.updateExtractedURL(nil)) }
@@ -346,8 +346,8 @@ final class EditClipReactor: Reactor {
             newState.isSuccessedEditClip = value
         case .updateIsLoading(let value):
             newState.isLoading = value
-        case .updateShouldReadPastedboardURL(let value):
-            newState.shouldReadPasteboardURL = value
+        case .updateIsViewDidAppear(let value):
+            newState.isViewDidAppear = value
         case .updateExtractedURL(let url):
             newState.extractedURL = url
         case .updateIsShowKeyboard(let value):

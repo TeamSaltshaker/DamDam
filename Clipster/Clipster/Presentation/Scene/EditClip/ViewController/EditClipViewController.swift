@@ -192,7 +192,7 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { ($0.type, $0.shouldReadPasteboardURL) }
+            .map { ($0.type, $0.isViewDidAppear) }
             .filter { $0.0 == .create && $0.1 }
             .take(1)
             .observe(on: MainScheduler.asyncInstance)
