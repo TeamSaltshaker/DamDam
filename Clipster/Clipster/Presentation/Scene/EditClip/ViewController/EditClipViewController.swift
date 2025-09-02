@@ -153,19 +153,14 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map(\.isShowKeyboard)
-            .filter { $0 }
+            .map { ($0.isShowKeyboard, $0.isViewDidAppear) }
+            .filter { $0.0 && $0.1 }
+            .take(1)
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] in
                 guard let self, case .next = $0 else { return }
                 editClipView.urlView.urlTextField.becomeFirstResponder()
             }
-//            .asDriver(onErrorDriveWith: .empty())
-//            .debug()
-//            .drive { [weak self] in
-//                guard let self else { return }
-//                self.editClipView.urlView.urlTextField.becomeFirstResponder()
-//            }
             .disposed(by: disposeBag)
     }
 
@@ -201,13 +196,12 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { ($0.extractedURL, $0.type) }
-            .filter { $0.1 == .create }
+            .map { ($0.extractedURL, $0.type, $0.isViewDidAppear) }
+            .filter { $0.1 == .create && $0.2 }
             .map { $0.0 }
             .skip(1)
             .distinctUntilChanged()
             .observe(on: MainScheduler.asyncInstance)
-            .debug()
             .subscribe(onNext: { url in
                 if let url = url {
                     reactor.action.onNext(.editingURLTextField)
