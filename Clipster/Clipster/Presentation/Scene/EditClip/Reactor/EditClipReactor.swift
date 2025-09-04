@@ -314,7 +314,7 @@ final class EditClipReactor: Reactor {
         case .extractURLFromPasteboard:
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.just(.updateExtractedURL(nil)) }
-                let pastedURL = await extractURLFromPasteboardUseCase.execute()
+                let pastedURL = try await extractURLFromPasteboardUseCase.execute().get()
                 return .just(Mutation.updateExtractedURL(pastedURL))
             }
             .flatMap { $0 }
