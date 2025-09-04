@@ -202,6 +202,7 @@ extension EditClipViewController: View {
             .skip(1)
             .distinctUntilChanged()
             .observe(on: MainScheduler.asyncInstance)
+            // swiftlint:disable:next trailing_closure
             .subscribe(onNext: { url in
                 if let url = url {
                     reactor.action.onNext(.editingURLTextField)
