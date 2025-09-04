@@ -1,6 +1,6 @@
 import UIKit
 
-final class DefaultExtractURLPasteboardUseCase: ExtractURLPasteboardUseCase {
+final class DefaultExtractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase {
     func execute() async -> URL? {
         guard let patterns = try? await UIPasteboard.general.detectedPatterns(for: [\.probableWebURL]) else {
             print("\(Self.self) 클립보드에 감지된 URL이 없습니다.")
