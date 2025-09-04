@@ -153,8 +153,8 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { ($0.isShowKeyboard, $0.isViewDidAppear) }
-            .filter { $0.0 && $0.1 }
+            .map(\.isShowKeyboard)
+            .filter { $0 }
             .take(1)
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] in
@@ -198,20 +198,15 @@ extension EditClipViewController: View {
         reactor.state
             .map { ($0.extractedURL, $0.type, $0.isViewDidAppear) }
             .filter { $0.1 == .create && $0.2 }
-            .map { $0.0 }
-            .skip(1)
+            .compactMap { $0.0 }
             .distinctUntilChanged()
             .observe(on: MainScheduler.asyncInstance)
-            // swiftlint:disable:next trailing_closure
-            .subscribe(onNext: { url in
-                if let url = url {
-                    reactor.action.onNext(.editingURLTextField)
-                    reactor.action.onNext(.editURLTextField(url.absoluteString))
-                    reactor.action.onNext(.validifyURL(url.absoluteString))
-                } else {
-                    reactor.action.onNext(.showKeyboard)
-                }
-            })
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { url in
+                reactor.action.onNext(.editingURLTextField)
+                reactor.action.onNext(.editURLTextField(url.absoluteString))
+                reactor.action.onNext(.validifyURL(url.absoluteString))
+            }
             .disposed(by: disposeBag)
 
         reactor.state

@@ -319,7 +319,7 @@ final class EditClipReactor: Reactor {
             }
             .flatMap { $0 }
             .catch { _ in
-                .just(Mutation.updateExtractedURL(nil))
+                .just(Mutation.updateIsShowKeyboard(true))
             }
         case .showKeyboard:
             return .just(.updateIsShowKeyboard(true))
