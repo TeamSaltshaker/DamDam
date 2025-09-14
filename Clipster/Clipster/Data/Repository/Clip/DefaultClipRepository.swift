@@ -18,7 +18,9 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clip)
         }
 
-        return await storage.fetchClip(by: id)
+        let predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
+
+        return await storage.fetchClip(predicate: predicate)
             .mapError { _ in .fetchFailed }
     }
 
@@ -29,7 +31,9 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter { $0.deletedAt == nil })
         }
 
-        return await storage.fetchAllClips()
+        let predicate = NSPredicate(format: "deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
@@ -42,7 +46,9 @@ final class DefaultClipRepository: ClipRepository {
             })
         }
 
-        return await storage.fetchTopLevelClips()
+        let predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
@@ -55,7 +61,9 @@ final class DefaultClipRepository: ClipRepository {
             })
         }
 
-        return await storage.fetchUnvisitedClips()
+        let predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
@@ -68,7 +76,9 @@ final class DefaultClipRepository: ClipRepository {
             })
         }
 
-        return await storage.fetchRecentVisitedClips(for: ids)
+        let predicate = NSPredicate(format: "id IN %@ AND deletedAt == nil", ids)
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
