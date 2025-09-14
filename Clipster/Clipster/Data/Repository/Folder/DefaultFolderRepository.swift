@@ -16,10 +16,10 @@ final class DefaultFolderRepository: FolderRepository {
                 return .failure(.entityNotFound)
             }
             return .success(folder)
-        } else {
-            return await storage.fetchFolder(by: id)
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchFolder(by: id)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchAllFolders() async -> Result<[Folder], DomainError> {
@@ -27,10 +27,10 @@ final class DefaultFolderRepository: FolderRepository {
            await cache.isFoldersInitialized {
             let folders = await cache.folders()
             return .success(folders.filter { $0.deletedAt == nil })
-        } else {
-            return await storage.fetchAllFolders()
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchAllFolders()
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchTopLevelFolders() async -> Result<[Folder], DomainError> {
@@ -38,10 +38,10 @@ final class DefaultFolderRepository: FolderRepository {
            await cache.isFoldersInitialized {
             let folders = await cache.folders()
             return .success(folders.filter { $0.parentFolderID == nil && $0.deletedAt == nil })
-        } else {
-            return await storage.fetchTopLevelFolders()
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchTopLevelFolders()
+            .mapError { _ in .fetchFailed }
     }
 
     func insertFolder(_ folder: Folder) async -> Result<Void, DomainError> {

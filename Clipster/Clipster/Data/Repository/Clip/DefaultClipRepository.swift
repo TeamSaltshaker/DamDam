@@ -16,10 +16,10 @@ final class DefaultClipRepository: ClipRepository {
                 return .failure(.entityNotFound)
             }
             return .success(clip)
-        } else {
-            return await storage.fetchClip(by: id)
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchClip(by: id)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchAllClips() async -> Result<[Clip], DomainError> {
@@ -27,10 +27,10 @@ final class DefaultClipRepository: ClipRepository {
            await cache.isClipsInitialized {
             let clips = await cache.clips()
             return .success(clips.filter { $0.deletedAt == nil })
-        } else {
-            return await storage.fetchAllClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchAllClips()
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
@@ -40,10 +40,10 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 $0.folderID == nil && $0.deletedAt == nil
             })
-        } else {
-            return await storage.fetchTopLevelClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchTopLevelClips()
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError> {
@@ -53,10 +53,10 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 $0.lastVisitedAt == nil && $0.deletedAt == nil
             })
-        } else {
-            return await storage.fetchUnvisitedClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchUnvisitedClips()
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], DomainError> {
@@ -66,10 +66,10 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 ids.contains($0.id)
             })
-        } else {
-            return await storage.fetchRecentVisitedClips(for: ids)
-                .mapError { _ in .fetchFailed }
         }
+
+        return await storage.fetchRecentVisitedClips(for: ids)
+            .mapError { _ in .fetchFailed }
     }
 
     func insertClip(_ clip: Clip) async -> Result<Void, DomainError> {
