@@ -9,46 +9,34 @@ final class DefaultFolderStorage: FolderStorage {
         self.mapper = mapper
     }
 
-    func fetchFolder(by id: UUID) async -> Result<Folder, CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
+    func fetchFolder(
+        predicate: NSPredicate
+    ) async -> Result<Folder, CoreDataError> {
+        let result = await fetchFolders(predicate: predicate, fetchLimit: 1)
 
-                let request = FolderEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
-                request.fetchLimit = 1
-
-                do {
-                    guard let entity = try context.fetch(request).first else {
-                        print("\(Self.self): ❌ Failed to fetch: Entity not found")
-                        continuation.resume(returning: .failure(.entityNotFound))
-                        return
-                    }
-
-                    filterFolderRecursively(entity)
-
-                    guard let folder = mapper.folder(from: entity) else {
-                        print("\(Self.self): ❌ Failed to fetch: Mapping failed")
-                        continuation.resume(returning: .failure(.mapFailed))
-                        return
-                    }
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(folder))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
+        switch result {
+        case .success(let folders):
+            if let folder = folders.first {
+                return .success(folder)
+            } else {
+                return .failure(.entityNotFound)
             }
+        case .failure(let error):
+            return .failure(error)
         }
     }
 
-    func fetchAllFolders() async -> Result<[Folder], CoreDataError> {
+    func fetchFolders(
+        predicate: NSPredicate,
+        fetchLimit: Int
+    ) async -> Result<[Folder], CoreDataError> {
         await withCheckedContinuation { continuation in
             container.performBackgroundTask { [weak self] context in
                 guard let self else { return }
 
                 let request = FolderEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "deletedAt == nil")
+                request.predicate = predicate
+                request.fetchLimit = fetchLimit
 
                 do {
                     let entities = try context.fetch(request)
@@ -59,31 +47,6 @@ final class DefaultFolderStorage: FolderStorage {
                     let allFolders = entities.compactMap(mapper.folder)
                     print("\(Self.self): ✅ Fetch successfully")
                     continuation.resume(returning: .success(allFolders))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
-            }
-        }
-    }
-
-    func fetchTopLevelFolders() async -> Result<[Folder], CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
-
-                let request = FolderEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "parentFolder == nil AND deletedAt == nil")
-
-                do {
-                    let entities = try context.fetch(request)
-                    for entity in entities {
-                        filterFolderRecursively(entity)
-                    }
-
-                    let topLevelFolders = entities.compactMap(mapper.folder)
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(topLevelFolders))
                 } catch {
                     print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
                     continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))

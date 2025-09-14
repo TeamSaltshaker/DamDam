@@ -18,7 +18,9 @@ final class DefaultFolderRepository: FolderRepository {
             return .success(folder)
         }
 
-        return await storage.fetchFolder(by: id)
+        let predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
+
+        return await storage.fetchFolder(predicate: predicate)
             .mapError { _ in .fetchFailed }
     }
 
@@ -29,7 +31,9 @@ final class DefaultFolderRepository: FolderRepository {
             return .success(folders.filter { $0.deletedAt == nil })
         }
 
-        return await storage.fetchAllFolders()
+        let predicate = NSPredicate(format: "deletedAt == nil")
+
+        return await storage.fetchFolders(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
@@ -40,7 +44,9 @@ final class DefaultFolderRepository: FolderRepository {
             return .success(folders.filter { $0.parentFolderID == nil && $0.deletedAt == nil })
         }
 
-        return await storage.fetchTopLevelFolders()
+        let predicate = NSPredicate(format: "parentFolder == nil AND deletedAt == nil")
+
+        return await storage.fetchFolders(predicate: predicate, fetchLimit: 0)
             .mapError { _ in .fetchFailed }
     }
 
