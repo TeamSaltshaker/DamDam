@@ -1,7 +1,7 @@
 @testable import Clipster
 import Foundation
 
-final class MockExtractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase {
+final class MockExtractURLUseCase: ExtractURLUseCase {
     private(set) var didCallExecute: Bool = false
     var executeResult: Result<URL, PasteboardError>!
 

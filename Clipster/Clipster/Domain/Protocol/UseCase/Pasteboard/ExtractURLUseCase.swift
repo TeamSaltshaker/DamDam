@@ -1,5 +1,5 @@
 import Foundation
 
-protocol ExtractURLFromPasteboardUseCase {
+protocol ExtractURLUseCase {
     func execute() async -> Result<URL, PasteboardError>
 }

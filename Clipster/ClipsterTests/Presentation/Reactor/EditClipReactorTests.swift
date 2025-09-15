@@ -8,7 +8,7 @@ final class EditClipReactorTests: XCTestCase {
     private var fetchFolderUseCase: MockFetchFolderUseCase!
     private var createClipUseCase: MockCreateClipUseCase!
     private var updateClipUseCase: MockUpdateClipUseCase!
-    private var extractURLFromPasteboardUseCase: MockExtractURLFromPasteboardUseCase!
+    private var extractURLUseCase: MockExtractURLUseCase!
     private var disposeBag: DisposeBag!
     private var reactor: EditClipReactor!
 
@@ -19,7 +19,7 @@ final class EditClipReactorTests: XCTestCase {
         fetchFolderUseCase = MockFetchFolderUseCase()
         createClipUseCase = MockCreateClipUseCase()
         updateClipUseCase = MockUpdateClipUseCase()
-        extractURLFromPasteboardUseCase = MockExtractURLFromPasteboardUseCase()
+        extractURLUseCase = MockExtractURLUseCase()
         disposeBag = DisposeBag()
         reactor = createReactor(type: .create)
     }
@@ -212,7 +212,7 @@ final class EditClipReactorTests: XCTestCase {
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase,
-            extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -240,7 +240,7 @@ final class EditClipReactorTests: XCTestCase {
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase,
-            extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -273,7 +273,7 @@ final class EditClipReactorTests: XCTestCase {
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase,
-            extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -302,7 +302,7 @@ final class EditClipReactorTests: XCTestCase {
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
             updateClipUseCase: updateClipUseCase,
-            extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -459,7 +459,7 @@ private extension EditClipReactorTests {
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
                 updateClipUseCase: updateClipUseCase,
-                extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+                extractURLUseCase: extractURLUseCase
             )
         case .edit:
             return EditClipReactor(
@@ -469,7 +469,7 @@ private extension EditClipReactorTests {
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
                 updateClipUseCase: updateClipUseCase,
-                extractURLFromPasteboardUseCase: extractURLFromPasteboardUseCase
+                extractURLUseCase: extractURLUseCase
             )
         }
     }
