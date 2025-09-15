@@ -115,7 +115,7 @@ final class EditClipReactor: Reactor {
     private let fetchFolderUseCase: FetchFolderUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
-    private let extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
+    private let extractURLUseCase: ExtractURLUseCase
 
     #if DEBUG
     init(
@@ -127,7 +127,7 @@ final class EditClipReactor: Reactor {
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase,
-        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
+        extractURLUseCase: ExtractURLUseCase
     ) {
         self.initialState = State(
             type: type,
@@ -139,7 +139,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
-        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
+        self.extractURLUseCase = extractURLUseCase
     }
     #endif
 
@@ -150,7 +150,7 @@ final class EditClipReactor: Reactor {
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase,
-        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
+        extractURLUseCase: ExtractURLUseCase
     ) {
         self.initialState = State(
             type: .create,
@@ -161,7 +161,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
-        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
+        self.extractURLUseCase = extractURLUseCase
     }
 
     init(
@@ -171,7 +171,7 @@ final class EditClipReactor: Reactor {
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
         updateClipUseCase: UpdateClipUseCase,
-        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
+        extractURLUseCase: ExtractURLUseCase
     ) {
         self.initialState = State(
             type: .edit,
@@ -184,7 +184,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
-        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
+        self.extractURLUseCase = extractURLUseCase
     }
 
     func transform(action: Observable<Action>) -> Observable<Action> {
@@ -301,7 +301,7 @@ final class EditClipReactor: Reactor {
         case .extractURLFromPasteboard:
             return .fromAsync { [weak self] in
                 guard let self else { return Observable<Mutation>.just(.updateExtractedURL(nil)) }
-                let pastedURL = try await extractURLFromPasteboardUseCase.execute().get()
+                let pastedURL = try await extractURLUseCase.execute().get()
                 return .just(Mutation.updateExtractedURL(pastedURL))
             }
             .flatMap { $0 }

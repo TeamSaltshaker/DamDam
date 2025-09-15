@@ -1,6 +1,6 @@
 import Foundation
 
-final class DefaultExtractURLUseCase: ExtractURLFromPasteboardUseCase {
+final class DefaultExtractURLUseCase: ExtractURLUseCase {
     let pasteboardRepository: PasteboardRepository
 
     init(pasteboardRepository: PasteboardRepository) {

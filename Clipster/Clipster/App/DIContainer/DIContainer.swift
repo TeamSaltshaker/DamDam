@@ -279,7 +279,7 @@ final class DIContainer {
         DefaultUpdateHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
-    func makeExtractURLFromPasteboardUseCase() -> ExtractURLFromPasteboardUseCase {
+    func makeExtractURLFromPasteboardUseCase() -> ExtractURLUseCase {
         DefaultExtractURLUseCase(pasteboardRepository: makePasteboardRepository())
     }
 
@@ -299,7 +299,7 @@ final class DIContainer {
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase(),
-            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
+            extractURLUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 
@@ -311,7 +311,7 @@ final class DIContainer {
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase(),
-            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
+            extractURLUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 
@@ -323,7 +323,7 @@ final class DIContainer {
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
             updateClipUseCase: makeUpdateClipUseCase(),
-            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
+            extractURLUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 

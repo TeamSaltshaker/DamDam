@@ -8,6 +8,7 @@ final class EditClipReactorTests: XCTestCase {
     private var fetchFolderUseCase: MockFetchFolderUseCase!
     private var createClipUseCase: MockCreateClipUseCase!
     private var updateClipUseCase: MockUpdateClipUseCase!
+    private var extractURLUseCase: MockExtractURLUseCase!
     private var disposeBag: DisposeBag!
     private var reactor: EditClipReactor!
 
@@ -18,6 +19,7 @@ final class EditClipReactorTests: XCTestCase {
         fetchFolderUseCase = MockFetchFolderUseCase()
         createClipUseCase = MockCreateClipUseCase()
         updateClipUseCase = MockUpdateClipUseCase()
+        extractURLUseCase = MockExtractURLUseCase()
         disposeBag = DisposeBag()
         reactor = createReactor(type: .create)
     }
@@ -172,6 +174,44 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertFalse(reactor.currentState.isLoading)
     }
 
+    func test_extractURL_성공() {
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.extractedURL)
+            .compactMap { $0 }
+            .subscribe { url in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let url = URL(string: "www.google.com")!
+        extractURLUseCase.executeResult = .success(url)
+        reactor.action.onNext(.extractURLFromPasteboard)
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(reactor.currentState.extractedURL, url)
+        XCTAssertTrue(extractURLUseCase.didCallExecute)
+        XCTAssertFalse(reactor.currentState.isShowKeyboard)
+    }
+
+    func test_extractURL_실패() {
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.extractedURL)
+            .subscribe { url in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        extractURLUseCase.executeResult = .failure(.failedExtractURL)
+        reactor.action.onNext(.extractURLFromPasteboard)
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(reactor.currentState.extractedURL, nil)
+        XCTAssertTrue(extractURLUseCase.didCallExecute)
+        XCTAssertTrue(reactor.currentState.isShowKeyboard)
+    }
+
     func test_editingURLTextField_isLoading이_true() {
         reactor.action.onNext(.editingURLTextField)
 
@@ -209,7 +249,8 @@ final class EditClipReactorTests: XCTestCase {
             sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
-            updateClipUseCase: updateClipUseCase
+            updateClipUseCase: updateClipUseCase,
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -236,7 +277,8 @@ final class EditClipReactorTests: XCTestCase {
             sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
-            updateClipUseCase: updateClipUseCase
+            updateClipUseCase: updateClipUseCase,
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -268,7 +310,8 @@ final class EditClipReactorTests: XCTestCase {
             sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
-            updateClipUseCase: updateClipUseCase
+            updateClipUseCase: updateClipUseCase,
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -296,7 +339,8 @@ final class EditClipReactorTests: XCTestCase {
             sanitizeURLUseCase: sanitizeURLUseCase,
             fetchFolderUseCase: fetchFolderUseCase,
             createClipUseCase: createClipUseCase,
-            updateClipUseCase: updateClipUseCase
+            updateClipUseCase: updateClipUseCase,
+            extractURLUseCase: extractURLUseCase
         )
 
         let expectation = expectation(description: #function)
@@ -452,7 +496,8 @@ private extension EditClipReactorTests {
                 sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
-                updateClipUseCase: updateClipUseCase
+                updateClipUseCase: updateClipUseCase,
+                extractURLUseCase: extractURLUseCase
             )
         case .edit:
             return EditClipReactor(
@@ -461,7 +506,8 @@ private extension EditClipReactorTests {
                 sanitizeURLUseCase: sanitizeURLUseCase,
                 fetchFolderUseCase: fetchFolderUseCase,
                 createClipUseCase: createClipUseCase,
-                updateClipUseCase: updateClipUseCase
+                updateClipUseCase: updateClipUseCase,
+                extractURLUseCase: extractURLUseCase
             )
         }
     }
