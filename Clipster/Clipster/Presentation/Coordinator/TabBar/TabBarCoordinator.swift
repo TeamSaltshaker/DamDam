@@ -11,6 +11,8 @@ final class TabBarCoordinator: Coordinator {
         TabBarViewController(coordinator: self)
     }()
 
+    private var currentTab: TabItem = .defaultTab
+
     init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
         self.diContainer = diContainer
@@ -30,14 +32,39 @@ final class TabBarCoordinator: Coordinator {
         myPageCoordinator.start()
 
         navigationController.setViewControllers([tabBarController], animated: false)
+
+        didSelect(tab: currentTab)
     }
 }
 
 extension TabBarCoordinator {
-    func didSelect(tab: TabBarMode) {
+    func didTap(tab: TabItem) {
         guard children.indices.contains(tab.rawValue) else { return }
-        let targetVC = children[tab.rawValue].navigationController
-        tabBarController.switchTo(targetVC)
+
+        if tab != currentTab {
+            didSelect(tab: tab)
+        } else {
+            didReselect(tab: tab)
+        }
+    }
+
+    func didSelect(tab: TabItem) {
+        let targetNav = children[tab.rawValue].navigationController
+        tabBarController.switchTo(targetNav)
+        tabBarController.updateSelectedTab(tab)
+        currentTab = tab
+    }
+
+    func didReselect(tab: TabItem) {
+        let targetNav = children[tab.rawValue].navigationController
+
+        if targetNav.presentedViewController != nil {
+            targetNav.dismiss(animated: false)
+        }
+
+        if targetNav.viewControllers.count > 1 {
+            targetNav.popToRootViewController(animated: true)
+        }
     }
 }
 

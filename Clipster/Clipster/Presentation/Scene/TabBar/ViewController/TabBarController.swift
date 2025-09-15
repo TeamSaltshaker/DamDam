@@ -9,7 +9,8 @@ final class TabBarViewController: UIViewController {
     private weak var coordinator: TabBarCoordinator?
 
     private var currentVC: UIViewController?
-    private let selectedTab = BehaviorRelay<TabBarMode>(value: .home)
+
+    private var lastTabBarHeight: CGFloat = 0
 
     init(coordinator: TabBarCoordinator) {
         self.coordinator = coordinator
@@ -27,10 +28,15 @@ final class TabBarViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        let baseTabBarHeight: CGFloat = 64
         let bottomInset = view.safeAreaInsets.bottom
-        let tabBarHeight = bottomInset > 0 ? 100 : 64
-        tabBarView.snp.updateConstraints {
-            $0.height.equalTo(tabBarHeight)
+        let tabBarHeight = baseTabBarHeight + bottomInset
+
+        guard lastTabBarHeight != tabBarHeight else { return }
+
+        lastTabBarHeight = tabBarHeight
+        tabBarView.snp.updateConstraints { make in
+            make.height.equalTo(tabBarHeight)
         }
     }
 
@@ -42,14 +48,18 @@ final class TabBarViewController: UIViewController {
         addChild(vc)
         view.insertSubview(vc.view, belowSubview: tabBarView)
 
-        vc.view.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(tabBarView.snp.top)
+        vc.view.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(tabBarView.snp.top)
         }
 
         vc.didMove(toParent: self)
         currentVC = vc
+    }
+
+    func updateSelectedTab(_ item: TabItem) {
+        tabBarView.updateSelectedTab(item)
     }
 }
 
@@ -66,38 +76,20 @@ private extension TabBarViewController {
     }
 
     func setConstraints() {
-        let bottomInset = view.safeAreaInsets.bottom
-        let tabBarHeight = bottomInset > 0 ? 100 : 64
-
-        tabBarView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(tabBarHeight)
+        tabBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.equalTo(1)
         }
     }
 
     func setBindings() {
         tabBarView.action
             .bind { [weak self] action in
-                guard let self else { return }
-
                 switch action {
-                case .tapHome:
-                    selectedTab.accept(.home)
-                case .tapSearch:
-                    selectedTab.accept(.search)
-                case .tapUser:
-                    selectedTab.accept(.myPage)
+                case .tap(let item):
+                    self?.coordinator?.didTap(tab: item)
                 }
-            }
-            .disposed(by: disposeBag)
-
-        selectedTab
-            .distinctUntilChanged()
-            .subscribe { [weak self] mode in
-                guard let self else { return }
-
-                tabBarView.updateSelectedTab(mode)
-                coordinator?.didSelect(tab: mode)
             }
             .disposed(by: disposeBag)
     }
