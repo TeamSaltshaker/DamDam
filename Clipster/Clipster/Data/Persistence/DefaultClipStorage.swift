@@ -9,112 +9,40 @@ final class DefaultClipStorage: ClipStorage {
         self.mapper = mapper
     }
 
-    func fetchClip(by id: UUID) async -> Result<Clip, CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
+    func fetchClip(
+        predicate: NSPredicate,
+    ) async -> Result<Clip, CoreDataError> {
+        let result = await fetchClips(predicate: predicate, fetchLimit: 1)
 
-                let request = ClipEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
-                request.fetchLimit = 1
-
-                do {
-                    guard let entity = try context.fetch(request).first else {
-                        print("\(Self.self): ❌ Failed to fetch: Entity not found")
-                        continuation.resume(returning: .failure(.entityNotFound))
-                        return
-                    }
-                    guard let clip = mapper.clip(from: entity) else {
-                        print("\(Self.self): ❌ Failed to fetch: Mapping failed")
-                        continuation.resume(returning: .failure(.mapFailed))
-                        return
-                    }
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(clip))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
+        switch result {
+        case .success(let clips):
+            if let clip = clips.first {
+                return .success(clip)
+            } else {
+                return .failure(.entityNotFound)
             }
+        case .failure(let error):
+            return .failure(error)
         }
     }
 
-    func fetchAllClips() async -> Result<[Clip], CoreDataError> {
+    func fetchClips(
+        predicate: NSPredicate,
+        fetchLimit: Int,
+    ) async -> Result<[Clip], CoreDataError> {
         await withCheckedContinuation { continuation in
             container.performBackgroundTask { [weak self] context in
                 guard let self else { return }
 
                 let request = ClipEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "deletedAt == nil")
+                request.predicate = predicate
+                request.fetchLimit = fetchLimit
 
                 do {
                     let entities = try context.fetch(request)
-                    let allClips = entities.compactMap(mapper.clip)
+                    let clips = entities.compactMap(mapper.clip)
                     print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(allClips))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
-            }
-        }
-    }
-
-    func fetchTopLevelClips() async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
-
-                let request = ClipEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
-
-                do {
-                    let entities = try context.fetch(request)
-                    let topLevelClips = entities.compactMap(mapper.clip)
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(topLevelClips))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
-            }
-        }
-    }
-
-    func fetchUnvisitedClips() async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
-
-                let request = ClipEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
-
-                do {
-                    let entities = try context.fetch(request)
-                    let unvisitedClips = entities.compactMap(mapper.clip)
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(unvisitedClips))
-                } catch {
-                    print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
-                    continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))
-                }
-            }
-        }
-    }
-
-    func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], CoreDataError> {
-        await withCheckedContinuation { continuation in
-            container.performBackgroundTask { [weak self] context in
-                guard let self else { return }
-
-                let request = ClipEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id IN %@ AND deletedAt == nil", ids)
-
-                do {
-                    let entities = try context.fetch(request)
-                    let recentVisitedClips = entities.compactMap(mapper.clip)
-                    print("\(Self.self): ✅ Fetch successfully")
-                    continuation.resume(returning: .success(recentVisitedClips))
+                    continuation.resume(returning: .success(clips))
                 } catch {
                     print("\(Self.self): ❌ Failed to fetch: \(error.localizedDescription)")
                     continuation.resume(returning: .failure(.fetchFailed(error.localizedDescription)))

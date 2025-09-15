@@ -16,10 +16,12 @@ final class DefaultClipRepository: ClipRepository {
                 return .failure(.entityNotFound)
             }
             return .success(clip)
-        } else {
-            return await storage.fetchClip(by: id)
-                .mapError { _ in .fetchFailed }
         }
+
+        let predicate = NSPredicate(format: "id == %@ AND deletedAt == nil", id as CVarArg)
+
+        return await storage.fetchClip(predicate: predicate)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchAllClips() async -> Result<[Clip], DomainError> {
@@ -27,10 +29,12 @@ final class DefaultClipRepository: ClipRepository {
            await cache.isClipsInitialized {
             let clips = await cache.clips()
             return .success(clips.filter { $0.deletedAt == nil })
-        } else {
-            return await storage.fetchAllClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        let predicate = NSPredicate(format: "deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchTopLevelClips() async -> Result<[Clip], DomainError> {
@@ -40,10 +44,12 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 $0.folderID == nil && $0.deletedAt == nil
             })
-        } else {
-            return await storage.fetchTopLevelClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        let predicate = NSPredicate(format: "folder == nil AND deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchUnvisitedClips() async -> Result<[Clip], DomainError> {
@@ -53,10 +59,12 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 $0.lastVisitedAt == nil && $0.deletedAt == nil
             })
-        } else {
-            return await storage.fetchUnvisitedClips()
-                .mapError { _ in .fetchFailed }
         }
+
+        let predicate = NSPredicate(format: "lastVisitedAt == nil AND deletedAt == nil")
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
+            .mapError { _ in .fetchFailed }
     }
 
     func fetchRecentVisitedClips(for ids: [UUID]) async -> Result<[Clip], DomainError> {
@@ -66,10 +74,12 @@ final class DefaultClipRepository: ClipRepository {
             return .success(clips.filter {
                 ids.contains($0.id)
             })
-        } else {
-            return await storage.fetchRecentVisitedClips(for: ids)
-                .mapError { _ in .fetchFailed }
         }
+
+        let predicate = NSPredicate(format: "id IN %@ AND deletedAt == nil", ids)
+
+        return await storage.fetchClips(predicate: predicate, fetchLimit: 0)
+            .mapError { _ in .fetchFailed }
     }
 
     func insertClip(_ clip: Clip) async -> Result<Void, DomainError> {
