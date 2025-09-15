@@ -174,6 +174,43 @@ final class EditClipReactorTests: XCTestCase {
         XCTAssertFalse(reactor.currentState.isLoading)
     }
 
+    func test_extractURL_성공() {
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.extractedURL)
+            .compactMap { $0 }
+            .subscribe { url in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        let url = URL(string: "www.google.com")!
+        extractURLUseCase.executeResult = .success(url)
+        reactor.action.onNext(.extractURLFromPasteboard)
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(reactor.currentState.extractedURL, url)
+        XCTAssertFalse(reactor.currentState.isShowKeyboard)
+    }
+
+    func test_extractURL_실패() {
+        let expectation = expectation(description: #function)
+
+        reactor.state.map(\.extractedURL)
+            .compactMap { $0 }
+            .subscribe { url in
+                expectation.fulfill()
+            }
+            .disposed(by: disposeBag)
+
+        extractURLUseCase.executeResult = .failure(.failedExtractURL)
+        reactor.action.onNext(.extractURLFromPasteboard)
+
+        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(reactor.currentState.extractedURL, nil)
+        XCTAssertTrue(reactor.currentState.isShowKeyboard)
+    }
+
     func test_editingURLTextField_isLoading이_true() {
         reactor.action.onNext(.editingURLTextField)
 
