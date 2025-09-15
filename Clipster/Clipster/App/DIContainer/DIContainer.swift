@@ -81,6 +81,10 @@ final class DIContainer {
         DefaultUserDefaultsRepository(userDefaults: userDefaults)
     }
 
+    func makePasteboardRepository() -> PasteboardRepository {
+        DefaultPasteboardRepository()
+    }
+
     func makeCheckLoginStatusUseCase() -> CheckLoginStatusUseCase {
         DefaultCheckLoginStatusUseCase(authRepository: makeAuthRepository())
     }
@@ -275,6 +279,10 @@ final class DIContainer {
         DefaultUpdateHasSeenOnboardingUseCase(userDefaultsRepository: makeUserDefaultsRepository())
     }
 
+    func makeExtractURLFromPasteboardUseCase() -> ExtractURLFromPasteboardUseCase {
+        DefaultExtractURLUseCase(pasteboardRepository: makePasteboardRepository())
+    }
+
     func makeClipDetailReactor(clip: Clip) -> ClipDetailReactor {
         ClipDetailReactor(
             fetchFolderUseCase: makeFetchFolderUseCase(),
@@ -290,7 +298,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 
@@ -301,7 +310,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 
@@ -312,7 +322,8 @@ final class DIContainer {
             sanitizeURLUseCase: makeSanitizeURLUseCase(),
             fetchFolderUseCase: makeFetchFolderUseCase(),
             createClipUseCase: makeCreateClipUseCase(),
-            updateClipUseCase: makeUpdateClipUseCase()
+            updateClipUseCase: makeUpdateClipUseCase(),
+            extractURLFromPasteboardUseCase: makeExtractURLFromPasteboardUseCase()
         )
     }
 

@@ -151,6 +151,17 @@ extension EditClipViewController: View {
                 editClipView.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
             }
             .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.isShowKeyboard)
+            .filter { $0 }
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] in
+                guard let self, case .next = $0 else { return }
+                editClipView.urlView.urlTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
     }
 
     private func bindState(from reactor: EditClipReactor) {
@@ -176,21 +187,25 @@ extension EditClipViewController: View {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { ($0.type, $0.shouldReadPastedboardURL) }
+            .map { ($0.type, $0.isViewDidAppear) }
             .filter { $0.0 == .create && $0.1 }
             .take(1)
-            .subscribe { [weak self] in
-                guard let self else { return }
-                if case .next = $0 {
-                    if UIPasteboard.general.hasURLs, let url = UIPasteboard.general.url {
-                        reactor.action.onNext(.editingURLTextField)
-                        reactor.action.onNext(.editURLTextField(url.absoluteString))
-                        reactor.action.onNext(.validifyURL(url.absoluteString))
-                    } else {
-                        editClipView.urlView.urlTextField.becomeFirstResponder()
-                    }
-                    UIPasteboard.general.url = nil
-                }
+            .observe(on: MainScheduler.asyncInstance)
+            .map { _ in Reactor.Action.extractURLFromPasteboard }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map { ($0.extractedURL, $0.type, $0.isViewDidAppear) }
+            .filter { $0.1 == .create && $0.2 }
+            .compactMap { $0.0 }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { url in
+                reactor.action.onNext(.editingURLTextField)
+                reactor.action.onNext(.editURLTextField(url.absoluteString))
+                reactor.action.onNext(.validifyURL(url.absoluteString))
             }
             .disposed(by: disposeBag)
 

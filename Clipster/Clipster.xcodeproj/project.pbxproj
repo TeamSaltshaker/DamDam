@@ -96,6 +96,7 @@
 				Data/Repository/UserDefaults/DefaultUserDefaultsRepository.swift,
 				Data/Util/Mapper/DomainMapper.swift,
 				Domain/Error/DomainError.swift,
+				Domain/Error/PasteboardError.swift,
 				Domain/Error/URLValidationError.swift,
 				Domain/Model/Entity/Clip.swift,
 				Domain/Model/Entity/Folder.swift,

@@ -18,6 +18,8 @@ final class EditClipReactor: Reactor {
         case changeFolder(Folder?)
         case saveClip
         case disappearFolderSelectorView
+        case extractURLFromPasteboard
+        case showKeyboard
     }
 
     enum Mutation {
@@ -29,7 +31,9 @@ final class EditClipReactor: Reactor {
         case updateCurrentFolder(Folder?)
         case updateIsSuccessedEditClip(Bool)
         case updateIsLoading(Bool)
-        case updateShouldReadPastedboardURL(Bool)
+        case updateIsViewDidAppear(Bool)
+        case updateExtractedURL(URL?)
+        case updateIsShowKeyboard(Bool)
     }
 
     struct State {
@@ -43,7 +47,9 @@ final class EditClipReactor: Reactor {
         var isLoading = false
         var isTappedFolderView: Bool = false
         var isSuccessedEditClip: Bool = false
-        var shouldReadPastedboardURL: Bool = false
+        var isViewDidAppear: Bool = false
+        var extractedURL: URL?
+        var isShowKeyboard: Bool = false
 
         var navigationTitle: String {
             type == .create ? "클립 추가" : "클립 수정"
@@ -109,6 +115,7 @@ final class EditClipReactor: Reactor {
     private let fetchFolderUseCase: FetchFolderUseCase
     private let createClipUseCase: CreateClipUseCase
     private let updateClipUseCase: UpdateClipUseCase
+    private let extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
 
     #if DEBUG
     init(
@@ -119,7 +126,8 @@ final class EditClipReactor: Reactor {
         sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
-        updateClipUseCase: UpdateClipUseCase
+        updateClipUseCase: UpdateClipUseCase,
+        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
     ) {
         self.initialState = State(
             type: type,
@@ -131,6 +139,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
+        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
     }
     #endif
 
@@ -140,7 +149,8 @@ final class EditClipReactor: Reactor {
         sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
-        updateClipUseCase: UpdateClipUseCase
+        updateClipUseCase: UpdateClipUseCase,
+        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
     ) {
         self.initialState = State(
             type: .create,
@@ -151,6 +161,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
+        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
     }
 
     init(
@@ -159,7 +170,8 @@ final class EditClipReactor: Reactor {
         sanitizeURLUseCase: SanitizeURLUseCase,
         fetchFolderUseCase: FetchFolderUseCase,
         createClipUseCase: CreateClipUseCase,
-        updateClipUseCase: UpdateClipUseCase
+        updateClipUseCase: UpdateClipUseCase,
+        extractURLFromPasteboardUseCase: ExtractURLFromPasteboardUseCase
     ) {
         self.initialState = State(
             type: .edit,
@@ -172,6 +184,7 @@ final class EditClipReactor: Reactor {
         self.fetchFolderUseCase = fetchFolderUseCase
         self.createClipUseCase = createClipUseCase
         self.updateClipUseCase = updateClipUseCase
+        self.extractURLFromPasteboardUseCase = extractURLFromPasteboardUseCase
     }
 
     func transform(action: Observable<Action>) -> Observable<Action> {
@@ -284,7 +297,19 @@ final class EditClipReactor: Reactor {
         case .disappearFolderSelectorView:
             return .just(.updateIsTappedFolderView(false))
         case .viewDidAppear:
-            return .just(.updateShouldReadPastedboardURL(true))
+            return .just(.updateIsViewDidAppear(true))
+        case .extractURLFromPasteboard:
+            return .fromAsync { [weak self] in
+                guard let self else { return Observable<Mutation>.just(.updateExtractedURL(nil)) }
+                let pastedURL = try await extractURLFromPasteboardUseCase.execute().get()
+                return .just(Mutation.updateExtractedURL(pastedURL))
+            }
+            .flatMap { $0 }
+            .catch { _ in
+                .just(Mutation.updateIsShowKeyboard(true))
+            }
+        case .showKeyboard:
+            return .just(.updateIsShowKeyboard(true))
         }
     }
 
@@ -308,8 +333,12 @@ final class EditClipReactor: Reactor {
             newState.isSuccessedEditClip = value
         case .updateIsLoading(let value):
             newState.isLoading = value
-        case .updateShouldReadPastedboardURL(let value):
-            newState.shouldReadPastedboardURL = value
+        case .updateIsViewDidAppear(let value):
+            newState.isViewDidAppear = value
+        case .updateExtractedURL(let url):
+            newState.extractedURL = url
+        case .updateIsShowKeyboard(let value):
+            newState.isShowKeyboard = value
         }
         return newState
     }

@@ -83,7 +83,7 @@ final class EditClipReactorTests: XCTestCase {
 
     func test_viewDidAppear() {
         reactor.action.onNext(.viewDidAppear)
-        XCTAssertEqual(reactor.currentState.shouldReadPastedboardURL, true)
+        XCTAssertEqual(reactor.currentState.isViewDidAppear, true)
     }
 
     func test_url_입력했을_때_공백_제거() {
