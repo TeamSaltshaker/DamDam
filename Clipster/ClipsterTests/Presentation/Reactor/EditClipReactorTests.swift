@@ -190,6 +190,7 @@ final class EditClipReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(reactor.currentState.extractedURL, url)
+        XCTAssertTrue(extractURLUseCase.didCallExecute)
         XCTAssertFalse(reactor.currentState.isShowKeyboard)
     }
 
@@ -197,7 +198,6 @@ final class EditClipReactorTests: XCTestCase {
         let expectation = expectation(description: #function)
 
         reactor.state.map(\.extractedURL)
-            .compactMap { $0 }
             .subscribe { url in
                 expectation.fulfill()
             }
@@ -208,6 +208,7 @@ final class EditClipReactorTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(reactor.currentState.extractedURL, nil)
+        XCTAssertTrue(extractURLUseCase.didCallExecute)
         XCTAssertTrue(reactor.currentState.isShowKeyboard)
     }
 
