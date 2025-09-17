@@ -439,7 +439,7 @@ final class DIContainer {
         )
     }
 
-    func makeDDWebReactor() -> DDWebReactor {
-        DDWebReactor()
+    func makeDDWebReactor(url: URL) -> DDWebReactor {
+        DDWebReactor(url: url)
     }
 }

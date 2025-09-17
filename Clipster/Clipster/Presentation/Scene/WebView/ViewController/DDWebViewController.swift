@@ -7,10 +7,8 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
 
     var disposeBag = DisposeBag()
     private let ddWebView = DDWebView()
-    private let url: URL
 
-    init(reactor: DDWebReactor, url: URL) {
-        self.url = url
+    init(reactor: DDWebReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -26,15 +24,14 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let request = URLRequest(url: url)
-        ddWebView.webView.load(request)
+        reactor?.action.onNext(.viewDidLoad)
     }
 }
 
 extension DDWebViewController: View {
     func bind(reactor: DDWebReactor) {
         bindUI(to: reactor)
+        bindState(to: reactor)
     }
 
     private func bindUI(to reactor: DDWebReactor) {
@@ -44,6 +41,17 @@ extension DDWebViewController: View {
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+    }
+
+    private func bindState(to reactor: DDWebReactor) {
+        reactor.state
+            .map(\.isViewDidLoad)
+            .filter { $0 }
+            .subscribe { [weak self] _ in
+                let request = URLRequest(url: reactor.currentState.url)
+                self?.ddWebView.webView.load(request)
             }
             .disposed(by: disposeBag)
     }

@@ -2,19 +2,40 @@ import Foundation
 import ReactorKit
 
 final class DDWebReactor: Reactor {
-    enum Action {}
+    enum Action {
+        case viewDidLoad
+    }
 
-    enum Mutation {}
+    enum Mutation {
+        case updateViewDidLoad
+    }
 
-    struct State {}
+    struct State {
+        let url: URL
+        var isViewDidLoad = false
+    }
 
     var initialState: State
 
-    init() {
-        self.initialState = State()
+    init(url: URL) {
+        initialState = State(url: url)
     }
 
-    func mutate(action: Action) -> Observable<Mutation> {}
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .viewDidLoad:
+                .just(.updateViewDidLoad)
+        }
+    }
 
-    func reduce(state: State, mutation: Mutation) -> State {}
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+
+        switch mutation {
+        case .updateViewDidLoad:
+            newState.isViewDidLoad = true
+        }
+
+        return newState
+    }
 }

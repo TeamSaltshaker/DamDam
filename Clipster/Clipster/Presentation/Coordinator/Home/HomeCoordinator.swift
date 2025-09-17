@@ -72,8 +72,8 @@ extension HomeCoordinator {
     }
 
     func showWebView(url: URL) {
-        let reactor = diContainer.makeDDWebReactor()
-        let webVC = DDWebViewController(reactor: reactor, url: url)
+        let reactor = diContainer.makeDDWebReactor(url: url)
+        let webVC = DDWebViewController(reactor: reactor)
         navigationController.pushViewController(webVC, animated: true)
     }
 
