@@ -72,7 +72,7 @@ extension HomeCoordinator {
     }
 
     func showWebView(url: URL) {
-        let webVC = WebViewController(url: url)
+        let webVC = DDWebViewController(url: url)
         navigationController.pushViewController(webVC, animated: true)
     }
 
