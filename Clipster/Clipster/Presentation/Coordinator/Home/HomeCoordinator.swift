@@ -73,8 +73,7 @@ extension HomeCoordinator {
 
     func showWebView(url: URL) {
         let webVC = WebViewController(url: url)
-        webVC.modalPresentationStyle = .overFullScreen
-        navigationController.present(webVC, animated: true)
+        navigationController.pushViewController(webVC, animated: true)
     }
 
     func showFolderSelectorForClip(
