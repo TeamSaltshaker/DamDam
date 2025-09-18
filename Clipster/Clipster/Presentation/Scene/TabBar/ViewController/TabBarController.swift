@@ -12,6 +12,12 @@ final class TabBarViewController: UIViewController {
 
     private var lastTabBarHeight: CGFloat = 0
 
+    private lazy var defaultTabBarHeight: CGFloat = {
+        let baseTabBarHeight: CGFloat = 64
+        let bottomInset = view.safeAreaInsets.bottom
+        return baseTabBarHeight + bottomInset
+    }()
+
     init(coordinator: TabBarCoordinator) {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
@@ -28,15 +34,12 @@ final class TabBarViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let baseTabBarHeight: CGFloat = 64
-        let bottomInset = view.safeAreaInsets.bottom
-        let tabBarHeight = baseTabBarHeight + bottomInset
 
-        guard lastTabBarHeight != tabBarHeight else { return }
+        guard lastTabBarHeight != defaultTabBarHeight else { return }
 
-        lastTabBarHeight = tabBarHeight
+        lastTabBarHeight = defaultTabBarHeight
         tabBarView.snp.updateConstraints { make in
-            make.height.equalTo(tabBarHeight)
+            make.height.equalTo(defaultTabBarHeight)
         }
     }
 
@@ -60,6 +63,18 @@ final class TabBarViewController: UIViewController {
 
     func updateSelectedTab(_ item: TabItem) {
         tabBarView.updateSelectedTab(item)
+    }
+
+    func hideTabBar() {
+        tabBarView.snp.updateConstraints { make in
+            make.height.equalTo(0)
+        }
+    }
+
+    func showTabBar() {
+        tabBarView.snp.updateConstraints { make in
+            make.height.equalTo(defaultTabBarHeight)
+        }
     }
 }
 

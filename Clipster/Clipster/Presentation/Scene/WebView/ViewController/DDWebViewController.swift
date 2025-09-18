@@ -5,6 +5,7 @@ import WebKit
 final class DDWebViewController: UIViewController, WKUIDelegate {
     typealias Reactor = DDWebReactor
 
+    var showTabBar: (() -> Void)?
     var disposeBag = DisposeBag()
     private let ddWebView = DDWebView()
 
@@ -25,6 +26,11 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         reactor?.action.onNext(.viewDidLoad)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        showTabBar?()
     }
 }
 
