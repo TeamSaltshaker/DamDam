@@ -54,6 +54,7 @@ extension MyPageCoordinator {
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
             sheet.detents = [.custom { _ in 290 }]
+            sheet.prefersGrabberVisible = true
         }
 
         navigationController.present(vc, animated: true)

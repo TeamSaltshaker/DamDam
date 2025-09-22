@@ -19,13 +19,6 @@ final class SingleOptionSelectorViewController<Option: SelectableOption>: UIView
         return view
     }()
 
-    private let grabberView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .textPrimary
-        view.layer.cornerRadius = 2.5
-        return view
-    }()
-
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .textPrimary
@@ -121,7 +114,6 @@ private extension SingleOptionSelectorViewController {
     func setHierarchy() {
         [
             baseBackgroundView,
-            grabberView,
             titleLabel,
             separatorView,
             tableView
@@ -133,15 +125,8 @@ private extension SingleOptionSelectorViewController {
             make.edges.equalToSuperview()
         }
 
-        grabberView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(8)
-            make.width.equalTo(134)
-            make.height.equalTo(5)
-            make.centerX.equalToSuperview()
-        }
-
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(grabberView.snp.bottom).offset(8)
+            make.top.equalToSuperview().inset(8)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(48)
         }
