@@ -16,6 +16,7 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
 
     deinit {
         ddWebView.webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        ddWebView.webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
     }
 
     required init?(coder: NSCoder) {
@@ -31,6 +32,7 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
         super.viewDidLoad()
         reactor?.action.onNext(.viewDidLoad)
         ddWebView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        ddWebView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -76,6 +78,10 @@ extension DDWebViewController: UIGestureRecognizerDelegate {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             ddWebView.setProgress(progress: ddWebView.webView.estimatedProgress)
+        } else if keyPath == "title" {
+            if let newTitle = change?[.newKey] as? String {
+                ddWebView.commonNavigationView.setTitle(newTitle)
+            }
         }
     }
 }
