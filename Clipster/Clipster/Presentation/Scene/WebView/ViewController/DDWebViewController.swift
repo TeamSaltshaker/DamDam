@@ -14,6 +14,10 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
         self.reactor = reactor
     }
 
+    deinit {
+        ddWebView.webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -26,6 +30,7 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         reactor?.action.onNext(.viewDidLoad)
+        ddWebView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -66,5 +71,11 @@ extension DDWebViewController: View {
 extension DDWebViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            ddWebView.setProgress(progress: ddWebView.webView.estimatedProgress)
+        }
     }
 }

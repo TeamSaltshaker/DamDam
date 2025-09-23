@@ -24,7 +24,7 @@ final class DDWebReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-                .just(.updateViewDidLoad)
+            return .just(.updateViewDidLoad)
         }
     }
 
