@@ -35,11 +35,6 @@ final class SearchViewController: UIViewController, View {
         reactor?.action.onNext(.viewWillAppear)
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        searchView.searchTextField.becomeFirstResponder()
-    }
-
     func bind(reactor: Reactor) {
         bindAction(to: reactor)
         bindState(from: reactor)
