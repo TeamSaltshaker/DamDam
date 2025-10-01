@@ -35,6 +35,11 @@ final class DDWebViewController: UIViewController, WKUIDelegate {
         ddWebView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         showTabBar?()
@@ -62,6 +67,8 @@ extension DDWebViewController: View {
         reactor.state
             .map(\.isViewDidLoad)
             .filter { $0 }
+            .take(1)
+            .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 let request = URLRequest(url: reactor.currentState.url)
                 self?.ddWebView.webView.load(request)
@@ -72,7 +79,7 @@ extension DDWebViewController: View {
 
 extension DDWebViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        true
+        !ddWebView.webView.canGoBack
     }
 }
 

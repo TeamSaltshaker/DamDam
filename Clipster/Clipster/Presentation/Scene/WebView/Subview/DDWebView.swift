@@ -16,11 +16,12 @@ final class DDWebView: UIView {
     lazy var webView: WKWebView = {
         let webViewConfiguration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: webViewConfiguration)
+        webView.allowsBackForwardNavigationGestures = true
         return webView
     }()
 
-    init() {
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configure()
     }
 
