@@ -66,6 +66,14 @@ extension TabBarCoordinator {
             targetNav.popToRootViewController(animated: true)
         }
     }
+
+    func hideTabBar() {
+        tabBarController.hideTabBar()
+    }
+
+    func showTabBar() {
+        tabBarController.showTabBar()
+    }
 }
 
 private extension TabBarCoordinator {

@@ -72,8 +72,15 @@ extension HomeCoordinator {
     }
 
     func showWebView(url: URL) {
-        let safariVC = SFSafariViewController(url: url)
-        navigationController.present(safariVC, animated: true)
+        guard let tabBarCoordinator = parent as? TabBarCoordinator else { return }
+        tabBarCoordinator.hideTabBar()
+
+        let reactor = diContainer.makeDDWebReactor(url: url)
+        let webVC = DDWebViewController(reactor: reactor)
+        webVC.showTabBar = {
+            tabBarCoordinator.showTabBar()
+        }
+        navigationController.pushViewController(webVC, animated: true)
     }
 
     func showFolderSelectorForClip(

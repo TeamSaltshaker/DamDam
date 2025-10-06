@@ -438,4 +438,8 @@ final class DIContainer {
             updateNicknameUseCase: makeUpdateNicknameUseCase()
         )
     }
+
+    func makeDDWebReactor(url: URL) -> DDWebReactor {
+        DDWebReactor(url: url)
+    }
 }
