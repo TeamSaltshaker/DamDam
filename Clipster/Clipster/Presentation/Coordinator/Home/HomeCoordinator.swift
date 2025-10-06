@@ -86,6 +86,7 @@ extension HomeCoordinator {
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
             sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
+            sheet.prefersGrabberVisible = true
         }
         navigationController.present(vc, animated: true)
     }
@@ -101,6 +102,7 @@ extension HomeCoordinator {
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
             sheet.detents = [.custom { $0.maximumDetentValue * 0.75 }]
+            sheet.prefersGrabberVisible = true
         }
         navigationController.present(vc, animated: true)
     }

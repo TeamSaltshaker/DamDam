@@ -7,13 +7,6 @@ final class FolderSelectorView: UIView {
 
     private let baseBackgroundView = UIView()
 
-    private let grabberView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .textPrimary
-        view.layer.cornerRadius = 2.5
-        return view
-    }()
-
     let commonNavigationView: CommonNavigationView = {
         let commonNavigationView = CommonNavigationView()
         commonNavigationView.backgroundColor = .cell
@@ -79,7 +72,7 @@ private extension FolderSelectorView {
     }
 
     func setHierarchy() {
-        [baseBackgroundView, grabberView, commonNavigationView, separator, tableView]
+        [baseBackgroundView, commonNavigationView, separator, tableView]
             .forEach { addSubview($0) }
     }
 
@@ -88,15 +81,8 @@ private extension FolderSelectorView {
             make.edges.equalToSuperview()
         }
 
-        grabberView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(8)
-            make.width.equalTo(134)
-            make.height.equalTo(5)
-            make.centerX.equalToSuperview()
-        }
-
         commonNavigationView.snp.makeConstraints { make in
-            make.top.equalTo(grabberView.snp.bottom).offset(8)
+            make.top.equalToSuperview().inset(8)
             make.directionalHorizontalEdges.equalToSuperview()
         }
 
