@@ -44,9 +44,7 @@ final class OnboardingViewController: UIViewController {
 
     private lazy var skipButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitleColor(.appPrimary, for: .normal)
-        button.setTitle("Skip", for: .normal)
-        button.titleLabel?.font = .pretendard(size: 14, weight: .medium)
+        button.setImage(.xGray.withRenderingMode(.alwaysOriginal), for: .normal)
         button.addTarget(self, action: #selector(didTapStart), for: .touchUpInside)
         return button
     }()
