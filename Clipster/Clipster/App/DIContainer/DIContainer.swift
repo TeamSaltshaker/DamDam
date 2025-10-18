@@ -5,19 +5,16 @@ import Supabase
 final class DIContainer {
     private let container: NSPersistentContainer
     private let supabaseClient: SupabaseClient
-    private let cache: FolderClipCache
     private let userDefaults: UserDefaults
 
     init(
         container: NSPersistentContainer? = nil,
         supabaseURL: URL,
         supabaseKey: String,
-        cache: FolderClipCache,
         userDefaults: UserDefaults
     ) {
         self.container = container ?? CoreDataStack.shared.container
         supabaseClient = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
-        self.cache = cache
         self.userDefaults = userDefaults
     }
 
@@ -58,11 +55,11 @@ final class DIContainer {
     }
 
     func makeClipRepository() -> ClipRepository {
-        DefaultClipRepository(storage: makeClipStorage(), cache: cache)
+        DefaultClipRepository(storage: makeClipStorage())
     }
 
     func makeFolderRepository() -> FolderRepository {
-        DefaultFolderRepository(storage: makeFolderStorage(), cache: cache)
+        DefaultFolderRepository(storage: makeFolderStorage())
     }
 
     func makeURLRepository() -> URLRepository {

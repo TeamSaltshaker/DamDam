@@ -31,13 +31,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let supabaseURLString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String ?? ""
         let supabaseKey = Bundle.main.infoDictionary?["SUPABASE_KEY"] as? String ?? ""
-        let cache = FolderClipCache()
 
         if let supabaseURL = URL(string: supabaseURLString) {
             let diContainer = DIContainer(
                 supabaseURL: supabaseURL,
                 supabaseKey: supabaseKey,
-                cache: cache,
                 userDefaults: userDefaults
             )
 
