@@ -1,7 +1,7 @@
 import UIKit
 
 final class AppCoordinator: Coordinator {
-    private let diContainer: DIContainer
+    private let diContainer: DefaultDIContainer
     private let fetchHasSeenOnboardingUseCase: FetchHasSeenOnboardingUseCase
     private let updateHasSeenOnboardingUseCase: UpdateHasSeenOnboardingUseCase
 
@@ -9,7 +9,7 @@ final class AppCoordinator: Coordinator {
     weak var parent: Coordinator?
     var children: [Coordinator] = []
 
-    init(navigationController: UINavigationController, diContainer: DIContainer) {
+    init(navigationController: UINavigationController, diContainer: DefaultDIContainer) {
         self.navigationController = navigationController
         self.diContainer = diContainer
         self.fetchHasSeenOnboardingUseCase = diContainer.makeFetchHasSeenOnboardingUseCase()

@@ -34,7 +34,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let cache = FolderClipCache()
 
         if let supabaseURL = URL(string: supabaseURLString) {
-            let diContainer = DIContainer(
+            let diContainer = DefaultDIContainer(
                 supabaseURL: supabaseURL,
                 supabaseKey: supabaseKey,
                 cache: cache,
