@@ -42,11 +42,9 @@ final class OnboardingViewController: UIViewController {
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>?
 
-    private lazy var skipButton: UIButton = {
+    private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitleColor(.appPrimary, for: .normal)
-        button.setTitle("Skip", for: .normal)
-        button.titleLabel?.font = .pretendard(size: 14, weight: .medium)
+        button.setImage(.xGray.withRenderingMode(.alwaysOriginal), for: .normal)
         button.addTarget(self, action: #selector(didTapStart), for: .touchUpInside)
         return button
     }()
@@ -144,14 +142,14 @@ private extension OnboardingViewController {
 
     func setHierarchy() {
         [
-            skipButton,
+            closeButton,
             collectionView,
             pageControl
         ].forEach { view.addSubview($0) }
     }
 
     func setConstraints() {
-        skipButton.snp.makeConstraints { make in
+        closeButton.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).inset(14)
             make.trailing.equalToSuperview().inset(24)
         }
@@ -163,7 +161,7 @@ private extension OnboardingViewController {
         }
 
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(skipButton.snp.bottom).offset(14)
+            make.top.equalTo(closeButton.snp.bottom).offset(14)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalTo(pageControl.snp.top).offset(-24)
         }
