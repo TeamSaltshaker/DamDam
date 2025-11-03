@@ -27,7 +27,7 @@ final class ShareDIContainer {
     }
 
     func makeClipRepository() -> ClipRepository {
-        DefaultClipRepository(storage: makeClipStorage(), cache: nil)
+        DefaultClipRepository(storage: makeClipStorage())
     }
 
     func makeCreateClipUseCase() -> CreateClipUseCase {
@@ -60,7 +60,7 @@ final class ShareDIContainer {
     }
 
     func makeFolderRepository() -> FolderRepository {
-        DefaultFolderRepository(storage: makeFolderStorage(), cache: nil)
+        DefaultFolderRepository(storage: makeFolderStorage())
     }
 
     func makeUserDefaultsRepository() -> UserDefaultsRepository {

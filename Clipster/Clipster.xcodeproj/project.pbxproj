@@ -78,7 +78,6 @@
 			membershipExceptions = (
 				Data/Error/CoreDataError.swift,
 				Data/Error/DatabaseError.swift,
-				Data/Model/Cache/FolderClipCache.swift,
 				Data/Model/Network/UserDTO.swift,
 				Data/Model/Persistence/CoreData/ClipEntity.swift,
 				Data/Model/Persistence/CoreData/Clipster.xcdatamodeld,
